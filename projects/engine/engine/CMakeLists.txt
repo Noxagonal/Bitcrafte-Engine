@@ -1,0 +1,18 @@
+
+# Core
+
+cmake_minimum_required(VERSION 3.22)
+
+get_auto_target_name(THIS_TARGET_NAME)
+
+if(BITCRAFTE_BUILD_SHARED_ENGINE)
+	set(ENGINE_OUTPUT_TYPE SHARED_LIBRARY)
+else()
+	set(ENGINE_OUTPUT_TYPE STATIC_LIBRARY)
+endif()
+
+add_engine_component(${THIS_TARGET_NAME}
+	${ENGINE_OUTPUT_TYPE}
+	PUBLIC_LIBRARY_DEPENDENCIES
+		core
+)
