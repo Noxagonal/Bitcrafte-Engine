@@ -1,4 +1,6 @@
 
+#include <editor/PreCompiledHeader.hpp>
+
 #include <editor/entrypoint/Main.hpp>
 
 
@@ -8,5 +10,8 @@ int main(
 	char		**	argument_strings
 )
 {
+	auto engine_editor = bc::editor::EditorComponent();
+	engine_editor.Run();
+
     return 0;
 }
