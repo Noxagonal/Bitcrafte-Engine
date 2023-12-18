@@ -727,7 +727,6 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Append( other );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -736,7 +735,6 @@ public:
 	) noexcept
 	{
 		this->SwapOther( std::move( other ) );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -746,7 +744,6 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
 		this->Append( init_list );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -756,7 +753,6 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Append( other );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -766,7 +762,6 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ) );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -776,7 +771,6 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ) );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -786,7 +780,6 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->FillBack( fill_with_character, initialize_with_size );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -798,7 +791,6 @@ public:
 
 		this->Clear();
 		this->Append( other );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 		return *this;
 	}
 
@@ -808,7 +800,6 @@ public:
 	) noexcept
 	{
 		this->SwapOther( std::move( other ) );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 		return *this;
 	}
 
@@ -820,7 +811,6 @@ public:
 	{
 		this->Clear();
 		this->Append( init_list );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 		return *this;
 	}
 
@@ -840,7 +830,6 @@ public:
 
 		this->Clear();
 		this->Append( other );
-		assert( this->data_size == 0 || this->data_size < this->data_capacity && "data capacity must always be larger than size for a text object" );
 		return *this;
 	}
 
