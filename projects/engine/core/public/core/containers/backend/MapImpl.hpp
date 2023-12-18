@@ -371,10 +371,10 @@ public:
 	using ThisContainerType					= BC_CONTAINER_NAME( MapViewBase )<OtherKeyType, OtherValueType, IsOtherConst>;
 	using ThisType							= ThisContainerType<KeyType, ValueType, IsConst>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst = true>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( MapViewBase )<OtherKeyType, OtherValueType, IsOtherConst>;
 
-	template<bool IsOtherConst = true>
+	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<KeyType, ValueType, IsOtherConst>;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType>
@@ -748,10 +748,10 @@ public:
 	using ThisContainerType					= BC_CONTAINER_NAME( Map )<OtherKeyType, OtherValueType>;
 	using ThisType							= ThisContainerType<KeyType, ValueType>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst = true>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( MapViewBase )<OtherKeyType, OtherValueType, IsOtherConst>;
 
-	template<bool IsOtherConst = true>
+	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<KeyType, ValueType, IsOtherConst>;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType>

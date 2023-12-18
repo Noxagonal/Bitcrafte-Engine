@@ -42,10 +42,10 @@ public:
 	using ThisContainerType					= BC_CONTAINER_NAME( ListViewBase )<OtherValueType, IsOtherConst>;
 	using ThisType							= ThisContainerType<ValueType, IsDataConst>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst = true>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( ListViewBase )<OtherValueType, IsOtherConst>;
 
-	template<bool IsOtherConst = true>
+	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<ValueType, IsOtherConst>;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
@@ -63,7 +63,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class ListIteratorBase;
+	friend class BC_CONTAINER_NAME( ListIteratorBase );
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( ListViewBase );
@@ -77,13 +77,13 @@ private:
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( ListViewBase )() BC_CONTAINER_NOEXCEPT = default;
+	constexpr BC_CONTAINER_NAME( ListViewBase )() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( container_bases::IsConstConvertible<IsDataConst, IsOtherConst> )
+	) noexcept requires( container_bases::IsConstConvertible<IsDataConst, IsOtherConst> )
 		:
 		Base(
 			other.Data(),
@@ -95,7 +95,7 @@ public:
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		const ValueType																				*	from_data,
 		size_t																							size
-	) BC_CONTAINER_NOEXCEPT requires( IsDataConst == true )
+	) noexcept requires( IsDataConst == true )
 		:
 		Base(
 			from_data,
@@ -107,7 +107,7 @@ public:
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		ValueType																					*	from_data,
 		size_t																							size
-	) BC_CONTAINER_NOEXCEPT requires( IsDataConst == false )
+	) noexcept requires( IsDataConst == false )
 		:
 		Base(
 			from_data,
@@ -119,7 +119,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( ListViewBase )														&	operator=(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( container_bases::IsConstConvertible<IsDataConst, IsOtherConst> )
+	) noexcept requires( container_bases::IsConstConvertible<IsDataConst, IsOtherConst> )
 	{
 		this->data_ptr = other.Data();
 		this->data_size = other.Size();
@@ -138,7 +138,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr bool																						operator==(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) const BC_CONTAINER_NOEXCEPT
+	) const noexcept
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
@@ -157,7 +157,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr bool																						operator!=(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) const BC_CONTAINER_NOEXCEPT
+	) const noexcept
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
@@ -184,10 +184,10 @@ public:
 	using ThisContainerType					= BC_CONTAINER_NAME( List )<OtherValueType>;
 	using ThisType							= ThisContainerType<ValueType>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst = true>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( ListViewBase )<OtherValueType, IsOtherConst>;
 
-	template<bool IsOtherConst = true>
+	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<ValueType, IsOtherConst>;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
@@ -219,7 +219,7 @@ private:
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( List )() BC_CONTAINER_NOEXCEPT = default;
+	constexpr BC_CONTAINER_NAME( List )() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )(

@@ -122,7 +122,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>					&	operator++() BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, "Tried using iterator that points to nothing" );
+		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
 		BC_ContainerAssert( this->data + 1 <= this->container->data_ptr + this->container->data_size,
 			U"Tried to increment iterator past end",
@@ -305,7 +305,7 @@ private:
 ///
 /// @tparam IsConst
 ///	Tells if the data should be kept read only. true if data should be read only or false if data is allowed to be modified.
-template<BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst = true>
+template<BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst>
 class BC_CONTAINER_NAME( LinearContainerViewBase )
 {
 public:
