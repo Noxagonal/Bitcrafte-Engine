@@ -247,7 +247,7 @@ inline const SystemMemoryAllocationInfo				*	GetSystemMemoryAllocationInfoFromRa
 
 	auto raw_location_bytes = reinterpret_cast<uint8_t*>( raw_location );
 
-	auto allocation_info = reinterpret_cast<SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof(SystemMemoryAllocationInfo) );
+	auto allocation_info = reinterpret_cast<SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
 
 	#if BITCRAFTE_DEVELOPMENT_BUILD
 	auto allocation_info_checksum = CalculateSystemMemoryAllocationInfoInfoChecksum( *allocation_info );
