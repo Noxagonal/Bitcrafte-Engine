@@ -298,6 +298,8 @@ protected:
 		size_t				element_count
 	) const noexcept
 	{
+		if( location == nullptr ) return;
+
 		if( std::is_constant_evaluated() )
 		{
 			// Assert some common Visual studio fault addresses.
@@ -307,10 +309,8 @@ protected:
 			BHardAssert( location != reinterpret_cast<Type*>( 0xCCCCCCCCCCCCCCCC ), "Freeing uninitialized stack memory" );
 		}
 
-		BHardAssert( location != nullptr, "Freeing memory, location is nullptr" );
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Freeing memory, element count too high, something is not right" );
 
-		if( location == nullptr ) return;
 		memory::FreeMemory<Type>( location, element_count );
 	}
 };
