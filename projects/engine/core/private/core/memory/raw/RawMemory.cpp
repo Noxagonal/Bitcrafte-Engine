@@ -38,7 +38,7 @@ void * bc::memory::internal::AllocateRawMemory_Runtime(
 	auto system_allocation_info = CalculateSystemMemoryAllocationInfoFromSystemAllocation(
 		system_ptr,
 		minimum_required_allocation_size,
-		size,
+		size, 
 		alignment_requirement
 	);
 	SetSystemMemoryAllocationInfo( system_allocation_info );

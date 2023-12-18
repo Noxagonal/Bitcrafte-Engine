@@ -186,7 +186,7 @@ inline SystemMemoryAllocationInfo						CalculateSystemMemoryAllocationInfoFromSy
 	allocation_info.system_allocated_location		= system_allocated_location;
 	allocation_info.payload_location				= AlignMemoryToRequirement(
 		reinterpret_cast<uint8_t*>( system_allocated_location ) + sizeof( SystemMemoryAllocationInfo ),
-		payload_alignment_requirement
+		std::max( payload_alignment_requirement, alignof( SystemMemoryAllocationInfo ) )
 	);
 	allocation_info.system_allocation_size			= system_allocated_size;
 	allocation_info.payload_size					= payload_size;
