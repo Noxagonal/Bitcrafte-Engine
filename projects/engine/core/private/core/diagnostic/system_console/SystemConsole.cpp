@@ -1,13 +1,8 @@
 
 #include <core/PreCompiledHeader.hpp>
-#include <core/diagnostic/system_console/SystemConsole.hpp>
-#include <core/containers/Map.hpp>
-#include <core/containers/simple/SimpleText.hpp>
-#include <core/conversion/text/utf/UTFConversion.hpp>
 
 #include <iostream>
 #include <sstream>
-#include <mutex>
 
 
 
@@ -30,17 +25,17 @@ const char * PrintRecordColorToCharANSIForegroundColorCode(
 	case bc::diagnostic::PrintRecordColor::DARK_CYAN:			return "36";
 	case bc::diagnostic::PrintRecordColor::DARK_RED:			return "31";
 	case bc::diagnostic::PrintRecordColor::DARK_MAGENTA:		return "35";
-	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:		return "33";
+	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:			return "33";
 	case bc::diagnostic::PrintRecordColor::GRAY:				return "37";
 	case bc::diagnostic::PrintRecordColor::DARK_GRAY:			return "90";
 	case bc::diagnostic::PrintRecordColor::BLUE:				return "94";
 	case bc::diagnostic::PrintRecordColor::GREEN:				return "92";
 	case bc::diagnostic::PrintRecordColor::CYAN:				return "96";
-	case bc::diagnostic::PrintRecordColor::RED:				return "91";
-	case bc::diagnostic::PrintRecordColor::MAGENTA:			return "95";
+	case bc::diagnostic::PrintRecordColor::RED:					return "91";
+	case bc::diagnostic::PrintRecordColor::MAGENTA:				return "95";
 	case bc::diagnostic::PrintRecordColor::YELLOW:				return "93";
 	case bc::diagnostic::PrintRecordColor::WHITE:				return "97";
-	case bc::diagnostic::PrintRecordColor::DEFAULT:			return "37";
+	case bc::diagnostic::PrintRecordColor::DEFAULT:				return "37";
 	}
 	assert( 0 );
 	return "37";
@@ -61,17 +56,17 @@ const char * PrintRecordColorToCharANSIBackgroundColorCode(
 	case bc::diagnostic::PrintRecordColor::DARK_CYAN:			return "46";
 	case bc::diagnostic::PrintRecordColor::DARK_RED:			return "41";
 	case bc::diagnostic::PrintRecordColor::DARK_MAGENTA:		return "45";
-	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:		return "43";
+	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:			return "43";
 	case bc::diagnostic::PrintRecordColor::GRAY:				return "47";
 	case bc::diagnostic::PrintRecordColor::DARK_GRAY:			return "100";
 	case bc::diagnostic::PrintRecordColor::BLUE:				return "104";
 	case bc::diagnostic::PrintRecordColor::GREEN:				return "102";
 	case bc::diagnostic::PrintRecordColor::CYAN:				return "106";
-	case bc::diagnostic::PrintRecordColor::RED:				return "101";
-	case bc::diagnostic::PrintRecordColor::MAGENTA:			return "105";
+	case bc::diagnostic::PrintRecordColor::RED:					return "101";
+	case bc::diagnostic::PrintRecordColor::MAGENTA:				return "105";
 	case bc::diagnostic::PrintRecordColor::YELLOW:				return "103";
 	case bc::diagnostic::PrintRecordColor::WHITE:				return "107";
-	case bc::diagnostic::PrintRecordColor::DEFAULT:			return "40";
+	case bc::diagnostic::PrintRecordColor::DEFAULT:				return "40";
 	}
 	assert( 0 );
 	return "40";
@@ -92,17 +87,17 @@ const wchar_t * PrintRecordColorToWCharANSIForegroundColorCode(
 	case bc::diagnostic::PrintRecordColor::DARK_CYAN:			return L"36";
 	case bc::diagnostic::PrintRecordColor::DARK_RED:			return L"31";
 	case bc::diagnostic::PrintRecordColor::DARK_MAGENTA:		return L"35";
-	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:		return L"33";
+	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:			return L"33";
 	case bc::diagnostic::PrintRecordColor::GRAY:				return L"37";
 	case bc::diagnostic::PrintRecordColor::DARK_GRAY:			return L"90";
 	case bc::diagnostic::PrintRecordColor::BLUE:				return L"94";
 	case bc::diagnostic::PrintRecordColor::GREEN:				return L"92";
 	case bc::diagnostic::PrintRecordColor::CYAN:				return L"96";
-	case bc::diagnostic::PrintRecordColor::RED:				return L"91";
-	case bc::diagnostic::PrintRecordColor::MAGENTA:			return L"95";
+	case bc::diagnostic::PrintRecordColor::RED:					return L"91";
+	case bc::diagnostic::PrintRecordColor::MAGENTA:				return L"95";
 	case bc::diagnostic::PrintRecordColor::YELLOW:				return L"93";
 	case bc::diagnostic::PrintRecordColor::WHITE:				return L"97";
-	case bc::diagnostic::PrintRecordColor::DEFAULT:			return L"37";
+	case bc::diagnostic::PrintRecordColor::DEFAULT:				return L"37";
 	}
 	assert( 0 );
 	return L"37";
@@ -123,17 +118,17 @@ const wchar_t * PrintRecordColorToWCharANSIBackgroundColorCode(
 	case bc::diagnostic::PrintRecordColor::DARK_CYAN:			return L"46";
 	case bc::diagnostic::PrintRecordColor::DARK_RED:			return L"41";
 	case bc::diagnostic::PrintRecordColor::DARK_MAGENTA:		return L"45";
-	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:		return L"43";
+	case bc::diagnostic::PrintRecordColor::DARK_YELLOW:			return L"43";
 	case bc::diagnostic::PrintRecordColor::GRAY:				return L"47";
 	case bc::diagnostic::PrintRecordColor::DARK_GRAY:			return L"100";
 	case bc::diagnostic::PrintRecordColor::BLUE:				return L"104";
 	case bc::diagnostic::PrintRecordColor::GREEN:				return L"102";
 	case bc::diagnostic::PrintRecordColor::CYAN:				return L"106";
-	case bc::diagnostic::PrintRecordColor::RED:				return L"101";
-	case bc::diagnostic::PrintRecordColor::MAGENTA:			return L"105";
+	case bc::diagnostic::PrintRecordColor::RED:					return L"101";
+	case bc::diagnostic::PrintRecordColor::MAGENTA:				return L"105";
 	case bc::diagnostic::PrintRecordColor::YELLOW:				return L"103";
 	case bc::diagnostic::PrintRecordColor::WHITE:				return L"107";
-	case bc::diagnostic::PrintRecordColor::DEFAULT:			return L"40";
+	case bc::diagnostic::PrintRecordColor::DEFAULT:				return L"40";
 	}
 	assert( 0 );
 	return L"40";

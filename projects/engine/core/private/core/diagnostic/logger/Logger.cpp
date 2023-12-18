@@ -1,10 +1,5 @@
 
-#include <core/diagnostic/logger/Logger.hpp>
-
-#include <core/diagnostic/system_console/SystemConsole.hpp>
-#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
-
-#include <utility>
+#include <core/PreCompiledHeader.hpp>
 
 
 
@@ -123,7 +118,7 @@ void bc::diagnostic::Logger::PushLogEntry(
 	const LogEntry		&	log_entry
 )
 {
-	assert( log_entry.message.IsFinalized() && "log entry must be finalized before calling this function" );
+	BHardAssert( log_entry.message.IsFinalized(), "Log entry must be finalized before calling this function" );
 
 #if !BITCRAFTE_DEVELOPMENT_BUILD
 	if( log_entry.severity == ReportSeverity::DEBUG ) return;

@@ -1,8 +1,5 @@
 
-#include "PreCompiledHeader.hpp"
-#include <core/CoreComponent.hpp>
-
-#include <core/diagnostic/logger/Logger.hpp>
+#include <core/PreCompiledHeader.hpp>
 
 
 

@@ -1,7 +1,5 @@
 
-#include <core/diagnostic/exception/Exception.hpp>
-
-#include <assert.h>
+#include <core/PreCompiledHeader.hpp>
 
 
 

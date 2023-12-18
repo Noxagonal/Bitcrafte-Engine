@@ -1,12 +1,5 @@
 
-#include <core/diagnostic/thread/ThreadingDebug.hpp>
-
-#include <core/containers/simple/SimpleText.hpp>
-#include <core/containers/Map.hpp>
-#include <core/CoreComponent.hpp>
-#include <core/diagnostic/logger/Logger.hpp>
-#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
-#include <core/conversion/text/primitives/PrimitiveToTextConversion.hpp>
+#include <core/PreCompiledHeader.hpp>
 
 
 
