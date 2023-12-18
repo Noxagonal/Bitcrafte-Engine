@@ -726,7 +726,7 @@ public:
 		const BC_CONTAINER_NAME( TextBase )															&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( other );
+		this->Append( other, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -743,7 +743,7 @@ public:
 		const std::initializer_list<OtherT>															&	init_list
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
-		this->Append( init_list );
+		this->Append( init_list, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -752,7 +752,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( other );
+		this->Append( other, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -761,7 +761,7 @@ public:
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ) );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ), 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -770,7 +770,7 @@ public:
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ) );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ), 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -790,7 +790,7 @@ public:
 		if( &other == this ) return *this;
 
 		this->Clear();
-		this->Append( other );
+		this->Append( other, 1, 0 );
 		return *this;
 	}
 
@@ -810,7 +810,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
 		this->Clear();
-		this->Append( init_list );
+		this->Append( init_list, 1, 0 );
 		return *this;
 	}
 
@@ -829,7 +829,7 @@ public:
 		}
 
 		this->Clear();
-		this->Append( other );
+		this->Append( other, 1, 0 );
 		return *this;
 	}
 
@@ -840,7 +840,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ) );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ), 1, 0 );
 		return *this;
 	}
 
@@ -851,7 +851,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
 		this->Clear();
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ) );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ), 1, 0 );
 		return *this;
 	}
 
@@ -914,8 +914,8 @@ public:
 	{
 		auto result = BC_CONTAINER_NAME( TextBase ) {};
 		result.Reserve( this->data_size + other.Size() );
-		result = *this;
-		result += other;
+		result.Append( *this, 1, 0 );
+		result.Append( other, 1, 0 );
 		return result;
 	}
 
@@ -935,8 +935,8 @@ public:
 	{
 		auto result = BC_CONTAINER_NAME( TextBase ) {};
 		result.Reserve( this->data_size + ArraySize );
-		result = *this;
-		result += BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize );
+		result.Append( *this, 1, 0 );
+		result.Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ), 1, 0 );
 		return result;
 	}
 
@@ -956,8 +956,8 @@ public:
 	{
 		auto result = BC_CONTAINER_NAME( TextBase ) {};
 		result.Reserve( this->data_size + ArraySize );
-		result = *this;
-		result += BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize );
+		result.Append( *this, 1, 0 );
+		result.Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ), 1, 0 );
 		return result;
 	}
 
@@ -974,7 +974,7 @@ public:
 		const BC_CONTAINER_NAME( TextBase )															&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( other );
+		this->Append( other, 1, this->data_size + other.Size() );
 		return *this;
 	}
 
@@ -992,7 +992,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( other );
+		this->Append( other, 1, this->data_size + other.Size() );
 		return *this;
 	}
 
@@ -1010,7 +1010,7 @@ public:
 		const std::initializer_list<OtherT>															&	other
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
-		this->Append( other );
+		this->Append( other, 1, this->data_size + other.Size() );
 		return *this;
 	}
 
@@ -1028,7 +1028,7 @@ public:
 		const OtherContainerType																	&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( other );
+		this->Append( other, 1, this->data_size + other.Size() );
 		return *this;
 	}
 
@@ -1046,7 +1046,7 @@ public:
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ) );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ), 1, this->data_size + ArraySize );
 		return *this;
 	}
 
@@ -1064,8 +1064,7 @@ public:
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
-		auto reserve_space = this->data_size + ArraySize;
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ) );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ), 1, this->data_size + ArraySize );
 		return *this;
 	}
 
@@ -1314,7 +1313,8 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
-		size_t																							count							= 1
+		size_t																							count							= 1,
+		size_t																							headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, typename OtherContainerType::ContainedCharacterType> || std::is_same_v<char, typename OtherContainerType::ContainedCharacterType> )
 	{
 		BC_ContainerAssert( reinterpret_cast<const void*>( at.container ) == reinterpret_cast<const void*>( this ),
@@ -1329,7 +1329,7 @@ public:
 			size_t other_size			= other.Size();
 			size_t total_insert_size	= other_size * count;
 
-			this->ShiftRight( start_index, total_insert_size );
+			this->ShiftRight( start_index, total_insert_size, headroom );
 
 			for( size_t c = 0; c < count; ++c ) {
 				auto it = other.begin();
@@ -1381,10 +1381,11 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const CharacterType( &c_string )[ ArraySize ],
-		size_t																							count							= 1
+		size_t																							count							= 1,
+		size_t																							headroom						= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
-		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> {c_string, ArraySize }, count );
+		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> {c_string, ArraySize }, count, headroom );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1414,17 +1415,19 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const char( &c_string )[ ArraySize ],
-		size_t																							count							= 1
+		size_t																							count							= 1,
+		size_t																							headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
-		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<char, true> {c_string, ArraySize }, count );
+		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<char, true> {c_string, ArraySize }, count, headroom );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<container_bases::TextContainerCharacterType OtherT>
 	void																								Append(
 		const std::initializer_list<OtherT>															&	init_list,
-		size_t																							count							= 1
+		size_t																							count							= 1,
+		size_t																							headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
 		// Cannot use this->Base::Append() because other element type is always allowed to be char which is not necessarily
@@ -1433,7 +1436,7 @@ public:
 		size_t other_size			= init_list.size();
 		size_t total_insert_size	= other_size * count;
 
-		this->ResizeNoConstruct( old_size + total_insert_size, 0 );
+		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
 		for( size_t c = 0; c < count; ++c ) {
 			auto other_it			= init_list.begin();
@@ -1449,7 +1452,8 @@ public:
 	template<container_bases::TextContainerView OtherContainerType>
 	void																								Append(
 		const OtherContainerType																	&	other,
-		size_t																							count							= 1
+		size_t																							count							= 1,
+		size_t																							headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, typename OtherContainerType::ContainedCharacterType> || std::is_same_v<char, typename OtherContainerType::ContainedCharacterType> )
 	{
 		// Cannot use this->Base::Append() because other container element type is always allowed to be char which is not
@@ -1458,7 +1462,7 @@ public:
 		size_t other_size			= other.Size();
 		size_t total_insert_size	= other_size * count;
 
-		this->ResizeNoConstruct( old_size + total_insert_size, 0 );
+		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
 		for( size_t c = 0; c < count; ++c ) {
 			auto other_it			= other.begin();
@@ -1479,10 +1483,11 @@ public:
 	template<size_t ArraySize>
 	constexpr void																						Append(
 		const CharacterType( &c_string )[ ArraySize ],
-		size_t																							count							= 1
+		size_t																							count							= 1,
+		size_t																							headroom						= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize }, count, headroom );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1497,10 +1502,11 @@ public:
 	template<size_t ArraySize>
 	constexpr void																						Append(
 		const char( &c_string )[ ArraySize ],
-		size_t																							count							= 1
+		size_t																							count							= 1,
+		size_t																							headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
+		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize }, count, headroom );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

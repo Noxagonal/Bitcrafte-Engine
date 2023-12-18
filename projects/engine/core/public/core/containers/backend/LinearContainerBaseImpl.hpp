@@ -1424,7 +1424,6 @@ protected:
 
 		if( old_size > 0 )
 		{
-
 			// Construct the values assigned to a newly allocated memory from previous ones.
 			for( size_t i = copy_range_end - 1; i >= copy_range_begin; --i )
 			{
