@@ -29,6 +29,9 @@
 #include <core/diagnostic/system_console/SystemConsole.hpp>
 #include <core/diagnostic/thread/ThreadingDebug.hpp>
 
+// Events
+#include <core/event/Event.hpp>
+
 // Timers
 #include <core/timer/BasicTimer.hpp>
 
