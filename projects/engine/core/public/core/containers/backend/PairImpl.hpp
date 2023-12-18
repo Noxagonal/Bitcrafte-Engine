@@ -1,5 +1,5 @@
 
-#include "ContainerBase.hpp"
+#include <core/containers/backend/ContainerBase.hpp>
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
@@ -7,7 +7,7 @@
 #error "Container implementation type not given"
 #endif
 
-#include "ContainerImplAddDefinitions.hpp"
+#include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 
 
@@ -129,4 +129,6 @@ static_assert( sizeof( BC_CONTAINER_NAME( Pair )<uint32_t, uint32_t> ) == ( size
 
 } // bc
 
-#include "ContainerImplRemoveDefinitions.hpp"
+
+
+#include <core/containers/backend/ContainerImplRemoveDefinitions.hpp>

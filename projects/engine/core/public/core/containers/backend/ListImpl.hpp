@@ -1,13 +1,13 @@
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
-#include "LinearContainerBaseNormal.hpp"
+#include <core/containers/backend/LinearContainerBaseNormal.hpp>
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
-#include "LinearContainerBaseSimple.hpp"
+#include <core/containers/backend/LinearContainerBaseSimple.hpp>
 #else
 #error "Container implementation type not given"
 #endif
 
-#include "ContainerImplAddDefinitions.hpp"
+#include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 
 namespace bc {
@@ -514,4 +514,6 @@ static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( ListView )<cha
 
 } // bc
 
-#include "ContainerImplRemoveDefinitions.hpp"
+
+
+#include <core/containers/backend/ContainerImplRemoveDefinitions.hpp>

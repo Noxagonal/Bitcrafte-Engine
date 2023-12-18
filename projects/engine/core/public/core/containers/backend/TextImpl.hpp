@@ -1,8 +1,8 @@
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
-#include "LinearContainerBaseNormal.hpp"
+#include <core/containers/backend/LinearContainerBaseNormal.hpp>
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
-#include "LinearContainerBaseSimple.hpp"
+#include <core/containers/backend/LinearContainerBaseSimple.hpp>
 #else
 #error "Container implementation type not given"
 #endif
@@ -13,7 +13,7 @@
 #include <climits>
 #include <xstring>
 
-#include "ContainerImplAddDefinitions.hpp"
+#include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 
 
@@ -1918,4 +1918,6 @@ static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( TextView )> );
 
 } // bc
 
-#include "ContainerImplRemoveDefinitions.hpp"
+
+
+#include <core/containers/backend/ContainerImplRemoveDefinitions.hpp>

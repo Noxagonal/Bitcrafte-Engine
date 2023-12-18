@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/memory/raw/RawMemory.hpp>
-#include "ContainerConcepts.hpp"
+#include <core/containers/backend/ContainerConcepts.hpp>
 #include <core/diagnostic/assertion/HardAssert.hpp>
 
 #include <cstdint>

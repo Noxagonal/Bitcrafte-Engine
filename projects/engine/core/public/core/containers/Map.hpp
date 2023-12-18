@@ -4,5 +4,5 @@
 #include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 
 #define BI_CONTAINER_IMPLEMENTATION_NORMAL 1
-#include "backend/MapImpl.hpp"
+#include <core/containers/backend/MapImpl.hpp>
 #undef BI_CONTAINER_IMPLEMENTATION_NORMAL

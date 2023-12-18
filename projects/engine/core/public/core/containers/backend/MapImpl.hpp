@@ -1,10 +1,10 @@
 
-#include "ContainerBase.hpp"
+#include <core/containers/backend/ContainerBase.hpp>
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
-#include "PairImplNormal.hpp"
+#include <core/containers/backend/PairImplNormal.hpp>
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
-#include "PairImplSimple.hpp"
+#include <core/containers/backend/PairImplSimple.hpp>
 #else
 #error "Container implementation type not given"
 #endif
@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "ContainerImplAddDefinitions.hpp"
+#include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 
 
@@ -2046,4 +2046,6 @@ inline void RunTests_Containers_Map()
 
 }
 
-#include "ContainerImplRemoveDefinitions.hpp"
+
+
+#include <core/containers/backend/ContainerImplRemoveDefinitions.hpp>

@@ -1,5 +1,5 @@
 
-#include "ContainerBase.hpp"
+#include <core/containers/backend/ContainerBase.hpp>
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
@@ -10,7 +10,7 @@
 #include <memory>
 #include <new>
 
-#include "ContainerImplAddDefinitions.hpp"
+#include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 
 
@@ -287,4 +287,4 @@ static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( UniquePtr )<ch
 
 
 
-#include "ContainerImplRemoveDefinitions.hpp"
+#include <core/containers/backend/ContainerImplRemoveDefinitions.hpp>
