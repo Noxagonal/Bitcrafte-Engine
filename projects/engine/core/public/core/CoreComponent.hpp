@@ -1,10 +1,12 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
+#include <memory>
 
 
 
 namespace bc {
+namespace diagnostic { class Logger; }
 
 
 
@@ -19,14 +21,18 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~CoreComponent();
 
+	diagnostic::Logger										*	GetLogger();
+
 private:
+
+	std::unique_ptr<diagnostic::Logger> 						logger;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 };
 
 
 
-CoreComponent * GetCore();
+CoreComponent												*	GetCore();
 
 
 

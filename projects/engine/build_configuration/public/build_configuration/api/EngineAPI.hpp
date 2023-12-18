@@ -30,7 +30,7 @@
 
 #if defined( BITCRAFTE_PLATFORM_WINDOWS )
 
-#if defined( _MSC_VER )
+#if defined( _MSC_VER ) && !defined( __clang__ )
 #if( _MSC_VER < BITCRAFTE_MSVC_MINIMUM_VERSION )
 #error "MSVC version not supported, please update your compiler"
 #endif
