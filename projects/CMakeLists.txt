@@ -160,7 +160,7 @@ function(add_bitcrafte_target
 	)
 
 	target_precompile_headers(${BITCRAFTE_TARGET_NAME}
-		PUBLIC
+		PRIVATE
 			"${CMAKE_CURRENT_SOURCE_DIR}/private/${BITCRAFTE_TARGET_NAME}/PreCompiledHeader.hpp"
 	)
 
