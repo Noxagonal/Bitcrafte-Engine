@@ -1,7 +1,5 @@
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
-#include <core/diagnostic/assertion/Assert.hpp>
-#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 #include "LinearContainerBaseNormal.hpp"
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
 #include "LinearContainerBaseSimple.hpp"

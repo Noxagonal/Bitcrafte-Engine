@@ -2,8 +2,6 @@
 #include "ContainerBase.hpp"
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
-#include <core/diagnostic/assertion/Assert.hpp>
-#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 #include "PairImplNormal.hpp"
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
 #include "PairImplSimple.hpp"

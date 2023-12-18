@@ -2,8 +2,6 @@
 #include "ContainerBase.hpp"
 
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
-#include <core/diagnostic/assertion/Assert.hpp>
-#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
 #else
 #error "Container implementation type not given"
