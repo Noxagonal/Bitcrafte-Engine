@@ -11,9 +11,7 @@ void bc::memory::internal::FreeRawMemory_Runtime(
 ) noexcept
 {
 	auto allocation_info = GetSystemMemoryAllocationInfoFromRawPointer( location );
-
-	assert( allocation_info );
-	if( allocation_info == nullptr ) diagnostic::Panic( "Freeing memory that is not allocated using bc runtime allocation functions" );
+	BHardAssert( allocation_info, "Couldn't free runtime memory, memory pointer was not allocated from bc::memory utilities" );
 
 	// TODO: Free from memory pool once it's implemented.
 	delete[] reinterpret_cast<uint8_t*>( allocation_info->system_allocated_location );
@@ -34,6 +32,7 @@ void * bc::memory::internal::AllocateRawMemory_Runtime(
 
 	// TODO: Allocate from memory pool once it's implemented.
 	auto system_ptr = new uint8_t[ minimum_required_allocation_size ];
+	if( system_ptr == nullptr ) std::abort();
 
 	auto system_allocation_info = CalculateSystemMemoryAllocationInfoFromSystemAllocation(
 		system_ptr,
@@ -55,7 +54,7 @@ void * bc::memory::internal::ReallocateRawMemory_Runtime(
 ) noexcept
 {
 	auto old_allocation_info = GetSystemMemoryAllocationInfoFromRawPointer( old_location );
-	if( old_allocation_info == nullptr ) std::abort();
+	BHardAssert( old_allocation_info, "Couldn't reallocate runtime memory, old memory pointer was not allocated from bc::memory utilities" );
 
 	auto old_size				= old_allocation_info->payload_size;
 	auto alignment_requirement	= old_allocation_info->payload_alignment_requirement;
