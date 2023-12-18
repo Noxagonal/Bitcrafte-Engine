@@ -783,6 +783,12 @@ public:
 		if( this->data_capacity < new_capacity )
 		{
 			new_capacity += headroom;
+			if( this->data_ptr == nullptr )
+			{
+				this->data_ptr		= AllocateMemory<ValueType>( new_capacity );
+				this->data_capacity	= new_capacity;
+				return;
+			}
 			auto new_ptr = this->ResizeRange( this->data_ptr, this->data_size, new_capacity );
 			if( !new_ptr ) return;
 			this->data_ptr		= new_ptr;
