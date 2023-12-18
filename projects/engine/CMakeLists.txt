@@ -69,9 +69,6 @@ function(add_engine_component
 	
 	set_target_properties(${ENGINE_COMPONENT_NAME}
 		PROPERTIES
-			ARCHIVE_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/lib/engine/"
-			LIBRARY_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/lib/engine/"
-			RUNTIME_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/bin/engine/"
 			FOLDER							"projects/engine"
 	)
 
