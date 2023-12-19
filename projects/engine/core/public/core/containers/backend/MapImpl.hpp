@@ -31,7 +31,6 @@ template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueT
 class BC_CONTAINER_NAME( Map );
 
 
-
 namespace container_bases {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,11 +65,8 @@ private:
 	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( MapIteratorBase );
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( MapViewBase );
-
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	friend class BC_CONTAINER_NAME( Map );
+	friend class BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, true>;
+	friend class BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, false>;
 
 	using Container				= BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsConst>;
 	using Node					= container_bases::BC_CONTAINER_NAME( MapNode )<KeyType, ValueType>;
@@ -343,6 +339,8 @@ private:
 		}
 		return from_node->parent;
 	}
+
+private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Container																						*	container				= nullptr;
@@ -702,10 +700,10 @@ protected:
 
 
 template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType>
-using BC_CONTAINER_NAME( MapView ) = BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, true>;
+using BC_CONTAINER_NAME( EditableMapView ) = BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, false>;
 
 template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType>
-using BC_CONTAINER_NAME( EditableMapView ) = BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, false>;
+using BC_CONTAINER_NAME( MapView ) = BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, true>;
 
 
 
@@ -1376,7 +1374,7 @@ public:
 			Node ** temp_node_list = this->AllocateMemory<Node*>( temp_node_list_size );
 			auto it = this->begin();
 			for( size_t i = 0; i < this->size; ++i ) {
-				temp_node_list[ i ] = it.node;
+				temp_node_list[ i ] = it.GetData();
 				++it;
 			}
 			for( size_t i = 0; i < this->size; ++i ) {

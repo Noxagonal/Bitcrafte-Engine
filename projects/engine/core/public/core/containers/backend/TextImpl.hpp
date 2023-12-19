@@ -1323,7 +1323,7 @@ public:
 			"Cannot insert into container using iterator that doesn't point to the container we're inserting into"
 		);
 
-		auto CopyFunc = [this, count, &at](
+		auto CopyFunc = [this, count, &at, headroom](
 			auto		other
 		) -> Iterator
 		{

@@ -1,13 +1,14 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
+#include <core/diagnostic/assertion/HardAssert.hpp>
 #include <core/memory/raw/RawMemory.hpp>
 #include <core/containers/backend/ContainerConcepts.hpp>
-#include <core/diagnostic/assertion/HardAssert.hpp>
 
 #include <cstdint>
 
 #include <type_traits>
+#include <memory>
 #include <new>
 #include <assert.h>
 
@@ -149,7 +150,6 @@ protected:
 		BHardAssert( element_count > 0, "Move constructing range, element count must be larger than 0" );
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Move constructing range, element count too high, something is not right" );
 
-		auto end = destination + element_count;
 		for( size_t i = 0; i < element_count; ++i )
 		{
 			new( &destination[ i ] ) ValueType( std::move( source[ i ] ) );

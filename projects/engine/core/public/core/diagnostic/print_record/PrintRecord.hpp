@@ -4,7 +4,7 @@
 
 #include <core/containers/simple/SimpleList.hpp>
 #include <core/containers/simple/SimpleText.hpp>
-#include "PrintRecordSection.hpp"
+#include <core/diagnostic/print_record/PrintRecordSection.hpp>
 
 
 

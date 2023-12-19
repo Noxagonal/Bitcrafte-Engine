@@ -41,11 +41,8 @@ private:
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase );
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( LinearContainerViewBase );
-
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	friend class BC_CONTAINER_NAME( LinearContainerBase );
+	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, true>;
+	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, false>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsConst>								*	container;

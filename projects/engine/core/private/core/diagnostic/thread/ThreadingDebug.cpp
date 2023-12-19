@@ -1,6 +1,7 @@
 
 #include <core/PreCompiledHeader.hpp>
 #include <core/diagnostic/thread/ThreadingDebug.hpp>
+#include <core/CoreComponent.hpp>
 #include <core/diagnostic/logger/Logger.hpp>
 
 

@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/containers/simple/SimpleText.hpp>
-#include "PrintRecordTheme.hpp"
+#include <core/diagnostic/print_record/PrintRecordTheme.hpp>
 
 
 

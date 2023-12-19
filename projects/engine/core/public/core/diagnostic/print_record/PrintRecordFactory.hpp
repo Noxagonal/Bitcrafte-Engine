@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include "PrintRecord.hpp"
+#include <core/diagnostic/print_record/PrintRecord.hpp>
 
 #include <core/conversion/text/text_format/TextFormat.hpp>
 #include <core/containers/simple/SimpleText.hpp>

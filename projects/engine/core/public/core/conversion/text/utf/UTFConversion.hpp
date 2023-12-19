@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/containers/backend/ContainerBase.hpp>
-#include <core/diagnostic/assertion/Assert.hpp>
+#include <core/diagnostic/assertion/HardAssert.hpp>
 
 #include <cuchar>
 
@@ -77,7 +77,7 @@ auto											ToUTF8(
 		}
 
 	} else {
-		assert( 0 && "Not a valid character type" );
+		assert( 0 && "Failed to convert to UTF32, not a valid character type" );
 	}
 
 	return out;
@@ -138,7 +138,7 @@ auto											ToUTF16(
 		out = ToUTF16( ToUTF8( text ) );
 
 	} else {
-		assert( 0 && "Not a valid character type" );
+		assert( 0 && "Failed to convert to UTF32, not a valid character type" );
 	}
 
 	return out;
@@ -183,7 +183,7 @@ auto											ToUTF32(
 		auto data_in_end	= reinterpret_cast<const char*>( text.Data() + text.Size() );
 		while( data_in < data_in_end ) {
 			size_t read_length = std::mbrtoc32( &c32, data_in, text.Size(), &state );
-			BAssert( read_length != size_t( -3 ), "Corrupt UTF text, UTF-32 does not have surrogates" );
+			BHardAssert( read_length != size_t( -3 ), "Failed to convert to UTF32, corrupt UTF text, UTF-32 does not have surrogates" );
 			if( read_length == 0 ) break;
 			if( read_length == size_t( -1 ) ) break;
 			if( read_length == size_t( -2 ) ) break;
@@ -200,7 +200,7 @@ auto											ToUTF32(
 		out = text;
 
 	} else {
-		assert( 0 && "Not a valid character type" );
+		assert( 0 && "Failed to convert to UTF32, not a valid character type" );
 	}
 
 	return out;

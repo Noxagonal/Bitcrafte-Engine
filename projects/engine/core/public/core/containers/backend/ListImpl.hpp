@@ -54,8 +54,8 @@ public:
 	using ThisContainerFullType				= BC_CONTAINER_NAME( List )<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
-	template<bool IsConst>
-	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>;
+	template<bool IsOtherConst>
+	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsOtherConst>;
 	using ConstIterator						= IteratorBase<true>;
 	using Iterator							= IteratorBase<false>;
 

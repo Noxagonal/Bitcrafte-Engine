@@ -2,7 +2,10 @@
 
 // Components
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <core/CoreComponent.hpp>
+
+// Diagnostic
+#include <core/diagnostic/assertion/HardAssert.hpp>
+#include <core/diagnostic/assertion/Assert.hpp>
 
 // Containers
 #include <core/containers/simple/SimpleUniquePtr.hpp>

@@ -7,9 +7,6 @@
 #error "Container implementation type not given"
 #endif
 
-#include <memory>
-#include <new>
-
 #include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 

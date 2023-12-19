@@ -406,7 +406,6 @@ public:
 		conversion::PrimitiveToText( buffer, in, float_to_text_conversion_format );
 
 		auto remaining_decimals = requested_decimal_count;
-		size_t dot_position_in_buffer = 0;
 
 		enum class ParseState
 		{
