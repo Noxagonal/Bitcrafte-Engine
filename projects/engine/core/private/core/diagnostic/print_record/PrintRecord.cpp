@@ -38,10 +38,15 @@ constexpr const bc::diagnostic::PrintRecord::PrintRecordSectionList & bc::diagno
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr const uint32_t bc::diagnostic::PrintRecord::GetLineCount() const
+constexpr const uint32_t bc::diagnostic::PrintRecord::CalculateLineCount() const
 {
-	if( is_finalized ) return calculated_line_count;
-	return CalculateLineCount( section_list );
+	auto character_count = uint32_t { 1 };
+	for( auto & section : section_list )
+	{
+		character_count += uint32_t( section.text.CountCharacters( U'\n' ) );
+	}
+
+	return character_count;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,8 +54,6 @@ constexpr bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::Append(
 	const PrintRecord & other
 )
 {
-	if( is_finalized ) return *this;
-
 	section_list.Append( other.section_list );
 
 	return *this;
@@ -61,8 +64,6 @@ constexpr bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::AddSection(
 	const PrintRecordSection & section
 )
 {
-	if( is_finalized ) return *this;
-
 	section_list.PushBack( section );
 
 	return *this;
@@ -73,8 +74,6 @@ constexpr bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::AddIndent(
 	int32_t add_indentation_level
 )
 {
-	if( is_finalized ) return *this;
-
 	for( auto & s : section_list )
 	{
 		s.indent += add_indentation_level;
@@ -84,46 +83,32 @@ constexpr bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::AddIndent(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr bool bc::diagnostic::PrintRecord::IsFinalized() const
-{
-	return is_finalized;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 constexpr bool bc::diagnostic::PrintRecord::IsEmpty() const
 {
 	return section_list.IsEmpty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::Finalize(
+constexpr bc::diagnostic::PrintRecord bc::diagnostic::PrintRecord::GetFinalized(
 	uint32_t indentation_size
-)
+) const
 {
-	if( is_finalized ) return *this;
+	auto result = *this;
 
-	auto indented_section_list	= ApplyIndents( section_list, indentation_size );
-	calculated_line_count		= CalculateLineCount( indented_section_list );
+	result.Finalize_ApplyIndents( indentation_size );
 
-	section_list = indented_section_list;
-
-	is_finalized = true;
-
-	return *this;
+	return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr bc::diagnostic::PrintRecord::PrintRecordSectionList bc::diagnostic::PrintRecord::ApplyIndents(
-	const PrintRecordSectionList	&	source_section_list,
-	uint32_t							indentation_size
-) const
+constexpr void bc::diagnostic::PrintRecord::Finalize_ApplyIndents(
+	uint32_t		indentation_size
+)
 {
-	assert( !is_finalized && "Should not call this function when print record has already been finalized" );
-
 	auto new_section_list = PrintRecordSectionList {};
 	auto indent_next = true;
 
-	for( auto & r : source_section_list )
+	for( auto & r : section_list )
 	{
 		auto new_section = PrintRecordSection();
 		new_section.theme		= r.theme;
@@ -159,21 +144,5 @@ constexpr bc::diagnostic::PrintRecord::PrintRecordSectionList bc::diagnostic::Pr
 		new_section_list.PushBack( new_section );
 	}
 
-	return new_section_list;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr uint32_t bc::diagnostic::PrintRecord::CalculateLineCount(
-	const bc::diagnostic::PrintRecord::PrintRecordSectionList & source_section_list
-) const
-{
-	assert( !is_finalized && "Should not call this function when print record has already been finalized" );
-
-	auto character_count = uint32_t { 1 };
-	for( auto & section : source_section_list )
-	{
-		character_count += uint32_t( section.text.CountCharacters( U'\n' ) );
-	}
-
-	return character_count;
+	section_list = std::move( new_section_list );
 }

@@ -123,7 +123,7 @@ public:
 	///
 	/// @return
 	/// Number of lines taken by this print record.
-	constexpr const uint32_t								GetLineCount() const;
+	constexpr const uint32_t								CalculateLineCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -179,7 +179,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Converts tabs to spaces, calculates number of lines, applies formatting, etc.
+	/// Converts tabs to spaces, calculates number of lines, applies formatting, etc. And returns a copy of this.
 	///
 	/// This is usually the final stage before being presented to the viewer.
 	///
@@ -194,20 +194,9 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	constexpr PrintRecord								&	Finalize(
+	constexpr PrintRecord									GetFinalized(
 		uint32_t											indentation_size				= 4
-	);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if the print record has been finalized and is un-modifiable.
-	///
-	/// @note
-	/// Print record must be finalized before using it to display information.
-	///
-	/// @return
-	/// True if finalized and un-modifiable, false if we can still add sections to this print record.
-	constexpr bool											IsFinalized() const;
+	) const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr bool											IsEmpty() const;
@@ -223,20 +212,12 @@ private:
 	///
 	/// @return
 	/// New section list with applied indents.
-	constexpr PrintRecordSectionList						ApplyIndents(
-		const PrintRecordSectionList					&	source_section_list,
+	constexpr void											Finalize_ApplyIndents(
 		uint32_t											indentation_size				= 4
-	) const;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr uint32_t										CalculateLineCount(
-		const PrintRecordSectionList					&	source_section_list
-	) const;
+	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	PrintRecordSectionList									section_list;
-	uint32_t												calculated_line_count			= 0;
-	bool													is_finalized					= false;
 };
 
 

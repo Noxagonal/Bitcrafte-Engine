@@ -75,7 +75,6 @@ void bc::diagnostic::Logger::Log(
 	auto log_entry = LogEntry {};
 	log_entry.severity		= report_severity;
 	log_entry.message		= message;
-	log_entry.message.Finalize();
 
 	PushLogEntry( log_entry );
 }
@@ -105,7 +104,6 @@ void bc::diagnostic::Logger::Log(
 		log_entry.message += diagnostic::MakePrintRecord( U"\n" );
 	}
 
-	log_entry.message.Finalize();
 	PushLogEntry( log_entry );
 }
 

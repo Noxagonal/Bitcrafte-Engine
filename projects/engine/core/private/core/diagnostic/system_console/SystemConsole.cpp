@@ -351,9 +351,8 @@ void bc::diagnostic::SystemConsolePrint(
 	const PrintRecord	&	print_record
 )
 {
-	assert( print_record.IsFinalized() && "Print record must have been finalized by this point" );
-
-	for( const auto & s : print_record.GetSections() )
+	auto finalized_print_record = print_record.GetFinalized();
+	for( const auto & s : finalized_print_record.GetSections() )
 	{
 		auto print_record_colors = diagnostic::GetPrintRecordThemeColors( s.theme );
 		SystemConsolePrint( s.text, print_record_colors.foreground_color, print_record_colors.background_color );
