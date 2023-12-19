@@ -56,17 +56,22 @@ void * bc::memory::internal::ReallocateRawMemory_Runtime(
 	auto old_allocation_info = GetSystemMemoryAllocationInfoFromRawPointer( old_location );
 	BHardAssert( old_allocation_info, "Couldn't reallocate runtime memory, old memory pointer was not allocated from bc::memory utilities" );
 
-	auto old_size				= old_allocation_info->payload_size;
-	auto alignment_requirement	= old_allocation_info->payload_alignment_requirement;
+	auto old_size								= old_allocation_info->payload_size;
 
-	// TODO: Test if new size fits inside the old allocation size, if it does, just return old_location instead.
+	// This checks if the allocation has enough payload space remaining at the end to accommodate new payload size, in this case
+	// we can just recalculate the allocation info struct and return the old pointer.
+	if( IsInPlaceReallocateable_Runtime( *old_allocation_info, new_size ) )
+	{
+		return InPlaceReallocateMemory_Runtime( *old_allocation_info, new_size );
+	}
+
 	// TODO: Test if new size fits inside the old allocation size in the memory pool, if it does, update memory pool allocation
 	// tracker, update SystemMemoryAllocationInfo, and return old_location.
 
 	// We need to make sure that we have enough space for correct alignment requirement, so we allocate extra.
 	auto new_ptr = AllocateRawMemory_Runtime(
 		new_size,
-		alignment_requirement
+		old_allocation_info->payload_alignment_requirement
 	);
 
 	auto common_size = ( old_size < new_size ) ? old_size : new_size;

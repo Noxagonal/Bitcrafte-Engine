@@ -229,25 +229,33 @@ protected:
 
 		if constexpr( std::is_trivial_v<Type> )
 		{
-			// For trivially stuff we can try and reallocate the memory, this can be a cheaper operation than allocating.
+			// For trivial stuff we can try and reallocate the memory, this can be a cheaper operation than allocating.
 			return static_cast<Type*>( this->ReallocateMemory( old_location, old_element_count, new_reserved_element_count ) );
 		}
 		else
 		{
-			// If type is not trivially constructible then we need to allocate a new block and copy to it as we need to invoke move
-			// constructor of the objects.
-			auto new_ptr = static_cast<Type*>( this->AllocateMemory<Type>( new_reserved_element_count ) );
+			// Type is not trivial, we need to do some extra work.
+			if( this->IsInPlaceReallocateable( old_location, new_reserved_element_count ) )
+			{
+				auto new_location = this->InPlaceReallocateMemory( old_location, old_element_count, new_reserved_element_count );
+				assert( old_location == new_location );
+				return new_location;
+			}
+
+			// If the type is not in-place re-allocate-able then we need to allocate a new block and copy to it either by
+			// invoking the copy or more constructors.
+			auto new_location = static_cast<Type*>( this->AllocateMemory<Type>( new_reserved_element_count ) );
 			if constexpr( std::is_move_constructible_v<Type> )
 			{
-				this->MoveConstructRange( new_ptr, old_location, old_element_count );
+				this->MoveConstructRange( new_location, old_location, old_element_count );
 			}
 			else
 			{
-				this->CopyConstructRange( new_ptr, old_location, old_element_count );
+				this->CopyConstructRange( new_location, old_location, old_element_count );
 			}
 			this->DestructRange( old_location, old_element_count );
 			this->FreeMemory( old_location, old_element_count );
-			return new_ptr;
+			return new_location;
 		}
 	}
 
@@ -312,6 +320,27 @@ protected:
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Freeing memory, element count too high, something is not right" );
 
 		memory::FreeMemory<Type>( location, element_count );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename Type>
+	constexpr bool			IsInPlaceReallocateable(
+		const Type		*	location,
+		size_t				new_reserved_element_count
+	) const
+	{
+		return memory::IsInPlaceReallocateable<Type>( location, new_reserved_element_count );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename Type>
+	constexpr Type		*	InPlaceReallocateMemory(
+		Type			*	old_location,
+		size_t				old_element_count,
+		size_t				new_reserved_element_count
+	) const
+	{
+		return memory::InPlaceReallocateMemory<Type>( old_location, old_element_count, new_reserved_element_count );
 	}
 };
 

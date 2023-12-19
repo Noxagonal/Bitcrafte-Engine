@@ -91,6 +91,8 @@ void bc::diagnostic::Logger::Log(
 	auto log_entry = LogEntry {};
 	log_entry.severity = report_severity;
 
+	// TODO: Do formatting on both Log functions.
+
 	while( true )
 	{
 		log_entry.message += current_exception_in_chain->GetMessage();

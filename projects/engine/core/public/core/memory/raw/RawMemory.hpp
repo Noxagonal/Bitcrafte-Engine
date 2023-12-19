@@ -237,6 +237,36 @@ inline void												SetSystemMemoryAllocationInfo(
 /// @return
 /// Pointer to allocation info on success, nullptr if something went wrong.
 inline const SystemMemoryAllocationInfo				*	GetSystemMemoryAllocationInfoFromRawPointer(
+	const void										*	raw_location
+)
+{
+	if( raw_location == nullptr ) return nullptr; // raw_location was nullptr, return.
+
+	auto raw_ptr_position = reinterpret_cast<uintptr_t>( raw_location );
+	if( raw_ptr_position % alignof( SystemMemoryAllocationInfo ) ) return nullptr; // raw_location isn't aligned to SystemMemoryAllocationInfo, which is the minimum, return.
+
+	auto raw_location_bytes = reinterpret_cast<const uint8_t*>( raw_location );
+
+	auto allocation_info = reinterpret_cast<const SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
+
+	#if BITCRAFTE_DEVELOPMENT_BUILD
+	auto allocation_info_checksum = CalculateSystemMemoryAllocationInfoInfoChecksum( *allocation_info );
+	if( allocation_info->checksum != allocation_info_checksum ) return nullptr; // Checksum mismatch, this is not a runtime allocated memory block.
+	#endif
+
+	return allocation_info;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Used to get the SystemMemoryAllocationInfo residing in front of the raw memory given to user.
+///
+/// @param raw_location
+/// Pointer give to user.
+///
+/// @return
+/// Pointer to allocation info on success, nullptr if something went wrong.
+inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPointer(
 	void											*	raw_location
 )
 {
@@ -255,6 +285,96 @@ inline const SystemMemoryAllocationInfo				*	GetSystemMemoryAllocationInfoFromRa
 	#endif
 
 	return allocation_info;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Calculates the unused but allocated space for the payload in an allocation.
+///
+/// @param allocation_info
+/// Allocation info to existing memory allocation.
+///
+/// @return
+/// Unused space left after the payload.
+inline size_t											CalculateUnusedPayloadSpaceInAllocation(
+	const SystemMemoryAllocationInfo				&	allocation_info
+)
+{
+	BHardAssert(
+		allocation_info.payload_location > allocation_info.system_allocated_location,
+		"Unable to calculate unused space in allocation, payload location was before system allocation location"
+	);
+
+	auto payload_offset_to_system_ptr = reinterpret_cast<size_t>( allocation_info.payload_location ) - reinterpret_cast<size_t>( allocation_info.system_allocated_location );
+	BHardAssert(
+		allocation_info.system_allocation_size >= payload_offset_to_system_ptr + allocation_info.payload_size,
+		"Unable to calculate unused space in allocation, apparent system allocation size was smaller than actual space required by the payload"
+	);
+	return allocation_info.system_allocation_size - payload_offset_to_system_ptr - allocation_info.payload_size;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Checks if allocation is in-place re-allocate-able, meaning it can be reused.
+///
+/// @param allocation_info
+/// Allocation info describing the allocated memory.
+///
+/// @param new_size
+/// New size we want the allocation to be.
+///
+/// @return
+/// True if allocation can accomodate the new size, false if new size does not fit into already allocated memory.
+inline bool												IsInPlaceReallocateable_Runtime(
+	const SystemMemoryAllocationInfo				&	allocation_info,
+	size_t												new_size
+)
+{
+	auto allocation_remaining_payload_size = CalculateUnusedPayloadSpaceInAllocation( allocation_info );
+	return allocation_info.payload_size + allocation_remaining_payload_size >= new_size;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Do in-place memory allocation.
+///
+/// @warning
+/// Current system memory allocation must have enough space to accommodate the new payload size.
+///
+/// @param allocation_info
+/// Allocation info struct describing the allocation.
+///
+/// @param new_size
+/// New required size.
+///
+/// @return
+/// Pointer to payload start, this is the same as original payload pointer.
+inline void											*	InPlaceReallocateMemory_Runtime(
+	SystemMemoryAllocationInfo						&	allocation_info,
+	size_t												new_size
+)
+{
+	assert( IsInPlaceReallocateable_Runtime( allocation_info, new_size ) && "Not in place reallocateable, size too large" );
+
+	// Reallocation fits inside the old memory pointer, we can just reuse it.
+	auto new_allocation_info = CalculateSystemMemoryAllocationInfoFromSystemAllocation(
+		allocation_info.system_allocated_location,
+		allocation_info.system_allocation_size,
+		new_size,
+		allocation_info.payload_alignment_requirement
+	);
+	SetSystemMemoryAllocationInfo( new_allocation_info );
+	assert(
+		allocation_info.payload_location == new_allocation_info.payload_location &&
+		"Expected old payload location to match new payload location."
+	);
+	return new_allocation_info.payload_location;
 }
 
 
@@ -492,6 +612,47 @@ constexpr ValueType			*	ReallocateMemory(
 	else
 	{
 		return reinterpret_cast<ValueType*>( internal::ReallocateRawMemory_Runtime( old_location, new_count * sizeof( ValueType ) ) );
+	}
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename ValueType>
+constexpr bool					IsInPlaceReallocateable(
+	const ValueType			*	location,
+	size_t						new_count
+)
+{
+	if( std::is_constant_evaluated() )
+	{
+		return false;
+	}
+	else
+	{
+		auto allocation_info = internal::GetSystemMemoryAllocationInfoFromRawPointer( location );
+		return internal::IsInPlaceReallocateable_Runtime( *allocation_info, new_count * sizeof( ValueType ) );
+	}
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename ValueType>
+constexpr ValueType				*	InPlaceReallocateMemory(
+	ValueType					*	old_location,
+	size_t							old_count,
+	size_t							new_count
+)
+{
+	if( std::is_constant_evaluated() )
+	{
+		return internal::ReallocateMemory_Consteval<ValueType>( old_location, old_count, new_count );
+	}
+	else
+	{
+		auto allocation_info = internal::GetSystemMemoryAllocationInfoFromRawPointer( old_location );
+		return reinterpret_cast<ValueType*>( internal::InPlaceReallocateMemory_Runtime( *allocation_info, new_count * sizeof( ValueType ) ) );
 	}
 }
 
