@@ -266,9 +266,6 @@ protected:
 		size_t				new_element_count
 	) const noexcept
 	{
-		BHardAssert( new_element_count > 0, "Allocating memory, new element count must be larger than 0" );
-		BHardAssert( new_element_count < 0x0000FFFFFFFFFFFF, "Allocating memory, new element count too high, something is not right" );
-
 		return memory::AllocateMemory<Type>( new_element_count, alignof( Type ) );
 	}
 
@@ -283,19 +280,6 @@ protected:
 	{
 		static_assert( std::is_trivial_v<Type>, "Type must be trivial for it to be reallocated via this function" );
 
-		if( !std::is_constant_evaluated() )
-		{
-			// Assert some common Visual studio fault addresses.
-			BHardAssert( old_location != reinterpret_cast<Type*>( 0xFDFDFDFDFDFDFDFD ), "Reallocating memory, with old pointer pointing to memory outside of process" );
-			BHardAssert( old_location != reinterpret_cast<Type*>( 0xDDDDDDDDDDDDDDDD ), "Reallocating memory, with old pointer pointing to freed memory" );
-			BHardAssert( old_location != reinterpret_cast<Type*>( 0xCDCDCDCDCDCDCDCD ), "Reallocating memory, with old pointer pointing to uninitialized global memory" );
-			BHardAssert( old_location != reinterpret_cast<Type*>( 0xCCCCCCCCCCCCCCCC ), "Reallocating memory, with old pointer pointing to uninitialized stack memory" );
-		}
-
-		BHardAssert( old_location != nullptr, "Reallocating memory, old location is nullptr" );
-		BHardAssert( old_element_count > 0, "Reallocating memory, old element count must be larger than 0" );
-		BHardAssert( old_element_count < 0x0000FFFFFFFFFFFF, "Reallocating memory, old element count too high, something is not right" );
-
 		return memory::ReallocateMemory<Type>( old_location, old_element_count, new_element_count );
 	}
 
@@ -307,17 +291,6 @@ protected:
 	) const noexcept
 	{
 		if( location == nullptr ) return;
-
-		if( std::is_constant_evaluated() )
-		{
-			// Assert some common Visual studio fault addresses.
-			BHardAssert( location != reinterpret_cast<Type*>( 0xFDFDFDFDFDFDFDFD ), "Freeing memory outside of process" );
-			BHardAssert( location != reinterpret_cast<Type*>( 0xDDDDDDDDDDDDDDDD ), "Freeing already freed memory" );
-			BHardAssert( location != reinterpret_cast<Type*>( 0xCDCDCDCDCDCDCDCD ), "Freeing uninitialized global memory" );
-			BHardAssert( location != reinterpret_cast<Type*>( 0xCCCCCCCCCCCCCCCC ), "Freeing uninitialized stack memory" );
-		}
-
-		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Freeing memory, element count too high, something is not right" );
 
 		memory::FreeMemory<Type>( location, element_count );
 	}

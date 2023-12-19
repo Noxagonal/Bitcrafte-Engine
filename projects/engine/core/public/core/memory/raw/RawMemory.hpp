@@ -570,6 +570,14 @@ constexpr void					FreeMemory(
 	}
 	else
 	{
+		// Assert some common Visual studio fault addresses.
+		BHardAssert( location != reinterpret_cast<Type*>( 0xFDFDFDFDFDFDFDFD ), "Freeing memory outside of process" );
+		BHardAssert( location != reinterpret_cast<Type*>( 0xDDDDDDDDDDDDDDDD ), "Freeing already freed memory" );
+		BHardAssert( location != reinterpret_cast<Type*>( 0xCDCDCDCDCDCDCDCD ), "Freeing uninitialized global memory" );
+		BHardAssert( location != reinterpret_cast<Type*>( 0xCCCCCCCCCCCCCCCC ), "Freeing uninitialized stack memory" );
+
+		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Freeing memory, element count too high, something is not right" );
+
 		internal::FreeRawMemory_Runtime( location );
 	}
 }
@@ -589,6 +597,9 @@ constexpr ValueType			*	AllocateMemory(
 	}
 	else
 	{
+		BHardAssert( new_element_count > 0, "Allocating memory, new element count must be larger than 0" );
+		BHardAssert( new_element_count < 0x0000FFFFFFFFFFFF, "Allocating memory, new element count too high, something is not right" );
+
 		return reinterpret_cast<ValueType*>( internal::AllocateRawMemory_Runtime( count * sizeof( ValueType ), alignment_requirement ) );
 	}
 }
@@ -611,6 +622,18 @@ constexpr ValueType			*	ReallocateMemory(
 	}
 	else
 	{
+		// Assert some common Visual studio fault addresses.
+		BHardAssert( old_location != reinterpret_cast<Type*>( 0xFDFDFDFDFDFDFDFD ), "Reallocating memory, with old pointer pointing to memory outside of process" );
+		BHardAssert( old_location != reinterpret_cast<Type*>( 0xDDDDDDDDDDDDDDDD ), "Reallocating memory, with old pointer pointing to freed memory" );
+		BHardAssert( old_location != reinterpret_cast<Type*>( 0xCDCDCDCDCDCDCDCD ), "Reallocating memory, with old pointer pointing to uninitialized global memory" );
+		BHardAssert( old_location != reinterpret_cast<Type*>( 0xCCCCCCCCCCCCCCCC ), "Reallocating memory, with old pointer pointing to uninitialized stack memory" );
+
+		BHardAssert( old_location != nullptr, "Reallocating memory, old location is nullptr" );
+		BHardAssert( old_element_count > 0, "Reallocating memory, old element count must be larger than 0" );
+		BHardAssert( old_element_count < 0x0000FFFFFFFFFFFF, "Reallocating memory, old element count too high, something is not right" );
+
+		BHardAssert( old_element_count != new_reserved_element_count, "Reallocating memory, new reserved element count is the same as the old element count, this check should be done earlier" );
+
 		return reinterpret_cast<ValueType*>( internal::ReallocateRawMemory_Runtime( old_location, new_count * sizeof( ValueType ) ) );
 	}
 }
@@ -652,6 +675,13 @@ constexpr ValueType				*	InPlaceReallocateMemory(
 	else
 	{
 		auto allocation_info = internal::GetSystemMemoryAllocationInfoFromRawPointer( old_location );
+
+		BHardAssert( allocation_info, "In place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier" );
+		BHardAssert(
+			allocation_info->payload_size != new_count * sizeof( ValueType ),
+			"In place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier"
+		);
+
 		return reinterpret_cast<ValueType*>( internal::InPlaceReallocateMemory_Runtime( *allocation_info, new_count * sizeof( ValueType ) ) );
 	}
 }
