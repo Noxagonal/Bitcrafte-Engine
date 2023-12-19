@@ -17,12 +17,14 @@ namespace diagnostic {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline PrintRecord											MakePrintRecord(
-	SimpleTextView32										text
+	SimpleTextView32										text,
+	PrintRecordTheme										theme					= PrintRecordTheme::DEFAULT
 )
 {
 	auto record = PrintRecord {};
 	auto new_section = PrintRecordSection {};
 	new_section.text = text;
+	new_section.theme = theme;
 	record += new_section;
 	return record;
 }

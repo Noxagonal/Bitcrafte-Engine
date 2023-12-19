@@ -51,12 +51,15 @@ enum class PrintRecordTheme : uint32_t
 
 	// Result
 	SUCCESS,
+	PERFORMANCE_WARNING,
 	WARNING,
 	ERROR,
+	CRITICAL_ERROR,
 
 	// Reporting
 	VERBOSE,
 	INFO,
+	DEBUG,
 
 	// Custom
 	TITLE,

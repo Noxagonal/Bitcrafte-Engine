@@ -21,16 +21,22 @@ bc::diagnostic::PrintRecordThemeColors bc::diagnostic::GetPrintRecordThemeColors
 		return PrintRecordThemeColors { PrintRecordColor::YELLOW, PrintRecordColor::DEFAULT };
 
 	case bc::diagnostic::PrintRecordTheme::SUCCESS:
-		return PrintRecordThemeColors { PrintRecordColor::BLACK, PrintRecordColor::GREEN };
+		return PrintRecordThemeColors { PrintRecordColor::GREEN, PrintRecordColor::DEFAULT };
+	case bc::diagnostic::PrintRecordTheme::PERFORMANCE_WARNING:
+		return PrintRecordThemeColors { PrintRecordColor::DARK_YELLOW, PrintRecordColor::DEFAULT };
 	case bc::diagnostic::PrintRecordTheme::WARNING:
-		return PrintRecordThemeColors { PrintRecordColor::BLACK, PrintRecordColor::YELLOW };
+		return PrintRecordThemeColors { PrintRecordColor::YELLOW, PrintRecordColor::DEFAULT };
 	case bc::diagnostic::PrintRecordTheme::ERROR:
+		return PrintRecordThemeColors { PrintRecordColor::RED, PrintRecordColor::DEFAULT };
+	case bc::diagnostic::PrintRecordTheme::CRITICAL_ERROR:
 		return PrintRecordThemeColors { PrintRecordColor::WHITE, PrintRecordColor::RED };
 
 	case bc::diagnostic::PrintRecordTheme::VERBOSE:
 		return PrintRecordThemeColors { PrintRecordColor::DARK_GRAY, PrintRecordColor::DEFAULT };
 	case bc::diagnostic::PrintRecordTheme::INFO:
 		return PrintRecordThemeColors { PrintRecordColor::DARK_GREEN, PrintRecordColor::DEFAULT };
+	case bc::diagnostic::PrintRecordTheme::DEBUG:
+		return PrintRecordThemeColors { PrintRecordColor::WHITE, PrintRecordColor::GREEN };
 
 	case bc::diagnostic::PrintRecordTheme::TITLE:
 		return PrintRecordThemeColors { PrintRecordColor::BLUE, PrintRecordColor::DEFAULT };

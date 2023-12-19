@@ -1,5 +1,6 @@
 
 #include <core/PreCompiledHeader.hpp>
+#include <core/diagnostic/logger/LogReportSeverityToOther.hpp>
 
 
 
@@ -92,16 +93,21 @@ void bc::diagnostic::Logger::Log(
 
 	// TODO: Do formatting on both Log functions.
 
-	while( true )
+	uint64_t exception_counter = 0;
+	while( current_exception_in_chain )
 	{
-		log_entry.message += current_exception_in_chain->GetMessage();
+		auto exception_message = MakePrintRecord_Argument( U"Exception", exception_counter );
+		exception_message += MakePrintRecord( U"\n" );
+
+		auto message_body = current_exception_in_chain->GetMessage();
+		message_body.AddIndent();
+		exception_message += message_body;
+
+		log_entry.message += exception_message;
 
 		current_exception_in_chain = current_exception_in_chain->GetNextException();
-		if( !current_exception_in_chain ) break;
 
-		log_entry.message += diagnostic::MakePrintRecord( U"\n\n" );
-		log_entry.message += diagnostic::MakePrintRecord( U"Next chained exception:" );
-		log_entry.message += diagnostic::MakePrintRecord( U"\n" );
+		++exception_counter;
 	}
 
 	PushLogEntry( log_entry );
@@ -118,8 +124,6 @@ void bc::diagnostic::Logger::PushLogEntry(
 	const LogEntry		&	log_entry
 )
 {
-	BHardAssert( log_entry.message.IsFinalized(), "Log entry must be finalized before calling this function" );
-
 #if !BITCRAFTE_DEVELOPMENT_BUILD
 	if( log_entry.severity == ReportSeverity::DEBUG ) return;
 #endif
@@ -143,5 +147,10 @@ void bc::diagnostic::Logger::PushLogEntry(
 	// TODO: Update callbacks here, if we introduced any.
 
 	if( !create_info.print_to_system_console ) return;
-	SystemConsolePrint( log_entry.message );
+ 	auto console_print_complete_message = MakePrintRecord( LogReportSeverityToText( log_entry.severity ), LogReportSeverityToPrintRecordTheme( log_entry.severity ) );
+	console_print_complete_message += MakePrintRecord( U"\n" );
+	auto console_print_body = log_history.Back().message;
+	console_print_body.AddIndent();
+	console_print_complete_message += console_print_body;
+	SystemConsolePrint( console_print_complete_message );
 }
