@@ -1,5 +1,7 @@
 
 #include <core/PreCompiledHeader.hpp>
+#include <core/CoreComponent.hpp>
+#include <core/diagnostic/logger/Logger.hpp>
 
 
 
@@ -18,7 +20,7 @@ bc::CoreComponent::CoreComponent(
 
 	// TODO: Start memory pool.
 
-	logger = MakeUnique<diagnostic::Logger>( create_info.logger_create_info );
+	logger = MakeUniquePtr<diagnostic::Logger>( create_info.logger_create_info );
 
 	logger->LogVerbose( "Core component started" );
 }

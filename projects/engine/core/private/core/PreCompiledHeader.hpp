@@ -16,25 +16,6 @@
 #include <core/containers/Map.hpp>
 #include <core/containers/Path.hpp>
 
-// Diagnostic
-#include <core/diagnostic/assertion/Assert.hpp>
-#include <core/diagnostic/assertion/HardAssert.hpp>
-#include <core/diagnostic/crash_handling/Panic.hpp>
-#include <core/diagnostic/exception/Exception.hpp>
-#include <core/diagnostic/logger/Logger.hpp>
-#include <core/diagnostic/print_record/PrintRecord.hpp>
-#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
-#include <core/diagnostic/source_location/SourceLocation.hpp>
-#include <core/diagnostic/stack_trace/StackTrace.hpp>
-#include <core/diagnostic/system_console/SystemConsole.hpp>
-#include <core/diagnostic/thread/ThreadingDebug.hpp>
-
-// Events
-#include <core/event/Event.hpp>
-
-// Timers
-#include <core/timer/BasicTimer.hpp>
-
 // C++ libraries
 #include <assert.h>
 #include <cstdint>

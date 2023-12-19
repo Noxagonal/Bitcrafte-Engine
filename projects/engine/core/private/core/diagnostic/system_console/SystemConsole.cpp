@@ -1,5 +1,6 @@
 
 #include <core/PreCompiledHeader.hpp>
+#include <core/diagnostic/system_console/SystemConsole.hpp>
 
 #include <iostream>
 #include <sstream>

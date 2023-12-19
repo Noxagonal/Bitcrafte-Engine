@@ -1,5 +1,6 @@
 
 #include <core/PreCompiledHeader.hpp>
+#include <core/diagnostic/crash_handling/Panic.hpp>
 
 
 

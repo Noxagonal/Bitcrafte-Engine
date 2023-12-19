@@ -1,4 +1,5 @@
 
+#include <core/PreCompiledHeader.hpp>
 #include <core/diagnostic/logger/LogReportSeverityToOther.hpp>
 
 

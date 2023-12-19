@@ -1,4 +1,6 @@
 
+#include <core/containers/backend/ContainerBase.hpp>
+
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/containers/backend/LinearContainerBaseNormal.hpp>
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE

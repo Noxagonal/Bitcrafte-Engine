@@ -1,6 +1,8 @@
 
 #include <core/PreCompiledHeader.hpp>
+#include <core/diagnostic/logger/Logger.hpp>
 #include <core/diagnostic/logger/LogReportSeverityToOther.hpp>
+#include <core/diagnostic/system_console/SystemConsole.hpp>
 
 
 

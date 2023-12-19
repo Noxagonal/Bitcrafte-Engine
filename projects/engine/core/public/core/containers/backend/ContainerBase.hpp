@@ -449,6 +449,5 @@ constexpr bool											CheckContainerContentsDiffer(
 
 
 
-
 } // container_bases
 } // bc

@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <type_traits>
+
 
 
 namespace bc {
@@ -33,7 +35,7 @@ std::is_same_v<CharacterType, char32_t>;
 /// @tparam ValueType
 /// Type to test if it is allowed to be used in simple containers.
 template<typename ValueType>
-concept SimpleListAllowedValueType =
+concept SimpleContainerAllowedValueType =
 ( !std::is_default_constructible_v<ValueType>		|| std::is_nothrow_default_constructible_v<ValueType> ) &&
 ( !std::is_destructible_v<ValueType>				|| std::is_nothrow_destructible_v<ValueType> ) &&
 ( !std::is_copy_constructible_v<ValueType>			|| std::is_nothrow_copy_constructible_v<ValueType> ) &&

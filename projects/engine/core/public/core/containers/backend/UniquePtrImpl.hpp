@@ -18,16 +18,7 @@ namespace bc {
 
 
 
-template<BC_CONTAINER_VALUE_TYPENAME ValueType>
-class BC_CONTAINER_NAME( UniquePtr );
-
-template<BC_CONTAINER_VALUE_TYPENAME ValueType, typename ...ConstructorArgumentTypePack>
-UniquePtr<ValueType>																					MakeUnique(
-	ConstructorArgumentTypePack																		&&	...constructor_arguments
-);
-
-
-template<BC_CONTAINER_VALUE_TYPENAME ValueType>
+template<typename ValueType>
 class BC_CONTAINER_NAME( UniquePtr ) :
 	public container_bases::ContainerResource
 {
@@ -38,17 +29,17 @@ public:
 	using ContainedValueType				= ValueType;
 	static constexpr bool IsDataConst		= false;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
+	template<typename OtherValueType>
 	using ThisContainerType					= BC_CONTAINER_NAME( UniquePtr )<OtherValueType>;
 	using ThisType							= ThisContainerType<ValueType>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
+	template<typename OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= void;
 
 	template<bool IsOtherConst>
 	using ThisViewType						= void;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
+	template<typename OtherValueType>
 	using ThisContainerFullType				= BC_CONTAINER_NAME( UniquePtr )<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
@@ -57,13 +48,8 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
+	template<typename OtherValueType>
 	friend class BC_CONTAINER_NAME( UniquePtr );
-
-	template<BC_CONTAINER_VALUE_TYPENAME ValueType, typename ...ConstructorArgumentTypePack>
-	friend UniquePtr<ValueType>																			MakeUnique(
-		ConstructorArgumentTypePack																	&&	...constructor_arguments
-	);
 
 public:
 
@@ -246,18 +232,6 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																						*	data_ptr			= nullptr;
 };
-
-
-
-template<BC_CONTAINER_VALUE_TYPENAME ValueType, typename ...ConstructorArgumentTypePack>
-UniquePtr<ValueType>																					MakeUnique(
-	ConstructorArgumentTypePack																		&&	...constructor_arguments
-)
-{
-	auto result = UniquePtr<ValueType> {};
-	result.Emplace( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
-	return result;
-}
 
 
 

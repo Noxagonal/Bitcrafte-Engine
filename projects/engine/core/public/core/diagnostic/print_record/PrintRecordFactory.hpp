@@ -18,7 +18,7 @@ namespace diagnostic {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline PrintRecord											MakePrintRecord(
 	SimpleTextView32										text,
-	PrintRecordTheme										theme					= PrintRecordTheme::DEFAULT
+	PrintRecordTheme										theme
 )
 {
 	auto record = PrintRecord {};
@@ -30,6 +30,14 @@ inline PrintRecord											MakePrintRecord(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+inline PrintRecord											MakePrintRecord(
+	SimpleTextView32										text
+)
+{
+	return MakePrintRecord( text, PrintRecordTheme::DEFAULT );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
 	typename												ArgumentTextType,
 	typename												ArgumentValueType
@@ -37,7 +45,7 @@ template<
 PrintRecord													MakePrintRecord_Argument(
 	const ArgumentTextType								&	text,
 	const ArgumentValueType								&	argument
-)
+) requires( !std::is_same_v<ArgumentValueType, PrintRecordTheme> )
 {
 	auto record = MakePrintRecord( text::TextFormat( U"{}", text ) );
 	record += MakePrintRecord( U": \"" );
