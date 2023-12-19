@@ -1091,7 +1091,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
-		this->ResizeNoConstruct( reserve_space, 0 );
+		this->ResizeNoConstruct( reserve_space, reserve_space );
 		// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
 		if constexpr( std::is_move_constructible_v<ValueType> )
 		{
