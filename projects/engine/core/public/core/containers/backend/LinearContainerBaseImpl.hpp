@@ -507,7 +507,7 @@ public:
 	[[nodiscard]]
 	constexpr const ValueType																		&	Front() const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->IsEmpty(), "Cannot get container front value, container is empty.");
+		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container front value, container is empty.");
 		return this->data_ptr[ 0 ];
 	}
 
@@ -520,7 +520,7 @@ public:
 	[[nodiscard]]
 	constexpr ValueType																				&	Front() BC_CONTAINER_NOEXCEPT requires( IsDataConst == false )
 	{
-		BC_ContainerAssert( this->IsEmpty(), "Cannot get container front value, container is empty." );
+		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container front value, container is empty." );
 		return this->data_ptr[ 0 ];
 	}
 
@@ -533,7 +533,7 @@ public:
 	[[nodiscard]]
 	constexpr const ValueType																		&	Back() const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->IsEmpty(), "Cannot get container back value, container is empty." );
+		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container back value, container is empty." );
 		return this->data_ptr[ this->data_size - 1 ];
 	}
 
@@ -546,7 +546,7 @@ public:
 	[[nodiscard]]
 	constexpr ValueType																				&	Back() BC_CONTAINER_NOEXCEPT requires( IsDataConst == false )
 	{
-		BC_ContainerAssert( this->IsEmpty(), "Cannot get container back value, container is empty." );
+		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container back value, container is empty." );
 		return this->data_ptr[ this->data_size - 1 ];
 	}
 
