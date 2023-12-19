@@ -130,14 +130,14 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Add additional function to call when this event is signalled.
+	///
+	/// @see
+	/// cb::Event::UnRegisterCallback()
 	/// 
 	/// @warning
-	/// NEVER USE THIS FUNCTION TO REGISTER CALLBACK LAMBAS OUTSIDE THE SAME CLASS THAN WHERE THIS EVENT IS !!!
-	///	If callback is a lambda that has "this" in it's capture list or the callback in any way points to a specific object, make
-	/// sure that object calls UnRegisterCallback() at the end of the objects's life, otherwise this event may call the callback
-	/// that handles a reference that points to nothing and will cause memory corruption and weird behaviour, and if you're very
-	/// lucky it will crash.
-	/// 
+	/// There are no way to automatically unregister callbacks. Be mindful of registering member functions and lambdas that capture
+	/// anything as those callbacks will still be called even if the object is destroyed.
+	///
 	/// @param callback
 	///	Function to call when this event is signalled.
 	/// 

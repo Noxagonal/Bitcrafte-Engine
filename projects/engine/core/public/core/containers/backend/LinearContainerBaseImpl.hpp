@@ -567,7 +567,7 @@ public:
 	/// Gets the container data directly.
 	///
 	/// @warning
-	/// Never use this function to get a C-style character string, it will not be null terminated.
+	/// Do not use this function to get a C-style character string, it will not be null terminated.
 	/// 
 	/// @return
 	/// Pointer to raw data.
@@ -584,7 +584,7 @@ public:
 	/// Gets the container data directly.
 	///
 	/// @warning
-	/// Never use this function to get a C-style character string, it will not be null terminated.
+	/// Don't use this function to get a C-style character string, it will not be null terminated.
 	/// 
 	/// @return
 	/// Pointer to raw data.
