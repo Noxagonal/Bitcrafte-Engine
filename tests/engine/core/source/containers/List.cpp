@@ -1,8 +1,7 @@
 
-#include <containers/List.hpp>
-
 #include <gtest/gtest.h>
-#include <TestsCommon.hpp>
+
+#include <core/containers/List.hpp>
 
 
 
@@ -12,9 +11,9 @@ namespace list {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, BasicInit )
+TEST( CoreContainerArray, BasicInit )
 {
-	using A = qup::List<uint32_t>;
+	using A = bc::List<uint32_t>;
 	A a;
 	EXPECT_EQ( a.Size(), 0 );
 
@@ -34,104 +33,130 @@ TEST( CoreContainerList, BasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, ConstructWithSize )
+TEST( CoreContainerArray, ConstructWithSize )
 {
-	using A = qup::List<uint32_t>;
+	using A = bc::List<uint32_t>;
 	A a;
 	EXPECT_EQ( a.Size(), 0 );
 
-	A b { 5, 10 };
-	EXPECT_EQ( b.Size(), 2 );
+	A b( 1 );
+	EXPECT_EQ( b.Size(), 1 );
 
-	A c = { 5, 10, 20 };
-	EXPECT_EQ( c.Size(), 3 );
+	A c { 5, 10 };
+	EXPECT_EQ( c.Size(), 2 );
 
-	A d = A { 5, 10, 20, 50, 100 };
-	EXPECT_EQ( d.Size(), 5 );
+	A d = { 5, 10, 20 };
+	EXPECT_EQ( d.Size(), 3 );
+
+	A e = A( 4 );
+	EXPECT_EQ( e.Size(), 4 );
+
+	A f = A { 5, 10, 20, 50, 100 };
+	EXPECT_EQ( f.Size(), 5 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, Erase )
+TEST( CoreContainerArray, IndexOperator )
 {
-	using A = qup::List<uint32_t>;
+	using A = bc::List<uint32_t>;
+	A a { 5, 10, 20 };
+
+	EXPECT_EQ( a.Size(), 3 );
+	EXPECT_EQ( a[ 0 ], 5 );
+	EXPECT_EQ( a[ 1 ], 10 );
+	EXPECT_EQ( a[ 2 ], 20 );
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( CoreContainerArray, Erase )
+{
+	using A = bc::List<uint32_t>;
+	{
+		A a { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+		EXPECT_THROW( a.begin() - 1, bc::diagnostic::Exception );
+		EXPECT_THROW( a.end() + 1, bc::diagnostic::Exception );
+		EXPECT_THROW( a.Erase( a.end() ), bc::diagnostic::Exception );
+		EXPECT_THROW( a.Erase( a.begin() + 10 ), bc::diagnostic::Exception );
+	}
+	using A = bc::List<uint32_t>;
 	{
 		A a { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
 		a.Erase( a.begin() );
 		EXPECT_EQ( a.Size(), 9 );
-		EXPECT_EQ( *( a.begin() + 0 ), 1 );
-		EXPECT_EQ( *( a.begin() + 1 ), 2 );
-		EXPECT_EQ( *( a.begin() + 2 ), 3 );
-		EXPECT_EQ( *( a.begin() + 3 ), 4 );
-		EXPECT_EQ( *( a.begin() + 4 ), 5 );
-		EXPECT_EQ( *( a.begin() + 5 ), 6 );
-		EXPECT_EQ( *( a.begin() + 6 ), 7 );
-		EXPECT_EQ( *( a.begin() + 7 ), 8 );
-		EXPECT_EQ( *( a.begin() + 8 ), 9 );
-
-		EXPECT_THROW( a.Erase( a.end() ), qup::exception::Exception );
+		EXPECT_EQ( a[ 0 ], 1 );
+		EXPECT_EQ( a[ 1 ], 2 );
+		EXPECT_EQ( a[ 2 ], 3 );
+		EXPECT_EQ( a[ 3 ], 4 );
+		EXPECT_EQ( a[ 4 ], 5 );
+		EXPECT_EQ( a[ 5 ], 6 );
+		EXPECT_EQ( a[ 6 ], 7 );
+		EXPECT_EQ( a[ 7 ], 8 );
+		EXPECT_EQ( a[ 8 ], 9 );
 	}
 	{
 		A a { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		a.Erase( a.end() - 1 );
 		a.Erase( a.begin() );
 		EXPECT_EQ( a.Size(), 8 );
-		EXPECT_EQ( *( a.begin() + 0 ), 1 );
-		EXPECT_EQ( *( a.begin() + 1 ), 2 );
-		EXPECT_EQ( *( a.begin() + 2 ), 3 );
-		EXPECT_EQ( *( a.begin() + 3 ), 4 );
-		EXPECT_EQ( *( a.begin() + 4 ), 5 );
-		EXPECT_EQ( *( a.begin() + 5 ), 6 );
-		EXPECT_EQ( *( a.begin() + 6 ), 7 );
-		EXPECT_EQ( *( a.begin() + 7 ), 8 );
+		EXPECT_EQ( a[ 0 ], 1 );
+		EXPECT_EQ( a[ 1 ], 2 );
+		EXPECT_EQ( a[ 2 ], 3 );
+		EXPECT_EQ( a[ 3 ], 4 );
+		EXPECT_EQ( a[ 4 ], 5 );
+		EXPECT_EQ( a[ 5 ], 6 );
+		EXPECT_EQ( a[ 6 ], 7 );
+		EXPECT_EQ( a[ 7 ], 8 );
 	}
 	{
 		A a { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		a.Erase( a.begin(), a.end() - 5 );
 		EXPECT_EQ( a.Size(), 5 );
-		EXPECT_EQ( *( a.begin() + 0 ), 5 );
-		EXPECT_EQ( *( a.begin() + 1 ), 6 );
-		EXPECT_EQ( *( a.begin() + 2 ), 7 );
-		EXPECT_EQ( *( a.begin() + 3 ), 8 );
-		EXPECT_EQ( *( a.begin() + 4 ), 9 );
+		EXPECT_EQ( a[ 0 ], 5 );
+		EXPECT_EQ( a[ 1 ], 6 );
+		EXPECT_EQ( a[ 2 ], 7 );
+		EXPECT_EQ( a[ 3 ], 8 );
+		EXPECT_EQ( a[ 4 ], 9 );
 	}
 	{
 		A a { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		a.Erase( a.begin() + 5, a.end() );
 		EXPECT_EQ( a.Size(), 5 );
-		EXPECT_EQ( *( a.begin() + 0 ), 0 );
-		EXPECT_EQ( *( a.begin() + 1 ), 1 );
-		EXPECT_EQ( *( a.begin() + 2 ), 2 );
-		EXPECT_EQ( *( a.begin() + 3 ), 3 );
-		EXPECT_EQ( *( a.begin() + 4 ), 4 );
+		EXPECT_EQ( a[ 0 ], 0 );
+		EXPECT_EQ( a[ 1 ], 1 );
+		EXPECT_EQ( a[ 2 ], 2 );
+		EXPECT_EQ( a[ 3 ], 3 );
+		EXPECT_EQ( a[ 4 ], 4 );
 	}
 	{
 		A a { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		a.Erase( a.begin() + 3, a.end() - 3 );
 		EXPECT_EQ( a.Size(), 6 );
-		EXPECT_EQ( *( a.begin() + 0 ), 0 );
-		EXPECT_EQ( *( a.begin() + 1 ), 1 );
-		EXPECT_EQ( *( a.begin() + 2 ), 2 );
-		EXPECT_EQ( *( a.begin() + 3 ), 7 );
-		EXPECT_EQ( *( a.begin() + 4 ), 8 );
-		EXPECT_EQ( *( a.begin() + 5 ), 9 );
+		EXPECT_EQ( a[ 0 ], 0 );
+		EXPECT_EQ( a[ 1 ], 1 );
+		EXPECT_EQ( a[ 2 ], 2 );
+		EXPECT_EQ( a[ 3 ], 7 );
+		EXPECT_EQ( a[ 4 ], 8 );
+		EXPECT_EQ( a[ 5 ], 9 );
 	}
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, FrontBack )
+TEST( CoreContainerArray, FrontBack )
 {
-	using A = qup::List<uint32_t>;
-
+	using A = bc::List<uint32_t>;
 	{
 		A a;
 
-		EXPECT_THROW( auto t = a.Front(), qup::exception::Exception );
-		EXPECT_THROW( auto t = a.Back(), qup::exception::Exception );
+		EXPECT_THROW( auto t = a.Front(), bc::diagnostic::Exception );
+		EXPECT_THROW( auto t = a.Back(), bc::diagnostic::Exception );
 	}
 	{
 		A b = { 5 };
@@ -169,67 +194,63 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, PushBack )
+TEST( CoreContainerArray, PushBack )
 {
-	using A = qup::List<uint32_t>;
-	using B = qup::List<PushObject>;
+	using A = bc::List<uint32_t>;
+	using B = bc::List<PushObject>;
 
-	{
-		A a;
-		a.PushBack( 5 );
-		a.PushBack( 10 );
-		a.PushBack( 20 );
+	A a;
+	a.PushBack( 5 );
+	a.PushBack( 10 );
+	a.PushBack( 20 );
 
-		EXPECT_EQ( *( a.begin() + 0 ), 5 );
-		EXPECT_EQ( *( a.begin() + 1 ), 10 );
-		EXPECT_EQ( *( a.begin() + 2 ), 20 );
+	EXPECT_EQ( a[ 0 ], 5 );
+	EXPECT_EQ( a[ 1 ], 10 );
+	EXPECT_EQ( a[ 2 ], 20 );
 
-		B b;
-		b.PushBack( 5 );
-		b.PushBack( 10 );
-		b.PushBack( 20 );
+	B b;
+	b.PushBack( 5 );
+	b.PushBack( 10 );
+	b.PushBack( 20 );
 
-		EXPECT_EQ( *( b.begin() + 0 ), 5 );
-		EXPECT_EQ( *( b.begin() + 1 ), 10 );
-		EXPECT_EQ( *( b.begin() + 2 ), 20 );
-	}
+	EXPECT_EQ( b[ 0 ], 5 );
+	EXPECT_EQ( b[ 1 ], 10 );
+	EXPECT_EQ( b[ 2 ], 20 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, PushFront )
+TEST( CoreContainerArray, PushFront )
 {
-	using A = qup::List<uint32_t>;
-	using B = qup::List<PushObject>;
+	using A = bc::List<uint32_t>;
+	using B = bc::List<PushObject>;
 
-	{
-		A a;
-		a.PushFront( 5 );
-		a.PushFront( 10 );
-		a.PushFront( 20 );
+	A a;
+	a.PushFront( 5 );
+	a.PushFront( 10 );
+	a.PushFront( 20 );
 
-		EXPECT_EQ( *( a.begin() + 0 ), 20 );
-		EXPECT_EQ( *( a.begin() + 1 ), 10 );
-		EXPECT_EQ( *( a.begin() + 2 ), 5 );
+	EXPECT_EQ( a[ 0 ], 20 );
+	EXPECT_EQ( a[ 1 ], 10 );
+	EXPECT_EQ( a[ 2 ], 5 );
 
-		B b;
-		b.PushFront( 5 );
-		b.PushFront( 10 );
-		b.PushFront( 20 );
+	B b;
+	b.PushFront( 5 );
+	b.PushFront( 10 );
+	b.PushFront( 20 );
 
-		EXPECT_EQ( *( b.begin() + 0 ), 20 );
-		EXPECT_EQ( *( b.begin() + 1 ), 10 );
-		EXPECT_EQ( *( b.begin() + 2 ), 5 );
-	}
+	EXPECT_EQ( b[ 0 ], 20 );
+	EXPECT_EQ( b[ 1 ], 10 );
+	EXPECT_EQ( b[ 2 ], 5 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, MixedPushBackPushFront )
+TEST( CoreContainerArray, MixedPushBackPushFront )
 {
-	using A = qup::List<uint32_t>;
+	using A = bc::List<uint32_t>;
 	A a;
 	a.PushFront( 5 );
 	a.PushBack( 10 );
@@ -238,20 +259,20 @@ TEST( CoreContainerList, MixedPushBackPushFront )
 	a.PushFront( 100 );
 
 	EXPECT_EQ( a.Size(), 5 );
-	EXPECT_EQ( *( a.begin() + 0 ), 100 );
-	EXPECT_EQ( *( a.begin() + 1 ), 20 );
-	EXPECT_EQ( *( a.begin() + 2 ), 5 );
-	EXPECT_EQ( *( a.begin() + 3 ), 10 );
-	EXPECT_EQ( *( a.begin() + 4 ), 50 );
+	EXPECT_EQ( a[ 0 ], 100 );
+	EXPECT_EQ( a[ 1 ], 20 );
+	EXPECT_EQ( a[ 2 ], 5 );
+	EXPECT_EQ( a[ 3 ], 10 );
+	EXPECT_EQ( a[ 4 ], 50 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, Append )
+TEST( CoreContainerArray, Append )
 {
 	{
-		using A = qup::List<uint32_t>;
+		using A = bc::List<uint32_t>;
 		A a { 5, 10, 20 };
 		A b { 50, 100, 200 };
 		a.Append( b );
@@ -259,18 +280,18 @@ TEST( CoreContainerList, Append )
 		a.Append( { 1000, 2000 } );
 
 		EXPECT_EQ( a.Size(), 9 );
-		EXPECT_EQ( *( a.begin() + 0 ), 5 );
-		EXPECT_EQ( *( a.begin() + 1 ), 10 );
-		EXPECT_EQ( *( a.begin() + 2 ), 20 );
-		EXPECT_EQ( *( a.begin() + 3 ), 50 );
-		EXPECT_EQ( *( a.begin() + 4 ), 100 );
-		EXPECT_EQ( *( a.begin() + 5 ), 200 );
-		EXPECT_EQ( *( a.begin() + 6 ), 500 );
-		EXPECT_EQ( *( a.begin() + 7 ), 1000 );
-		EXPECT_EQ( *( a.begin() + 8 ), 2000 );
+		EXPECT_EQ( a[ 0 ], 5 );
+		EXPECT_EQ( a[ 1 ], 10 );
+		EXPECT_EQ( a[ 2 ], 20 );
+		EXPECT_EQ( a[ 3 ], 50 );
+		EXPECT_EQ( a[ 4 ], 100 );
+		EXPECT_EQ( a[ 5 ], 200 );
+		EXPECT_EQ( a[ 6 ], 500 );
+		EXPECT_EQ( a[ 7 ], 1000 );
+		EXPECT_EQ( a[ 8 ], 2000 );
 	}
 	{
-		using A = qup::List<uint32_t>;
+		using A = bc::List<uint32_t>;
 		A a { 5, 10, 20 };
 		A b { 50, 100, 200 };
 		a += b;
@@ -278,22 +299,22 @@ TEST( CoreContainerList, Append )
 		a += { 1000, 2000 };
 
 		EXPECT_EQ( a.Size(), 9 );
-		EXPECT_EQ( *( a.begin() + 0 ), 5 );
-		EXPECT_EQ( *( a.begin() + 1 ), 10 );
-		EXPECT_EQ( *( a.begin() + 2 ), 20 );
-		EXPECT_EQ( *( a.begin() + 3 ), 50 );
-		EXPECT_EQ( *( a.begin() + 4 ), 100 );
-		EXPECT_EQ( *( a.begin() + 5 ), 200 );
-		EXPECT_EQ( *( a.begin() + 6 ), 500 );
-		EXPECT_EQ( *( a.begin() + 7 ), 1000 );
-		EXPECT_EQ( *( a.begin() + 8 ), 2000 );
+		EXPECT_EQ( a[ 0 ], 5 );
+		EXPECT_EQ( a[ 1 ], 10 );
+		EXPECT_EQ( a[ 2 ], 20 );
+		EXPECT_EQ( a[ 3 ], 50 );
+		EXPECT_EQ( a[ 4 ], 100 );
+		EXPECT_EQ( a[ 5 ], 200 );
+		EXPECT_EQ( a[ 6 ], 500 );
+		EXPECT_EQ( a[ 7 ], 1000 );
+		EXPECT_EQ( a[ 8 ], 2000 );
 	}
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, StructureBasicInit )
+TEST( CoreContainerArray, StructureBasicInit )
 {
 	struct Simple
 	{
@@ -303,12 +324,12 @@ TEST( CoreContainerList, StructureBasicInit )
 		double v4;
 	};
 
-	using A = qup::List<Simple>;
+	using A = bc::List<Simple>;
 	A a;
 	A b {};
 	A c = {};
-	A d = qup::List<Simple>();
-	A e = qup::List<Simple> {};
+	A d = bc::List<Simple>();
+	A e = bc::List<Simple> {};
 
 	EXPECT_EQ( a.Size(), 0 );
 	EXPECT_EQ( b.Size(), 0 );
@@ -320,7 +341,7 @@ TEST( CoreContainerList, StructureBasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, StructureInitializerListInit )
+TEST( CoreContainerArray, StructureInitializerListInit )
 {
 	struct Simple
 	{
@@ -330,26 +351,26 @@ TEST( CoreContainerList, StructureInitializerListInit )
 		double v4;
 	};
 
-	using A = qup::List<Simple>;
+	using A = bc::List<Simple>;
 	A a { { 5, 10, 20.0f, 50.0 }, {} };
 
 	EXPECT_EQ( a.Size(), 2 );
 
-	EXPECT_EQ( ( a.begin() + 0 )->v1, 5 );
-	EXPECT_EQ( ( a.begin() + 0 )->v2, 10 );
-	EXPECT_FLOAT_EQ( ( a.begin() + 0 )->v3, 20.0f );
-	EXPECT_DOUBLE_EQ( ( a.begin() + 0 )->v4, 50.0 );
+	EXPECT_EQ( a[ 0 ].v1, 5 );
+	EXPECT_EQ( a[ 0 ].v2, 10 );
+	EXPECT_FLOAT_EQ( a[ 0 ].v3, 20.0f );
+	EXPECT_DOUBLE_EQ( a[ 0 ].v4, 50.0 );
 
-	EXPECT_EQ( ( a.begin() + 1 )->v1, 0 );
-	EXPECT_EQ( ( a.begin() + 1 )->v2, 0 );
-	EXPECT_FLOAT_EQ( ( a.begin() + 1 )->v3, 0.0f );
-	EXPECT_DOUBLE_EQ( ( a.begin() + 1 )->v4, 0.0 );
+	EXPECT_EQ( a[ 1 ].v1, 0 );
+	EXPECT_EQ( a[ 1 ].v2, 0 );
+	EXPECT_FLOAT_EQ( a[ 1 ].v3, 0.0f );
+	EXPECT_DOUBLE_EQ( a[ 1 ].v4, 0.0 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, StructureCopy )
+TEST( CoreContainerArray, StructureCopy )
 {
 	struct Simple
 	{
@@ -359,39 +380,39 @@ TEST( CoreContainerList, StructureCopy )
 		double v4;
 	};
 
-	using A = qup::List<Simple>;
+	using A = bc::List<Simple>;
 	A a { { 5, 10, 20.0f, 50.0 }, {} };
 	A b = a;
 
 	EXPECT_EQ( a.Size(), 2 );
 	EXPECT_EQ( b.Size(), 2 );
 
-	EXPECT_EQ( ( a.begin() + 0 )->v1, ( b.begin() + 0 )->v1 );
-	EXPECT_EQ( ( a.begin() + 0 )->v2, ( b.begin() + 0 )->v2 );
-	EXPECT_FLOAT_EQ( ( a.begin() + 0 )->v3, ( b.begin() + 0 )->v3 );
-	EXPECT_DOUBLE_EQ( ( a.begin() + 0 )->v4, ( b.begin() + 0 )->v4 );
+	EXPECT_EQ( a[ 0 ].v1, b[ 0 ].v1 );
+	EXPECT_EQ( a[ 0 ].v2, b[ 0 ].v2 );
+	EXPECT_FLOAT_EQ( a[ 0 ].v3, b[ 0 ].v3 );
+	EXPECT_DOUBLE_EQ( a[ 0 ].v4, b[ 0 ].v4 );
 
-	EXPECT_EQ( ( a.begin() + 1 )->v1, ( b.begin() + 1 )->v1 );
-	EXPECT_EQ( ( a.begin() + 1 )->v2, ( b.begin() + 1 )->v2 );
-	EXPECT_FLOAT_EQ( ( a.begin() + 1 )->v3, ( b.begin() + 1 )->v3 );
-	EXPECT_DOUBLE_EQ( ( a.begin() + 1 )->v4, ( b.begin() + 1 )->v4 );
+	EXPECT_EQ( a[ 1 ].v1, b[ 1 ].v1 );
+	EXPECT_EQ( a[ 1 ].v2, b[ 1 ].v2 );
+	EXPECT_FLOAT_EQ( a[ 1 ].v3, b[ 1 ].v3 );
+	EXPECT_DOUBLE_EQ( a[ 1 ].v4, b[ 1 ].v4 );
 
-	b.Front().v1 = 600;
-	EXPECT_EQ( ( a.begin() + 0 )->v1, 5 );
-	EXPECT_EQ( ( b.begin() + 0 )->v1, 600 );
+	b[ 0 ].v1 = 600;
+	EXPECT_EQ( a[ 0 ].v1, 5 );
+	EXPECT_EQ( b[ 0 ].v1, 600 );
 
 	A c { { 700 } };
 	c = b;
-	EXPECT_EQ( ( b.begin() + 0 )->v1, ( c.begin() + 0 )->v1 );
-	EXPECT_EQ( ( b.begin() + 0 )->v2, ( c.begin() + 0 )->v2 );
-	EXPECT_FLOAT_EQ( ( b.begin() + 0 )->v3, ( c.begin() + 0 )->v3 );
-	EXPECT_DOUBLE_EQ( ( b.begin() + 0 )->v4, ( c.begin() + 0 )->v4 );
+	EXPECT_EQ( b[ 0 ].v1, c[ 0 ].v1 );
+	EXPECT_EQ( b[ 0 ].v2, c[ 0 ].v2 );
+	EXPECT_FLOAT_EQ( b[ 0 ].v3, c[ 0 ].v3 );
+	EXPECT_DOUBLE_EQ( b[ 0 ].v4, c[ 0 ].v4 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, StructureMove )
+TEST( CoreContainerArray, StructureMove )
 {
 	struct Simple
 	{
@@ -401,7 +422,7 @@ TEST( CoreContainerList, StructureMove )
 		double v4;
 	};
 
-	using A = qup::List<Simple>;
+	using A = bc::List<Simple>;
 	A a1 { { 5, 10, 20.0f, 50.0 }, {} };
 	A a2 = a1;
 	A b1 = std::move( a1 );
@@ -412,21 +433,21 @@ TEST( CoreContainerList, StructureMove )
 	EXPECT_EQ( b1.Size(), 2 );
 	EXPECT_EQ( b2.Size(), 2 );
 
-	EXPECT_EQ( ( b1.begin() + 0 )->v1, 5 );
-	EXPECT_EQ( ( b1.begin() + 0 )->v2, 10 );
-	EXPECT_FLOAT_EQ( ( b1.begin() + 0 )->v3, 20.0f );
-	EXPECT_DOUBLE_EQ( ( b1.begin() + 0 )->v4, 50.0 );
+	EXPECT_EQ( b1[ 0 ].v1, 5 );
+	EXPECT_EQ( b1[ 0 ].v2, 10 );
+	EXPECT_FLOAT_EQ( b1[ 0 ].v3, 20.0f );
+	EXPECT_DOUBLE_EQ( b1[ 0 ].v4, 50.0 );
 
-	EXPECT_EQ( ( b2.begin() + 0 )->v1, 5 );
-	EXPECT_EQ( ( b2.begin() + 0 )->v2, 10 );
-	EXPECT_FLOAT_EQ( ( b2.begin() + 0 )->v3, 20.0f );
-	EXPECT_DOUBLE_EQ( ( b2.begin() + 0 )->v4, 50.0 );
+	EXPECT_EQ( b2[ 0 ].v1, 5 );
+	EXPECT_EQ( b2[ 0 ].v2, 10 );
+	EXPECT_FLOAT_EQ( b2[ 0 ].v3, 20.0f );
+	EXPECT_DOUBLE_EQ( b2[ 0 ].v4, 50.0 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, MoveableOnlyStructure )
+TEST( CoreContainerArray, MoveableOnlyStructure )
 {
 	struct MoveableOnly
 	{
@@ -438,7 +459,7 @@ TEST( CoreContainerList, MoveableOnlyStructure )
 		size_t v1 = {};
 	};
 
-	using A = qup::List<MoveableOnly>;
+	using A = bc::List<MoveableOnly>;
 	A a;
 	a.PushBack( MoveableOnly( 5 ) );
 	a.PushBack( MoveableOnly( 10 ) );
@@ -460,7 +481,7 @@ TEST( CoreContainerList, MoveableOnlyStructure )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class List_CopyableOnly_Control
+class Array_CopyableOnly_Control
 {
 public:
 	static int32_t copy_counter;
@@ -468,50 +489,50 @@ public:
 
 	size_t data = 0;
 
-	List_CopyableOnly_Control() {}
-	List_CopyableOnly_Control( const List_CopyableOnly_Control & other ) { ++copy_counter; }
-	List_CopyableOnly_Control( List_CopyableOnly_Control && other ) { ++move_counter; }
+	Array_CopyableOnly_Control() {}
+	Array_CopyableOnly_Control( const Array_CopyableOnly_Control & other ) { ++copy_counter; }
+	Array_CopyableOnly_Control( Array_CopyableOnly_Control && other ) { ++move_counter; }
 
-	List_CopyableOnly_Control & operator=( const List_CopyableOnly_Control & other ) { ++copy_counter; }
-	List_CopyableOnly_Control & operator=( List_CopyableOnly_Control && other ) { ++move_counter; }
+	Array_CopyableOnly_Control & operator=( const Array_CopyableOnly_Control & other ) { ++copy_counter; return *this; }
+	Array_CopyableOnly_Control & operator=( Array_CopyableOnly_Control && other ) { ++move_counter; return *this; }
 };
-int32_t List_CopyableOnly_Control::copy_counter		= 0;
-int32_t List_CopyableOnly_Control::move_counter		= 0;
+int32_t Array_CopyableOnly_Control::copy_counter		= 0;
+int32_t Array_CopyableOnly_Control::move_counter		= 0;
 
-class List_CopyableOnly
+class Array_CopyableOnly
 {
 public:
 	static int32_t copy_counter;
 
 	size_t data = 0;
 
-	List_CopyableOnly() {}
-	List_CopyableOnly( const List_CopyableOnly & other ) { ++copy_counter; }
-	List_CopyableOnly( List_CopyableOnly && other ) = delete;
+	Array_CopyableOnly() {}
+	Array_CopyableOnly( const Array_CopyableOnly & other ) { ++copy_counter; }
+	Array_CopyableOnly( Array_CopyableOnly && other ) = delete;
 
-	List_CopyableOnly & operator=( const List_CopyableOnly & other ) { ++copy_counter; }
-	List_CopyableOnly & operator=( List_CopyableOnly && other ) = delete;
+	Array_CopyableOnly & operator=( const Array_CopyableOnly & other ) { ++copy_counter; return *this; }
+	Array_CopyableOnly & operator=( Array_CopyableOnly && other ) = delete;
 };
-int32_t List_CopyableOnly::copy_counter		= 0;
+int32_t Array_CopyableOnly::copy_counter		= 0;
 
-TEST( CoreContainerList, List_CopyableOnlyStructure )
+TEST( CoreContainerArray, Array_CopyableOnlyStructure )
 {
-	List_CopyableOnly_Control::copy_counter	= 0;
-	List_CopyableOnly_Control::move_counter	= 0;
+	Array_CopyableOnly_Control::copy_counter	= 0;
+	Array_CopyableOnly_Control::move_counter	= 0;
 
-	List_CopyableOnly::copy_counter			= 0;
+	Array_CopyableOnly::copy_counter			= 0;
 
-	using A = qup::List<List_CopyableOnly>;
-	using B = qup::List<List_CopyableOnly_Control>;
+	using A = bc::List<Array_CopyableOnly>;
+	using B = bc::List<Array_CopyableOnly_Control>;
 	A a;
-	a.PushBack( List_CopyableOnly() );
-	a.PushBack( List_CopyableOnly() );
-	a.PushBack( List_CopyableOnly() );
+	a.PushBack( Array_CopyableOnly() );
+	a.PushBack( Array_CopyableOnly() );
+	a.PushBack( Array_CopyableOnly() );
 
 	B ac;
-	ac.PushBack( List_CopyableOnly_Control() );
-	ac.PushBack( List_CopyableOnly_Control() );
-	ac.PushBack( List_CopyableOnly_Control() );
+	ac.PushBack( Array_CopyableOnly_Control() );
+	ac.PushBack( Array_CopyableOnly_Control() );
+	ac.PushBack( Array_CopyableOnly_Control() );
 
 	A b = a;
 	B bc = ac;
@@ -533,119 +554,113 @@ TEST( CoreContainerList, List_CopyableOnlyStructure )
 	EXPECT_EQ( bc.Size(), 0 );
 	EXPECT_EQ( cc.Size(), 3 );
 
-	EXPECT_GT( List_CopyableOnly::copy_counter, List_CopyableOnly_Control::copy_counter );
-	EXPECT_EQ( List_CopyableOnly::copy_counter, List_CopyableOnly_Control::copy_counter + List_CopyableOnly_Control::move_counter );
+	EXPECT_GT( Array_CopyableOnly::copy_counter, Array_CopyableOnly_Control::copy_counter );
+	EXPECT_EQ( Array_CopyableOnly::copy_counter, Array_CopyableOnly_Control::copy_counter + Array_CopyableOnly_Control::move_counter );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class List_CtorDtorCounted
+class Array_CtorDtorCounted
 {
 public:
 	static int32_t constructed_counter;
 
 	size_t data = 0;
 
-	List_CtorDtorCounted() { ++constructed_counter; }
-	List_CtorDtorCounted( const List_CtorDtorCounted & other ) { ++constructed_counter; }
-	List_CtorDtorCounted( List_CtorDtorCounted && other ) { ++constructed_counter; }
-	~List_CtorDtorCounted() { --constructed_counter; }
-	List_CtorDtorCounted & operator=( const List_CtorDtorCounted & other ) = default;
-	List_CtorDtorCounted & operator=( List_CtorDtorCounted && other ) = default;
+	Array_CtorDtorCounted() { ++constructed_counter; data = constructed_counter; }
+	Array_CtorDtorCounted( const Array_CtorDtorCounted & other ) { ++constructed_counter; data = constructed_counter; }
+	Array_CtorDtorCounted( Array_CtorDtorCounted && other ) { ++constructed_counter; data = constructed_counter; }
+	~Array_CtorDtorCounted() { --constructed_counter; }
+	Array_CtorDtorCounted & operator=( const Array_CtorDtorCounted & other ) = default;
+	Array_CtorDtorCounted & operator=( Array_CtorDtorCounted && other ) = default;
 };
-int32_t List_CtorDtorCounted::constructed_counter	= 0;
+int32_t Array_CtorDtorCounted::constructed_counter	= 0;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, CtorDtorCounter )
+TEST( CoreContainerArray, CtorDtorCounter )
 {
-	List_CtorDtorCounted::constructed_counter	= 0;
+	Array_CtorDtorCounted::constructed_counter		= 0;
 
-	using A = qup::List<List_CtorDtorCounted>;
-	{
-		A a;
+	using A = bc::List<Array_CtorDtorCounted>;
+	A a;
 
-		a.PushBack( {} );
-		a.PushBack( List_CtorDtorCounted() );
-		a.PushBack( List_CtorDtorCounted {} );
-		EXPECT_EQ( a.Size(), 3 );
+	a.PushBack( {} );
+	a.PushBack( Array_CtorDtorCounted() );
+	a.PushBack( Array_CtorDtorCounted {} );
+	EXPECT_EQ( a.Size(), 3 );
 
-		a.PushFront( {} );
-		a.PushFront( List_CtorDtorCounted() );
-		a.PushFront( List_CtorDtorCounted {} );
-		EXPECT_EQ( a.Size(), 6 );
+	a.PushFront( {} );
+	a.PushFront( Array_CtorDtorCounted() );
+	a.PushFront( Array_CtorDtorCounted {} );
+	EXPECT_EQ( a.Size(), 6 );
 
-		a.EmplaceBack();
-		a.EmplaceFront();
-		EXPECT_EQ( a.Size(), 8 );
+	a.EmplaceBack();
+	a.EmplaceFront();
+	EXPECT_EQ( a.Size(), 8 );
 
-		a.PopBack();
-		EXPECT_EQ( a.Size(), 7 );
+	a.PopBack();
+	EXPECT_EQ( a.Size(), 7 );
 
-		a.PopFront();
-		EXPECT_EQ( a.Size(), 6 );
+	a.PopFront();
+	EXPECT_EQ( a.Size(), 6 );
 
-		a.Clear();
+	a.Resize( 50 );
+	EXPECT_EQ( a.Size(), 50 );
 
-		EXPECT_EQ( a.Size(), 0 );
-		EXPECT_EQ( List_CtorDtorCounted::constructed_counter, 0 );
-	}
-	{
-		A a;
+	a.Erase( a.begin() );
+	EXPECT_EQ( a.Size(), 49 );
 
-		for( size_t i = 0; i < 50; ++i ) {
-			a.PushBack( {} );
-		}
-		EXPECT_EQ( a.Size(), 50 );
+	a.Erase( a.end() - 1 );
+	EXPECT_EQ( a.Size(), 48 );
 
-		a.Erase( a.begin() );
-		EXPECT_EQ( a.Size(), 49 );
+	a.Erase( a.begin() + 10 );
+	EXPECT_EQ( a.Size(), 47 );
 
-		a.Erase( a.end() - 1 );
-		EXPECT_EQ( a.Size(), 48 );
+	a.Erase( a.begin(), a.end() - 5 );
+	EXPECT_EQ( a.Size(), 5 );
 
-		a.Erase( a.begin() + 10 );
-		EXPECT_EQ( a.Size(), 47 );
+	a.Clear();
 
-		a.Erase( a.begin(), a.end() - 5 );
-		EXPECT_EQ( a.Size(), 5 );
-
-		a.Clear();
-
-		EXPECT_EQ( a.Size(), 0 );
-		EXPECT_EQ( List_CtorDtorCounted::constructed_counter, 0 );
-	}
+	EXPECT_EQ( a.Size(), 0 );
+	EXPECT_EQ( Array_CtorDtorCounted::constructed_counter, 0 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, Iterator )
+TEST( CoreContainerArray, Iterator )
 {
-	using A = qup::List<uint32_t>;
+	using A = bc::List<uint32_t>;
 
+	{
+		A a;
+		EXPECT_EQ( a.begin(), a.end() );
+
+		a.PushBack( 5 );
+		EXPECT_NE( a.begin(), a.end() );
+	}
 	{
 		A a;
 		auto it = a.begin();
 		auto temp_it = it;
 
 		temp_it = it;
-		EXPECT_THROW( --temp_it, qup::exception::Exception );
+		EXPECT_THROW( --temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( ++temp_it, qup::exception::Exception );
+		EXPECT_THROW( ++temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it - 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it - 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it + 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it + 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it -= 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it -= 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it += 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it += 1, bc::diagnostic::Exception );
 	}
 	{
 		A a;
@@ -656,34 +671,34 @@ TEST( CoreContainerList, Iterator )
 		auto temp_it = it;
 
 		temp_it = it;
-		EXPECT_THROW( --temp_it, qup::exception::Exception );
+		EXPECT_THROW( --temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
 		EXPECT_NO_THROW( ++temp_it );
-		EXPECT_THROW( ++temp_it, qup::exception::Exception );
+		EXPECT_THROW( ++temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it - 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it - 1, bc::diagnostic::Exception );
 		EXPECT_NO_THROW( temp_it + 1 );
-		EXPECT_THROW( temp_it + 2, qup::exception::Exception );
+		EXPECT_THROW( temp_it + 2, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it -= 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it -= 1, bc::diagnostic::Exception );
 
 		temp_it = it;
 		EXPECT_NO_THROW( temp_it += 1 );
-		EXPECT_THROW( temp_it += 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it += 1, bc::diagnostic::Exception );
 	}
 }
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerList, SelfAssignment )
+TEST( CoreContainerArray, SelfAssignment )
 {
 	{
-		using A = qup::List<uint32_t>;
-		using AView = A::ViewType;
+		using A = bc::List<uint32_t>;
+		using AView = A::ThisViewType<true>;
 
 		A original { 5, 10, 20, 50, 200 };
 		{
@@ -700,7 +715,7 @@ TEST( CoreContainerList, SelfAssignment )
 		}
 		{
 			A a = original;
-			a = AView( a.begin() + 1, a.end() - 1 );
+			a = AView( a.Data() + 1, a.Size() - 2 );
 
 			A comp { 10, 20, 50 };
 			EXPECT_EQ( a.Size(), 3 );
@@ -710,36 +725,36 @@ TEST( CoreContainerList, SelfAssignment )
 			A a = original;
 			a.Append( a );
 
-			EXPECT_EQ( a.Size(), 10 );
 			A comp { 5, 10, 20, 50, 200, 5, 10, 20, 50, 200 };
+			EXPECT_EQ( a.Size(), 10 );
 			EXPECT_EQ( a, comp );
 		}
 	}
 	{
-		List_CtorDtorCounted::constructed_counter		= 0;
+		Array_CtorDtorCounted::constructed_counter		= 0;
 
-		using A = qup::List<List_CtorDtorCounted>;
-		using AView = A::ViewType;
-		A a;
+		using A = bc::List<Array_CtorDtorCounted>;
+		using AView = A::ThisViewType<true>;
+		A a( 5 );
+		a.Resize( 10 );
+		a.Reserve( 50 );
 		a.PushBack( {} );
-		a.PushBack( {} );
-		a.PushBack( {} );
-		a.Insert( a.begin() + 1, {} );
+		a.Insert( a.begin() + 5, {} );
 		for( size_t i = 0; i < 5; i++ ) {
-			a.PushFront( List_CtorDtorCounted() );
-			a.PushBack( List_CtorDtorCounted() );
-			a.Insert( a.begin() + 3, List_CtorDtorCounted() );
+			a.PushFront( Array_CtorDtorCounted() );
+			a.PushBack( Array_CtorDtorCounted() );
+			a.Insert( a.begin() + 10, Array_CtorDtorCounted() );
 			a = a;
 			a.Append( a );
 		}
 		a.Clear();
 
 		EXPECT_EQ( a.Size(), 0 );
-		EXPECT_EQ( List_CtorDtorCounted::constructed_counter, 0 );
+		EXPECT_EQ( Array_CtorDtorCounted::constructed_counter, 0 );
 	}
 }
 
 
 
-} // array
+} // list
 } // containers

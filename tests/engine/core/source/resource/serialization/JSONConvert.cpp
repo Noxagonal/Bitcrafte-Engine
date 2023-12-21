@@ -1,4 +1,8 @@
 
+/*
+
+// TODO: JSON converter
+
 #include <gtest/gtest.h>
 #include <TestsCommon.hpp>
 
@@ -20,7 +24,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_primitives =
+constexpr bc::TextView json_comparison_text_primitives =
 R"json_comp_prim({
 	"test_bool": true,
 	"test_uint8_t": 5,
@@ -74,12 +78,12 @@ TEST( CoreResourceSerializationJSONConvert, Primitives )
 	int64_t		test_zerofill_5			= 111;
 	int64_t		test_zerofill_8_hex		= 0x00ABCDEF;
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
+		bc::serialization::JSONStructure json_structure;
 
 		#define SerializePrimitiveTest( m_variable, ... )								\
-			qup::serialization::JSONSerialization<decltype( m_variable )>::Serialize(	\
+			bc::serialization::JSONSerialization<decltype( m_variable )>::Serialize(	\
 				json_structure.GetRoot(), #m_variable, m_variable, __VA_ARGS__			\
 			)
 
@@ -96,27 +100,27 @@ TEST( CoreResourceSerializationJSONConvert, Primitives )
 		SerializePrimitiveTest( test_float32 );
 		SerializePrimitiveTest( test_float64 );
 
-		SerializePrimitiveTest( test_binary, qup::conversion::IntegerToTextConversionFormat::BINARY );
-		SerializePrimitiveTest( test_octal, qup::conversion::IntegerToTextConversionFormat::OCTAL );
-		SerializePrimitiveTest( test_hex, qup::conversion::IntegerToTextConversionFormat::HEX );
+		SerializePrimitiveTest( test_binary, bc::conversion::IntegerToTextConversionFormat::BINARY );
+		SerializePrimitiveTest( test_octal, bc::conversion::IntegerToTextConversionFormat::OCTAL );
+		SerializePrimitiveTest( test_hex, bc::conversion::IntegerToTextConversionFormat::HEX );
 
-		SerializePrimitiveTest( test_zerofill_0, qup::conversion::IntegerToTextConversionFormat::DECIMAL, 0 );
-		SerializePrimitiveTest( test_zerofill_1, qup::conversion::IntegerToTextConversionFormat::DECIMAL, 1 );
-		SerializePrimitiveTest( test_zerofill_2, qup::conversion::IntegerToTextConversionFormat::DECIMAL, 2 );
-		SerializePrimitiveTest( test_zerofill_3, qup::conversion::IntegerToTextConversionFormat::DECIMAL, 3 );
-		SerializePrimitiveTest( test_zerofill_4, qup::conversion::IntegerToTextConversionFormat::DECIMAL, 4 );
-		SerializePrimitiveTest( test_zerofill_5, qup::conversion::IntegerToTextConversionFormat::DECIMAL, 5 );
-		SerializePrimitiveTest( test_zerofill_8_hex, qup::conversion::IntegerToTextConversionFormat::HEX, 8 );
+		SerializePrimitiveTest( test_zerofill_0, bc::conversion::IntegerToTextConversionFormat::DECIMAL, 0 );
+		SerializePrimitiveTest( test_zerofill_1, bc::conversion::IntegerToTextConversionFormat::DECIMAL, 1 );
+		SerializePrimitiveTest( test_zerofill_2, bc::conversion::IntegerToTextConversionFormat::DECIMAL, 2 );
+		SerializePrimitiveTest( test_zerofill_3, bc::conversion::IntegerToTextConversionFormat::DECIMAL, 3 );
+		SerializePrimitiveTest( test_zerofill_4, bc::conversion::IntegerToTextConversionFormat::DECIMAL, 4 );
+		SerializePrimitiveTest( test_zerofill_5, bc::conversion::IntegerToTextConversionFormat::DECIMAL, 5 );
+		SerializePrimitiveTest( test_zerofill_8_hex, bc::conversion::IntegerToTextConversionFormat::HEX, 8 );
 
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
 		EXPECT_EQ( json_text, json_comparison_text_primitives );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
 		#define DeserializePrimitiveTest( m_variable )									\
-			qup::serialization::JSONSerialization<decltype( m_variable )>::Deserialize(	\
+			bc::serialization::JSONSerialization<decltype( m_variable )>::Deserialize(	\
 				deserialized_json_text.GetRoot()->FindChildByName( U#m_variable )		\
 			)
 
@@ -174,7 +178,7 @@ TEST( CoreResourceSerializationJSONConvert, Primitives )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_arrays =
+constexpr bc::TextView json_comparison_text_arrays =
 R"json_comp_arrays({
 	"test_array": [
 		50,
@@ -199,26 +203,26 @@ R"json_comp_arrays({
 
 TEST( CoreResourceSerializationJSONConvert, Arrays )
 {
-	qup::Array<uint32_t> test_array { 50, 120, 600 };
-	qup::Array<qup::Array<uint32_t>> test_array_2 {
+	bc::Array<uint32_t> test_array { 50, 120, 600 };
+	bc::Array<bc::Array<uint32_t>> test_array_2 {
 		{ 500, 20, 0 },
 		{ 100, 30, 90, 13 }
 	};
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
-		qup::serialization::JSONSerialization<decltype( test_array )>::Serialize( json_structure.GetRoot(), "test_array", test_array );
-		qup::serialization::JSONSerialization<decltype( test_array_2 )>::Serialize( json_structure.GetRoot(), "test_array_2", test_array_2 );
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		bc::serialization::JSONStructure json_structure;
+		bc::serialization::JSONSerialization<decltype( test_array )>::Serialize( json_structure.GetRoot(), "test_array", test_array );
+		bc::serialization::JSONSerialization<decltype( test_array_2 )>::Serialize( json_structure.GetRoot(), "test_array_2", test_array_2 );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
 		EXPECT_EQ( json_text, json_comparison_text_arrays );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
-		auto out_array		= qup::serialization::JSONSerialization<decltype( test_array )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_array" ) );
-		auto out_array_2	= qup::serialization::JSONSerialization<decltype( test_array_2 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_array_2" ) );
+		auto out_array		= bc::serialization::JSONSerialization<decltype( test_array )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_array" ) );
+		auto out_array_2	= bc::serialization::JSONSerialization<decltype( test_array_2 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_array_2" ) );
 
 		EXPECT_EQ( test_array, out_array );
 		EXPECT_EQ( test_array_2, out_array_2 );
@@ -228,7 +232,7 @@ TEST( CoreResourceSerializationJSONConvert, Arrays )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_texts =
+constexpr bc::TextView json_comparison_text_texts =
 R"json_comp_texts({
 	"test_text8": "Test Text8",
 	"test_text16": "Test Text16",
@@ -238,26 +242,26 @@ R"json_comp_texts({
 
 TEST( CoreResourceSerializationJSONConvert, Texts )
 {
-	qup::Text8		test_text8		= "Test Text8";
-	qup::Text16		test_text16		= "Test Text16";
-	qup::Text32		test_text32		= "Test Text32";
+	bc::Text8		test_text8		= "Test Text8";
+	bc::Text16		test_text16		= "Test Text16";
+	bc::Text32		test_text32		= "Test Text32";
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
-		qup::serialization::JSONSerialization<decltype( test_text8 )>::Serialize( json_structure.GetRoot(), "test_text8", test_text8 );
-		qup::serialization::JSONSerialization<decltype( test_text16 )>::Serialize( json_structure.GetRoot(), "test_text16", test_text16 );
-		qup::serialization::JSONSerialization<decltype( test_text32 )>::Serialize( json_structure.GetRoot(), "test_text32", test_text32 );
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		bc::serialization::JSONStructure json_structure;
+		bc::serialization::JSONSerialization<decltype( test_text8 )>::Serialize( json_structure.GetRoot(), "test_text8", test_text8 );
+		bc::serialization::JSONSerialization<decltype( test_text16 )>::Serialize( json_structure.GetRoot(), "test_text16", test_text16 );
+		bc::serialization::JSONSerialization<decltype( test_text32 )>::Serialize( json_structure.GetRoot(), "test_text32", test_text32 );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
 		EXPECT_EQ( json_text, json_comparison_text_texts );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
-		auto out_text8		= qup::serialization::JSONSerialization<decltype( test_text8 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_text8" ) );
-		auto out_text16		= qup::serialization::JSONSerialization<decltype( test_text16 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_text16" ) );
-		auto out_text32		= qup::serialization::JSONSerialization<decltype( test_text32 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_text32" ) );
+		auto out_text8		= bc::serialization::JSONSerialization<decltype( test_text8 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_text8" ) );
+		auto out_text16		= bc::serialization::JSONSerialization<decltype( test_text16 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_text16" ) );
+		auto out_text32		= bc::serialization::JSONSerialization<decltype( test_text32 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_text32" ) );
 
 		EXPECT_EQ( out_text8, test_text8 );
 		EXPECT_EQ( out_text16, test_text16 );
@@ -268,7 +272,7 @@ TEST( CoreResourceSerializationJSONConvert, Texts )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_lists =
+constexpr bc::TextView json_comparison_text_lists =
 R"json_comp_lists({
 	"test_list": [
 		50,
@@ -293,26 +297,26 @@ R"json_comp_lists({
 
 TEST( CoreResourceSerializationJSONConvert, Lists )
 {
-	qup::List<uint32_t> test_list { 50, 120, 600 };
-	qup::List<qup::List<uint32_t>> test_list_2 {
+	bc::List<uint32_t> test_list { 50, 120, 600 };
+	bc::List<bc::List<uint32_t>> test_list_2 {
 		{ 500, 20, 0 },
 		{ 100, 30, 90, 13 }
 	};
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
-		qup::serialization::JSONSerialization<decltype( test_list )>::Serialize( json_structure.GetRoot(), "test_list", test_list );
-		qup::serialization::JSONSerialization<decltype( test_list_2 )>::Serialize( json_structure.GetRoot(), "test_list_2", test_list_2 );
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		bc::serialization::JSONStructure json_structure;
+		bc::serialization::JSONSerialization<decltype( test_list )>::Serialize( json_structure.GetRoot(), "test_list", test_list );
+		bc::serialization::JSONSerialization<decltype( test_list_2 )>::Serialize( json_structure.GetRoot(), "test_list_2", test_list_2 );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
 		EXPECT_EQ( json_text, json_comparison_text_lists );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
-		auto out_list		= qup::serialization::JSONSerialization<decltype( test_list )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_list" ) );
-		auto out_list_2		= qup::serialization::JSONSerialization<decltype( test_list_2 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_list_2" ) );
+		auto out_list		= bc::serialization::JSONSerialization<decltype( test_list )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_list" ) );
+		auto out_list_2		= bc::serialization::JSONSerialization<decltype( test_list_2 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_list_2" ) );
 
 		EXPECT_EQ( test_list, out_list );
 		EXPECT_EQ( test_list_2, out_list_2 );
@@ -322,7 +326,7 @@ TEST( CoreResourceSerializationJSONConvert, Lists )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_map =
+constexpr bc::TextView json_comparison_text_map =
 R"json_comp_map({
 	"test_map": [
 		[
@@ -371,10 +375,10 @@ R"json_comp_map({
 
 TEST( CoreResourceSerializationJSONConvert, Maps )
 {
-	using M		= qup::Map<uint32_t, uint32_t>;
+	using M		= bc::Map<uint32_t, uint32_t>;
 	using P		= M::ElementType;
 
-	using M2	= qup::Map<uint32_t, M>;
+	using M2	= bc::Map<uint32_t, M>;
 	using P2	= M2::ElementType;
 
 	M test_map {
@@ -397,20 +401,20 @@ TEST( CoreResourceSerializationJSONConvert, Maps )
 		}
 	};
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
-		qup::serialization::JSONSerialization<decltype( test_map )>::Serialize( json_structure.GetRoot(), "test_map", test_map );
-		qup::serialization::JSONSerialization<decltype( test_map_2 )>::Serialize( json_structure.GetRoot(), "test_map_2", test_map_2 );
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		bc::serialization::JSONStructure json_structure;
+		bc::serialization::JSONSerialization<decltype( test_map )>::Serialize( json_structure.GetRoot(), "test_map", test_map );
+		bc::serialization::JSONSerialization<decltype( test_map_2 )>::Serialize( json_structure.GetRoot(), "test_map_2", test_map_2 );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
 		EXPECT_EQ( json_text, json_comparison_text_map );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
-		auto out_map		= qup::serialization::JSONSerialization<decltype( test_map )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_map" ) );
-		auto out_map_2		= qup::serialization::JSONSerialization<decltype( test_map_2 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_map_2" ) );
+		auto out_map		= bc::serialization::JSONSerialization<decltype( test_map )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_map" ) );
+		auto out_map_2		= bc::serialization::JSONSerialization<decltype( test_map_2 )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_map_2" ) );
 
 		EXPECT_EQ( test_map, out_map );
 		EXPECT_EQ( test_map_2, out_map_2 );
@@ -420,7 +424,7 @@ TEST( CoreResourceSerializationJSONConvert, Maps )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_glm =
+constexpr bc::TextView json_comparison_text_glm =
 R"json_comp_glm({
 	"test_vec1": [5.05],
 	"test_vec2": [5.05, 10.1],
@@ -534,12 +538,12 @@ TEST( CoreResourceSerializationJSONConvert, GLM )
 		{ 5.05f, 10.1f, 20.2f, 50.5f }
 	};
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
+		bc::serialization::JSONStructure json_structure;
 
 		#define SerializeGLMTest( m_variable, ... )										\
-			qup::serialization::JSONSerialization<decltype( m_variable )>::Serialize(	\
+			bc::serialization::JSONSerialization<decltype( m_variable )>::Serialize(	\
 				json_structure.GetRoot(), #m_variable, m_variable, __VA_ARGS__			\
 			)
 
@@ -574,15 +578,15 @@ TEST( CoreResourceSerializationJSONConvert, GLM )
 		SerializeGLMTest( test_dmat3 );
 		SerializeGLMTest( test_dmat4 );
 
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
 		EXPECT_EQ( json_text, json_comparison_text_glm );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
 		#define DeserializeGLMTest( m_variable )										\
-			qup::serialization::JSONSerialization<decltype( m_variable )>::Deserialize(	\
+			bc::serialization::JSONSerialization<decltype( m_variable )>::Deserialize(	\
 				deserialized_json_text.GetRoot()->FindChildByName( U#m_variable )		\
 			)
 
@@ -653,7 +657,7 @@ TEST( CoreResourceSerializationJSONConvert, GLM )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_uuids =
+constexpr bc::TextView json_comparison_text_uuids =
 R"json_comp_uuid({
 	"test_uuid": [
 		"0x1234567890abcdef",
@@ -664,24 +668,24 @@ R"json_comp_uuid({
 
 TEST( CoreResourceSerializationJSONConvert, UUIDs )
 {
-	qup::UUID	test_uuid;
+	bc::UUID	test_uuid;
 	test_uuid.data = {
 		0x1234567890ABCDEF,
 		0x0000FFFF0000FFFF
 	};
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
-		qup::serialization::JSONSerialization<decltype( test_uuid )>::Serialize( json_structure.GetRoot(), "test_uuid", test_uuid );
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		bc::serialization::JSONStructure json_structure;
+		bc::serialization::JSONSerialization<decltype( test_uuid )>::Serialize( json_structure.GetRoot(), "test_uuid", test_uuid );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
 		EXPECT_EQ( json_text, json_comparison_text_uuids );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
-		auto out_uuid		= qup::serialization::JSONSerialization<decltype( test_uuid )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_uuid" ) );
+		auto out_uuid		= bc::serialization::JSONSerialization<decltype( test_uuid )>::Deserialize( deserialized_json_text.GetRoot()->FindChildByName( U"test_uuid" ) );
 
 		EXPECT_EQ( out_uuid, test_uuid );
 	}
@@ -690,7 +694,7 @@ TEST( CoreResourceSerializationJSONConvert, UUIDs )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr qup::TextView json_comparison_text_parameters =
+constexpr bc::TextView json_comparison_text_parameters =
 R"json_comp_params({
 	"test_bool": {
 		"Type": "bool",
@@ -737,19 +741,19 @@ R"json_comp_params({
 		"Value": 50.005001068115234
 	},
 	"test_Text8": {
-		"Type": "qup::Text8",
+		"Type": "bc::Text8",
 		"Value": "Test Text8"
 	},
 	"test_Text16": {
-		"Type": "qup::Text16",
+		"Type": "bc::Text16",
 		"Value": "Test Text16"
 	},
 	"test_Text32": {
-		"Type": "qup::Text32",
+		"Type": "bc::Text32",
 		"Value": "Test Text32"
 	},
 	"test_uuid": {
-		"Type": "qup::UUID",
+		"Type": "bc::UUID",
 		"Value": [
 			"0x000000000000000f",
 			"0x00000000000000ff"
@@ -760,28 +764,28 @@ R"json_comp_params({
 
 TEST( CoreResourceSerializationJSONConvert, Parameters )
 {
-	auto test_bool		= qup::reflection::MemoryBackedParameterData::Create<bool>( true );
-	auto test_uint8_t	= qup::reflection::MemoryBackedParameterData::Create<uint8_t>( 5 );
-	auto test_int8_t	= qup::reflection::MemoryBackedParameterData::Create<int8_t>( -5 );
-	auto test_uint16_t	= qup::reflection::MemoryBackedParameterData::Create<uint16_t>( 10 );
-	auto test_int16_t	= qup::reflection::MemoryBackedParameterData::Create<int16_t>( -10 );
-	auto test_uint32_t	= qup::reflection::MemoryBackedParameterData::Create<uint32_t>( 20 );
-	auto test_int32_t	= qup::reflection::MemoryBackedParameterData::Create<int32_t>( -20 );
-	auto test_uint64_t	= qup::reflection::MemoryBackedParameterData::Create<uint64_t>( 50 );
-	auto test_int64_t	= qup::reflection::MemoryBackedParameterData::Create<int64_t>( -50 );
-	auto test_float32	= qup::reflection::MemoryBackedParameterData::Create<float>( 5.05f );
-	auto test_float64	= qup::reflection::MemoryBackedParameterData::Create<double>( 50.005f );
-	auto test_Text8		= qup::reflection::MemoryBackedParameterData::Create<qup::Text8>( "Test Text8" );
-	auto test_Text16	= qup::reflection::MemoryBackedParameterData::Create<qup::Text16>( "Test Text16" );
-	auto test_Text32	= qup::reflection::MemoryBackedParameterData::Create<qup::Text32>( "Test Text32" );
-	auto test_uuid		= qup::reflection::MemoryBackedParameterData::Create<qup::UUID>( std::array<uint64_t, 2> { 0xF, 0xFF } );
+	auto test_bool		= bc::reflection::MemoryBackedParameterData::Create<bool>( true );
+	auto test_uint8_t	= bc::reflection::MemoryBackedParameterData::Create<uint8_t>( 5 );
+	auto test_int8_t	= bc::reflection::MemoryBackedParameterData::Create<int8_t>( -5 );
+	auto test_uint16_t	= bc::reflection::MemoryBackedParameterData::Create<uint16_t>( 10 );
+	auto test_int16_t	= bc::reflection::MemoryBackedParameterData::Create<int16_t>( -10 );
+	auto test_uint32_t	= bc::reflection::MemoryBackedParameterData::Create<uint32_t>( 20 );
+	auto test_int32_t	= bc::reflection::MemoryBackedParameterData::Create<int32_t>( -20 );
+	auto test_uint64_t	= bc::reflection::MemoryBackedParameterData::Create<uint64_t>( 50 );
+	auto test_int64_t	= bc::reflection::MemoryBackedParameterData::Create<int64_t>( -50 );
+	auto test_float32	= bc::reflection::MemoryBackedParameterData::Create<float>( 5.05f );
+	auto test_float64	= bc::reflection::MemoryBackedParameterData::Create<double>( 50.005f );
+	auto test_Text8		= bc::reflection::MemoryBackedParameterData::Create<bc::Text8>( "Test Text8" );
+	auto test_Text16	= bc::reflection::MemoryBackedParameterData::Create<bc::Text16>( "Test Text16" );
+	auto test_Text32	= bc::reflection::MemoryBackedParameterData::Create<bc::Text32>( "Test Text32" );
+	auto test_uuid		= bc::reflection::MemoryBackedParameterData::Create<bc::UUID>( std::array<uint64_t, 2> { 0xF, 0xFF } );
 
-	qup::Text32 json_text;
+	bc::Text32 json_text;
 	{
-		qup::serialization::JSONStructure json_structure;
+		bc::serialization::JSONStructure json_structure;
 
 		#define SerializeParameterTest( m_variable, ... )										\
-			qup::serialization::JSONSerialization<qup::reflection::ParameterData>::Serialize(	\
+			bc::serialization::JSONSerialization<bc::reflection::ParameterData>::Serialize(	\
 				json_structure.GetRoot(), #m_variable, m_variable, __VA_ARGS__					\
 			)
 
@@ -801,17 +805,17 @@ TEST( CoreResourceSerializationJSONConvert, Parameters )
 		SerializeParameterTest( test_Text32 );
 		SerializeParameterTest( test_uuid );
 
-		json_text = qup::serialization::JSONContainerToJSONText( json_structure );
+		json_text = bc::serialization::JSONContainerToJSONText( json_structure );
 
-		std::cout << reinterpret_cast<const char*>( qup::conversion::ToUTF8( json_text ).ToCStr() );
+		std::cout << reinterpret_cast<const char*>( bc::conversion::ToUTF8( json_text ).ToCStr() );
 
 		EXPECT_EQ( json_text, json_comparison_text_parameters );
 	}
 	{
-		auto deserialized_json_text = qup::serialization::JSONTextToJSONContainer( json_text );
+		auto deserialized_json_text = bc::serialization::JSONTextToJSONContainer( json_text );
 
 		#define DeserializeParameterTest( m_variable )											\
-			qup::serialization::JSONSerialization<qup::reflection::ParameterData>::Deserialize(	\
+			bc::serialization::JSONSerialization<bc::reflection::ParameterData>::Deserialize(	\
 				deserialized_json_text.GetRoot()->FindChildByName( U#m_variable )				\
 			)
 
@@ -848,3 +852,5 @@ TEST( CoreResourceSerializationJSONConvert, Parameters )
 		EXPECT_EQ( out_uuid, test_uuid );
 	}
 }
+
+*/

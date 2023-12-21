@@ -1,21 +1,19 @@
 
 #include <gtest/gtest.h>
-#include <TestsCommon.hpp>
 
-#include <core/containers/simple/SimpleLinearContainer.hpp>
-#include <core/assertion/Assert.hpp>
+#include <core/containers/simple/SimpleList.hpp>
 
 
 
 namespace containers {
-namespace array {
+namespace simple_list {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerSimpleLinearContainer, BasicInit )
 {
-	using A = qup::_internal::SimpleLinearContainerBase<uint32_t>;
+	using A = bc::SimpleList<uint32_t>;
 	A a;
 	EXPECT_EQ( a.Size(), 0 );
 
@@ -37,7 +35,7 @@ TEST( CoreContainerSimpleLinearContainer, BasicInit )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerSimpleLinearContainer, ConstructWithSize )
 {
-	using A = qup::_internal::SimpleLinearContainerBase<uint32_t>;
+	using A = bc::SimpleList<uint32_t>;
 	A a;
 	EXPECT_EQ( a.Size(), 0 );
 
@@ -62,7 +60,7 @@ TEST( CoreContainerSimpleLinearContainer, ConstructWithSize )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerSimpleLinearContainer, IndexOperator )
 {
-	using A = qup::_internal::SimpleLinearContainerBase<uint32_t>;
+	using A = bc::SimpleList<uint32_t>;
 	A a { 5, 10, 20 };
 
 	EXPECT_EQ( a.Size(), 3 );
@@ -78,7 +76,7 @@ TEST( CoreContainerSimpleLinearContainer, IndexOperator )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerSimpleLinearContainer, FrontBack )
 {
-	using A = qup::_internal::SimpleLinearContainerBase<uint32_t>;
+	using A = bc::SimpleList<uint32_t>;
 	{
 		A a;
 
@@ -126,8 +124,8 @@ static_assert( std::is_nothrow_constructible_v<PushObject, size_t>, "Test object
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerSimpleLinearContainer, PushBack )
 {
-	using A = qup::_internal::SimpleLinearContainerBase<uint32_t>;
-	using B = qup::_internal::SimpleLinearContainerBase<PushObject>;
+	using A = bc::SimpleList<uint32_t>;
+	using B = bc::SimpleList<PushObject>;
 
 	A a;
 	a.PushBack( 5 );
@@ -161,12 +159,12 @@ TEST( CoreContainerSimpleLinearContainer, StructureBasicInit )
 		double v4;
 	};
 
-	using A = qup::_internal::SimpleLinearContainerBase<Simple>;
+	using A = bc::SimpleList<Simple>;
 	A a;
 	A b {};
 	A c = {};
-	A d = qup::_internal::SimpleLinearContainerBase<Simple>();
-	A e = qup::_internal::SimpleLinearContainerBase<Simple> {};
+	A d = bc::SimpleList<Simple>();
+	A e = bc::SimpleList<Simple> {};
 
 	EXPECT_EQ( a.Size(), 0 );
 	EXPECT_EQ( b.Size(), 0 );
@@ -188,7 +186,7 @@ TEST( CoreContainerSimpleLinearContainer, StructureInitializerListInit )
 		double v4;
 	};
 
-	using A = qup::_internal::SimpleLinearContainerBase<Simple>;
+	using A = bc::SimpleList<Simple>;
 	A a { { 5, 10, 20.0f, 50.0 }, {} };
 
 	EXPECT_EQ( a.Size(), 2 );
@@ -217,7 +215,7 @@ TEST( CoreContainerSimpleLinearContainer, StructureCopy )
 		double v4;
 	};
 
-	using A = qup::_internal::SimpleLinearContainerBase<Simple>;
+	using A = bc::SimpleList<Simple>;
 	A a { { 5, 10, 20.0f, 50.0 }, {} };
 	A b = a;
 
@@ -259,7 +257,7 @@ TEST( CoreContainerSimpleLinearContainer, StructureMove )
 		double v4;
 	};
 
-	using A = qup::_internal::SimpleLinearContainerBase<Simple>;
+	using A = bc::SimpleList<Simple>;
 	A a1 { { 5, 10, 20.0f, 50.0 }, {} };
 	A a2 = a1;
 	A b1 = std::move( a1 );
@@ -297,7 +295,7 @@ TEST( CoreContainerSimpleLinearContainer, MoveableOnlyStructure )
 		size_t v1 = {};
 	};
 
-	using A = qup::_internal::SimpleLinearContainerBase<MoveableOnly>;
+	using A = bc::SimpleList<MoveableOnly>;
 	A a;
 	a.PushBack( MoveableOnly( 5 ) );
 	a.PushBack( MoveableOnly( 10 ) );
@@ -331,8 +329,8 @@ public:
 	SimpleLinearContainer_CopyableOnly_Control( const SimpleLinearContainer_CopyableOnly_Control & other ) noexcept { ++copy_counter; }
 	SimpleLinearContainer_CopyableOnly_Control( SimpleLinearContainer_CopyableOnly_Control && other ) noexcept { ++move_counter; }
 
-	SimpleLinearContainer_CopyableOnly_Control & operator=( const SimpleLinearContainer_CopyableOnly_Control & other ) noexcept { ++copy_counter; }
-	SimpleLinearContainer_CopyableOnly_Control & operator=( SimpleLinearContainer_CopyableOnly_Control && other ) noexcept { ++move_counter; }
+	SimpleLinearContainer_CopyableOnly_Control & operator=( const SimpleLinearContainer_CopyableOnly_Control & other ) noexcept { ++copy_counter; return *this; }
+	SimpleLinearContainer_CopyableOnly_Control & operator=( SimpleLinearContainer_CopyableOnly_Control && other ) noexcept { ++move_counter; return *this; }
 };
 int32_t SimpleLinearContainer_CopyableOnly_Control::copy_counter		= 0;
 int32_t SimpleLinearContainer_CopyableOnly_Control::move_counter		= 0;
@@ -348,7 +346,7 @@ public:
 	SimpleLinearContainer_CopyableOnly( const SimpleLinearContainer_CopyableOnly & other ) noexcept { ++copy_counter; }
 	SimpleLinearContainer_CopyableOnly( SimpleLinearContainer_CopyableOnly && other ) noexcept = delete;
 
-	SimpleLinearContainer_CopyableOnly & operator=( const SimpleLinearContainer_CopyableOnly & other ) noexcept { ++copy_counter; }
+	SimpleLinearContainer_CopyableOnly & operator=( const SimpleLinearContainer_CopyableOnly & other ) noexcept { ++copy_counter; return *this; }
 	SimpleLinearContainer_CopyableOnly & operator=( SimpleLinearContainer_CopyableOnly && other ) noexcept = delete;
 };
 int32_t SimpleLinearContainer_CopyableOnly::copy_counter		= 0;
@@ -360,8 +358,8 @@ TEST( CoreContainerSimpleLinearContainer, SimpleLinearContainer_CopyableOnlyStru
 
 	SimpleLinearContainer_CopyableOnly::copy_counter			= 0;
 
-	using A = qup::_internal::SimpleLinearContainerBase<SimpleLinearContainer_CopyableOnly>;
-	using B = qup::_internal::SimpleLinearContainerBase<SimpleLinearContainer_CopyableOnly_Control>;
+	using A = bc::SimpleList<SimpleLinearContainer_CopyableOnly>;
+	using B = bc::SimpleList<SimpleLinearContainer_CopyableOnly_Control>;
 	A a;
 	a.PushBack( SimpleLinearContainer_CopyableOnly() );
 	a.PushBack( SimpleLinearContainer_CopyableOnly() );
@@ -419,7 +417,7 @@ TEST( CoreContainerSimpleLinearContainer, CtorDtorCounter )
 {
 	SimpleLinearContainer_CtorDtorCounted::constructed_counter		= 0;
 
-	using A = qup::_internal::SimpleLinearContainerBase<SimpleLinearContainer_CtorDtorCounted>;
+	using A = bc::SimpleList<SimpleLinearContainer_CtorDtorCounted>;
 	A a;
 
 	a.PushBack( {} );
@@ -471,8 +469,8 @@ TEST( CoreContainerSimpleLinearContainer, CtorDtorCounter )
 TEST( CoreContainerSimpleLinearContainer, SelfAssignment )
 {
 	{
-		using A = qup::_internal::SimpleLinearContainerBase<uint32_t>;
-		using AView = A::ViewType;
+		using A = bc::SimpleList<uint32_t>;
+		using AView = A::ThisViewType<true>;
 
 		A original { 5, 10, 20, 50, 200 };
 		{
@@ -507,8 +505,9 @@ TEST( CoreContainerSimpleLinearContainer, SelfAssignment )
 	{
 		SimpleLinearContainer_CtorDtorCounted::constructed_counter		= 0;
 
-		using A = qup::_internal::SimpleLinearContainerBase<SimpleLinearContainer_CtorDtorCounted>;
-		using AView = A::ViewType;
+		using A = bc::SimpleList<SimpleLinearContainer_CtorDtorCounted>;
+		using AView = A::ThisViewType<true>;
+
 		A a( 5 );
 		a.Resize( 10 );
 		a.Reserve( 50 );
@@ -527,5 +526,5 @@ TEST( CoreContainerSimpleLinearContainer, SelfAssignment )
 
 
 
-} // array
+} // simple_list
 } // containers

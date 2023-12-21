@@ -373,14 +373,7 @@ constexpr bool											CheckContainerContentsMatch(
 	auto second_it = second_container.begin();
 	for( size_t i = 0; i < first_size; ++i )
 	{
-		if constexpr( !std::is_class_v<FirstValueType> && !std::is_class_v<SecondValueType> )
-		{
-			if( *first_it != FirstValueType( *second_it ) ) return false;
-		}
-		else
-		{
-			if( *first_it != *second_it ) return false;
-		}
+		if( *first_it != *second_it ) return false;
 		++first_it;
 		++second_it;
 	}

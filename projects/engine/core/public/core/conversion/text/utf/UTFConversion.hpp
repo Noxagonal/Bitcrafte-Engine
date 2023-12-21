@@ -39,11 +39,11 @@ auto											ToUTF8(
 
 	if constexpr( std::is_same_v<char, OutTextCharacterType> ) {
 		// From ASCII to UTF-8.
-		out = text;
+		out.Append( text );
 
 	} else if constexpr( std::is_same_v<char8_t, OutTextCharacterType> ) {
 		// From UTF-8 to UTF-8.
-		out = text;
+		out.Append( text );
 
 	} else if constexpr( std::is_same_v<char16_t, OutTextCharacterType> ) {
 		// From UTF-16 to UTF-8.
@@ -112,7 +112,7 @@ auto											ToUTF16(
 
 	if constexpr( std::is_same_v<char, OutTextCharacterType> ) {
 		// From ASCII to UTF-16.
-		out = text;
+		out.Append( text );
 
 	} else if constexpr( std::is_same_v<char8_t, OutTextCharacterType> ) {
 		// From UTF-8 to UTF-16.
@@ -131,7 +131,7 @@ auto											ToUTF16(
 
 	} else if constexpr( std::is_same_v<char16_t, OutTextCharacterType> ) {
 		// From UTF-16 to UTF-16.
-		out = text;
+		out.Append( text );
 
 	} else if constexpr( std::is_same_v<char32_t, OutTextCharacterType> ) {
 		// From UTF-32 to UTF-16.
@@ -173,7 +173,7 @@ auto											ToUTF32(
 
 	if constexpr( std::is_same_v<char, OutTextCharacterType> ) {
 		// From ASCII to UTF-32.
-		out = text;
+		out.Append( text );
 
 	} else if constexpr( std::is_same_v<char8_t, OutTextCharacterType> ) {
 		// From UTF-8 to UTF-32.
@@ -197,7 +197,7 @@ auto											ToUTF32(
 
 	} else if constexpr( std::is_same_v<char32_t, OutTextCharacterType> ) {
 		// From UTF-32 to UTF-32.
-		out = text;
+		out.Append( text );
 
 	} else {
 		assert( 0 && "Failed to convert to UTF32, not a valid character type" );

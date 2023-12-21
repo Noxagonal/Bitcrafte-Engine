@@ -1,17 +1,20 @@
 
+/*
+
+// TODO: Path
+
 #include <gtest/gtest.h>
 
-#include <TestsCommon.hpp>
 #include <core/containers/Path.hpp>
 
 
 
 TEST( CoreContainerPath, BasicInitialize )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
 	// absolute path
-	#if QUP_PLATFORM_WINDOWS
+	#if BITCRAFTE_PLATFORM_WINDOWS
 
 	A a;
 	EXPECT_EQ( a.Size(), 0 );
@@ -25,7 +28,7 @@ TEST( CoreContainerPath, BasicInitialize )
 	A b( U"C:/testing1/testing2" );
 	EXPECT_EQ( b.Size(), 3 );
 
-	#elif QUP_PLATFORM_LINUX || QUP_PLATFORM_APPLE
+	#elif BITCRAFTE_PLATFORM_LINUX || BITCRAFTE_PLATFORM_APPLE
 
 	A a;
 	EXPECT_EQ( a.Size(), 0 );
@@ -51,7 +54,7 @@ TEST( CoreContainerPath, BasicInitialize )
 
 TEST( CoreContainerPath, Parsing )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 	{
 		A a = U"";
 		EXPECT_EQ( a.Size(), 0 );
@@ -132,9 +135,9 @@ TEST( CoreContainerPath, Parsing )
 
 TEST( CoreContainerPath, IsRelative )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
-	#if QUP_PLATFORM_WINDOWS
+	#if BITCRAFTE_PLATFORM_WINDOWS
 
 	// absolute path
 	A a = U"C:/testing1/testing2";
@@ -144,7 +147,7 @@ TEST( CoreContainerPath, IsRelative )
 	A b = U"testing1/testing2";
 	EXPECT_EQ( b.IsRelative(), true );
 
-	#elif QUP_PLATFORM_LINUX || QUP_PLATFORM_APPLE
+	#elif BITCRAFTE_PLATFORM_LINUX || BITCRAFTE_PLATFORM_APPLE
 
 	// absolute path
 	A a = U"/testing1/testing2";
@@ -159,9 +162,9 @@ TEST( CoreContainerPath, IsRelative )
 
 TEST( CoreContainerPath, OperatorIndex )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
-	#if QUP_PLATFORM_WINDOWS
+	#if BITCRAFTE_PLATFORM_WINDOWS
 
 	{
 		A a = U"C:/testing1/testing2";
@@ -169,10 +172,10 @@ TEST( CoreContainerPath, OperatorIndex )
 		EXPECT_EQ( a[ 1 ], U"testing1" );
 		EXPECT_EQ( a[ 2 ], U"testing2" );
 
-		EXPECT_THROW( a[ 3 ], qup::exception::Exception );
+		EXPECT_THROW( a[ 3 ], bc::diagnostic::Exception );
 	}
 
-	#elif QUP_PLATFORM_LINUX || QUP_PLATFORM_APPLE
+	#elif BITCRAFTE_PLATFORM_LINUX || BITCRAFTE_PLATFORM_APPLE
 
 	{
 		A a = U"/testing1/testing2";
@@ -180,7 +183,7 @@ TEST( CoreContainerPath, OperatorIndex )
 		EXPECT_EQ( a[ 1 ], U"testing1" );
 		EXPECT_EQ( a[ 2 ], U"testing2" );
 
-		EXPECT_THROW( a[ 3 ], qup::exception::Exception );
+		EXPECT_THROW( a[ 3 ], bc::diagnostic::Exception );
 	}
 
 	#endif
@@ -190,13 +193,13 @@ TEST( CoreContainerPath, OperatorIndex )
 		EXPECT_EQ( a[ 0 ], U"testing1" );
 		EXPECT_EQ( a[ 1 ], U"testing2" );
 
-		EXPECT_THROW( a[ 2 ], qup::exception::Exception );
+		EXPECT_THROW( a[ 2 ], bc::diagnostic::Exception );
 	}
 };
 
 TEST( CoreContainerPath, ToText )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
 	{
 		A a;
@@ -222,9 +225,9 @@ TEST( CoreContainerPath, ToText )
 
 TEST( CoreContainerPath, Replace )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
-	#if QUP_PLATFORM_WINDOWS
+	#if BITCRAFTE_PLATFORM_WINDOWS
 
 	{
 		A a( U"C:\\testing1\\testing2" );
@@ -237,10 +240,10 @@ TEST( CoreContainerPath, Replace )
 		a.Replace( 0, U"root" );
 		EXPECT_EQ( a, U"root/test/testing5" );
 
-		EXPECT_THROW( a.Replace( 3, U"non_existant" ), qup::exception::Exception );
+		EXPECT_THROW( a.Replace( 3, U"non_existant" ), bc::diagnostic::Exception );
 	}
 
-	#elif QUP_PLATFORM_LINUX || QUP_PLATFORM_APPLE
+	#elif BITCRAFTE_PLATFORM_LINUX || BITCRAFTE_PLATFORM_APPLE
 
 	{
 		A a( U"/testing1/testing2" );
@@ -253,7 +256,7 @@ TEST( CoreContainerPath, Replace )
 		a.Replace( 0, U"root" );
 		EXPECT_EQ( a, U"root/test/testing5" );
 
-		EXPECT_THROW( a.Replace( 3, U"non_existant" ), qup::exception::Exception );
+		EXPECT_THROW( a.Replace( 3, U"non_existant" ), bc::diagnostic::Exception );
 	}
 
 	#endif
@@ -269,10 +272,10 @@ TEST( CoreContainerPath, Replace )
 		a.Replace( 0, U"same_size" );
 		EXPECT_EQ( a, U"same_size/test" );
 
-		EXPECT_THROW( a.Replace( 2, U"non_existant" ), qup::exception::Exception );
+		EXPECT_THROW( a.Replace( 2, U"non_existant" ), bc::diagnostic::Exception );
 	}
 
-	#if QUP_PLATFORM_WINDOWS
+	#if BITCRAFTE_PLATFORM_WINDOWS
 
 	{
 		A a( U"C:\\testing1\\testing2" );
@@ -286,7 +289,7 @@ TEST( CoreContainerPath, Replace )
 		EXPECT_EQ( a, U"C:/test/testing5" );
 	}
 
-	#elif QUP_PLATFORM_LINUX || QUP_PLATFORM_APPLE
+	#elif BITCRAFTE_PLATFORM_LINUX || BITCRAFTE_PLATFORM_APPLE
 
 	{
 		A a( U"/testing1/testing2" );
@@ -331,7 +334,7 @@ TEST( CoreContainerPath, Replace )
 
 TEST( CoreContainerPath, ExtraSeparators )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 	{
 		A a;
 		a = U"double_slashes//here";
@@ -340,7 +343,7 @@ TEST( CoreContainerPath, ExtraSeparators )
 		EXPECT_EQ( a[ 1 ], U"here" );
 	}
 
-	#if QUP_PLATFORM_WINDOWS
+	#if BITCRAFTE_PLATFORM_WINDOWS
 
 	{
 		A a;
@@ -359,7 +362,7 @@ TEST( CoreContainerPath, ExtraSeparators )
 		EXPECT_EQ( a[ 2 ], U"here" );
 	}
 
-	#elif QUP_PLATFORM_LINUX || QUP_PLATFORM_APPLE
+	#elif BITCRAFTE_PLATFORM_LINUX || BITCRAFTE_PLATFORM_APPLE
 
 	{
 		A a;
@@ -392,7 +395,7 @@ TEST( CoreContainerPath, ExtraSeparators )
 
 TEST( CoreContainerPath, GetCommonParent )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
 	{
 		A a = U"p1/p2/p3";
@@ -428,7 +431,7 @@ TEST( CoreContainerPath, GetCommonParent )
 
 TEST( CoreContainerPath, RelativePath )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
 	{
 		A a = U"p1/p2";
@@ -476,7 +479,7 @@ TEST( CoreContainerPath, RelativePath )
 
 TEST( CoreContainerPath, GetStem )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 	{
 		A a = U"test_file.txt";
 		EXPECT_EQ( a.GetStem(), U"test_file" );
@@ -522,7 +525,7 @@ TEST( CoreContainerPath, GetStem )
 
 TEST( CoreContainerPath, GetExtension )
 {
-	using A = qup::Path32;
+	using A = bc::Path32;
 
 	{
 		A a = U"test_file.txt";
@@ -612,12 +615,4 @@ TEST( CoreContainerPath, GetExtension )
 	}
 };
 
-
-
-/*
-	#if QUP_PLATFORM_WINDOWS
-
-	#elif QUP_PLATFORM_LINUX || QUP_PLATFORM_APPLE
-
-	#endif
 */

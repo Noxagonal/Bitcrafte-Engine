@@ -1,7 +1,6 @@
 
 #include <gtest/gtest.h>
 
-#include <TestsCommon.hpp>
 #include <core/event/Event.hpp>
 
 
@@ -9,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreEvent, BasicInitialize )
 {
-	using A = qup::Event<>;
+	using A = bc::Event<>;
 
 	A a;
 	EXPECT_EQ( a.GetObserverCount(), 0 );
@@ -21,7 +20,7 @@ TEST( CoreEvent, BasicInitialize )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreEvent, Observers )
 {
-	using A = qup::Event<>;
+	using A = bc::Event<>;
 	{
 		A a;
 		EXPECT_EQ( a.GetObserverCount(), 0 );
@@ -98,7 +97,7 @@ TEST( CoreEvent, Observers )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreEvent, Callbacks )
 {
-	using A = qup::Event<>;
+	using A = bc::Event<>;
 
 	int32_t a_call_counter = 0;
 	int32_t b_call_counter = 0;
@@ -144,7 +143,7 @@ TEST( CoreEvent, Callbacks )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreEvent, Ordering )
 {
-	using A = qup::Event<>;
+	using A = bc::Event<>;
 
 	enum class First
 	{
@@ -182,7 +181,7 @@ TEST( CoreEvent, Ordering )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreEvent, CyclicOrDoubleDependency )
 {
-	using A = qup::Event<>;
+	using A = bc::Event<>;
 
 	A a;
 	A b;
@@ -193,6 +192,6 @@ TEST( CoreEvent, CyclicOrDoubleDependency )
 	b.RegisterObserver( &c );
 	c.RegisterObserver( &d );
 
-	EXPECT_THROW( b.RegisterObserver( &a ), qup::exception::Exception );
-	EXPECT_THROW( a.RegisterObserver( &c ), qup::exception::Exception );
+	EXPECT_THROW( b.RegisterObserver( &a ), bc::diagnostic::Exception );
+	EXPECT_THROW( a.RegisterObserver( &c ), bc::diagnostic::Exception );
 }

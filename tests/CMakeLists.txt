@@ -65,7 +65,7 @@ function(add_bitcrafte_test
 	)
 
 	set(UTILS_INCLUDE
-		"${BITCRAFTE_UTILS_DIR}/.natvis"
+		"${BITCRAFTE_UTILITIES_DIR}/.natvis"
 	)
 
 	source_group(TREE "${BITCRAFTE_TEST_SOURCE_DIR}"
@@ -77,11 +77,6 @@ function(add_bitcrafte_test
 		${SOURCE_FILES}
 		${UTILS_INCLUDE}
 		${CREATE_BITCRAFTE_TEST_ADDITIONAL_SOURCES}
-	)
-
-	target_include_directories(${BITCRAFTE_TEST_NAME}
-		PRIVATE
-			"${BITCRAFTE_EXTERNAL_SUBMODULES_DIR}/glm/"
 	)
 
 	set_target_properties(${BITCRAFTE_TEST_NAME}
@@ -138,6 +133,14 @@ function(add_bitcrafte_test
 		COMMAND 	${BITCRAFTE_TEST_NAME}
 	)
 
+endfunction()
+
+# Get a target name automatically from current source folder name.
+function(get_auto_test_target_name
+	OUT_RESULT
+)
+	cmake_path(GET CMAKE_CURRENT_SOURCE_DIR FILENAME AUTO_TARGET_NAME)
+	SET(${OUT_RESULT} "test_${AUTO_TARGET_NAME}" PARENT_SCOPE)
 endfunction()
 
 

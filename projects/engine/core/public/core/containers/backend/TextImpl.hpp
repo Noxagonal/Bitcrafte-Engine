@@ -1084,7 +1084,7 @@ public:
 		const std::initializer_list<OtherT>															&	other
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
-		this->Append( other, 1, this->data_size + other.Size() );
+		this->Append( other, 1, this->data_size + other.size() );
 		return *this;
 	}
 
@@ -1467,8 +1467,8 @@ public:
 		size_t																							headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<CharacterType> )
 	{
-		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
-		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		BC_ContainerAssert( at.GetContainer() && at.GetData(), U"Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
@@ -1509,8 +1509,8 @@ public:
 		size_t																							headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<CharacterType> && std::is_same_v<CharacterType, typename OtherContainerType::ContainedValueType> )
 	{
-		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
-		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		BC_ContainerAssert( at.GetContainer() && at.GetData(), U"Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
@@ -1749,7 +1749,8 @@ public:
 		size_t																							search_length					= std::numeric_limits<size_t>::max()
 	) const noexcept
 	{
-		return ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
+		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
+		return ConstIterator { this, result.GetData() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1774,7 +1775,8 @@ public:
 		size_t																							search_length					= std::numeric_limits<size_t>::max()
 	) const noexcept
 	{
-		return ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
+		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
+		return ConstIterator { this, result.GetData() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1799,7 +1801,8 @@ public:
 		size_t																							search_length					= std::numeric_limits<size_t>::max()
 	) const noexcept
 	{
-		return ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
+		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
+		return ConstIterator { this, result.GetData() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1824,7 +1827,8 @@ public:
 		size_t																							search_length					= std::numeric_limits<size_t>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
+		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
+		return ConstIterator { this, result.GetData() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1910,8 +1914,8 @@ public:
 		ConstIterator																					end_it
 	)  const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( reinterpret_cast<void*>( begin_it.container ) == this, "Wrong start iterator used on TextBase::SubText" );
-		BC_ContainerAssert( reinterpret_cast<void*>( end_it.container ) == this, "Wrong end iterator used on TextBase::SubText" );
+		BC_ContainerAssert( reinterpret_cast<void*>( begin_it.container ) == this, U"Wrong start iterator used on TextBase::SubText" );
+		BC_ContainerAssert( reinterpret_cast<void*>( end_it.container ) == this, U"Wrong end iterator used on TextBase::SubText" );
 		size_t begin_position = begin_it.GetIndex();
 		size_t end_position = end_it.GetIndex();
 		size_t length;

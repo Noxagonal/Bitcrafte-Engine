@@ -39,7 +39,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<typename ContainerType, bool IsOtherConst>
+	template<typename OtherContainerType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase );
 
 	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, true>;
@@ -499,7 +499,7 @@ public:
 	[[nodiscard]]
 	constexpr const ValueType																		&	Front() const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container front value, container is empty.");
+		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container front value, container is empty.");
 		return this->data_ptr[ 0 ];
 	}
 
@@ -512,7 +512,7 @@ public:
 	[[nodiscard]]
 	constexpr ValueType																				&	Front() BC_CONTAINER_NOEXCEPT requires( IsDataConst == false )
 	{
-		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container front value, container is empty." );
+		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container front value, container is empty." );
 		return this->data_ptr[ 0 ];
 	}
 
@@ -525,7 +525,7 @@ public:
 	[[nodiscard]]
 	constexpr const ValueType																		&	Back() const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container back value, container is empty." );
+		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container back value, container is empty." );
 		return this->data_ptr[ this->data_size - 1 ];
 	}
 
@@ -538,7 +538,7 @@ public:
 	[[nodiscard]]
 	constexpr ValueType																				&	Back() BC_CONTAINER_NOEXCEPT requires( IsDataConst == false )
 	{
-		BC_ContainerAssert( !this->IsEmpty(), "Cannot get container back value, container is empty." );
+		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container back value, container is empty." );
 		return this->data_ptr[ this->data_size - 1 ];
 	}
 
@@ -713,13 +713,12 @@ public:
 protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//template<container_bases::LinearContainer OtherContainerType>
 	//BC_CONTAINER_NAME( LinearContainerBase )(
-	//	const OtherContainerType									&	other
+	//	const BC_CONTAINER_NAME( LinearContainerBase )												&	other
 	//)
 	//{
-	//	// Do not use Append() as it may construct a temporary with same type using this constructor.
-	//	auto other_size = other.Size();
+	//	// Do not use Append() here as it may construct a temporary with same type using this constructor.
+	//	auto other_size = other.Size();BC_CONTAINER_NAME( LinearContainerBase )
 	//
 	//	this->ResizeNoConstruct( other_size, 0 );
 	//
@@ -1066,7 +1065,7 @@ public:
 	///	Decreases the index of all other values by 1.
 	constexpr void																						PopFront() BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( !this->IsEmpty(), "Cannot pop front, container is empty");
+		BC_ContainerAssert( !this->IsEmpty(), U"Cannot pop front, container is empty");
 		this->ShiftLeft();
 	}
 
@@ -1075,7 +1074,7 @@ public:
 	/// Removes the last value.
 	constexpr void																						PopBack() BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( !this->IsEmpty(), "Cannot pop back, container is empty");
+		BC_ContainerAssert( !this->IsEmpty(), U"Cannot pop back, container is empty");
 		this->ResizeNoConstruct( this->data_size - 1, 0 );
 	}
 
@@ -1183,10 +1182,10 @@ protected:
 		);
 
 		auto CopyFunc = [ this, count, &at, headroom ](
-			auto		other
+			auto & other
 		) -> ValueType*
 			{
-				size_t start_index			= at - this->data_size;
+				size_t start_index			= at - this->data_ptr;
 				size_t other_size			= other.Size();
 				size_t total_insert_size	= other_size * count;
 
@@ -1194,12 +1193,26 @@ protected:
 
 				for( size_t c = 0; c < count; ++c )
 				{
-					auto it = other.begin();
-					for( size_t i = 0; i < other_size; ++i )
+					// Dirty SFINAE test to see if other container has Data() function.
+					if constexpr( std::is_same_v<decltype( other.Data() ), decltype( other.Data() )> )
 					{
-						auto count_start_pos = c * other_size + start_index;
-						new( &this->data_ptr[ count_start_pos + i ] ) ValueType( *it );
-						++it;
+						auto it = other.Data();
+						for( size_t i = 0; i < other_size; ++i )
+						{
+							auto count_start_pos = c * other_size + start_index;
+							new( &this->data_ptr[ count_start_pos + i ] ) ValueType( *it );
+							++it;
+						}
+					}
+					else
+					{
+						auto it = other.begin();
+						for( size_t i = 0; i < other_size; ++i )
+						{
+							auto count_start_pos = c * other_size + start_index;
+							new( &this->data_ptr[ count_start_pos + i ] ) ValueType( *it );
+							++it;
+						}
 					}
 				}
 				return &this->data_ptr[ start_index + total_insert_size ];
@@ -1211,7 +1224,9 @@ protected:
 				other.Data() < this->data_ptr + this->data_size )
 			{
 				// Other container data is either full or partial range from within this container, need to make a temporary.
-				auto other_copy = BC_CONTAINER_NAME( LinearContainerBase )<typename OtherContainerType::ContainedValueType> { other };
+				auto other_copy = BC_CONTAINER_NAME( LinearContainerBase )<typename OtherContainerType::ContainedValueType> {};
+				other_copy.Reserve( other.Size() );
+				this->CopyConstructRange( other_copy.Data(), this->data_ptr, other.Size() );
 				return CopyFunc( other_copy );
 			}
 		}

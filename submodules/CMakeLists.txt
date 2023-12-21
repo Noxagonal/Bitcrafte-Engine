@@ -64,6 +64,7 @@ endif()
 
 
 
+add_subdirectory(googletest)
 # Set google test projects to their own folders
 set_target_properties(gtest			PROPERTIES FOLDER "submodules/googletest")
 set_target_properties(gtest_main	PROPERTIES FOLDER "submodules/googletest")

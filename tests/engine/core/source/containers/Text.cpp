@@ -1,23 +1,22 @@
 
 #include <gtest/gtest.h>
-#include <TestsCommon.hpp>
 
 #include <core/containers/Text.hpp>
 
 
 
 namespace containers {
-namespace array {
+namespace text {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, BasicInit )
 {
-	using A = qup::Text;
-	using B = qup::Text8;
-	using C = qup::Text16;
-	using D = qup::Text32;
+	using A = bc::Text;
+	using B = bc::Text8;
+	using C = bc::Text16;
+	using D = bc::Text32;
 
 	{
 		A a;
@@ -84,7 +83,7 @@ TEST( CoreContainerText, BasicInit )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, ConstructWithSize )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 	A a;
 	EXPECT_EQ( a.Size(), 0 );
 
@@ -103,7 +102,7 @@ TEST( CoreContainerText, ConstructWithSize )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, IndexOperator )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 	A a { char( 5 ), char( 10 ), char( 20 ) };
 
 	EXPECT_EQ( a.Size(), 3 );
@@ -117,17 +116,17 @@ TEST( CoreContainerText, IndexOperator )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, Erase )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 	{
 		A a = "abcdefghij";
 
-		EXPECT_THROW( a.begin() - 1, qup::exception::Exception );
-		EXPECT_THROW( a.end() + 1, qup::exception::Exception );
-		EXPECT_THROW( a.Erase( a.end() ), qup::exception::Exception );
-		EXPECT_THROW( a.Erase( a.begin() + 10 ), qup::exception::Exception );
+		EXPECT_THROW( a.begin() - 1, bc::diagnostic::Exception );
+		EXPECT_THROW( a.end() + 1, bc::diagnostic::Exception );
+		EXPECT_THROW( a.Erase( a.end() ), bc::diagnostic::Exception );
+		EXPECT_THROW( a.Erase( a.begin() + 10 ), bc::diagnostic::Exception );
 	}
 
-	using A = qup::Text32;
+	using A = bc::Text32;
 	{
 		A a = "abcdefghij";
 
@@ -195,12 +194,12 @@ TEST( CoreContainerText, Erase )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, FrontBack )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 	{
 		A a;
 
-		EXPECT_THROW( auto t = a.Front(), qup::exception::Exception );
-		EXPECT_THROW( auto t = a.Back(), qup::exception::Exception );
+		EXPECT_THROW( auto t = a.Front(), bc::diagnostic::Exception );
+		EXPECT_THROW( auto t = a.Back(), bc::diagnostic::Exception );
 	}
 	{
 		A b = { char( 5 ) };
@@ -222,7 +221,7 @@ TEST( CoreContainerText, FrontBack )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, PushBack )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 
 	A a;
 	a.PushBack( 5 );
@@ -239,7 +238,7 @@ TEST( CoreContainerText, PushBack )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, PushFront )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 
 	A a;
 	a.PushFront( 5 );
@@ -256,7 +255,7 @@ TEST( CoreContainerText, PushFront )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, MixedPushBackPushFront )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 	A a;
 	a.PushFront( 5 );
 	a.PushBack( 10 );
@@ -277,7 +276,7 @@ TEST( CoreContainerText, MixedPushBackPushFront )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, Append )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 
 	{
 		A a { char( 5 ), char( 10 ), char( 20 ) };
@@ -350,7 +349,7 @@ TEST( CoreContainerText, Append )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, Replace )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 
 	// Simple replacements.
 	{
@@ -465,7 +464,7 @@ TEST( CoreContainerText, Replace )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerText, Iterator )
 {
-	using A = qup::Text32;
+	using A = bc::Text32;
 
 	{
 		A a;
@@ -480,22 +479,22 @@ TEST( CoreContainerText, Iterator )
 		auto temp_it = it;
 
 		temp_it = it;
-		EXPECT_THROW( --temp_it, qup::exception::Exception );
+		EXPECT_THROW( --temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( ++temp_it, qup::exception::Exception );
+		EXPECT_THROW( ++temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it - 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it - 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it + 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it + 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it -= 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it -= 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it += 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it += 1, bc::diagnostic::Exception );
 	}
 	{
 		A a;
@@ -506,23 +505,23 @@ TEST( CoreContainerText, Iterator )
 		auto temp_it = it;
 
 		temp_it = it;
-		EXPECT_THROW( --temp_it, qup::exception::Exception );
+		EXPECT_THROW( --temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
 		EXPECT_NO_THROW( ++temp_it );
-		EXPECT_THROW( ++temp_it, qup::exception::Exception );
+		EXPECT_THROW( ++temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it - 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it - 1, bc::diagnostic::Exception );
 		EXPECT_NO_THROW( temp_it + 1 );
-		EXPECT_THROW( temp_it + 2, qup::exception::Exception );
+		EXPECT_THROW( temp_it + 2, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it -= 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it -= 1, bc::diagnostic::Exception );
 
 		temp_it = it;
 		EXPECT_NO_THROW( temp_it += 1 );
-		EXPECT_THROW( temp_it += 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it += 1, bc::diagnostic::Exception );
 	}
 }
 
@@ -532,8 +531,8 @@ TEST( CoreContainerText, Iterator )
 TEST( CoreContainerText, SelfAssignment )
 {
 	{
-		using A = qup::Text32;
-		using AView = A::ViewType;
+		using A = bc::Text32;
+		using AView = A::ThisViewType<true>;
 
 		A original { char( 5 ), char( 10 ), char( 20 ), char( 50 ), char( 200 ) };
 		{
@@ -569,5 +568,5 @@ TEST( CoreContainerText, SelfAssignment )
 
 
 
-} // array
+} // text
 } // containers

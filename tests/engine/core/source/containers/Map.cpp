@@ -1,7 +1,6 @@
 
 #include <gtest/gtest.h>
 
-#include <TestsCommon.hpp>
 #include <core/containers/Map.hpp>
 
 
@@ -14,8 +13,8 @@ namespace map {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, BasicInit )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 	{
 		A a;
 		EXPECT_EQ( a.Size(), 0 );
@@ -54,8 +53,8 @@ TEST( CoreContainerMap, BasicInit )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, InsertEmplaceValue )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 
 	{
 		A a;
@@ -146,8 +145,8 @@ public:
 
 TEST( CoreContainerMap, InsertEmplaceObject )
 {
-	using A = qup::Map<uint32_t, InsertObject>;
-	using P = qup::Pair<uint32_t, InsertObject>;
+	using A = bc::Map<uint32_t, InsertObject>;
+	using P = bc::Pair<uint32_t, InsertObject>;
 
 	{
 		A a;
@@ -222,8 +221,8 @@ TEST( CoreContainerMap, InsertEmplaceObject )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, Iterator )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 
 	{
 		A a;
@@ -231,22 +230,22 @@ TEST( CoreContainerMap, Iterator )
 		auto temp_it = it;
 
 		temp_it = it;
-		EXPECT_THROW( --temp_it, qup::exception::Exception );
+		EXPECT_THROW( --temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( ++temp_it, qup::exception::Exception );
+		EXPECT_THROW( ++temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it - 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it - 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it + 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it + 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it -= 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it -= 1, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it += 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it += 1, bc::diagnostic::Exception );
 	}
 	{
 		A a;
@@ -257,23 +256,23 @@ TEST( CoreContainerMap, Iterator )
 		auto temp_it = it;
 
 		temp_it = it;
-		EXPECT_THROW( --temp_it, qup::exception::Exception );
+		EXPECT_THROW( --temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
 		EXPECT_NO_THROW( ++temp_it );
-		EXPECT_THROW( ++temp_it, qup::exception::Exception );
+		EXPECT_THROW( ++temp_it, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it - 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it - 1, bc::diagnostic::Exception );
 		EXPECT_NO_THROW( temp_it + 1 );
-		EXPECT_THROW( temp_it + 2, qup::exception::Exception );
+		EXPECT_THROW( temp_it + 2, bc::diagnostic::Exception );
 
 		temp_it = it;
-		EXPECT_THROW( temp_it -= 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it -= 1, bc::diagnostic::Exception );
 
 		temp_it = it;
 		EXPECT_NO_THROW( temp_it += 1 );
-		EXPECT_THROW( temp_it += 1, qup::exception::Exception );
+		EXPECT_THROW( temp_it += 1, bc::diagnostic::Exception );
 	}
 	// Test basic iterator
 	{
@@ -393,8 +392,8 @@ TEST( CoreContainerMap, Iterator )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, Erase )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 	{
 		A a {
 			P( 1, 5 ),
@@ -482,10 +481,10 @@ TEST( CoreContainerMap, Erase )
 	// Trying to erase over limits
 	{
 		A a { P( 1, 5 ) };
-		EXPECT_THROW( a.Erase( a.end() ), qup::exception::Exception );
-		EXPECT_THROW( a.Erase( a.end() - 2 ), qup::exception::Exception );
-		EXPECT_THROW( a.Erase( a.begin() - 1 ), qup::exception::Exception );
-		EXPECT_THROW( a.Erase( a.begin() + 2 ), qup::exception::Exception );
+		EXPECT_THROW( a.Erase( a.end() ), bc::diagnostic::Exception );
+		EXPECT_THROW( a.Erase( a.end() - 2 ), bc::diagnostic::Exception );
+		EXPECT_THROW( a.Erase( a.begin() - 1 ), bc::diagnostic::Exception );
+		EXPECT_THROW( a.Erase( a.begin() + 2 ), bc::diagnostic::Exception );
 	}
 };
 
@@ -494,12 +493,12 @@ TEST( CoreContainerMap, Erase )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, FrontBack )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 	{
 		A a;
-		EXPECT_THROW( a.Front(), qup::exception::Exception );
-		EXPECT_THROW( a.Back(), qup::exception::Exception );
+		EXPECT_THROW( a.Front(), bc::diagnostic::Exception );
+		EXPECT_THROW( a.Back(), bc::diagnostic::Exception );
 	}
 	{
 		A a = { P( 1, 5 ) };
@@ -521,8 +520,8 @@ TEST( CoreContainerMap, FrontBack )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, Append )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 
 	// Append.
 	{
@@ -569,8 +568,8 @@ TEST( CoreContainerMap, Append )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, FindKey )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 
 	{
 		A a;
@@ -609,8 +608,8 @@ TEST( CoreContainerMap, FindKey )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreContainerMap, IndexOperator )
 {
-	using A = qup::Map<uint32_t, uint32_t>;
-	using P = qup::Pair<uint32_t, uint32_t>;
+	using A = bc::Map<uint32_t, uint32_t>;
+	using P = bc::Pair<uint32_t, uint32_t>;
 
 	A a;
 
@@ -709,8 +708,8 @@ TEST( CoreContainerMap, StructureBasicInit )
 		double v4;
 	};
 
-	using A = qup::Map<uint32_t, Simple>;
-	using P = qup::Pair<uint32_t, Simple>;
+	using A = bc::Map<uint32_t, Simple>;
+	using P = bc::Pair<uint32_t, Simple>;
 
 	{
 		A a;
@@ -760,8 +759,8 @@ TEST( CoreContainerMap, StructureCopy )
 		double v4;
 	};
 
-	using A = qup::Map<uint32_t, Simple>;
-	using P = qup::Pair<uint32_t, Simple>;
+	using A = bc::Map<uint32_t, Simple>;
+	using P = bc::Pair<uint32_t, Simple>;
 
 	A a {
 		P( 1, { 5, 10, 20.0f, 50.0 } ),
@@ -815,8 +814,8 @@ TEST( CoreContainerMap, StructureMove )
 		double v4;
 	};
 
-	using A = qup::Map<uint32_t, Simple>;
-	using P = qup::Pair<uint32_t, Simple>;
+	using A = bc::Map<uint32_t, Simple>;
+	using P = bc::Pair<uint32_t, Simple>;
 
 	// Construct original.
 	A a {
@@ -867,8 +866,8 @@ TEST( CoreContainerMap, MoveableOnlyStructure )
 		size_t v1 = {};
 	};
 
-	using A = qup::Map<uint32_t, MoveableOnly>;
-	using P = qup::Pair<uint32_t, MoveableOnly>;
+	using A = bc::Map<uint32_t, MoveableOnly>;
+	using P = bc::Pair<uint32_t, MoveableOnly>;
 	{
 		A a;
 		a.Insert( P( 1, MoveableOnly( 5 ) ) );
@@ -942,8 +941,8 @@ TEST( CoreContainerMap, CopyableOnlyStructure )
 		size_t v1;
 	};
 
-	using A = qup::Map<uint32_t, CopyableOnly>;
-	using P = qup::Pair<uint32_t, CopyableOnly>;
+	using A = bc::Map<uint32_t, CopyableOnly>;
+	using P = bc::Pair<uint32_t, CopyableOnly>;
 	{
 		A a;
 		a.Insert( P( 1, CopyableOnly( 5 ) ) );
@@ -1043,11 +1042,11 @@ TEST( CoreContainerMap, Map_CopyableOnlyStructure )
 
 	Map_CopyableOnly::copy_counter			= 0;
 
-	using P = qup::Pair<uint32_t, Map_CopyableOnly>;
-	using PC = qup::Pair<uint32_t, Map_CopyableOnly_Control>;
+	using P = bc::Pair<uint32_t, Map_CopyableOnly>;
+	using PC = bc::Pair<uint32_t, Map_CopyableOnly_Control>;
 
-	using A = qup::Map<uint32_t, Map_CopyableOnly>;
-	using AC = qup::Map<uint32_t, Map_CopyableOnly_Control>;
+	using A = bc::Map<uint32_t, Map_CopyableOnly>;
+	using AC = bc::Map<uint32_t, Map_CopyableOnly_Control>;
 
 	A a;
 	a.Insert( P( 1, {} ) );
@@ -1107,8 +1106,8 @@ TEST( CoreContainerMap, CtorDtorCounter )
 {
 	Map_CtorDtorCounted::constructed_counter	= 0;
 
-	using A = qup::Map<size_t, Map_CtorDtorCounted>;
-	using P = qup::Pair<size_t, Map_CtorDtorCounted>;
+	using A = bc::Map<size_t, Map_CtorDtorCounted>;
+	using P = bc::Pair<size_t, Map_CtorDtorCounted>;
 
 	{
 		A a;
@@ -1167,20 +1166,13 @@ TEST( CoreContainerMap, CtorDtorCounter )
 TEST( CoreContainerMap, SelfAssignment )
 {
 	{
-		using A = qup::Map<uint32_t, uint32_t>;
-		using P = A::ElementType;
-		using AView = A::ViewType;
+		using A = bc::Map<uint32_t, uint32_t>;
+		using P = A::ContainedPairType;
 
 		A original { P{ 5, 50 }, P{ 10, 100 }, P{ 20, 200 }, P{ 50, 500 }, P{ 200, 2000 } };
 		{
 			A a = original;
 			a = a;
-			EXPECT_EQ( a.Size(), 5 );
-			EXPECT_EQ( a, original );
-		}
-		{
-			A a = original;
-			a = AView( a );
 			EXPECT_EQ( a.Size(), 5 );
 			EXPECT_EQ( a, original );
 		}
@@ -1196,9 +1188,8 @@ TEST( CoreContainerMap, SelfAssignment )
 	{
 		Map_CtorDtorCounted::constructed_counter		= 0;
 
-		using A = qup::Map<uint32_t, Map_CtorDtorCounted>;
-		using P = A::ElementType;
-		using AView = A::ViewType;
+		using A = bc::Map<uint32_t, Map_CtorDtorCounted>;
+		using P = A::ContainedPairType;
 		A a;
 		a.Insert( P { 5, Map_CtorDtorCounted() } );
 		a.Insert( P { 10, Map_CtorDtorCounted() } );

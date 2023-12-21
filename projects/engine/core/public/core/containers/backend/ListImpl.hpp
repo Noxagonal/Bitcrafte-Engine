@@ -180,7 +180,7 @@ public:
 		const ValueType																				&	value
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		IteratorBase<IsConst>( this, this->DoFind( value ) );
+		return IteratorBase<IsConst>( this, this->DoFind( value ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		IteratorBase<IsConst>( this, this->DoFind( value ) );
+		return IteratorBase<IsConst>( this, this->DoFind( value ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -655,8 +655,8 @@ public:
 		size_t																							headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
 	{
-		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
-		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		BC_ContainerAssert( at.GetContainer() && at.GetData(), U"Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
@@ -724,7 +724,8 @@ public:
 		const ValueType																				&	value
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		ThisViewType<true>( *this ).Find( value );
+		auto result = ThisViewType<true>( *this ).Find( value );
+		return ConstIterator { this, result.GetData() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -741,7 +742,8 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		ThisViewType<false>( *this ).Find( value );
+		auto result = ThisViewType<true>( *this ).Find( value );
+		return Iterator { this, result.GetData() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

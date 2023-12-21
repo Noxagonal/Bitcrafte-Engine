@@ -1,4 +1,7 @@
 
+/*
+
+// TODO: JSON serialization
 #include <gtest/gtest.h>
 
 #include <TestsCommon.hpp>
@@ -35,27 +38,27 @@ TEST( CoreResourceSerializationJSON, SerializePrimitives )
 	double		data_f64p			= 100.005;
 	double		data_f64n			= -100.005;
 
-	qup::serialization::JSONStructure container;
+	bc::serialization::JSONStructure container;
 	auto root = container.GetRoot();
 
-	qup::serialization::JSONSerialization<uint8_t>::Serialize( root, "data_u8", data_u8, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
-	qup::serialization::JSONSerialization<int8_t>::Serialize( root, "data_s8", data_s8, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
-	qup::serialization::JSONSerialization<uint16_t>::Serialize( root, "data_u16", data_u16, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
-	qup::serialization::JSONSerialization<int16_t>::Serialize( root, "data_s16", data_s16, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
-	qup::serialization::JSONSerialization<uint32_t>::Serialize( root, "data_u32", data_u32, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
-	qup::serialization::JSONSerialization<int32_t>::Serialize( root, "data_s32", data_s32, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
-	qup::serialization::JSONSerialization<uint64_t>::Serialize( root, "data_u64", data_u64, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
-	qup::serialization::JSONSerialization<int64_t>::Serialize( root, "data_s64", data_s64, qup::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<uint8_t>::Serialize( root, "data_u8", data_u8, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<int8_t>::Serialize( root, "data_s8", data_s8, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<uint16_t>::Serialize( root, "data_u16", data_u16, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<int16_t>::Serialize( root, "data_s16", data_s16, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<uint32_t>::Serialize( root, "data_u32", data_u32, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<int32_t>::Serialize( root, "data_s32", data_s32, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<uint64_t>::Serialize( root, "data_u64", data_u64, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
+	bc::serialization::JSONSerialization<int64_t>::Serialize( root, "data_s64", data_s64, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
 
-	qup::serialization::JSONSerialization<float>::Serialize( root, "data_f32p", data_f32p, qup::conversion::FloatToTextConversionFormat::GENERAL );
-	qup::serialization::JSONSerialization<float>::Serialize( root, "data_f32n", data_f32n, qup::conversion::FloatToTextConversionFormat::GENERAL );
-	qup::serialization::JSONSerialization<double>::Serialize( root, "data_f64p", data_f64p, qup::conversion::FloatToTextConversionFormat::GENERAL );
-	qup::serialization::JSONSerialization<double>::Serialize( root, "data_f64n", data_f64n, qup::conversion::FloatToTextConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<float>::Serialize( root, "data_f32p", data_f32p, bc::conversion::FloatToTextConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<float>::Serialize( root, "data_f32n", data_f32n, bc::conversion::FloatToTextConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<double>::Serialize( root, "data_f64p", data_f64p, bc::conversion::FloatToTextConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<double>::Serialize( root, "data_f64n", data_f64n, bc::conversion::FloatToTextConversionFormat::GENERAL );
 
 	auto & child_entries = root->GetChildEntries();
 
 	for( auto & e : child_entries ) {
-		EXPECT_EQ( e.get()->GetType(), qup::serialization::JSONEntryBase::Type::VALUE );
+		EXPECT_EQ( e.get()->GetType(), bc::serialization::JSONEntryBase::Type::VALUE );
 	}
 
 	EXPECT_EQ( child_entries[ 0 ]->GetName(), "data_u8" );
@@ -73,15 +76,15 @@ TEST( CoreResourceSerializationJSON, SerializePrimitives )
 	EXPECT_EQ( child_entries[ 11 ]->GetName(), "data_f64n" );
 
 	#define DESERIALIZE_INTEGER_VALUE( m_data, m_entry_index )								\
-		m_data = qup::serialization::JSONSerialization<decltype( m_data )>::Deserialize(	\
+		m_data = bc::serialization::JSONSerialization<decltype( m_data )>::Deserialize(	\
 			child_entries[ m_entry_index ].get(),											\
-			qup::conversion::TextToIntegerConversionFormat::AUTOMATIC						\
+			bc::conversion::TextToIntegerConversionFormat::AUTOMATIC						\
 		);
 	
 	#define DESERIALIZE_FLOAT_VALUE( m_data, m_entry_index )								\
-		m_data = qup::serialization::JSONSerialization<decltype( m_data )>::Deserialize(	\
+		m_data = bc::serialization::JSONSerialization<decltype( m_data )>::Deserialize(	\
 			child_entries[ m_entry_index ].get(),											\
-			qup::conversion::TextToFloatConversionFormat::AUTOMATIC							\
+			bc::conversion::TextToFloatConversionFormat::AUTOMATIC							\
 		);
 
 	uint8_t		out_data_u8			= 0;
@@ -133,10 +136,10 @@ TEST( CoreResourceSerializationJSON, SerializePrimitives )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreResourceSerializationJSON, SerializeArray )
 {
-	using A = qup::Array<uint32_t>;
-	using B = qup::Array<A>;
+	using A = bc::Array<uint32_t>;
+	using B = bc::Array<A>;
 
-	qup::serialization::JSONStructure container;
+	bc::serialization::JSONStructure container;
 	auto root = container.GetRoot();
 
 	A a { 5, 10, 20, };
@@ -146,14 +149,14 @@ TEST( CoreResourceSerializationJSON, SerializeArray )
 		{ 50, 100, 200 }
 	};
 
-	qup::serialization::JSONSerialization<A>::Serialize( root, "a", a );
-	qup::serialization::JSONSerialization<B>::Serialize( root, "b", b );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "a", a );
+	bc::serialization::JSONSerialization<B>::Serialize( root, "b", b );
 
 	A out_a;
 	B out_b;
 
-	out_a = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
-	out_b = qup::serialization::JSONSerialization<B>::Deserialize( root->GetChildEntries()[ 1 ].get() );
+	out_a = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
+	out_b = bc::serialization::JSONSerialization<B>::Deserialize( root->GetChildEntries()[ 1 ].get() );
 
 	EXPECT_EQ( a.Size(), out_a.Size() );
 	EXPECT_EQ( b.Size(), out_b.Size() );
@@ -170,10 +173,10 @@ TEST( CoreResourceSerializationJSON, SerializeArray )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreResourceSerializationJSON, SerializeList )
 {
-	using A = qup::List<uint32_t>;
-	using B = qup::List<A>;
+	using A = bc::List<uint32_t>;
+	using B = bc::List<A>;
 
-	qup::serialization::JSONStructure container;
+	bc::serialization::JSONStructure container;
 	auto root = container.GetRoot();
 
 	A a { 5, 10, 20, };
@@ -183,14 +186,14 @@ TEST( CoreResourceSerializationJSON, SerializeList )
 		{ 50, 100, 200 }
 	};
 
-	qup::serialization::JSONSerialization<A>::Serialize( root, "a", a );
-	qup::serialization::JSONSerialization<B>::Serialize( root, "b", b );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "a", a );
+	bc::serialization::JSONSerialization<B>::Serialize( root, "b", b );
 
 	A out_a;
 	B out_b;
 
-	out_a = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
-	out_b = qup::serialization::JSONSerialization<B>::Deserialize( root->GetChildEntries()[ 1 ].get() );
+	out_a = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
+	out_b = bc::serialization::JSONSerialization<B>::Deserialize( root->GetChildEntries()[ 1 ].get() );
 
 	EXPECT_EQ( a.Size(), out_a.Size() );
 	EXPECT_EQ( b.Size(), out_b.Size() );
@@ -208,9 +211,9 @@ TEST( CoreResourceSerializationJSON, SerializeList )
 TEST( CoreResourceSerializationJSON, SerializeText )
 {
 	{
-		using A = qup::Text8;
+		using A = bc::Text8;
 
-		qup::serialization::JSONStructure container;
+		bc::serialization::JSONStructure container;
 		auto root = container.GetRoot();
 
 		A a = "Normal";
@@ -219,11 +222,11 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		A d = "With escape characters quote \" in the middle";
 		A e = "With escape characters quote at the end \"";
 
-		qup::serialization::JSONSerialization<A>::Serialize( root, "a", a );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "b", b );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "c", c );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "d", d );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "e", e );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "a", a );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "b", b );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "c", c );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "d", d );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "e", e );
 
 		A out_a;
 		A out_b;
@@ -231,11 +234,11 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		A out_d;
 		A out_e;
 
-		out_a = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
-		out_b = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
-		out_c = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 2 ].get() );
-		out_d = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 3 ].get() );
-		out_e = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 4 ].get() );
+		out_a = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
+		out_b = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
+		out_c = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 2 ].get() );
+		out_d = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 3 ].get() );
+		out_e = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 4 ].get() );
 
 		EXPECT_EQ( a.Size(), out_a.Size() );
 		EXPECT_EQ( b.Size(), out_b.Size() );
@@ -256,9 +259,9 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		EXPECT_EQ( e, out_e );
 	}
 	{
-		using A = qup::Text16;
+		using A = bc::Text16;
 
-		qup::serialization::JSONStructure container;
+		bc::serialization::JSONStructure container;
 		auto root = container.GetRoot();
 
 		A a = "Normal";
@@ -267,11 +270,11 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		A d = "With escape characters quote \" in the middle";
 		A e = "With escape characters quote at the end \"";
 
-		qup::serialization::JSONSerialization<A>::Serialize( root, "a", a );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "b", b );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "c", c );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "d", d );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "e", e );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "a", a );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "b", b );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "c", c );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "d", d );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "e", e );
 
 		A out_a;
 		A out_b;
@@ -279,11 +282,11 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		A out_d;
 		A out_e;
 
-		out_a = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
-		out_b = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
-		out_c = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 2 ].get() );
-		out_d = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 3 ].get() );
-		out_e = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 4 ].get() );
+		out_a = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
+		out_b = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
+		out_c = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 2 ].get() );
+		out_d = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 3 ].get() );
+		out_e = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 4 ].get() );
 
 		EXPECT_EQ( a.Size(), out_a.Size() );
 		EXPECT_EQ( b.Size(), out_b.Size() );
@@ -304,9 +307,9 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		EXPECT_EQ( e, out_e );
 	}
 	{
-		using A = qup::Text32;
+		using A = bc::Text32;
 
-		qup::serialization::JSONStructure container;
+		bc::serialization::JSONStructure container;
 		auto root = container.GetRoot();
 
 		A a = "Normal";
@@ -315,11 +318,11 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		A d = "With escape characters quote \" in the middle";
 		A e = "With escape characters quote at the end \"";
 
-		qup::serialization::JSONSerialization<A>::Serialize( root, "a", a );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "b", b );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "c", c );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "d", d );
-		qup::serialization::JSONSerialization<A>::Serialize( root, "e", e );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "a", a );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "b", b );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "c", c );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "d", d );
+		bc::serialization::JSONSerialization<A>::Serialize( root, "e", e );
 
 		A out_a;
 		A out_b;
@@ -327,11 +330,11 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 		A out_d;
 		A out_e;
 
-		out_a = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
-		out_b = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
-		out_c = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 2 ].get() );
-		out_d = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 3 ].get() );
-		out_e = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 4 ].get() );
+		out_a = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
+		out_b = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
+		out_c = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 2 ].get() );
+		out_d = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 3 ].get() );
+		out_e = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 4 ].get() );
 
 		EXPECT_EQ( a.Size(), out_a.Size() );
 		EXPECT_EQ( b.Size(), out_b.Size() );
@@ -358,32 +361,32 @@ TEST( CoreResourceSerializationJSON, SerializeText )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreResourceSerializationJSON, SerializeMap )
 {
-	using A = qup::Map<uint32_t, qup::Text8>;
-	using B = qup::Map<qup::Text8, uint32_t>;
+	using A = bc::Map<uint32_t, bc::Text8>;
+	using B = bc::Map<bc::Text8, uint32_t>;
 
-	qup::serialization::JSONStructure container;
+	bc::serialization::JSONStructure container;
 	auto root = container.GetRoot();
 
 	A a {
-		qup::Pair<uint32_t, qup::Text8>( 5, "5" ),
-		qup::Pair<uint32_t, qup::Text8>( 10, "10" ),
-		qup::Pair<uint32_t, qup::Text8>( 20, "20" ),
+		bc::Pair<uint32_t, bc::Text8>( 5, "5" ),
+		bc::Pair<uint32_t, bc::Text8>( 10, "10" ),
+		bc::Pair<uint32_t, bc::Text8>( 20, "20" ),
 	};
 
 	B b {
-		qup::Pair<qup::Text8, uint32_t>( "5", 5 ),
-		qup::Pair<qup::Text8, uint32_t>( "10", 10 ),
-		qup::Pair<qup::Text8, uint32_t>( "20", 20 ),
+		bc::Pair<bc::Text8, uint32_t>( "5", 5 ),
+		bc::Pair<bc::Text8, uint32_t>( "10", 10 ),
+		bc::Pair<bc::Text8, uint32_t>( "20", 20 ),
 	};
 
-	qup::serialization::JSONSerialization<A>::Serialize( root, "a", a );
-	qup::serialization::JSONSerialization<B>::Serialize( root, "b", b );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "a", a );
+	bc::serialization::JSONSerialization<B>::Serialize( root, "b", b );
 
 	A out_a;
 	B out_b;
 
-	out_a = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
-	out_b = qup::serialization::JSONSerialization<B>::Deserialize( root->GetChildEntries()[ 1 ].get() );
+	out_a = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
+	out_b = bc::serialization::JSONSerialization<B>::Deserialize( root->GetChildEntries()[ 1 ].get() );
 
 	EXPECT_EQ( a.Size(), out_a.Size() );
 	EXPECT_EQ( b.Size(), out_b.Size() );
@@ -431,7 +434,7 @@ TEST( CoreResourceSerializationJSON, SerializeGLM )
 	using DM3 = glm::dmat3;
 	using DM4 = glm::dmat4;
 
-	qup::serialization::JSONStructure container;
+	bc::serialization::JSONStructure container;
 	auto root = container.GetRoot();
 
 	auto v1 = V1( 5.05f );
@@ -493,36 +496,36 @@ TEST( CoreResourceSerializationJSON, SerializeGLM )
 		{ 5.05f, 10.1f, 20.2f, 50.5f }
 	);
 
-	qup::serialization::JSONSerialization<V1>::Serialize( root, "v1", v1 );
-	qup::serialization::JSONSerialization<V2>::Serialize( root, "v2", v2 );
-	qup::serialization::JSONSerialization<V3>::Serialize( root, "v3", v3 );
-	qup::serialization::JSONSerialization<V4>::Serialize( root, "v4", v4 );
+	bc::serialization::JSONSerialization<V1>::Serialize( root, "v1", v1 );
+	bc::serialization::JSONSerialization<V2>::Serialize( root, "v2", v2 );
+	bc::serialization::JSONSerialization<V3>::Serialize( root, "v3", v3 );
+	bc::serialization::JSONSerialization<V4>::Serialize( root, "v4", v4 );
 	
-	qup::serialization::JSONSerialization<DV1>::Serialize( root, "dv1", dv1 );
-	qup::serialization::JSONSerialization<DV2>::Serialize( root, "dv2", dv2 );
-	qup::serialization::JSONSerialization<DV3>::Serialize( root, "dv3", dv3 );
-	qup::serialization::JSONSerialization<DV4>::Serialize( root, "dv4", dv4 );
+	bc::serialization::JSONSerialization<DV1>::Serialize( root, "dv1", dv1 );
+	bc::serialization::JSONSerialization<DV2>::Serialize( root, "dv2", dv2 );
+	bc::serialization::JSONSerialization<DV3>::Serialize( root, "dv3", dv3 );
+	bc::serialization::JSONSerialization<DV4>::Serialize( root, "dv4", dv4 );
 	
-	qup::serialization::JSONSerialization<IV1>::Serialize( root, "iv1", iv1 );
-	qup::serialization::JSONSerialization<IV2>::Serialize( root, "iv2", iv2 );
-	qup::serialization::JSONSerialization<IV3>::Serialize( root, "iv3", iv3 );
-	qup::serialization::JSONSerialization<IV4>::Serialize( root, "iv4", iv4 );
+	bc::serialization::JSONSerialization<IV1>::Serialize( root, "iv1", iv1 );
+	bc::serialization::JSONSerialization<IV2>::Serialize( root, "iv2", iv2 );
+	bc::serialization::JSONSerialization<IV3>::Serialize( root, "iv3", iv3 );
+	bc::serialization::JSONSerialization<IV4>::Serialize( root, "iv4", iv4 );
 	
-	qup::serialization::JSONSerialization<UV1>::Serialize( root, "uv1", uv1 );
-	qup::serialization::JSONSerialization<UV2>::Serialize( root, "uv2", uv2 );
-	qup::serialization::JSONSerialization<UV3>::Serialize( root, "uv3", uv3 );
-	qup::serialization::JSONSerialization<UV4>::Serialize( root, "uv4", uv4 );
+	bc::serialization::JSONSerialization<UV1>::Serialize( root, "uv1", uv1 );
+	bc::serialization::JSONSerialization<UV2>::Serialize( root, "uv2", uv2 );
+	bc::serialization::JSONSerialization<UV3>::Serialize( root, "uv3", uv3 );
+	bc::serialization::JSONSerialization<UV4>::Serialize( root, "uv4", uv4 );
 
-	qup::serialization::JSONSerialization<Q>::Serialize( root, "q", q );
-	qup::serialization::JSONSerialization<Q>::Serialize( root, "dq", dq );
+	bc::serialization::JSONSerialization<Q>::Serialize( root, "q", q );
+	bc::serialization::JSONSerialization<Q>::Serialize( root, "dq", dq );
 
-	qup::serialization::JSONSerialization<M2>::Serialize( root, "m2", m2 );
-	qup::serialization::JSONSerialization<M3>::Serialize( root, "m3", m3 );
-	qup::serialization::JSONSerialization<M4>::Serialize( root, "m4", m4 );
+	bc::serialization::JSONSerialization<M2>::Serialize( root, "m2", m2 );
+	bc::serialization::JSONSerialization<M3>::Serialize( root, "m3", m3 );
+	bc::serialization::JSONSerialization<M4>::Serialize( root, "m4", m4 );
 	
-	qup::serialization::JSONSerialization<DM2>::Serialize( root, "dm2", dm2 );
-	qup::serialization::JSONSerialization<DM3>::Serialize( root, "dm3", dm3 );
-	qup::serialization::JSONSerialization<DM4>::Serialize( root, "dm4", dm4 );
+	bc::serialization::JSONSerialization<DM2>::Serialize( root, "dm2", dm2 );
+	bc::serialization::JSONSerialization<DM3>::Serialize( root, "dm3", dm3 );
+	bc::serialization::JSONSerialization<DM4>::Serialize( root, "dm4", dm4 );
 
 
 	V1 out_v1 {};
@@ -557,36 +560,36 @@ TEST( CoreResourceSerializationJSON, SerializeGLM )
 	DM4 out_dm4 {};
 
 	size_t counter = 0;
-	out_v1 = qup::serialization::JSONSerialization<V1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_v2 = qup::serialization::JSONSerialization<V2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_v3 = qup::serialization::JSONSerialization<V3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_v4 = qup::serialization::JSONSerialization<V4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_v1 = bc::serialization::JSONSerialization<V1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_v2 = bc::serialization::JSONSerialization<V2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_v3 = bc::serialization::JSONSerialization<V3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_v4 = bc::serialization::JSONSerialization<V4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 	
-	out_dv1 = qup::serialization::JSONSerialization<DV1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_dv2 = qup::serialization::JSONSerialization<DV2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_dv3 = qup::serialization::JSONSerialization<DV3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_dv4 = qup::serialization::JSONSerialization<DV4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dv1 = bc::serialization::JSONSerialization<DV1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dv2 = bc::serialization::JSONSerialization<DV2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dv3 = bc::serialization::JSONSerialization<DV3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dv4 = bc::serialization::JSONSerialization<DV4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 
-	out_iv1 = qup::serialization::JSONSerialization<IV1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_iv2 = qup::serialization::JSONSerialization<IV2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_iv3 = qup::serialization::JSONSerialization<IV3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_iv4 = qup::serialization::JSONSerialization<IV4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_iv1 = bc::serialization::JSONSerialization<IV1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_iv2 = bc::serialization::JSONSerialization<IV2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_iv3 = bc::serialization::JSONSerialization<IV3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_iv4 = bc::serialization::JSONSerialization<IV4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 	
-	out_uv1 = qup::serialization::JSONSerialization<UV1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_uv2 = qup::serialization::JSONSerialization<UV2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_uv3 = qup::serialization::JSONSerialization<UV3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_uv4 = qup::serialization::JSONSerialization<UV4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_uv1 = bc::serialization::JSONSerialization<UV1>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_uv2 = bc::serialization::JSONSerialization<UV2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_uv3 = bc::serialization::JSONSerialization<UV3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_uv4 = bc::serialization::JSONSerialization<UV4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 
-	out_q = qup::serialization::JSONSerialization<Q>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_dq = qup::serialization::JSONSerialization<DQ>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_q = bc::serialization::JSONSerialization<Q>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dq = bc::serialization::JSONSerialization<DQ>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 
-	out_m2 = qup::serialization::JSONSerialization<M2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_m3 = qup::serialization::JSONSerialization<M3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_m4 = qup::serialization::JSONSerialization<M4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_m2 = bc::serialization::JSONSerialization<M2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_m3 = bc::serialization::JSONSerialization<M3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_m4 = bc::serialization::JSONSerialization<M4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 	
-	out_dm2 = qup::serialization::JSONSerialization<M2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_dm3 = qup::serialization::JSONSerialization<M3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	out_dm4 = qup::serialization::JSONSerialization<M4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dm2 = bc::serialization::JSONSerialization<M2>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dm3 = bc::serialization::JSONSerialization<M3>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	out_dm4 = bc::serialization::JSONSerialization<M4>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 
 	EXPECT_EQ( v1, out_v1 );
 	EXPECT_EQ( v2, out_v2 );
@@ -625,22 +628,22 @@ TEST( CoreResourceSerializationJSON, SerializeGLM )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreResourceSerializationJSON, SerializeUUID )
 {
-	using A = qup::UUID;
+	using A = bc::UUID;
 
-	qup::serialization::JSONStructure container;
+	bc::serialization::JSONStructure container;
 	auto root = container.GetRoot();
 
 	A a;
 	A b;
 
-	qup::serialization::JSONSerialization<A>::Serialize( root, "a", a );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "b", b );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "a", a );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "b", b );
 
 	A out_a;
 	A out_b;
 
-	out_a = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
-	out_b = qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
+	out_a = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 0 ].get() );
+	out_b = bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ 1 ].get() );
 
 	EXPECT_EQ( a, out_a );
 	EXPECT_EQ( b, out_b );
@@ -651,10 +654,10 @@ TEST( CoreResourceSerializationJSON, SerializeUUID )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( CoreResourceSerializationJSON, SerializeParameterData )
 {
-	using A = qup::reflection::ParameterData;
-	using B = qup::reflection::MemoryBackedParameterData;
+	using A = bc::reflection::ParameterData;
+	using B = bc::reflection::MemoryBackedParameterData;
 
-	qup::serialization::JSONStructure container;
+	bc::serialization::JSONStructure container;
 	auto root = container.GetRoot();
 
 	bool		data_actual_bool		= true;
@@ -668,59 +671,59 @@ TEST( CoreResourceSerializationJSON, SerializeParameterData )
 	uint64_t	data_actual_uint64_t	= 500;
 	float		data_actual_float		= 5000.05f;
 	double		data_actual_double		= -50000.005;
-	qup::Text8	data_actual_text8		= "Test8";
-	qup::Text16	data_actual_text16		= "Test16";
-	qup::Text32	data_actual_text32		= "Test32";
-	qup::UUID	data_actual_uuid;
+	bc::Text8	data_actual_text8		= "Test8";
+	bc::Text16	data_actual_text16		= "Test16";
+	bc::Text32	data_actual_text32		= "Test32";
+	bc::UUID	data_actual_uuid;
 
-	A data_bool			{ qup::reflection::TypeName<bool>::Get(),			&data_actual_bool,		false };
-	A data_int8_t		{ qup::reflection::TypeName<int8_t>::Get(),			&data_actual_int8_t,	false };
-	A data_uint8_t		{ qup::reflection::TypeName<uint8_t>::Get(),		&data_actual_uint8_t,	false };
-	A data_int16_t		{ qup::reflection::TypeName<int16_t>::Get(),		&data_actual_int16_t,	false };
-	A data_uint16_t		{ qup::reflection::TypeName<uint16_t>::Get(),		&data_actual_uint16_t,	false };
-	A data_int32_t		{ qup::reflection::TypeName<int32_t>::Get(),		&data_actual_int32_t,	false };
-	A data_uint32_t		{ qup::reflection::TypeName<uint32_t>::Get(),		&data_actual_uint32_t,	false };
-	A data_int64_t		{ qup::reflection::TypeName<int64_t>::Get(),		&data_actual_int64_t,	false };
-	A data_uint64_t		{ qup::reflection::TypeName<uint64_t>::Get(),		&data_actual_uint64_t,	false };
-	A data_float		{ qup::reflection::TypeName<float>::Get(),			&data_actual_float,		false };
-	A data_double		{ qup::reflection::TypeName<double>::Get(),			&data_actual_double,	false };
-	A data_text8		{ qup::reflection::TypeName<qup::Text8>::Get(),		&data_actual_text8,		false };
-	A data_text16		{ qup::reflection::TypeName<qup::Text16>::Get(),	&data_actual_text16,	false };
-	A data_text32		{ qup::reflection::TypeName<qup::Text32>::Get(),	&data_actual_text32,	false };
-	A data_uuid			{ qup::reflection::TypeName<qup::UUID>::Get(),		&data_actual_uuid,		false };
+	A data_bool			{ bc::reflection::TypeName<bool>::Get(),			&data_actual_bool,		false };
+	A data_int8_t		{ bc::reflection::TypeName<int8_t>::Get(),			&data_actual_int8_t,	false };
+	A data_uint8_t		{ bc::reflection::TypeName<uint8_t>::Get(),		&data_actual_uint8_t,	false };
+	A data_int16_t		{ bc::reflection::TypeName<int16_t>::Get(),		&data_actual_int16_t,	false };
+	A data_uint16_t		{ bc::reflection::TypeName<uint16_t>::Get(),		&data_actual_uint16_t,	false };
+	A data_int32_t		{ bc::reflection::TypeName<int32_t>::Get(),		&data_actual_int32_t,	false };
+	A data_uint32_t		{ bc::reflection::TypeName<uint32_t>::Get(),		&data_actual_uint32_t,	false };
+	A data_int64_t		{ bc::reflection::TypeName<int64_t>::Get(),		&data_actual_int64_t,	false };
+	A data_uint64_t		{ bc::reflection::TypeName<uint64_t>::Get(),		&data_actual_uint64_t,	false };
+	A data_float		{ bc::reflection::TypeName<float>::Get(),			&data_actual_float,		false };
+	A data_double		{ bc::reflection::TypeName<double>::Get(),			&data_actual_double,	false };
+	A data_text8		{ bc::reflection::TypeName<bc::Text8>::Get(),		&data_actual_text8,		false };
+	A data_text16		{ bc::reflection::TypeName<bc::Text16>::Get(),	&data_actual_text16,	false };
+	A data_text32		{ bc::reflection::TypeName<bc::Text32>::Get(),	&data_actual_text32,	false };
+	A data_uuid			{ bc::reflection::TypeName<bc::UUID>::Get(),		&data_actual_uuid,		false };
 
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_bool",			data_bool );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_int8_t",		data_int8_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_uint8_t",		data_uint8_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_int16_t",		data_int16_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_uint16_t",		data_uint16_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_int32_t",		data_int32_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_uint32_t",		data_uint32_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_int64_t",		data_int64_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_uint64_t",		data_uint64_t );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_float",		data_float );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_double",		data_double );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_text8",		data_text8 );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_text16",		data_text16 );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_text32",		data_text32 );
-	qup::serialization::JSONSerialization<A>::Serialize( root, "data_uuid",			data_uuid);
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_bool",			data_bool );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_int8_t",		data_int8_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_uint8_t",		data_uint8_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_int16_t",		data_int16_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_uint16_t",		data_uint16_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_int32_t",		data_int32_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_uint32_t",		data_uint32_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_int64_t",		data_int64_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_uint64_t",		data_uint64_t );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_float",		data_float );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_double",		data_double );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_text8",		data_text8 );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_text16",		data_text16 );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_text32",		data_text32 );
+	bc::serialization::JSONSerialization<A>::Serialize( root, "data_uuid",			data_uuid);
 
 	size_t counter = 0;
-	B out_bool		= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_int8_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_uint8_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_int16_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_uint16_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_int32_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_uint32_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_int64_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_uint64_t	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_float		= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_double	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_text8		= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_text16	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_text32	= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
-	B out_uuid		= qup::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_bool		= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_int8_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_uint8_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_int16_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_uint16_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_int32_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_uint32_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_int64_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_uint64_t	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_float		= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_double	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_text8		= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_text16	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_text32	= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
+	B out_uuid		= bc::serialization::JSONSerialization<A>::Deserialize( root->GetChildEntries()[ counter++ ].get() );
 
 	EXPECT_EQ( out_bool.type,		data_bool.type );
 	EXPECT_EQ( out_int8_t.type,		data_int8_t.type );
@@ -749,8 +752,10 @@ TEST( CoreResourceSerializationJSON, SerializeParameterData )
 	EXPECT_EQ( *reinterpret_cast<uint64_t*>		( out_uint64_t.storage.Data() ),	data_actual_uint64_t );
 	EXPECT_EQ( *reinterpret_cast<float*>		( out_float.storage.Data() ),		data_actual_float );
 	EXPECT_EQ( *reinterpret_cast<double*>		( out_double.storage.Data() ),		data_actual_double );
-	EXPECT_EQ( *reinterpret_cast<qup::Text8*>	( out_text8.storage.Data() ),		data_actual_text8 );
-	EXPECT_EQ( *reinterpret_cast<qup::Text16*>	( out_text16.storage.Data() ),		data_actual_text16 );
-	EXPECT_EQ( *reinterpret_cast<qup::Text32*>	( out_text32.storage.Data() ),		data_actual_text32 );
-	EXPECT_EQ( *reinterpret_cast<qup::UUID*>	( out_uuid.storage.Data() ),		data_actual_uuid );
+	EXPECT_EQ( *reinterpret_cast<bc::Text8*>	( out_text8.storage.Data() ),		data_actual_text8 );
+	EXPECT_EQ( *reinterpret_cast<bc::Text16*>	( out_text16.storage.Data() ),		data_actual_text16 );
+	EXPECT_EQ( *reinterpret_cast<bc::Text32*>	( out_text32.storage.Data() ),		data_actual_text32 );
+	EXPECT_EQ( *reinterpret_cast<bc::UUID*>	( out_uuid.storage.Data() ),		data_actual_uuid );
 }
+
+*/

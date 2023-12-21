@@ -24,9 +24,6 @@ namespace bc {
 
 
 
-template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst>
-class BC_CONTAINER_NAME( MapViewBase );
-
 template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType>
 class BC_CONTAINER_NAME( Map );
 
@@ -68,7 +65,7 @@ private:
 	friend class BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, true>;
 	friend class BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, false>;
 
-	using Container				= BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsConst>;
+	using Container				= BC_CONTAINER_NAME( Map )<KeyType, ValueType>;
 	using Node					= container_bases::BC_CONTAINER_NAME( MapNode )<KeyType, ValueType>;
 
 public:
@@ -79,20 +76,17 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )(
 		const BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, IsOtherConst>				&	other
-	) noexcept requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> )
-		:
-		container( reinterpret_cast<Container*>( const_cast<BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst>*>( other.container ) ) ),
-		node( const_cast<Node*>( other.node ) )
+	) noexcept requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> ) :
+		container( other.GetContainer() ),
+		node( const_cast<Node*>( other.GetData() ) )
 	{};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )(
-		const MapViewBase<KeyType, ValueType, IsOtherConst>											*	container,
+		const Container																				*	container,
 		const Node																					*	node
-	) noexcept requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> )
-		:
-		container( reinterpret_cast<Container*>( const_cast<BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst>*>( container ) ) ),
+	) noexcept :
+		container( container ),
 		node( const_cast<Node*>( node ) )
 	{};
 
@@ -126,7 +120,7 @@ public:
 		BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, IsOtherConst>							other
 	) const noexcept
 	{
-		return this->node == other.node;
+		return this->node == other.GetData();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +129,7 @@ public:
 		BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, IsOtherConst>							other
 	) const noexcept
 	{
-		return this->node != other.node;
+		return this->node != other.GetData();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -274,12 +268,6 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr Container																				*	GetContainer() noexcept requires( IsConst == false )
-	{
-		return this->container;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Checks that the iterator points to valid data.
 	/// 
@@ -343,367 +331,13 @@ private:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Container																						*	container				= nullptr;
+	const Container																					*	container				= nullptr;
 	Node																							*	node					= nullptr;
 };
 
 
 
 } // container_bases
-
-
-
-template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst>
-class BC_CONTAINER_NAME( MapViewBase )
-{
-public:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	using Base								= void;
-	using ContainedKeyType					= KeyType;
-	using ContainedValueType				= ValueType;
-	using ContainedPairType					= BC_CONTAINER_NAME( Pair )<KeyType, ValueType>;
-	static constexpr bool IsDataConst		= IsConst;
-
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	using ThisContainerType					= BC_CONTAINER_NAME( MapViewBase )<OtherKeyType, OtherValueType, IsOtherConst>;
-	using ThisType							= ThisContainerType<KeyType, ValueType, IsConst>;
-
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	using ThisContainerViewType				= BC_CONTAINER_NAME( MapViewBase )<OtherKeyType, OtherValueType, IsOtherConst>;
-
-	template<bool IsOtherConst>
-	using ThisViewType						= ThisContainerViewType<KeyType, ValueType, IsOtherConst>;
-
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	using ThisContainerFullType				= BC_CONTAINER_NAME( Map )<OtherKeyType, OtherValueType>;
-	using ThisFullType						= ThisContainerFullType<KeyType, ValueType>;
-
-	template<bool IsOtherConst>
-	using IteratorBase						= container_bases::BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, IsOtherConst>;
-	using ConstIterator						= IteratorBase<true>;
-	using Iterator							= IteratorBase<false>;
-
-	using value_type						= ContainedPairType;	// for stl compatibility.
-
-private:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( MapIteratorBase );
-
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( MapViewBase );
-
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	friend class BC_CONTAINER_NAME( Map );
-
-	friend ConstIterator;
-	friend Iterator;
-
-protected:
-
-	using Node					= container_bases::BC_CONTAINER_NAME( MapNode )<KeyType, ValueType>;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	size_t						size				= 0;
-	Node					*	root_node			= nullptr;
-
-protected:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	struct FindNodeResult
-	{
-		Node				*	closest_node;	///< Closest node found, either the node itself or closest parent.
-		bool					found;			///< true if exact match found, false if not in which case closest_node points to it's parent.
-		bool					left_of_parent;	///< Place where the key would be inserted if node was not found.
-	};
-
-public:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( MapViewBase )() noexcept = default;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( MapViewBase )(
-		const BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst> & other
-	) noexcept requires(
-		container_bases::IsConstConvertible<IsConst, IsOtherConst> &&
-		std::is_copy_constructible_v<ContainedPairType>
-		)
-		:
-		size( other.size ),
-		root_node( other.root_node )
-	{}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if contents of this map matches the contents of another.
-	/// 
-	/// @param other
-	///	Other map to compare contents with.
-	/// 
-	/// @return
-	/// true if contents match, false if contents do not match.
-	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( MapViewBase )														&	other
-	) const noexcept
-	{
-		if( other.root_node == this->root_node && other.Size() == this->Size() ) return true;
-
-		return container_bases::CheckContainerContentsMatch( *this, other );
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if contents of this map differ the contents of another.
-	/// 
-	/// @param other
-	///	Other map to compare contents with.
-	/// 
-	/// @return
-	/// true if contents do not match, false if contents match.
-	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( MapViewBase )														&	other
-	) const noexcept
-	{
-		if( other.root_node == this->root_node && other.Size() == this->Size() ) return false;
-
-		return container_bases::CheckContainerContentsDiffer( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Get the smallest key/value pair.
-	///
-	/// @return
-	/// Pair with the smallest key.
-	constexpr const ContainedPairType																&	Front() BC_CONTAINER_NOEXCEPT const
-	{
-		BC_ContainerAssert( this->root_node, U"Cannot get container front, container is empty" );
-		return this->FindLeftmostFrom( this->root_node )->data;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Get the smallest key/value pair.
-	///
-	/// @return
-	/// Pair with the smallest key.
-	constexpr ContainedPairType																		&	Front() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
-	{
-		BC_ContainerAssert( this->root_node, U"Cannot get container front, container is empty" );
-		return this->FindLeftmostFrom( this->root_node )->data;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Get the largest key/value pair.
-	///
-	/// @return
-	/// Pair with the largest key.
-	constexpr const ContainedPairType																&	Back() BC_CONTAINER_NOEXCEPT const
-	{
-		BC_ContainerAssert( this->root_node, U"Cannot get container back, container is empty" );
-		return this->FindRightmostFrom( this->root_node )->data;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Get the largest key/value pair.
-	///
-	/// @return
-	/// Pair with the largest key.
-	constexpr ContainedPairType																		&	Back() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
-	{
-		BC_ContainerAssert( this->root_node, U"Cannot get container back, container is empty" );
-		return this->FindRightmostFrom( this->root_node )->data;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Finds an element with specific key.
-	/// 
-	/// @param key
-	///	Key value of an element we want to find.
-	/// 
-	/// @return
-	/// Iterator to the element if found, returns end iterator if not found.
-	constexpr Iterator																					Find(
-		const KeyType																				&	key
-	) noexcept requires( IsConst == false )
-	{
-		auto result = this->FindNode( key );
-		if( result.found ) return Iterator { this, result.closest_node };
-		else return Iterator { this, nullptr };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Finds an element with specific key.
-	/// 
-	/// @param key
-	///	Key value of an element we want to find.
-	/// 
-	/// @return
-	/// ConstIterator to the element if found, returns end iterator if not found.
-	constexpr ConstIterator																				Find(
-		const KeyType																				&	key
-	) const noexcept
-	{
-		auto result = this->FindNode( key );
-		if( result.found ) return ConstIterator { this, result.closest_node };
-		else return ConstIterator { this, nullptr };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check each member to see if any key match the parameter.
-	///
-	/// @note
-	/// This is exactly the same as <tt>container.Find( <key> ) != container.end()</tt>
-	/// 
-	/// @param member
-	///	Key value we're looking for.
-	/// 
-	/// @return
-	/// True if this container has member which key equals what we're searching for, false if not found.
-	constexpr bool																						HasMember(
-		const KeyType																				&	key
-	) const noexcept
-	{
-		return this->Find( key ) != this->end();
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Get size of the map.
-	/// 
-	/// @return
-	/// Current number of elements stored inside this map.
-	constexpr size_t																					Size() const noexcept
-	{
-		return this->size;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if this Map has no elements stored.
-	/// 
-	/// @return
-	/// true if Size == 0, false otherwise.
-	constexpr bool																						IsEmpty() const noexcept
-	{
-		return !this->size;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr Iterator																					begin() noexcept requires( IsConst == false )
-	{
-		return Iterator { this, this->FindLeftmostFrom( this->root_node ) };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr Iterator																					end() noexcept requires( IsConst == false )
-	{
-		return Iterator { this, nullptr };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ConstIterator																				begin() const noexcept
-	{
-		return ConstIterator { this, this->FindLeftmostFrom( this->root_node ) };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ConstIterator																				end() const noexcept
-	{
-		return ConstIterator { this, nullptr };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ConstIterator																				cbegin() const noexcept
-	{
-		return this->begin();
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ConstIterator																				cend() const noexcept
-	{
-		return this->end();
-	}
-
-protected:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr FindNodeResult																			FindNode(
-		const KeyType																				&	key
-	) const noexcept
-	{
-		Node * node = this->root_node;
-		while( node ) {
-			if( key == node->data.first ) {
-				return { node, true };
-			}
-			if( key < node->data.first ) {
-				if( node->left ) {
-					node = node->left;
-				} else {
-					return { node, false, true };
-				}
-			} else {
-				if( node->right ) {
-					node = node->right;
-				} else {
-					return { node, false, false };
-				}
-			}
-		}
-		return { node };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr static Node																			*	FindLeftmostFrom(
-		Node																						*	node
-	) noexcept
-	{
-		if( node == nullptr ) return nullptr;
-		while( node->left ) {
-			node = node->left;
-		}
-		return node;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr static Node																			*	FindRightmostFrom(
-		Node																						*	node
-	) noexcept
-	{
-		if( node == nullptr ) return nullptr;
-		while( node->right ) {
-			node = node->right;
-		}
-		return node;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr static Node																			*	FindSuccessor(
-		Node																						*	node
-	) noexcept
-	{
-		assert( node->right );
-		return FindLeftmostFrom( node->right );
-	}
-};
-
-
-
-template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType>
-using BC_CONTAINER_NAME( EditableMapView ) = BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, false>;
-
-template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType>
-using BC_CONTAINER_NAME( MapView ) = BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, true>;
 
 
 
@@ -730,13 +364,12 @@ using BC_CONTAINER_NAME( MapView ) = BC_CONTAINER_NAME( MapViewBase )<KeyType, V
 ///	value Type
 template<BC_CONTAINER_VALUE_TYPENAME KeyType, BC_CONTAINER_VALUE_TYPENAME ValueType>
 class BC_CONTAINER_NAME( Map ) :
-	public BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, false>,
 	protected container_bases::ContainerResource
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	using Base								= BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, false>;
+	using Base								= void;
 	using ContainedKeyType					= KeyType;
 	using ContainedValueType				= ValueType;
 	using ContainedPairType					= BC_CONTAINER_NAME( Pair )<KeyType, ValueType>;
@@ -747,7 +380,7 @@ public:
 	using ThisType							= ThisContainerType<KeyType, ValueType>;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	using ThisContainerViewType				= BC_CONTAINER_NAME( MapViewBase )<OtherKeyType, OtherValueType, IsOtherConst>;
+	using ThisContainerViewType				= void;
 
 	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<KeyType, ValueType, IsOtherConst>;
@@ -769,9 +402,6 @@ private:
 	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( MapIteratorBase );
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( MapViewBase );
-
 	template<BC_CONTAINER_VALUE_TYPENAME OtherKeyType, BC_CONTAINER_VALUE_TYPENAME OtherValueType>
 	friend class BC_CONTAINER_NAME( Map );
 
@@ -781,6 +411,18 @@ private:
 protected:
 
 	using Node					= container_bases::BC_CONTAINER_NAME( MapNode )<KeyType, ValueType>;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	size_t						size				= 0;
+	Node					*	root_node			= nullptr;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	struct FindNodeResult
+	{
+		Node				*	closest_node;	///< Closest node found, either the node itself or closest parent.
+		bool					found;			///< true if exact match found, false if not in which case closest_node points to it's parent.
+		bool					left_of_parent;	///< Place where the key would be inserted if node was not found.
+	};
 
 public:
 
@@ -793,15 +435,6 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> )
 	{
 		this->Append( init_list );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( Map )(
-		BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst>								other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
-	{
-		this->Append( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -831,23 +464,6 @@ public:
 		const std::initializer_list<ContainedPairType>												&	other
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
 	{
-		this->Clear();
-		this->Append( other );
-		return *this;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( Map )																&	operator=(
-		BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst> other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
-	{
-		if( other.root_node == this->root_node ) {
-			auto other_copy = BC_CONTAINER_NAME( Map )<KeyType, ValueType> { other };
-			*this = std::move( other_copy );
-			return *this;
-		}
-
 		this->Clear();
 		this->Append( other );
 		return *this;
@@ -892,90 +508,6 @@ public:
 	{
 		this->Append( init_list );
 		return *this;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Extends this map with elements from another container.
-	///
-	/// @note
-	/// If any key already exists in this map, then only the value is updated from the other map. Other container is iterated from
-	/// begin to end, dublicate values are updated in order, this means that the only the last occurance of a value is kept.
-	///
-	/// @tparam OtherContainerType
-	///	Other container type to copy elements from.
-	/// 
-	/// @param other
-	///	Another map to add to this map.
-	/// 
-	/// @return
-	/// Reference to this.
-	template<container_bases::ContainerView OtherContainerType>
-	constexpr BC_CONTAINER_NAME( Map )																&	operator+=(
-		const OtherContainerType																	&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> && std::is_same_v<ContainedPairType, typename OtherContainerType::ContainedPairType> )
-	{
-		this->Append( other );
-		return *this;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Extends this map with another.
-	///
-	/// @note
-	/// If any key already exists in this map, then only the value is updated from the other map.
-	/// 
-	/// @param other
-	///	Another map to add to this map.
-	/// 
-	/// @return
-	/// Reference to this.
-	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( Map )																&	operator+=(
-		BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst>								other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> )
-	{
-		this->Append( other );
-		return *this;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if contents of this map matches the contents of another.
-	/// 
-	/// @param other
-	///	Other map to compare contents with.
-	/// 
-	/// @return
-	/// true if contents match, false if contents do not match.
-	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst>								other
-	) const noexcept
-	{
-		if( other.root_node == this->root_node && other.Size() == this->Size() ) return true;
-
-		return container_bases::CheckContainerContentsMatch( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if contents of this map differ the contents of another.
-	/// 
-	/// @param other
-	///	Other map to compare contents with.
-	/// 
-	/// @return
-	/// true if contents do not match, false if contents match.
-	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( MapViewBase )<KeyType, ValueType, IsOtherConst>								other
-	) const noexcept
-	{
-		if( other.root_node == this->root_node && other.Size() == this->Size() ) return true;
-
-		return container_bases::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1059,6 +591,109 @@ public:
 			this->ConstructNode( new_node, key, {} );
 			return new_node->data.second;
 		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get the smallest key/value pair.
+	///
+	/// @return
+	/// Pair with the smallest key.
+	constexpr const ContainedPairType																&	Front() BC_CONTAINER_NOEXCEPT const
+	{
+		BC_ContainerAssert( this->root_node, U"Cannot get container front, container is empty" );
+		return this->FindLeftmostFrom( this->root_node )->data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get the smallest key/value pair.
+	///
+	/// @return
+	/// Pair with the smallest key.
+	constexpr ContainedPairType																		&	Front() BC_CONTAINER_NOEXCEPT
+	{
+		BC_ContainerAssert( this->root_node, U"Cannot get container front, container is empty" );
+		return this->FindLeftmostFrom( this->root_node )->data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get the largest key/value pair.
+	///
+	/// @return
+	/// Pair with the largest key.
+	constexpr const ContainedPairType																&	Back() BC_CONTAINER_NOEXCEPT const
+	{
+		BC_ContainerAssert( this->root_node, U"Cannot get container back, container is empty" );
+		return this->FindRightmostFrom( this->root_node )->data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get the largest key/value pair.
+	///
+	/// @return
+	/// Pair with the largest key.
+	constexpr ContainedPairType																		&	Back() BC_CONTAINER_NOEXCEPT
+	{
+		BC_ContainerAssert( this->root_node, U"Cannot get container back, container is empty" );
+		return this->FindRightmostFrom( this->root_node )->data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Finds an element with specific key.
+	/// 
+	/// @param key
+	///	Key value of an element we want to find.
+	/// 
+	/// @return
+	/// Iterator to the element if found, returns end iterator if not found.
+	constexpr Iterator																					Find(
+		const KeyType																				&	key
+	) noexcept
+	{
+		auto result = this->FindNode( key );
+		if( result.found ) return Iterator { this, result.closest_node };
+		else return Iterator { this, nullptr };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Finds an element with specific key.
+	/// 
+	/// @param key
+	///	Key value of an element we want to find.
+	/// 
+	/// @return
+	/// ConstIterator to the element if found, returns end iterator if not found.
+	constexpr ConstIterator																				Find(
+		const KeyType																				&	key
+	) const noexcept
+	{
+		auto result = this->FindNode( key );
+		if( result.found ) return ConstIterator { this, result.closest_node };
+		else return ConstIterator { this, nullptr };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Check each member to see if any key match the parameter.
+	///
+	/// @note
+	/// This is exactly the same as <tt>container.Find( <key> ) != container.end()</tt>
+	/// 
+	/// @param member
+	///	Key value we're looking for.
+	/// 
+	/// @return
+	/// True if this container has member which key equals what we're searching for, false if not found.
+	constexpr bool																						HasMember(
+		const KeyType																				&	key
+	) const noexcept
+	{
+		return this->Find( key ) != this->end();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1324,9 +959,9 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->size, U"Cannot erase from container, container is already empty" );
-		BC_ContainerAssert( reinterpret_cast<void*>( at.container ) == this, U"Cannot erase from container using iterator that doesn't point to the container we're erasing from" );
-		BC_ContainerAssert( at.node, U"Cannot erase from container, iterator was at the end" );
-		auto node = at.node;
+		BC_ContainerAssert( at.GetContainer() == this, U"Cannot erase from container using iterator that doesn't point to the container we're erasing from" );
+		BC_ContainerAssert( at.GetData(), U"Cannot erase from container, iterator was at the end");
+		auto node = const_cast<Node*>( at.GetData() );
 		auto ret = Iterator { this, node };
 		++ret;
 		this->DestructNode( node );
@@ -1353,11 +988,11 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->size, U"Cannot erase from container, container is already empty" );
-		BC_ContainerAssert( reinterpret_cast<void*>( from.container ) == this, U"Cannot erase from container using iterator that doesn't point to the container we're erasing from" );
-		BC_ContainerAssert( reinterpret_cast<void*>( to.container ) == this, U"Cannot erase from container using iterator that doesn't point to the container we're erasing from" );
-		BC_ContainerAssert( from.node, U"Cannot erase from container, iterator was at the end" );
-		auto it = Iterator { this, from.node };
-		auto end = Iterator { this, to.node };
+		BC_ContainerAssert( from.GetContainer() == this, U"Cannot erase from container using iterator that doesn't point to the container we're erasing from" );
+		BC_ContainerAssert( to.GetContainer() == this, U"Cannot erase from container using iterator that doesn't point to the container we're erasing from" );
+		BC_ContainerAssert( from.GetData(), U"Cannot erase from container, iterator was at the end" );
+		auto it = Iterator { this, from.GetData() };
+		auto end = Iterator { this, to.GetData() };
 		while( it != end ) {
 			it = this->Erase( it );
 		}
@@ -1388,6 +1023,64 @@ public:
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get size of the map.
+	/// 
+	/// @return
+	/// Current number of elements stored inside this map.
+	constexpr size_t																					Size() const noexcept
+	{
+		return this->size;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Check if this Map has no elements stored.
+	/// 
+	/// @return
+	/// true if Size == 0, false otherwise.
+	constexpr bool																						IsEmpty() const noexcept
+	{
+		return !this->size;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Iterator																					begin() noexcept
+	{
+		return Iterator { this, this->FindLeftmostFrom( this->root_node ) };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Iterator																					end() noexcept
+	{
+		return Iterator { this, nullptr };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ConstIterator																				begin() const noexcept
+	{
+		return ConstIterator { this, this->FindLeftmostFrom( this->root_node ) };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ConstIterator																				end() const noexcept
+	{
+		return ConstIterator { this, nullptr };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ConstIterator																				cbegin() const noexcept
+	{
+		return this->begin();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ConstIterator																				cend() const noexcept
+	{
+		return this->end();
+	}
+
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1400,8 +1093,80 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr FindNodeResult																			FindNode(
+		const KeyType																				&	key
+	) const noexcept
+	{
+		Node * node = this->root_node;
+		while( node )
+		{
+			if( key == node->data.first )
+			{
+				return { node, true };
+			}
+			if( key < node->data.first )
+			{
+				if( node->left )
+				{
+					node = node->left;
+				}
+				else
+				{
+					return { node, false, true };
+				}
+			}
+			else
+			{
+				if( node->right )
+				{
+					node = node->right;
+				}
+				else
+				{
+					return { node, false, false };
+				}
+			}
+		}
+		return { node };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr static Node																			*	FindLeftmostFrom(
+		Node																						*	node
+	) noexcept
+	{
+		if( node == nullptr ) return nullptr;
+		while( node->left )
+		{
+			node = node->left;
+		}
+		return node;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr static Node																			*	FindRightmostFrom(
+		Node																						*	node
+	) noexcept
+	{
+		if( node == nullptr ) return nullptr;
+		while( node->right )
+		{
+			node = node->right;
+		}
+		return node;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr static Node																			*	FindSuccessor(
+		Node																						*	node
+	) noexcept
+	{
+		assert( node->right );
+		return FindLeftmostFrom( node->right );
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void																						AddNodeToTree(
-		Base::FindNodeResult																			find_node_result,
+		FindNodeResult																					find_node_result,
 		Node																						*	node
 	) BC_CONTAINER_NOEXCEPT
 	{
@@ -1806,36 +1571,17 @@ private:
 static_assert( sizeof( container_bases::BC_CONTAINER_NAME( MapIteratorBase )<uint32_t, uint32_t, true> ) == 16 );
 static_assert( sizeof( container_bases::BC_CONTAINER_NAME( MapIteratorBase )<uint32_t, uint32_t, false> ) == 16 );
 
-static_assert( sizeof( BC_CONTAINER_NAME( MapView )<uint32_t, uint32_t> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( EditableMapView )<uint32_t, uint32_t> ) == 16 );
 static_assert( sizeof( BC_CONTAINER_NAME( Map )<uint32_t, uint32_t> ) == 16 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if map container fulfills concept requirements.
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( MapView )<uint32_t, uint32_t>> );
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( EditableMapView )<uint32_t, uint32_t>> );
 static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-
-static_assert( !container_bases::ContainerEditableView<BC_CONTAINER_NAME( MapView )<uint32_t, uint32_t>> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( EditableMapView )<uint32_t, uint32_t>> );
 static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-
-static_assert( !container_bases::Container<BC_CONTAINER_NAME( MapView )<uint32_t, uint32_t>> );
-static_assert( !container_bases::Container<BC_CONTAINER_NAME( EditableMapView )<uint32_t, uint32_t>> );
 static_assert( container_bases::Container<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-
-static_assert( !container_bases::LinearContainerView<BC_CONTAINER_NAME( MapView )<uint32_t, uint32_t>> );
-static_assert( !container_bases::LinearContainerView<BC_CONTAINER_NAME( EditableMapView )<uint32_t, uint32_t>> );
 static_assert( !container_bases::LinearContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-
-static_assert( !container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( MapView )<uint32_t, uint32_t>> );
-static_assert( !container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( EditableMapView )<uint32_t, uint32_t>> );
 static_assert( !container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( MapView )<uint32_t, uint32_t>> );
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( EditableMapView )<uint32_t, uint32_t>> );
 static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
 
 
