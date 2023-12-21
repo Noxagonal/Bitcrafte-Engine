@@ -735,7 +735,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ~BC_CONTAINER_NAME( LinearContainerBase )() BC_CONTAINER_NOEXCEPT
 	{
-		this->DestructRange( this->data_ptr, this->data_size );
+		this->Clear();
 		this->FreeMemory( this->data_ptr, this->data_capacity );
 	}
 

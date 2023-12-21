@@ -166,6 +166,7 @@ protected:
 		static_assert( sizeof( size_t ) == 8, "This function is build for 64 bit systems only" );
 
 		if( location == nullptr ) return;
+		if( element_count == 0 ) return;
 
 		if( !std::is_constant_evaluated() )
 		{
@@ -176,7 +177,6 @@ protected:
 			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Destructing range, location is in uninitialized stack memory" );
 		}
 
-		BHardAssert( element_count > 0, "Destructing range, element count must be larger than 0" );
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Destructing range, element count too high, something is not right" );
 
 		auto end = location + element_count;
