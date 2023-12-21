@@ -323,6 +323,11 @@ concept IsConstConvertible =
 IsDestinationConst == true ||
 IsDestinationConst == IsSourceConst;
 
+static_assert( IsConstConvertible<true, true> );
+static_assert( !IsConstConvertible<false, true> );
+static_assert( IsConstConvertible<true, false> );
+static_assert( IsConstConvertible<false, false> );
+
 
 
 } // container_bases
