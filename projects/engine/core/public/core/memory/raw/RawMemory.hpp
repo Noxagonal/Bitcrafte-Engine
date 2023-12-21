@@ -475,7 +475,8 @@ constexpr ValueType			*	ReallocateMemory_Consteval(
 	auto common_length = old_count < new_count ? old_count : new_count;
 	for (size_t i = 0; i < common_length; i++)
 	{
-		new_location[ i ] = old_location[ i ];
+		if constexpr( std::is_move_assignable_v<ValueType> ) new_location[ i ] = std::move( old_location[ i ] );
+		if constexpr( std::is_copy_assignable_v<ValueType> ) new_location[ i ] = old_location[ i ];
 	}
 	FreeMemory_Consteval<ValueType>( old_location, old_count );
 	return new_location;
