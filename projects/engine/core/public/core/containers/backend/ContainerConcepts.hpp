@@ -12,6 +12,23 @@ namespace container_bases {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename Type>
+concept ContainerIterator = requires(
+	Type											type,
+	const typename Type::IteratorContainerType	*	container,
+	const typename Type::ContainedValueType		*	data
+)
+{
+	typename Type::ContainedValueType;
+	typename Type::IteratorContainerType;
+
+	container = type.GetContainer();
+	data = type.GetData();
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Concept for accepted text container character types.
 ///
