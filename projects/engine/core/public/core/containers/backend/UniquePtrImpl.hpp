@@ -1,6 +1,4 @@
 
-#include <core/containers/backend/ContainerBase.hpp>
-
 #if BI_CONTAINER_IMPLEMENTATION_NORMAL
 #elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
 #else
@@ -16,8 +14,7 @@ namespace bc {
 
 
 template<typename ValueType>
-class BC_CONTAINER_NAME( UniquePtr ) :
-	public container_bases::ContainerResource
+class BC_CONTAINER_NAME( UniquePtr )
 {
 public:
 
@@ -191,14 +188,15 @@ private:
 	constexpr void																						AllocateContainedMemory() noexcept
 	{
 		assert( this->data_ptr == nullptr && "This function should not be called on an occupied container" );
-		this->data_ptr = this->AllocateMemory<ValueType>( 1 );
+		this->data_ptr = memory::AllocateMemory<ValueType>( 1, alignof( ValueType ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void																						FreeContainedMemory() noexcept
 	{
 		assert( this->data_ptr && "This function should not be called on an empty container" );
-		this->FreeMemory<ValueType>( this->data_ptr, 1 );
+		memory::FreeMemory( this->data_ptr, 1 );
+		this->data_ptr = nullptr;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,15 +205,26 @@ private:
 		ConstructorArgumentTypePack																	&&	...constructor_arguments
 	) BC_CONTAINER_NOEXCEPT
 	{
+		static_assert( sizeof( size_t ) == 8, "This function is build for 64 bit systems only" );
 		assert( this->data_ptr && "This function should not be called on an empty container" );
-		this->ConstructRange( this->data_ptr, 1, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+
+		if( !std::is_constant_evaluated() )
+		{
+			// Assert some common Visual studio fault addresses.
+			BC_ContainerAssert( this->data_ptr != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Failed to construct object, destination is in memory outside of process" );
+			BC_ContainerAssert( this->data_ptr != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Failed to construct object, destination is in freed memory" );
+			BC_ContainerAssert( this->data_ptr != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Failed to construct object, destination is in uninitialized global memory" );
+			BC_ContainerAssert( this->data_ptr != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Failed to construct object, destination is in uninitialized stack memory" );
+		}
+
+		new( this->data_ptr ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void																						DestructContained() BC_CONTAINER_NOEXCEPT
 	{
 		assert( this->data_ptr && "This function should not be called on an empty container" );
-		this->DestructRange( this->data_ptr, 1 );
+		this->data_ptr->~ValueType();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
