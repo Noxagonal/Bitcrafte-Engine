@@ -23,6 +23,9 @@ else()
 	message(FATAL_ERROR "Git repository not found, unable to download dependencies automatically")
 endif()
 
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/googletest/CMakeLists.txt")
+    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
 #if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/glm/CMakeLists.txt")
 #    message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 #endif()
@@ -59,3 +62,10 @@ endif()
 #	)
 #endif()
 
+
+
+# Set google test projects to their own folders
+set_target_properties(gtest			PROPERTIES FOLDER "submodules/googletest")
+set_target_properties(gtest_main	PROPERTIES FOLDER "submodules/googletest")
+set_target_properties(gmock			PROPERTIES FOLDER "submodules/googletest")
+set_target_properties(gmock_main	PROPERTIES FOLDER "submodules/googletest")

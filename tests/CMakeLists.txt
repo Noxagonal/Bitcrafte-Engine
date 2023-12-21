@@ -143,11 +143,3 @@ endfunction()
 
 
 add_subdirectory("engine")
-
-
-
-# Set google test projects to their own folders
-set_target_properties(gtest			PROPERTIES FOLDER "third_party/google_test")
-set_target_properties(gtest_main	PROPERTIES FOLDER "third_party/google_test")
-set_target_properties(gmock			PROPERTIES FOLDER "third_party/google_test")
-set_target_properties(gmock_main	PROPERTIES FOLDER "third_party/google_test")
