@@ -3,6 +3,7 @@
 #include <core/diagnostic/print_record/PrintRecord.hpp>
 #include <core/diagnostic/source_location/SourceLocation.hpp>
 #include <core/diagnostic/stack_trace/StackTrace.hpp>
+#include <core/containers/simple/SimpleUniquePtr.hpp>
 
 
 
@@ -71,7 +72,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr inline const Exception					*	GetNextException() const noexcept
 	{
-		return this->next.get();
+		return this->next.Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +91,7 @@ public:
 		assert( std::addressof( next_exception ) != this && "next_exception was this exception" );
 		if( std::addressof( next_exception ) == this ) return;
 		if( next_exception.IsEmpty() ) return;
-		this->next = std::make_unique<Exception>( next_exception );
+		this->next = MakeSimpleUniquePtr<Exception>( next_exception );
 	}
 
 	constexpr inline bool									IsEmpty() const noexcept
@@ -119,14 +120,13 @@ public:
 
 private:
 
-	// TODO: Get rid of std::unique_ptr in favor of our own version.
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Next exception in exception chain.
 	///
 	/// This is used when an exception is caught by something which will then throw its own exception with additional information.
 	/// The original exception may be stored here.
-	std::unique_ptr<Exception>								next;
+	SimpleUniquePtr<Exception>								next;
 };
 
 
