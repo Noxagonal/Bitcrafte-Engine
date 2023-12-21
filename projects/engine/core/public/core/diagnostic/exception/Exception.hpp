@@ -148,6 +148,7 @@ private:
 /// where this function was called.
 ///
 /// @return New Exception object.
+BITCRAFTE_ENGINE_API
 Exception												MakeException(
 	const PrintRecord								&	print_record,
 	const SourceLocation							&	source_location				= SourceLocation::Current(),
