@@ -56,7 +56,7 @@ public:
 	using ThisFullType						= ThisContainerFullType<CharacterType>;
 
 	template<bool IsOtherConst>
-	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<CharacterType, IsOtherConst>;
+	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsOtherConst>;
 	using ConstIterator						= IteratorBase<true>;
 	using Iterator							= IteratorBase<false>;
 
@@ -660,6 +660,78 @@ public:
 
 		return { begin_iterator.GetData(), length };
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first character.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first character.
+	[[nodiscard]]
+	constexpr ConstIterator																				begin() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first character.
+	[[nodiscard]]
+	constexpr ConstIterator																				cbegin() const noexcept
+	{
+		return this->begin();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last character.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last character.
+	[[nodiscard]]
+	constexpr ConstIterator																				end() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last character.
+	[[nodiscard]]
+	constexpr ConstIterator																				cend() const noexcept
+	{
+		return this->end();
+	}
 };
 
 
@@ -697,7 +769,7 @@ public:
 	using ThisFullType						= ThisContainerFullType<CharacterType>;
 
 	template<bool IsOtherConst>
-	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<CharacterType, IsOtherConst>;
+	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsOtherConst>;
 	using ConstIterator						= IteratorBase<true>;
 	using Iterator							= IteratorBase<false>;
 
@@ -1291,69 +1363,163 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Insert text anywhere in this text.
-	///
-	///	If inserting in the middle of the text, existing text is split to make space for the new text.
-	///
-	/// @tparam OtherContainerType
-	///	Any other text container type.
-	///
-	/// @param at
-	///	Iterator position where new text should be added. Eg. Consider text "abcd", if inserting "HH" at position <tt>begin() +
-	/// 2</tt> then resulting text is "abHHcd".
+	/// Erase the first found character from this container.
 	/// 
-	/// @param other
-	///	Container containing text to insert.
-	///
-	/// @param count
-	///	How many times other_text should be inserted. Eg. if "text" was inserted with count 2, it is as if "texttext" was inserted.
+	///	Remaining character at the end are moved to fill the gap if erasing from the middle.
+	/// 
+	/// @param character
+	///	Character to erase from the list, if not found, returns an iterator to the end.
 	/// 
 	/// @return
-	/// Iterator to the first original character after insertion. Eg. If inserting "HH" at position <tt>begin() + 2</tt> then
-	/// returned iterator points to <tt>begin() + 4</tt>.
-	template<container_bases::TextContainerView OtherContainerType>
+	/// Iterator to the next character which replaced the erased character or end if not found.
+	constexpr Iterator																					Erase(
+		const CharacterType																			&	character
+	) BC_CONTAINER_NOEXCEPT
+	{
+		return Iterator {
+			this,
+			this->DoErase( character )
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase character at iterator location.
+	///
+	///	Remaining values at the end are moved to fill the gap if erasing from the middle.
+	/// 
+	/// @param at
+	///	Iterator position to character which to erase.
+	/// 
+	/// @return
+	/// Iterator to the next character which replaced the erased character, if erased last character then returned iterator points
+	/// to the end.
+	constexpr Iterator																					Erase(
+		ConstIterator																					at
+	) BC_CONTAINER_NOEXCEPT
+	{
+		BC_ContainerAssert( at.GetContainer() == this,
+			U"Cannot erase using iterator that doesn't point to the container we're erasing from"
+		);
+		return Iterator {
+			this,
+			this->DoErase( at.GetData() )
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase character range.
+	///
+	///	Remaining values at the end are moved to fill the gap if erasing from the middle.
+	/// 
+	/// @param from
+	///	Iterator to first character to erase.
+	/// 
+	/// @param to
+	///	Iterator to last character where to stop erasing. This character is not erased from this container, rather it tells the
+	/// position where to stop.
+	/// 
+	/// @return
+	/// Iterator to the the first character which was not erased.
+	constexpr Iterator																					Erase(
+		ConstIterator																					from,
+		ConstIterator																					to
+	) BC_CONTAINER_NOEXCEPT
+	{
+		BC_ContainerAssert( from.GetContainer() == this,
+			U"Cannot erase using 'from' iterator that doesn't point to the container we're erasing from"
+		);
+		BC_ContainerAssert( to.GetContainer() == this,
+			U"Cannot erase using 'to' iterator that doesn't point to the container we're erasing from"
+		);
+		return Iterator {
+			this,
+			this->DoErase( from.GetData(), to.GetData() )
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Inserts another character at position.
+	///
+	///	This insert function copies the character.
+	///
+	/// @param at
+	///	Iterator location where to insert the new character.
+	///
+	/// @param character
+	/// New character to insert.
+	///
+	/// @param count
+	///	How many times should the new character be inserted. Eg. When inserting a character, 't' with count 4, you may consider it
+	/// as if "tttt" was inserted.
+	///
+	/// @param headroom
+	/// How much extra space is reserved if the capacity is expanded.
+	///
+	/// @return
+	/// Iterator to the next character after inserted character.
+	constexpr Iterator																					Insert(
+		ConstIterator																					at,
+		const CharacterType																			&	character,
+		size_t																							count			= 1,
+		size_t																							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<CharacterType> )
+	{
+		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		return Iterator {
+			this,
+			this->DoInsert(
+				at.GetData(),
+				character,
+				count,
+				headroom
+			)
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Inserts values from another container at position, optionally multiple times.
+	///
+	/// This insert function copies values.
+	///
+	/// @param at
+	///	Iterator location where to start inserting other values.
+	///
+	/// @param other
+	///	Linear container view type to insert values from.
+	///
+	/// @param count
+	///	How many times should the other values be inserted. Eg. When inserting text, "sample" with count 2, you may consider it
+	/// as if "samplesample" was inserted.
+	///
+	/// @param headroom
+	/// How much extra space is reserved if the capacity is expanded.
+	///
+	/// @return
+	/// Iterator one past the the last inserted character. Or first original character after insertion.
+	template<container_bases::ContainerView OtherContainerType>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
-		size_t																							count							= 1,
-		size_t																							headroom						= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, typename OtherContainerType::ContainedCharacterType> || std::is_same_v<char, typename OtherContainerType::ContainedCharacterType> )
+		size_t																							count			= 1,
+		size_t																							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<CharacterType> && std::is_same_v<CharacterType, typename OtherContainerType::ContainedValueType> )
 	{
-		BC_ContainerAssert( reinterpret_cast<const void*>( at.container ) == reinterpret_cast<const void*>( this ),
-			"Cannot insert into container using iterator that doesn't point to the container we're inserting into"
-		);
-
-		auto CopyFunc = [this, count, &at, headroom](
-			auto		other
-		) -> Iterator
-		{
-			size_t start_index			= at.GetIndex();
-			size_t other_size			= other.Size();
-			size_t total_insert_size	= other_size * count;
-
-			this->ShiftRight( start_index, total_insert_size, headroom );
-
-			for( size_t c = 0; c < count; ++c ) {
-				auto it = other.begin();
-				for( size_t i = 0; i < other_size; ++i ) {
-					auto count_start_pos = c * other_size + start_index;
-					new( &this->data_ptr[ count_start_pos + i ] ) CharacterType( *it );
-					++it;
-				}
-			}
-			return Iterator { this, &this->data_ptr[ start_index + total_insert_size ] };
+		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		return Iterator {
+			this,
+			this->DoInsert(
+				at.GetData(),
+				other,
+				count,
+				headroom
+			)
 		};
-
-		if constexpr( container_bases::LinearContainerView<OtherContainerType> ) {
-			if( reinterpret_cast<const void*>( other.Data() ) >= reinterpret_cast<const void*>( this->data_ptr ) &&
-				reinterpret_cast<const void*>( other.Data() ) < reinterpret_cast<const void*>( this->data_ptr + this->data_size ) ) {
-				// Other container data is either full or partial range from within this container, need to make a temporary.
-				auto other_copy = BC_CONTAINER_NAME( TextBase )<typename OtherContainerType::ContainedCharacterType> { other };
-				return CopyFunc( other_copy );
-			}
-		}
-
-		return CopyFunc( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1782,6 +1948,78 @@ public:
 		this->Reserve( this->data_size + 1 );
 		this->data_ptr[ this->data_size ] = '\0';
 		return this->data_ptr;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first character.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first character.
+	[[nodiscard]]
+	constexpr ConstIterator																				begin() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first character.
+	[[nodiscard]]
+	constexpr ConstIterator																				cbegin() const noexcept
+	{
+		return this->begin();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last character.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last character.
+	[[nodiscard]]
+	constexpr ConstIterator																				end() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last character.
+	[[nodiscard]]
+	constexpr ConstIterator																				cend() const noexcept
+	{
+		return this->end();
 	}
 
 	operator BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>() const noexcept

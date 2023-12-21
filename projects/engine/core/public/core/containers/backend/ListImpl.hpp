@@ -55,7 +55,7 @@ public:
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
 	template<bool IsOtherConst>
-	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsOtherConst>;
+	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsOtherConst>;
 	using ConstIterator						= IteratorBase<true>;
 	using Iterator							= IteratorBase<false>;
 
@@ -166,6 +166,112 @@ public:
 		return container_bases::CheckContainerContentsDiffer( *this, other );
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container.
+	///
+	/// @param value
+	///	Value to find.
+	/// 
+	/// @return
+	/// Pointer to value position where value was found.
+	[[nodiscard]]
+	constexpr ConstIterator																				Find(
+		const ValueType																				&	value
+	) const BC_CONTAINER_NOEXCEPT
+	{
+		IteratorBase<IsConst>( this, this->DoFind( value ) );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container.
+	///
+	/// @param value
+	///	Value to find.
+	/// 
+	/// @return
+	/// Pointer to value position where value was found.
+	[[nodiscard]]
+	constexpr IteratorBase<IsConst>																		Find(
+		const ValueType																				&	value
+	) BC_CONTAINER_NOEXCEPT
+	{
+		IteratorBase<IsConst>( this, this->DoFind( value ) );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first value.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first value.
+	[[nodiscard]]
+	constexpr ConstIterator																				begin() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first value.
+	[[nodiscard]]
+	constexpr ConstIterator																				cbegin() const noexcept
+	{
+		return this->begin();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last value.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last value.
+	[[nodiscard]]
+	constexpr ConstIterator																				end() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last value.
+	[[nodiscard]]
+	constexpr ConstIterator																				cend() const noexcept
+	{
+		return this->end();
+	}
+
 private:
 };
 
@@ -197,7 +303,7 @@ public:
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
 	template<bool IsConst>
-	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>;
+	using IteratorBase						= container_bases::BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsConst>;
 	using ConstIterator						= IteratorBase<true>;
 	using Iterator							= IteratorBase<false>;
 
@@ -441,6 +547,273 @@ public:
 		if( std::addressof( other ) == this ) return false;
 
 		return container_bases::CheckContainerContentsDiffer( *this, other );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase the first found value from this container.
+	/// 
+	///	Remaining value at the end are moved to fill the gap if erasing from the middle.
+	/// 
+	/// @param value
+	///	Value to erase from the list, if not found, returns an iterator to the end.
+	/// 
+	/// @return
+	/// Iterator to the next value which replaced the erased value or end if not found.
+	constexpr Iterator																					Erase(
+		const ValueType																				&	value
+	) BC_CONTAINER_NOEXCEPT
+	{
+		return Iterator {
+			this,
+			this->DoErase( value )
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase value at iterator location.
+	///
+	///	Remaining values at the end are moved to fill the gap if erasing from the middle.
+	/// 
+	/// @param at
+	///	Iterator position to value which to erase.
+	/// 
+	/// @return
+	/// Iterator to the next value which replaced the erased value, if erased last value then returned iterator points to
+	/// the end.
+	constexpr Iterator																					Erase(
+		ConstIterator																					at
+	) BC_CONTAINER_NOEXCEPT
+	{
+		BC_ContainerAssert( at.GetContainer() == this,
+			U"Cannot erase using iterator that doesn't point to the container we're erasing from"
+		);
+		return Iterator {
+			this,
+			this->DoErase( at.GetData() )
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase value range.
+	///
+	///	Remaining values at the end are moved to fill the gap if erasing from the middle.
+	/// 
+	/// @param from
+	///	Iterator to first value to erase.
+	/// 
+	/// @param to
+	///	Iterator to last value where to stop erasing. This value is not erased from this container, rather it tells the
+	/// position where to stop.
+	/// 
+	/// @return
+	/// Iterator to the the first value which was not erased.
+	constexpr Iterator																					Erase(
+		ConstIterator																					from,
+		ConstIterator																					to
+	) BC_CONTAINER_NOEXCEPT
+	{
+		BC_ContainerAssert( from.GetContainer() == this,
+			U"Cannot erase using 'from' iterator that doesn't point to the container we're erasing from"
+		);
+		BC_ContainerAssert( to.GetContainer() == this,
+			U"Cannot erase using 'to' iterator that doesn't point to the container we're erasing from"
+		);
+		return Iterator {
+			this,
+			this->DoErase( from.GetData(), to.GetData() )
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Inserts another value at position.
+	///
+	///	This insert function copies the value.
+	///
+	/// @param at
+	///	Iterator location where to insert the new value.
+	///
+	/// @param value
+	/// New value to insert.
+	///
+	/// @param count
+	///	How many times should the new value be inserted. Eg. When inserting a character, 't' with count 4, you may consider it
+	/// as if "tttt" was inserted.
+	///
+	/// @param headroom
+	/// How much extra space is reserved if the capacity is expanded.
+	///
+	/// @return
+	/// Iterator to the next value after inserted value.
+	constexpr Iterator																					Insert(
+		ConstIterator																					at,
+		const ValueType																				&	value,
+		size_t																							count			= 1,
+		size_t																							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	{
+		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		return Iterator {
+			this,
+			this->DoInsert(
+				at.GetData(),
+				value,
+				count,
+				headroom
+			)
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Inserts values from another container at position, optionally multiple times.
+	///
+	/// This insert function copies values.
+	///
+	/// @param at
+	///	Iterator location where to start inserting other values.
+	///
+	/// @param other
+	///	Linear container view type to insert values from.
+	///
+	/// @param count
+	///	How many times should the other values be inserted. Eg. When inserting text, "sample" with count 2, you may consider it
+	/// as if "samplesample" was inserted.
+	///
+	/// @param headroom
+	/// How much extra space is reserved if the capacity is expanded.
+	///
+	/// @return
+	/// Iterator one past the the last inserted value. Or first original value after insertion.
+	template<container_bases::ContainerView OtherContainerType>
+	constexpr Iterator																					Insert(
+		ConstIterator																					at,
+		const OtherContainerType																	&	other,
+		size_t																							count			= 1,
+		size_t																							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	{
+		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		return Iterator {
+			this,
+			this->DoInsert(
+				at.GetData(),
+				other,
+				count,
+				headroom
+			)
+		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container.
+	///
+	/// @param value
+	///	Value to find.
+	/// 
+	/// @return
+	/// Pointer to value position where value was found.
+	[[nodiscard]]
+	constexpr ConstIterator																				Find(
+		const ValueType																				&	value
+	) const BC_CONTAINER_NOEXCEPT
+	{
+		ThisViewType<true>( *this ).Find( value );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container.
+	///
+	/// @param value
+	///	Value to find.
+	/// 
+	/// @return
+	/// Pointer to value position where value was found.
+	[[nodiscard]]
+	constexpr Iterator																					Find(
+		const ValueType																				&	value
+	) BC_CONTAINER_NOEXCEPT
+	{
+		ThisViewType<false>( *this ).Find( value );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first value.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first value.
+	[[nodiscard]]
+	constexpr ConstIterator																				begin() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ 0 ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to the first value.
+	[[nodiscard]]
+	constexpr ConstIterator																				cbegin() const noexcept
+	{
+		return this->begin();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last value.
+	[[nodiscard]]
+	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	{
+		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last value.
+	[[nodiscard]]
+	constexpr ConstIterator																				end() const noexcept
+	{
+		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Used when iterating over the container.
+	/// 
+	/// @return
+	/// Iterator that points to one over the last value.
+	[[nodiscard]]
+	constexpr ConstIterator																				cend() const noexcept
+	{
+		return this->end();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

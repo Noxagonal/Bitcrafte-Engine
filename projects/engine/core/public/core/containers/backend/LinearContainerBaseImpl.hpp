@@ -25,28 +25,29 @@ class BC_CONTAINER_NAME( LinearContainerBase );
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst>
+template<typename ContainerType, bool IsConst>
 class BC_CONTAINER_NAME( LinearContainerIteratorBase )
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	using ContainedValueType	= ValueType;
+	using ContainedValueType	= typename ContainerType::ContainedValueType;
+	using IteratorContainerType	= ContainerType;
 
-	using value_type			= ValueType;	// For stl compatibility.
+	using value_type			= ContainedValueType;	// For stl compatibility.
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
+	template<typename ContainerType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase );
 
-	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, true>;
-	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, false>;
+	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, true>;
+	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, false>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsConst>								*	container;
-	ValueType																						*	data;
+	const ContainerType																				*	container		= nullptr;
+	ContainedValueType																				*	data			= nullptr;
 
 public:
 
@@ -54,46 +55,65 @@ public:
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Construct an iterator from LinearContainerIteratorBase type.
+	///
+	/// @param other
+	/// Other iterator.
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )(
-		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsOtherConst>				&	other
-	) noexcept requires( IsConstConvertible<IsConst, IsOtherConst> )
-		:
-		container( reinterpret_cast<decltype( this->container )>( const_cast<BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>*>( other.container ) ) ),
-		data( const_cast<ValueType*>( other.data ) )
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
+	) noexcept requires( IsConstConvertible<IsConst, IsOtherConst> ) :
+		container( other.container ),
+		data( const_cast<ContainedValueType*>( other.data ) )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<bool IsOtherConst = IsConst>
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )(
-		const BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>					*	container,
-		const ValueType																				*	data
-	) noexcept requires( IsConstConvertible<IsConst, IsOtherConst> )
-		:
-		container( reinterpret_cast<decltype( this->container )>( const_cast<BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>*>( container ) ) ),
-		data( const_cast<ValueType*>( data ) )
+		const ContainerType																			*	container,
+		const ContainedValueType																	*	data
+	) noexcept :
+		container( container ),
+		data( const_cast<ContainedValueType*>( data ) )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	operator*() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
+	/// @brief
+	/// Copy iterator from LinearContainerIteratorBase type.
+	///
+	/// @return
+	/// Reference to this.
+	template<bool IsOtherConst>
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )										&	operator=(
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
+	) noexcept requires( IsConstConvertible<IsConst, IsOtherConst> )
+	{
+		this->container = other.container;
+		this->data = other.data;
+		return *this;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ContainedValueType																	&	operator*() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
 	{
 		return *this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	operator*() const BC_CONTAINER_NOEXCEPT
+	constexpr const ContainedValueType																&	operator*() const BC_CONTAINER_NOEXCEPT
 	{
 		return *this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	operator->() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
+	constexpr ContainedValueType																	*	operator->() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
 	{
 		return this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	operator->() const BC_CONTAINER_NOEXCEPT
+	constexpr const ContainedValueType																*	operator->() const BC_CONTAINER_NOEXCEPT
 	{
 		return this->Get();
 	}
@@ -101,7 +121,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
 	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsOtherConst>				&	other
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
 	) const noexcept
 	{
 		return this->data == other.data;
@@ -110,20 +130,20 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
 	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsOtherConst>				&	other
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
 	) const noexcept
 	{
 		return this->data != other.data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>					&	operator++() BC_CONTAINER_NOEXCEPT
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator++() BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data + 1 <= this->container->data_ptr + this->container->data_size,
+		BC_ContainerAssert( this->data + 1 <= this->container->Data() + this->container->Size(),
 			U"Tried to increment iterator past end",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck() + 1
 		);
 		++this->data;
@@ -131,13 +151,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>					&	operator--() BC_CONTAINER_NOEXCEPT
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator--() BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data - 1 >= this->container->data_ptr,
+		BC_ContainerAssert( this->data - 1 >= this->container->Data(),
 			U"Tried to decrement iterator past first value",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck() - 1
 		);
 		--this->data;
@@ -145,49 +165,49 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>						operator+(
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>					operator+(
 		size_t																							value
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data + value <= this->container->data_ptr + this->container->data_size,
+		BC_ContainerAssert( this->data + value <= this->container->Data() + this->container->Size(),
 			U"Tried to increment iterator past end",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck() + value
 		);
-		BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst> ret = *this;
+		BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst> ret = *this;
 		ret.data += value;
 		return ret;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>						operator-(
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>					operator-(
 		size_t																							value
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data - value >= this->container->data_ptr,
+		BC_ContainerAssert( this->data - value >= this->container->Data(),
 			U"Tried to decrement iterator past first value",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck() - value
 		);
-		BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst> ret = *this;
+		BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst> ret = *this;
 		ret.data -= value;
 		return ret;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>					&	operator+=(
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator+=(
 		size_t																							value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data + value <= this->container->data_ptr + this->container->data_size,
+		BC_ContainerAssert( this->data + value <= this->container->Data() + this->container->Size(),
 			U"Tried to increment iterator past end",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck() + value
 		);
 		this->data += value;
@@ -195,15 +215,15 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsConst>					&	operator-=(
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator-=(
 		size_t																							value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data - value >= this->container->data_ptr,
+		BC_ContainerAssert( this->data - value >= this->container->Data(),
 			U"Tried to decrement iterator past first value",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck() - value
 		);
 		this->data -= value;
@@ -211,49 +231,49 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	Get() const BC_CONTAINER_NOEXCEPT
+	constexpr const ContainedValueType																*	Get() const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( this->data >= this->container->data_ptr && this->data < ( this->container->data_ptr + this->container->data_size ),
+		BC_ContainerAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
 			U"Iterator is out of range",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck()
 		);
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	Get() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
+	constexpr ContainedValueType																	*	Get() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( this->data >= this->container->data_ptr && this->data < ( this->container->data_ptr + this->container->data_size ),
+		BC_ContainerAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
 			U"Iterator is out of range",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck()
 		);
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	GetData() const noexcept
+	constexpr const ContainedValueType																*	GetData() const noexcept
 	{
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	GetData() noexcept requires( IsConst == false )
+	constexpr ContainedValueType																	*	GetData() noexcept requires( IsConst == false )
 	{
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsConst>				*	GetContainer() const noexcept
+	constexpr const ContainerType																	*	GetContainer() const noexcept
 	{
 		return this->container;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsConst>						*	GetContainer() noexcept requires( IsConst == false )
+	constexpr ContainerType																			*	GetContainer() noexcept requires( IsConst == false )
 	{
 		return this->container;
 	}
@@ -262,9 +282,9 @@ public:
 	constexpr int64_t																					GetIndex() const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( this->data >= this->container->data_ptr && this->data < ( this->container->data_ptr + this->container->data_size ),
+		BC_ContainerAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
 			U"Iterator is out of range",
-			U"Container size", this->container->data_size,
+			U"Container size", this->container->Size(),
 			U"Iterator index", this->GetIndex_NoCheck()
 		);
 		return GetIndex_NoCheck();
@@ -275,8 +295,8 @@ public:
 	{
 		return
 			( this->container != nullptr ) &&
-			( this->data >= this->container->data_ptr ) &&
-			( this->data <= this->container->data_ptr + this->container->data_size );
+			( this->data >= this->container->Data() ) &&
+			( this->data <= this->container->Data() + this->container->Size() );
 	}
 
 private:
@@ -284,7 +304,7 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr int64_t																					GetIndex_NoCheck() const noexcept
 	{
-		return ( int64_t( this->data ) - int64_t( this->container->data_ptr ) ) / sizeof( ValueType );
+		return ( int64_t( this->data ) - int64_t( this->container->Data() ) ) / sizeof( ContainedValueType );
 	}
 };
 
@@ -296,7 +316,7 @@ private:
 ///
 ///	This specific container base can only access members, modifying the contained data is allowed but modifying the container is
 /// not.
-/// 
+///
 /// @tparam ValueType
 ///	Type of linear container value.
 ///
@@ -314,7 +334,7 @@ public:
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerType					= BC_CONTAINER_NAME( LinearContainerViewBase )<OtherValueType, IsOtherConst>;
-	using ThisType							= ThisContainerType<ValueType, IsDataConst>;
+	using ThisType							= ThisContainerType<ValueType, IsConst>;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( LinearContainerViewBase )<OtherValueType, IsOtherConst>;
@@ -326,10 +346,10 @@ public:
 	using ThisContainerFullType				= BC_CONTAINER_NAME( LinearContainerBase )<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
-	template<bool IsOtherConst>
-	using IteratorBase						= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsOtherConst>;
-	using ConstIterator						= IteratorBase<true>;
-	using Iterator							= IteratorBase<false>;
+	//template<bool IsOtherConst>
+	//using IteratorBase						= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsOtherConst>;
+	//using ConstIterator						= IteratorBase<true>;
+	//using Iterator							= IteratorBase<false>;
 
 	using value_type						= ValueType;	// for stl compatibility.
 
@@ -339,8 +359,8 @@ private:
 	// template<bool IsOtherConst>
 	// friend class IteratorBase;
 
-	friend ConstIterator;
-	friend Iterator;
+	//friend ConstIterator;
+	//friend Iterator;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( LinearContainerViewBase );
@@ -356,7 +376,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )(
-		const BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>	&	other
+		const BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>					&	other
 	) noexcept requires( IsDataConst == true )
 		:
 		data_ptr( other.data_ptr ),
@@ -366,7 +386,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )(
-		const BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>	&	other
+		const BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>					&	other
 	) noexcept requires( IsConstConvertible<IsDataConst, IsOtherConst> )
 		:
 		data_ptr( const_cast<ValueType*>( other.Data() ) ),
@@ -441,31 +461,6 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Find the first occurance of a specific value in this container.
-	///
-	/// @param value
-	///	Value to find.
-	/// 
-	/// @return
-	/// Iterator to value position where value was found.
-	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	Find(
-		const ValueType																				&	value
-	) const BC_CONTAINER_NOEXCEPT
-	{
-		auto it = this->data_ptr;
-		auto it_end = this->data_ptr + this->data_size;
-		if( it != it_end ) {
-			if( *it == value ) {
-				return IteratorBase<IsDataConst>( this, it );
-			}
-			++it;
-		}
-		return IteratorBase<IsDataConst>( this, it );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
 	/// Check each member to see if any match the parameter.
 	///
 	/// @note
@@ -480,7 +475,7 @@ public:
 		const ValueType																				&	member
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return Find( member ) != end();
+		return this->DoFind( member ) < this->data_ptr + this->data_size;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -593,79 +588,61 @@ public:
 		return this->data_ptr;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Used when iterating over the container.
-	/// 
-	/// @return
-	/// Iterator that points to the first value.
-	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	begin() noexcept
-	{
-		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Used when iterating over the container.
-	/// 
-	/// @return
-	/// Iterator that points to the first value.
-	[[nodiscard]]
-	constexpr ConstIterator																				begin() const noexcept
-	{
-		return ConstIterator { this, &this->data_ptr[ 0 ] };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Used when iterating over the container.
-	/// 
-	/// @return
-	/// Iterator that points to the first value.
-	[[nodiscard]]
-	constexpr ConstIterator																				cbegin() const noexcept
-	{
-		return this->begin();
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Used when iterating over the container.
-	/// 
-	/// @return
-	/// Iterator that points to one over the last value.
-	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	end() noexcept
-	{
-		return IteratorBase<IsDataConst> { this, &this->data_ptr[ data_size ] };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Used when iterating over the container.
-	/// 
-	/// @return
-	/// Iterator that points to one over the last value.
-	[[nodiscard]]
-	constexpr ConstIterator																				end() const noexcept
-	{
-		return ConstIterator { this, &this->data_ptr[ data_size ] };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Used when iterating over the container.
-	/// 
-	/// @return
-	/// Iterator that points to one over the last value.
-	[[nodiscard]]
-	constexpr ConstIterator																				cend() const noexcept
-	{
-		return this->end();
-	}
-
 protected:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container.
+	///
+	/// @param value
+	///	Value to find.
+	/// 
+	/// @return
+	/// Pointer to value position where value was found.
+	[[nodiscard]]
+	constexpr const ValueType																		*	DoFind(
+		const ValueType																				&	value
+	) const BC_CONTAINER_NOEXCEPT
+	{
+		auto it = this->data_ptr;
+		auto it_end = this->data_ptr + this->data_size;
+		if( it != it_end )
+		{
+			if( *it == value )
+			{
+				return it;
+			}
+			++it;
+		}
+		return it;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container.
+	///
+	/// @param value
+	///	Value to find.
+	/// 
+	/// @return
+	/// Pointer to value position where value was found.
+	[[nodiscard]]
+	constexpr ValueType																				*	DoFind(
+		const ValueType																				&	value
+	) BC_CONTAINER_NOEXCEPT
+	{
+		auto it = this->data_ptr;
+		auto it_end = this->data_ptr + this->data_size;
+		if( it != it_end )
+		{
+			if( *it == value )
+			{
+				return it;
+			}
+			++it;
+		}
+		return it;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																						*	data_ptr				= {};
@@ -706,10 +683,10 @@ public:
 	using ThisContainerFullType				= BC_CONTAINER_NAME( LinearContainerBase )<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
-	template<bool IsOtherConst>
-	using IteratorBase						= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ValueType, IsOtherConst>;
-	using ConstIterator						= IteratorBase<true>;
-	using Iterator							= IteratorBase<false>;
+	//template<bool IsOtherConst>
+	//using IteratorBase						= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsOtherConst>;
+	//using ConstIterator						= IteratorBase<true>;
+	//using Iterator							= IteratorBase<false>;
 
 	using value_type						= ValueType;	// for stl compatibility.
 
@@ -719,8 +696,8 @@ private:
 	//template<bool IsOtherConst>
 	//friend class IteratorBase;
 
-	friend ConstIterator;
-	friend Iterator;
+	//friend ConstIterator;
+	//friend Iterator;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( LinearContainerViewBase );
@@ -890,120 +867,6 @@ public:
 				++other_it;
 			}
 		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Inserts another value at position.
-	///
-	///	This insert function copies the value.
-	///
-	/// @param at
-	///	Iterator location where to insert the new value.
-	///
-	/// @param value
-	/// New value to insert.
-	///
-	/// @param count
-	///	How many times should the new value be inserted. Eg. When inserting a character, 't' with count 4, you may consider it
-	/// as if "tttt" was inserted.
-	///
-	/// @param headroom
-	/// How much extra space is reserved if the capacity is expanded.
-	///
-	/// @return
-	/// Iterator one past the the inserted value. Or first original value after insertion.
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const ValueType																				&	value,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
-	{
-		auto * this_as_const_view = reinterpret_cast<ThisViewType<true>*>( this );
-		BC_ContainerAssert( at.container == this_as_const_view,
-			"Cannot insert into container using iterator that doesn't point to the container we're inserting into"
-		);
-
-		size_t at_index = at.GetIndex();
-		this->ShiftRight( at_index, count, headroom );
-
-		for( size_t i = 0; i < count; ++i )
-		{
-			new( &this->data_ptr[ at_index + i ] ) ValueType( value );
-		}
-
-		return Iterator { this, &this->data_ptr[ at_index + count ] };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Inserts values from another container at position, optionally multiple times.
-	///
-	/// This insert function copies values.
-	///
-	/// @param at
-	///	Iterator location where to start inserting other values.
-	///
-	/// @param other
-	///	Linear container view type to insert values from.
-	///
-	/// @param count
-	///	How many times should the other values be inserted. Eg. When inserting text, "text" with count 2, you may consider it
-	/// as if "texttext" was inserted.
-	///
-	/// @param headroom
-	/// How much extra space is reserved if the capacity is expanded.
-	///
-	/// @return
-	/// Iterator one past the the last inserted value. Or first original value after insertion.
-	template<container_bases::ContainerView OtherContainerType>
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const OtherContainerType																	&	other,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
-	{
-		BC_ContainerAssert( reinterpret_cast<const void*>( at.container ) == reinterpret_cast<const void*>( this ),
-			"Cannot insert into container using iterator that doesn't point to the container we're inserting into"
-		);
-
-		auto CopyFunc = [ this, count, &at, headroom ](
-			auto		other
-			) -> Iterator
-			{
-				size_t start_index			= at.GetIndex();
-				size_t other_size			= other.Size();
-				size_t total_insert_size	= other_size * count;
-
-				this->ShiftRight( start_index, total_insert_size, headroom );
-
-				for( size_t c = 0; c < count; ++c )
-				{
-					auto it = other.begin();
-					for( size_t i = 0; i < other_size; ++i )
-					{
-						auto count_start_pos = c * other_size + start_index;
-						new( &this->data_ptr[ count_start_pos + i ] ) ValueType( *it );
-						++it;
-					}
-				}
-				return Iterator { this, &this->data_ptr[ start_index + total_insert_size ] };
-			};
-
-		if constexpr( container_bases::LinearContainerView<OtherContainerType> )
-		{
-			if( reinterpret_cast<const void*>( other.Data() ) >= reinterpret_cast<const void*>( this->data_ptr ) &&
-				reinterpret_cast<const void*>( other.Data() ) < reinterpret_cast<const void*>( this->data_ptr + this->data_size ) )
-			{
-				// Other container data is either full or partial range from within this container, need to make a temporary.
-				auto other_copy = BC_CONTAINER_NAME( LinearContainerBase )<typename OtherContainerType::ContainedValueType> { other };
-				return CopyFunc( other_copy );
-			}
-		}
-
-		return CopyFunc( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1216,106 +1079,59 @@ public:
 		this->ResizeNoConstruct( this->data_size - 1, 0 );
 	}
 
+protected:
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Erase the first found value from this container.
-	/// 
-	///	Remaining value at the end are moved to fill the gap if erasing from the middle.
-	/// 
-	/// @param value
-	///	Value to erase from the list, if not found, returns an iterator to the end.
-	/// 
-	/// @return
-	/// Iterator to the next value which replaced the erased value or end if not found.
-	constexpr Iterator																					Erase(
+	constexpr ValueType																				*	DoErase(
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( !this->IsEmpty(), "Cannot erase from container, container is already empty" );
-		auto iterator = this->Find( value );
-		if( iterator == this->end() ) return iterator;
-		return this->Erase( iterator );
+		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
+		auto iterator = this->DoFind( value );
+		if( iterator > this->data_ptr + this->data_size ) return iterator;
+		return this->DoErase( iterator );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Erase value at iterator location.
-	///
-	///	Remaining values at the end are moved to fill the gap if erasing from the middle.
-	/// 
-	/// @param at
-	///	Iterator position to value which to erase.
-	/// 
-	/// @return
-	/// Iterator to the next value which replaced the erased value, if erased last value then returned iterator points to
-	/// the end.
-	constexpr Iterator																					Erase(
-		ConstIterator																					at
+	constexpr ValueType																				*	DoErase(
+		const ValueType																				*	at
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto * this_as_const_view = reinterpret_cast<ThisViewType<true>*>( this );
 		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
-		BC_ContainerAssert( at.container == this_as_const_view,
-			U"Cannot erase using iterator that doesn't point to the container we're erasing from"
-		);
-		BC_ContainerAssert( at.data < this->data_ptr + this->data_size,
-			U"Cannot erase from container, Iterator out of range or it points to the end",
-			U"Container size", this->data_size,
-			U"Iterator index", at.GetIndex_NoCheck()
+		BC_ContainerAssert(
+			at >= this->data_ptr && at < this->data_ptr + this->data_size,
+			U"Iterator out of range or it points to the end"
 		);
 
-		return this->Erase( at, at + 1 );
+		return this->DoErase( at, at + 1 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Erase value range.
-	///
-	///	Remaining values at the end are moved to fill the gap if erasing from the middle.
-	/// 
-	/// @param from
-	///	Iterator to first value to erase.
-	/// 
-	/// @param to
-	///	Iterator to last value where to stop erasing. This value is not erased from this container, rather it tells the
-	/// position where to stop.
-	/// 
-	/// @return
-	/// Iterator to the the first value which was not erased.
-	constexpr Iterator																					Erase(
-		ConstIterator																					from,
-		ConstIterator																					to
+	constexpr ValueType																				*	DoErase(
+		const ValueType																				*	from,
+		const ValueType																				*	to
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto * this_as_const_view = reinterpret_cast<ThisViewType<true>*>( this );
 		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
-		BC_ContainerAssert( from.container == this_as_const_view,
-			U"Cannot erase using a container iterator that doesn't point to the container we're erasing from"
+		BC_ContainerAssert(
+			from >= this->data_ptr && from < this->data_ptr + this->data_size,
+			U"'from' iterator out of range or it points to the end"
 		);
-		BC_ContainerAssert( to.container == this_as_const_view,
-			U"Cannot erase using container iterator that doesn't point to the container we're erasing from"
-		);
-		BC_ContainerAssert( from.data < this->data_ptr + this->data_size,
-			U"Cannot erase from container, \"From\" Iterator out of range or it points to the end",
-			U"Container size", this->data_size,
-			U"\"From\" Iterator index", from.GetIndex_NoCheck(),
-			U"\"To\" Iterator index", to.GetIndex_NoCheck()
-		);
-		BC_ContainerAssert( from.data < this->data_ptr + this->data_size + 1,
-			U"Cannot erase from container, \"To\" Iterator out of range or it points to the end",
-			U"Container size", this->data_size,
-			U"\"From\" Iterator index", from.GetIndex_NoCheck(),
-			U"\"To\" Iterator index", to.GetIndex_NoCheck()
+		BC_ContainerAssert(
+			to >= this->data_ptr && to < this->data_ptr + this->data_size + 1,
+			U"'to' iterator out of range"
 		);
 
-		size_t range = to.data - from.data;
-		auto it = from.data;
+		size_t range = to - from;
+		auto it_end = &this->data_ptr[ range ];
+		auto it = it_end;
 		auto it_last = this->data_ptr + this->data_size - 1;
 		while( it != it_last )
 		{
 			if constexpr( std::is_move_assignable_v<ValueType> )
 			{
-				*it = std::move( *( it + range ) );
+				auto offset = it + range;
+				*it = std::move( *( offset ) );
 			}
 			else
 			{
@@ -1323,12 +1139,85 @@ public:
 			}
 			++it;
 		}
-		auto last_occupied_slot		= ( it_last - this->data_ptr ) - range;
+		auto last_occupied_slot = ( it_last - this->data_ptr ) - range;
 		this->Resize( last_occupied_slot + 1 );
-		return Iterator( this, from.data );
+		return it_end;
 	}
 
-protected:
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ValueType																				*	DoInsert(
+		const ValueType																				*	at,
+		const ValueType																				&	value,
+		size_t																							count			= 1,
+		size_t																							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	{
+		BC_ContainerAssert(
+			at >= this->data_ptr && at < this->data_ptr + this->data_size,
+			U"Iterator out of range or it points to the end"
+		);
+
+		size_t at_index = at - this->data_ptr;
+		this->ShiftRight( at_index, count, headroom );
+
+		for( size_t i = 0; i < count; ++i )
+		{
+			new( &this->data_ptr[ at_index + i ] ) ValueType( value );
+		}
+
+		return &this->data_ptr[ at_index + count ];
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<container_bases::ContainerView OtherContainerType>
+	constexpr ValueType																				*	DoInsert(
+		const ValueType																				*	at,
+		const OtherContainerType																	&	other,
+		size_t																							count			= 1,
+		size_t																							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	{
+		BC_ContainerAssert(
+			at >= this->data_ptr && at < this->data_ptr + this->data_size,
+			U"Iterator out of range or it points to the end"
+		);
+
+		auto CopyFunc = [ this, count, &at, headroom ](
+			auto		other
+		) -> ValueType*
+			{
+				size_t start_index			= at - this->data_size;
+				size_t other_size			= other.Size();
+				size_t total_insert_size	= other_size * count;
+
+				this->ShiftRight( start_index, total_insert_size, headroom );
+
+				for( size_t c = 0; c < count; ++c )
+				{
+					auto it = other.begin();
+					for( size_t i = 0; i < other_size; ++i )
+					{
+						auto count_start_pos = c * other_size + start_index;
+						new( &this->data_ptr[ count_start_pos + i ] ) ValueType( *it );
+						++it;
+					}
+				}
+				return &this->data_ptr[ start_index + total_insert_size ];
+			};
+
+		if constexpr( container_bases::LinearContainerView<OtherContainerType> )
+		{
+			if( other.Data() >= this->data_ptr &&
+				other.Data() < this->data_ptr + this->data_size )
+			{
+				// Other container data is either full or partial range from within this container, need to make a temporary.
+				auto other_copy = BC_CONTAINER_NAME( LinearContainerBase )<typename OtherContainerType::ContainedValueType> { other };
+				return CopyFunc( other_copy );
+			}
+		}
+
+		return CopyFunc( other );
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -1507,15 +1396,27 @@ protected:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check if linear container base fullfills size requirements.
-
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<uint32_t, true> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<uint32_t, false> ) == 16 );
+// Check if linear container base fulfills size requirements.
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, true> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, true> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, false> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, false> ) == 16 );
 
 static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true> ) == 16 );
 static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false> ) == 16 );
 
 static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerBase )<uint32_t> ) == 24 );
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Check if linear container iterator base passes container iterator concept.
+static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, true>> );
+static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, true>> );
+static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, false>> );
+static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, false>> );
+static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, true>> );
+static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, false>> );
 
 
 
