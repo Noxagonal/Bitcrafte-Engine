@@ -1121,25 +1121,27 @@ protected:
 			U"'to' iterator out of range"
 		);
 
-		size_t range = to - from;
-		auto it_end = &this->data_ptr[ range ];
-		auto it = it_end;
-		auto it_last = this->data_ptr + this->data_size - 1;
-		while( it != it_last )
+		size_t from_to_range	= to - from;
+		size_t tail_range		= this->data_ptr + this->data_size - to;
+		auto from_it			= &this->data_ptr[ from - this->data_ptr ];
+		auto to_it				= &this->data_ptr[ to - this->data_ptr ];
+		auto it_end				= this->data_ptr + this->data_size;
+		auto it_last			= this->data_ptr + this->data_size - 1;
+		while( to_it != it_end )
 		{
 			if constexpr( std::is_move_assignable_v<ValueType> )
 			{
-				auto offset = it + range;
-				*it = std::move( *( offset ) );
+				*from_it = std::move( *( to_it ) );
 			}
 			else
 			{
-				*it = *( it + range );
+				*from_it = *( to_it );
 			}
-			++it;
+			++from_it;
+			++to_it;
 		}
-		auto last_occupied_slot = ( it_last - this->data_ptr ) - range;
-		this->Resize( last_occupied_slot + 1 );
+		auto new_size = this->data_size - from_to_range;
+		this->Resize( new_size );
 		return it_end;
 	}
 
