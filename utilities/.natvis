@@ -2,83 +2,17 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-	<Type Name="bc::internal::SimpleLinearContainerBase&lt;*&gt;">
-		<DisplayString>{{ size={data_size} }}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
-			<ArrayItems>
-				<Size>data_size</Size>
-				<ValuePointer>data_ptr</ValuePointer>
-			</ArrayItems>
-		</Expand>
-	</Type>
-
-	<Type Name="bc::internal::SimpleLinearContainerViewBase&lt;*&gt;">
-		<DisplayString>{{ size={data_size} }}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<ArrayItems>
-				<Size>data_size</Size>
-				<ValuePointer>data_ptr</ValuePointer>
-			</ArrayItems>
-		</Expand>
-	</Type>
-
-	<Type Name="SimpleTextBase&lt;*&gt;">
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
-		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
-			<Synthetic Name="[text]" ExcludeView="simple">
-				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
-				<Expand>
-					<ArrayItems>
-						<Size>data_size</Size>
-						<ValuePointer>data_ptr</ValuePointer>
-					</ArrayItems>
-				</Expand>
-			</Synthetic>
-		</Expand>
-	</Type>
-
-	<Type Name="SimpleTextViewBase&lt;*&gt;">
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
-		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<Synthetic Name="[text]" ExcludeView="simple">
-				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
-				<Expand>
-					<ArrayItems>
-						<Size>data_size</Size>
-						<ValuePointer>data_ptr</ValuePointer>
-					</ArrayItems>
-				</Expand>
-			</Synthetic>
-		</Expand>
-	</Type>
-
-
-
 	<Type Name="bc::List&lt;*&gt;">
-        <DisplayString>{{ size={data_size} }}</DisplayString>
-        <Expand>
-            <Item Name="[size]" ExcludeView="simple">data_size</Item>
-            <Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
-            <ArrayItems>
-                <Size>data_size</Size>
-                <ValuePointer>data_ptr</ValuePointer>
-            </ArrayItems>
-        </Expand>
-    </Type>
+		<DisplayString>{{ size={data_size} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">data_size</Item>
+			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
+			<ArrayItems>
+				<Size>data_size</Size>
+				<ValuePointer>data_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
 
 	<Type Name="bc::ListViewBase&lt;*&gt;">
 		<DisplayString>{{ size={data_size} }}</DisplayString>
@@ -90,6 +24,33 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
+
+	
+
+	<Type Name="bc::SimpleList&lt;*&gt;">
+		<DisplayString>{{ size={data_size} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">data_size</Item>
+			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
+			<ArrayItems>
+				<Size>data_size</Size>
+				<ValuePointer>data_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bc::SimpleListViewBase&lt;*&gt;">
+		<DisplayString>{{ size={data_size} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">data_size</Item>
+			<ArrayItems>
+				<Size>data_size</Size>
+				<ValuePointer>data_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	
 
 	<Type Name="bc::TextBase&lt;*&gt;">
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
@@ -132,29 +93,50 @@
 		</Expand>
 	</Type>
 
-	<Type Name="bc::LinkedList&lt;*&gt;">
-		<DisplayString Condition="size == 0">empty</DisplayString>
-		<DisplayString Condition="size &gt; 0">{{ size = {size} }}</DisplayString>
+
+	
+	<Type Name="bc::SimpleTextBase&lt;*&gt;">
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
+		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
 		<Expand>
-			<LinkedListItems Condition="first != nullptr">
-				<HeadPointer>first</HeadPointer>
-				<NextPointer>ahead</NextPointer>
-				<ValueNode>data</ValueNode>
-			</LinkedListItems>
+			<Item Name="[size]" ExcludeView="simple">data_size</Item>
+			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
+			<Synthetic Name="[text]" ExcludeView="simple">
+				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>data_size</Size>
+						<ValuePointer>data_ptr</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
 		</Expand>
 	</Type>
 
-	<Type Name="bc::LinkedListViewBase&lt;*&gt;">
-		<DisplayString Condition="size == 0">empty</DisplayString>
-		<DisplayString Condition="size &gt; 0">{{ size = {size} }}</DisplayString>
+	<Type Name="bc::SimpleTextViewBase&lt;*&gt;">
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
+		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
 		<Expand>
-			<LinkedListItems Condition="first != nullptr">
-				<HeadPointer>first</HeadPointer>
-				<NextPointer>ahead</NextPointer>
-				<ValueNode>data</ValueNode>
-			</LinkedListItems>
+			<Item Name="[size]" ExcludeView="simple">data_size</Item>
+			<Synthetic Name="[text]" ExcludeView="simple">
+				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>data_size</Size>
+						<ValuePointer>data_ptr</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
 		</Expand>
 	</Type>
+
+
 
 	<Type Name="bc::Pair&lt;*,*&gt;">
 		<DisplayString>{first} : {second}</DisplayString>
