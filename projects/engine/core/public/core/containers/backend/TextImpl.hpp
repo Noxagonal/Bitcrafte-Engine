@@ -546,8 +546,8 @@ public:
 		auto other_size = text_to_find.Size();
 		start_position = std::min( start_position, my_size );
 		search_length = std::min( search_length, my_size );
-		auto possible_start_count = int64_t( start_position ) - int64_t( std::max( other_size, search_length ) );
-		for( int64_t outer = start_position; outer < possible_start_count; ++outer )
+		auto max_search_position = int64_t( search_length ) - int64_t( other_size );
+		for( int64_t outer = start_position; outer <= max_search_position; ++outer )
 		{
 			int64_t inner;
 			for( inner = 0; inner < text_to_find.Size(); ++inner )
