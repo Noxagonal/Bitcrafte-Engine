@@ -62,7 +62,7 @@ concept TextToFloatingConvertible = std::is_floating_point_v<ValueType>;
 /// @param in_text
 ///	Text which contains the value we want to convert.
 template<
-	container_bases::TextContainerView			TextContainerType,
+	utility::TextContainerView					TextContainerType,
 	internal::TextToBoolConvertible				ValueType
 >
 constexpr size_t								TextToPrimitive(
@@ -160,7 +160,7 @@ enum class TextToIntegerConversionFormat : uint32_t
 /// example if you want to read value that was encoded with Base-5, you can just give this parameter
 /// static_cast<TextToIntegerConversionFormat>( 5 ).
 template<
-	container_bases::TextContainerView			TextContainerType,
+	utility::TextContainerView					TextContainerType,
 	internal::TextToIntegerConvertible			ValueType
 >
 constexpr size_t								TextToPrimitive(
@@ -309,7 +309,7 @@ enum class TextToFloatConversionFormat : uint32_t
 /// @param text_format
 ///	Value text representation. See TextToFloatConversionFormat.
 template<
-	container_bases::TextContainerView			TextContainerType,
+	utility::TextContainerView					TextContainerType,
 	internal::TextToFloatingConvertible			ValueType
 >
 constexpr size_t								TextToPrimitive(

@@ -89,7 +89,7 @@ void								SystemConsolePrint(
 /// 
 /// @param background_color
 ///	Color of the background of the letters you wish to print. ( not entire console window )
-template<container_bases::TextContainerView ContainerType>
+template<utility::TextContainerView ContainerType>
 void								SystemConsolePrint(
 	const ContainerType			&	text,
 	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
@@ -136,7 +136,7 @@ void								SystemConsolePrint(
 /// 
 /// @param theme
 ///	Text and background color of the message according to a theme.
-template<container_bases::TextContainerView ContainerType>
+template<utility::TextContainerView ContainerType>
 void								SystemConsolePrint(
 	const ContainerType			&	text,
 	PrintRecordTheme				theme
@@ -171,7 +171,7 @@ void								SystemConsolePrint(
 /// 
 /// @param background_color
 ///	Color of the background of the letters you wish to print. ( not entire console window )
-template<container_bases::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
+template<utility::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
 void								SystemConsolePrint(
 	const CharacterType				( &text )[ CharacterArraySize ],
 	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
@@ -204,7 +204,7 @@ void								SystemConsolePrint(
 /// 
 /// @param theme
 ///	Text and background color of the message according to a theme.
-template<container_bases::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
+template<utility::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
 void								SystemConsolePrint(
 	const CharacterType				( &text )[ CharacterArraySize ],
 	PrintRecordTheme				theme

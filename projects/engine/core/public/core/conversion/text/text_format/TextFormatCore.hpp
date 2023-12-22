@@ -14,7 +14,7 @@ namespace internal {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<container_bases::TextContainerView TextContainerType>
+template<utility::TextContainerView TextContainerType>
 constexpr void															TextFormat_Collector(
 	size_t																current_argument,
 	size_t																requested_argument,
@@ -25,7 +25,7 @@ constexpr void															TextFormat_Collector(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView									TextContainerType,
+	utility::TextContainerView											TextContainerType,
 	typename															FirstType,
 	typename															...RestTypePack
 >
@@ -119,7 +119,7 @@ constexpr void															TextFormat_Collector(
 /// @return
 /// New formatted text object.
 template<
-	container_bases::TextContainerView									TextContainerType,
+	utility::TextContainerView											TextContainerType,
 	typename															...ArgumentsTypePack
 >
 constexpr typename TextContainerType::ThisFullType						TextFormat(

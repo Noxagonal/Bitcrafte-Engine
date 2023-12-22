@@ -3,7 +3,7 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/diagnostic/assertion/HardAssert.hpp>
 #include <core/memory/raw/RawMemory.hpp>
-#include <core/containers/backend/ContainerConcepts.hpp>
+#include <core/utility/ContainerConcepts.hpp>
 
 #include <cstdint>
 
@@ -347,8 +347,8 @@ protected:
 /// @return
 /// True if contents match, false if they do not.
 template<
-	container_bases::ContainerView	FirstContainerType,
-	container_bases::ContainerView	SecondContainerType
+	utility::ContainerView	FirstContainerType,
+	utility::ContainerView	SecondContainerType
 >
 [[nodiscard]]
 constexpr bool											CheckContainerContentsMatch(
@@ -364,8 +364,8 @@ constexpr bool											CheckContainerContentsMatch(
 
 	if( first_size != second_size ) return false;
 
-	if constexpr( container_bases::LinearContainerView<FirstContainerType> &&
-		container_bases::LinearContainerView<SecondContainerType> &&
+	if constexpr( utility::LinearContainerView<FirstContainerType> &&
+		utility::LinearContainerView<SecondContainerType> &&
 		std::is_same_v<FirstValueType, SecondValueType> )
 	{
 		if( first_container.Data() == second_container.Data() ) return true;
@@ -407,8 +407,8 @@ constexpr bool											CheckContainerContentsMatch(
 /// 	    
 /// @return True if contents do not match, false if they do.
 template<
-	container_bases::ContainerView	FirstContainerType,
-	container_bases::ContainerView	SecondContainerType
+	utility::ContainerView	FirstContainerType,
+	utility::ContainerView	SecondContainerType
 >
 [[nodiscard]]
 constexpr bool											CheckContainerContentsDiffer(

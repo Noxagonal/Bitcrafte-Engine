@@ -76,7 +76,7 @@ internal::FloatingToTextConvertible<ValueType>;
 /// @param value
 ///	Value to convert into text.
 template<
-	container_bases::TextContainer				TextContainerType,
+	utility::TextContainer						TextContainerType,
 	internal::BoolToTextConvertible				ValueType
 >
 constexpr size_t								PrimitiveToText(
@@ -126,7 +126,7 @@ enum class IntegerToTextConversionFormat
 ///	Number base to convert the number into. See IntegerToTextConversionFormat for more info. You can also use other types. For
 /// example if you want Base-5 you can just give this parameter static_cast<IntegerToTextConversionFormat>( 5 ).
 template<
-	container_bases::TextContainer				TextContainerType,
+	utility::TextContainer						TextContainerType,
 	internal::IntegerToTextConvertible			ValueType
 >
 constexpr size_t								PrimitiveToText(
@@ -232,7 +232,7 @@ inline FloatToTextConversionFormat operator&( FloatToTextConversionFormat a, Flo
 /// @param text_format
 ///	Value text representation. See FloatToTextConversionFormat.
 template<
-	container_bases::TextContainer				TextContainerType,
+	utility::TextContainer						TextContainerType,
 	internal::FloatingToTextConvertible			ValueType
 >
 constexpr size_t								PrimitiveToText(

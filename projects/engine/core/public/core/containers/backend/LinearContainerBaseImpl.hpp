@@ -64,7 +64,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )(
 		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
-	) noexcept requires( IsConstConvertible<IsConst, IsOtherConst> ) :
+	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
 		container( other.container ),
 		data( const_cast<ContainedValueType*>( other.data ) )
 	{}
@@ -87,7 +87,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )										&	operator=(
 		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
-	) noexcept requires( IsConstConvertible<IsConst, IsOtherConst> )
+	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
 	{
 		this->container = other.container;
 		this->data = other.data;
@@ -387,7 +387,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )(
 		const BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsOtherConst>					&	other
-	) noexcept requires( IsConstConvertible<IsDataConst, IsOtherConst> )
+	) noexcept requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
 		:
 		data_ptr( const_cast<ValueType*>( other.Data() ) ),
 		data_size( other.Size() )
@@ -806,7 +806,7 @@ public:
 	///
 	/// @param headroom
 	/// How much extra space is reserved if the capacity is expanded.
-	template<container_bases::ContainerView OtherContainerType>
+	template<utility::ContainerView OtherContainerType>
 	constexpr void																						Append(
 		const OtherContainerType																	&	other,
 		size_t																							count				= 1,
@@ -1170,7 +1170,7 @@ protected:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<container_bases::ContainerView OtherContainerType>
+	template<utility::ContainerView OtherContainerType>
 	constexpr ValueType																				*	DoInsert(
 		const ValueType																				*	at,
 		const OtherContainerType																	&	other,
@@ -1220,7 +1220,7 @@ protected:
 				return &this->data_ptr[ start_index + total_insert_size ];
 			};
 
-		if constexpr( container_bases::LinearContainerView<OtherContainerType> )
+		if constexpr( utility::LinearContainerView<OtherContainerType> )
 		{
 			if( other.Data() >= this->data_ptr &&
 				other.Data() < this->data_ptr + this->data_size )
@@ -1428,12 +1428,12 @@ static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerBase )<uint32_t> ) == 2
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if linear container iterator base passes container iterator concept.
-static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, true>> );
-static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, true>> );
-static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, false>> );
-static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, false>> );
-static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, true>> );
-static_assert( ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, false>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, true>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, true>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, false>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, false>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, true>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, false>> );
 
 
 

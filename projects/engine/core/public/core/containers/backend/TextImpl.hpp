@@ -23,13 +23,13 @@ namespace bc {
 
 
 
-template<container_bases::TextContainerCharacterType CharacterType>
+template<utility::TextContainerCharacterType CharacterType>
 class BC_CONTAINER_NAME( TextBase );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<container_bases::TextContainerCharacterType CharacterType, bool IsConst>
+template<utility::TextContainerCharacterType CharacterType, bool IsConst>
 class BC_CONTAINER_NAME( TextViewBase ):
 	public container_bases::BC_CONTAINER_NAME( LinearContainerViewBase )<CharacterType, IsConst>
 {
@@ -41,17 +41,17 @@ public:
 	using ContainedCharacterType			= CharacterType;
 	static constexpr bool IsDataConst		= IsConst;
 
-	template<container_bases::TextContainerCharacterType OtherValueType, bool IsOtherConst>
+	template<utility::TextContainerCharacterType OtherValueType, bool IsOtherConst>
 	using ThisContainerType					= BC_CONTAINER_NAME( TextViewBase )<OtherValueType, IsOtherConst>;
 	using ThisType							= ThisContainerType<CharacterType, IsConst>;
 
-	template<container_bases::TextContainerCharacterType OtherValueType, bool IsOtherConst>
+	template<utility::TextContainerCharacterType OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( TextViewBase )<OtherValueType, IsOtherConst>;
 
 	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<CharacterType, IsOtherConst>;
 
-	template<container_bases::TextContainerCharacterType OtherValueType>
+	template<utility::TextContainerCharacterType OtherValueType>
 	using ThisContainerFullType				= BC_CONTAINER_NAME( TextBase )<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<CharacterType>;
 
@@ -71,10 +71,10 @@ private:
 	friend ConstIterator;
 	friend Iterator;
 
-	template<container_bases::TextContainerCharacterType OtherValueType, bool IsOtherConst>
+	template<utility::TextContainerCharacterType OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( TextViewBase );
 
-	template<container_bases::TextContainerCharacterType OtherValueType>
+	template<utility::TextContainerCharacterType OtherValueType>
 	friend class BC_CONTAINER_NAME( TextBase );
 
 public:
@@ -86,7 +86,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) noexcept requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> ) :
+	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
 		Base(
 			other.Data(),
 			other.Size()
@@ -98,7 +98,7 @@ public:
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		IteratorBase<IsOtherConst>																		begin_iterator,
 		IteratorBase<IsOtherConst>																		end_iterator
-	) BC_CONTAINER_NOEXCEPT requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> ) :
+	) BC_CONTAINER_NOEXCEPT requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
 		Base(
 			begin_iterator.Get(),
 			end_iterator.Get() - begin_iterator.Get()
@@ -200,7 +200,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( TextViewBase )														&	operator=(
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst> other
-	) noexcept requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> )
+	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
 	{
 		this->data_ptr	= other.Data();
 		this->data_size	= other.Size();
@@ -742,7 +742,7 @@ public:
 /// 
 /// @tparam CharacterType
 /// Data type of single character.
-template<container_bases::TextContainerCharacterType CharacterType>
+template<utility::TextContainerCharacterType CharacterType>
 class BC_CONTAINER_NAME( TextBase ) :
 	public container_bases::BC_CONTAINER_NAME( LinearContainerBase )<CharacterType>
 {
@@ -754,17 +754,17 @@ public:
 	using ContainedCharacterType			= CharacterType;
 	static constexpr bool IsDataConst		= false;
 
-	template<container_bases::TextContainerCharacterType OtherValueType>
+	template<utility::TextContainerCharacterType OtherValueType>
 	using ThisContainerType					= BC_CONTAINER_NAME( TextBase )<OtherValueType>;
 	using ThisType							= ThisContainerType<CharacterType>;
 
-	template<container_bases::TextContainerCharacterType OtherValueType, bool IsOtherConst>
+	template<utility::TextContainerCharacterType OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( TextViewBase )<OtherValueType, IsOtherConst>;
 
 	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<CharacterType, IsOtherConst>;
 
-	template<container_bases::TextContainerCharacterType OtherValueType>
+	template<utility::TextContainerCharacterType OtherValueType>
 	using ThisContainerFullType				= BC_CONTAINER_NAME( TextBase )<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<CharacterType>;
 
@@ -784,10 +784,10 @@ private:
 	friend ConstIterator;
 	friend Iterator;
 
-	template<container_bases::TextContainerCharacterType OtherValueType, bool IsOtherConst>
+	template<utility::TextContainerCharacterType OtherValueType, bool IsOtherConst>
 	friend class BC_CONTAINER_NAME( TextViewBase );
 
-	template<container_bases::TextContainerCharacterType OtherValueType>
+	template<utility::TextContainerCharacterType OtherValueType>
 	friend class BC_CONTAINER_NAME( TextBase );
 
 public:
@@ -812,7 +812,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<container_bases::TextContainerCharacterType OtherT>
+	template<utility::TextContainerCharacterType OtherT>
 	constexpr BC_CONTAINER_NAME( TextBase )(
 		const std::initializer_list<OtherT>															&	init_list
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
@@ -878,7 +878,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<container_bases::TextContainerCharacterType OtherT>
+	template<utility::TextContainerCharacterType OtherT>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
 		const std::initializer_list<OtherT>															&	init_list
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
@@ -981,7 +981,7 @@ public:
 	/// 
 	/// @return
 	/// New text object.
-	template<container_bases::ContainerView OtherContainerType>
+	template<utility::ContainerView OtherContainerType>
 	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
 		const OtherContainerType																	&	other
 	) const BC_CONTAINER_NOEXCEPT
@@ -1079,7 +1079,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	template<container_bases::TextContainerCharacterType OtherT>
+	template<utility::TextContainerCharacterType OtherT>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
 		const std::initializer_list<OtherT>															&	other
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
@@ -1097,7 +1097,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	template<container_bases::ContainerView OtherContainerType>
+	template<utility::ContainerView OtherContainerType>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
 		const OtherContainerType																	&	other
 	) BC_CONTAINER_NOEXCEPT
@@ -1501,7 +1501,7 @@ public:
 	///
 	/// @return
 	/// Iterator one past the the last inserted character. Or first original character after insertion.
-	template<container_bases::ContainerView OtherContainerType>
+	template<utility::ContainerView OtherContainerType>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
@@ -1591,7 +1591,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<container_bases::TextContainerCharacterType OtherT>
+	template<utility::TextContainerCharacterType OtherT>
 	void																								Append(
 		const std::initializer_list<OtherT>															&	init_list,
 		size_t																							count							= 1,
@@ -1617,7 +1617,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<container_bases::TextContainerView OtherContainerType>
+	template<utility::TextContainerView OtherContainerType>
 	void																								Append(
 		const OtherContainerType																	&	other,
 		size_t																							count							= 1,
@@ -2071,87 +2071,87 @@ static_assert( sizeof( BC_CONTAINER_NAME( TextView32 ) ) == 16 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill concept requirements.
-static_assert( container_bases::Container<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::Container<BC_CONTAINER_NAME( Text8 )> );
-static_assert( container_bases::Container<BC_CONTAINER_NAME( Text16 )> );
-static_assert( container_bases::Container<BC_CONTAINER_NAME( Text32 )> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Text8 )> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Text16 )> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Text32 )> );
 
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView8 )> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView16 )> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView32 )> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView8 )> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView16 )> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView32 )> );
 
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( TextView )> );
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( TextView8 )> );
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( TextView16 )> );
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( TextView32 )> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( TextView )> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( TextView8 )> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( TextView16 )> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( TextView32 )> );
 
-static_assert( container_bases::LinearContainer<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::LinearContainer<BC_CONTAINER_NAME( Text8 )> );
-static_assert( container_bases::LinearContainer<BC_CONTAINER_NAME( Text16 )> );
-static_assert( container_bases::LinearContainer<BC_CONTAINER_NAME( Text32 )> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Text8 )> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Text16 )> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Text32 )> );
 
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView8 )> );
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView16 )> );
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView32 )> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView8 )> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView16 )> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView32 )> );
 
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( TextView )> );
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( TextView8 )> );
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( TextView16 )> );
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( TextView32 )> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( TextView )> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( TextView8 )> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( TextView16 )> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( TextView32 )> );
 
-static_assert( container_bases::TextContainer<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::TextContainer<BC_CONTAINER_NAME( Text8 )> );
-static_assert( container_bases::TextContainer<BC_CONTAINER_NAME( Text16 )> );
-static_assert( container_bases::TextContainer<BC_CONTAINER_NAME( Text32 )> );
+static_assert( utility::TextContainer<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::TextContainer<BC_CONTAINER_NAME( Text8 )> );
+static_assert( utility::TextContainer<BC_CONTAINER_NAME( Text16 )> );
+static_assert( utility::TextContainer<BC_CONTAINER_NAME( Text32 )> );
 
-static_assert( container_bases::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( container_bases::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView8 )> );
-static_assert( container_bases::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView16 )> );
-static_assert( container_bases::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView32 )> );
+static_assert( utility::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView8 )> );
+static_assert( utility::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView16 )> );
+static_assert( utility::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView32 )> );
 
-static_assert( container_bases::TextContainerView<BC_CONTAINER_NAME( TextView )> );
-static_assert( container_bases::TextContainerView<BC_CONTAINER_NAME( TextView8 )> );
-static_assert( container_bases::TextContainerView<BC_CONTAINER_NAME( TextView16 )> );
-static_assert( container_bases::TextContainerView<BC_CONTAINER_NAME( TextView32 )> );
+static_assert( utility::TextContainerView<BC_CONTAINER_NAME( TextView )> );
+static_assert( utility::TextContainerView<BC_CONTAINER_NAME( TextView8 )> );
+static_assert( utility::TextContainerView<BC_CONTAINER_NAME( TextView16 )> );
+static_assert( utility::TextContainerView<BC_CONTAINER_NAME( TextView32 )> );
 
 
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::Container<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Text )> );
 
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( !container_bases::Container<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( EditableTextView )> );
 
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( TextView )> );
-static_assert( !container_bases::ContainerEditableView<BC_CONTAINER_NAME( TextView )> );
-static_assert( !container_bases::Container<BC_CONTAINER_NAME( TextView )> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( TextView )> );
+static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( TextView )> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( TextView )> );
 
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::LinearContainer<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Text )> );
 
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( EditableTextView )> );
 
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( TextView )> );
-static_assert( !container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( TextView )> );
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( TextView )> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( TextView )> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( TextView )> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( TextView )> );
 
-static_assert( container_bases::TextContainerView<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::TextContainerEditableView<BC_CONTAINER_NAME( Text )> );
-static_assert( container_bases::TextContainer<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::TextContainerView<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::TextContainerEditableView<BC_CONTAINER_NAME( Text )> );
+static_assert( utility::TextContainer<BC_CONTAINER_NAME( Text )> );
 
-static_assert( container_bases::TextContainerView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( container_bases::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
-static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::TextContainerView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( utility::TextContainerEditableView<BC_CONTAINER_NAME( EditableTextView )> );
+static_assert( !utility::TextContainer<BC_CONTAINER_NAME( EditableTextView )> );
 
-static_assert( container_bases::TextContainerView<BC_CONTAINER_NAME( TextView )> );
-static_assert( !container_bases::TextContainerEditableView<BC_CONTAINER_NAME( TextView )> );
-static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( TextView )> );
+static_assert( utility::TextContainerView<BC_CONTAINER_NAME( TextView )> );
+static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( TextView )> );
+static_assert( !utility::TextContainer<BC_CONTAINER_NAME( TextView )> );
 
 
 

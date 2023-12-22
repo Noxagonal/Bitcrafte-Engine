@@ -11,7 +11,7 @@ namespace text {
 
 
 template<
-	container_bases::TextContainerCharacterType							CharacterType,
+	utility::TextContainerCharacterType									CharacterType,
 	size_t 																CharacterArraySize,
 	typename															...ArgumentsTypePack
 >

@@ -13,7 +13,7 @@ namespace text {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	typename								FirstType,
 	typename								SecondType
 >

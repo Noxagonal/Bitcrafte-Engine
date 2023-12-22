@@ -13,7 +13,7 @@ namespace text {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	typename								ElementType
 >
 class TextFormatter<OutTextContainerType, List<ElementType>>
@@ -49,7 +49,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	typename								ElementType,
 	bool									IsViewConst
 >

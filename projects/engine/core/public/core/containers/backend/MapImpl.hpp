@@ -76,7 +76,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )(
 		const BC_CONTAINER_NAME( MapIteratorBase )<KeyType, ValueType, IsOtherConst>				&	other
-	) noexcept requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> ) :
+	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
 		container( other.GetContainer() ),
 		node( const_cast<Node*>( other.GetData() ) )
 	{};
@@ -710,7 +710,7 @@ public:
 	///
 	/// @param count
 	///	How many times the other elements are added to this list.
-	template<container_bases::ContainerView OtherContainerType>
+	template<utility::ContainerView OtherContainerType>
 	constexpr void																						Append(
 		const OtherContainerType																	&	other,
 		size_t																							count					= 1
@@ -1577,12 +1577,12 @@ static_assert( sizeof( BC_CONTAINER_NAME( Map )<uint32_t, uint32_t> ) == 16 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if map container fulfills concept requirements.
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( container_bases::Container<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( !container_bases::LinearContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( !container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
+static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
 
 
 

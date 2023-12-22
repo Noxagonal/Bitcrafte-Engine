@@ -23,8 +23,8 @@ namespace text {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
-	container_bases::TextContainerView		ValueTextContainerType
+	utility::TextContainerView				OutTextContainerType,
+	utility::TextContainerView				ValueTextContainerType
 >
 class TextFormatter<OutTextContainerType, ValueTextContainerType>
 {
@@ -103,7 +103,7 @@ std::is_same_v<T, char32_t>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	FormatterCStringType					ValueTextType
 >
 class TextFormatter<OutTextContainerType, const ValueTextType*>
@@ -138,7 +138,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	FormatterCStringType					ValueTextType,
 	size_t									StringArraySize
 >
@@ -222,7 +222,7 @@ std::is_same_v<T, size_t>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	FormatterIntegerType					IntegerType
 >
 class TextFormatter<OutTextContainerType, IntegerType>
@@ -323,7 +323,7 @@ std::is_same_v<T, double>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	FormatterFloatingType					FloatType
 >
 class TextFormatter<OutTextContainerType, FloatType>
@@ -488,7 +488,7 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<container_bases::TextContainerView OutTextContainerType>
+template<utility::TextContainerView OutTextContainerType>
 class TextFormatter<OutTextContainerType, bool>
 {
 	using OutTextContainerFullType = typename OutTextContainerType::ThisFullType;

@@ -6,6 +6,8 @@
 #include <core/thread/ThreadDescription.hpp>
 #include <core/thread/Task.hpp>
 
+#include <core/utility/LambdaConcepts.hpp>
+
 #include <core/containers/UniquePtr.hpp>
 #include <core/containers/List.hpp>
 
@@ -21,88 +23,6 @@ struct ThreadDescription;
 class ThreadSharedData;
 class Thread;
 class Task;
-
-namespace internal {
-
-
-
-// TODO: Move these concepts into utilities.
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Concept to check if the thread lambda returns void.
-template<
-	typename LambdaType,
-	typename ...LambdaParamsT
->
-concept IsLambdaReturningVoid = requires(
-	LambdaType			lambda,
-	LambdaParamsT		...params
-)
-{
-	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::same_as<void>;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Concept to check if the thread lambda returns something other than void.
-template<
-	typename LambdaType,
-	typename ...LambdaParamsT
->
-concept IsLambdaReturningNonVoid = !IsLambdaReturningVoid<LambdaType, LambdaParamsT...>;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Concept to check if a lambda matches signature.
-template<
-	typename LambdaType,
-	typename LambdaReturnT,
-	typename ...LambdaParamsT
->
-concept IsLambdaSignature = requires(
-	LambdaType			lambda,
-	LambdaParamsT		...params
-)
-{
-	lambda( std::forward<LambdaParamsT>( params )... );
-	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::same_as<LambdaReturnT>;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Concept to check if the thread lambda returns a specific type.
-template<
-	typename LambdaType,
-	typename LambdaReturnT,
-	typename ...LambdaParamsT
->
-concept IsLambdaReturningType = requires(
-	LambdaType			lambda,
-	LambdaParamsT		...params
-)
-{
-	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::same_as<LambdaReturnT>;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Concept to check if the thread lambda accepts specific parameters.
-template<
-	typename LambdaType,
-	typename ...LambdaParamsT
->
-concept IsLambdaAcceptingParameters = requires(
-	LambdaType			lambda,
-	LambdaParamsT		...params
-)
-{
-	lambda( std::forward<LambdaParamsT>( params )... );
-};
-
-
-
-} // internal
 
 
 
@@ -308,12 +228,12 @@ public:
 	)
 	{
 		static_assert(
-			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -350,12 +270,12 @@ public:
 	)
 	{
 		static_assert(
-			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -391,12 +311,12 @@ public:
 	)
 	{
 		static_assert(
-			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -428,12 +348,12 @@ public:
 	)
 	{
 		static_assert(
-			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -500,26 +420,26 @@ private:
 			Thread										&	thread
 		) override
 		{
-			constexpr bool non_void1 = internal::IsLambdaSignature<LambdaType, void>;
-			constexpr bool non_void2 = internal::IsLambdaSignature<LambdaType, void, Task&>;
-			constexpr bool non_void3 = internal::IsLambdaSignature<LambdaType, TaskExecutionResult>;
-			constexpr bool non_void4 = internal::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&>;
+			constexpr bool non_void1 = utility::IsLambdaSignature<LambdaType, void>;
+			constexpr bool non_void2 = utility::IsLambdaSignature<LambdaType, void, Task&>;
+			constexpr bool non_void3 = utility::IsLambdaSignature<LambdaType, TaskExecutionResult>;
+			constexpr bool non_void4 = utility::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&>;
 
-			if constexpr( internal::IsLambdaSignature<LambdaType, void> )
+			if constexpr( utility::IsLambdaSignature<LambdaType, void> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( internal::IsLambdaSignature<LambdaType, void, Task&> )
+			else if constexpr( utility::IsLambdaSignature<LambdaType, void, Task&> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( internal::IsLambdaSignature<LambdaType, TaskExecutionResult> )
+			else if constexpr( utility::IsLambdaSignature<LambdaType, TaskExecutionResult> )
 			{
 				return lambda_function();
 			}
-			else if constexpr( internal::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&> )
+			else if constexpr( utility::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&> )
 			{
 				return lambda_function();
 			}

@@ -45,7 +45,7 @@ namespace text {
 /// 
 /// @tparam ValueType
 ///	Printed type, need to specialize this for each type.
-template<container_bases::TextContainerView TextContainerType, typename ValueType>
+template<utility::TextContainerView TextContainerType, typename ValueType>
 class TextFormatter {};
 
 

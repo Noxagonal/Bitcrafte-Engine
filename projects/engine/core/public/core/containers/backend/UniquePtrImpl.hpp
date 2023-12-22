@@ -279,17 +279,17 @@ static_assert( sizeof( BC_CONTAINER_NAME( UniquePtr )<uint32_t> ) == 8 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill concept requirements.
-static_assert( !container_bases::ContainerView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !container_bases::ContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !container_bases::Container<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+static_assert( !utility::ContainerView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
 
-static_assert( !container_bases::LinearContainerView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
 
-static_assert( !container_bases::TextContainerView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
-static_assert( !container_bases::TextContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
-static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
+static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
+static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
+static_assert( !utility::TextContainer<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
 
 
 

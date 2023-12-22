@@ -85,7 +85,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) noexcept requires( container_bases::IsConstConvertible<IsDataConst, IsOtherConst> )
+	) noexcept requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
 		:
 		Base(
 			other.Data(),
@@ -121,7 +121,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( ListViewBase )														&	operator=(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) noexcept requires( container_bases::IsConstConvertible<IsDataConst, IsOtherConst> )
+	) noexcept requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
 	{
 		this->data_ptr = other.Data();
 		this->data_size = other.Size();
@@ -689,7 +689,7 @@ public:
 	///
 	/// @return
 	/// Iterator one past the the last inserted value. Or first original value after insertion.
-	template<container_bases::ContainerView OtherContainerType>
+	template<utility::ContainerView OtherContainerType>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
@@ -851,41 +851,41 @@ static_assert( sizeof( BC_CONTAINER_NAME( List )<uint32_t> ) == 24 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill concept requirements.
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( container_bases::Container<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::Container<BC_CONTAINER_NAME( List )<uint32_t>> );
 
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( container_bases::ContainerEditableView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( !container_bases::Container<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
 
-static_assert( container_bases::ContainerView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !container_bases::ContainerEditableView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !container_bases::Container<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( ListView )<uint32_t>> );
 
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( container_bases::LinearContainer<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( List )<uint32_t>> );
 
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
 
-static_assert( container_bases::LinearContainerView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !container_bases::LinearContainerEditableView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !container_bases::LinearContainer<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( ListView )<uint32_t>> );
 
-static_assert( !container_bases::TextContainerView<BC_CONTAINER_NAME( List )<char32_t>> );
-static_assert( !container_bases::TextContainerEditableView<BC_CONTAINER_NAME( List )<char32_t>> );
-static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( List )<char32_t>> );
+static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( List )<char32_t>> );
+static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( List )<char32_t>> );
+static_assert( !utility::TextContainer<BC_CONTAINER_NAME( List )<char32_t>> );
 
-static_assert( !container_bases::TextContainerView<BC_CONTAINER_NAME( EditableListView )<char32_t>> );
-static_assert( !container_bases::TextContainerEditableView<BC_CONTAINER_NAME( EditableListView )<char32_t>> );
-static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( EditableListView )<char32_t>> );
+static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( EditableListView )<char32_t>> );
+static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( EditableListView )<char32_t>> );
+static_assert( !utility::TextContainer<BC_CONTAINER_NAME( EditableListView )<char32_t>> );
 
-static_assert( !container_bases::TextContainerView<BC_CONTAINER_NAME( ListView )<char32_t>> );
-static_assert( !container_bases::TextContainerEditableView<BC_CONTAINER_NAME( ListView )<char32_t>> );
-static_assert( !container_bases::TextContainer<BC_CONTAINER_NAME( ListView )<char32_t>> );
+static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( ListView )<char32_t>> );
+static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( ListView )<char32_t>> );
+static_assert( !utility::TextContainer<BC_CONTAINER_NAME( ListView )<char32_t>> );
 
 
 

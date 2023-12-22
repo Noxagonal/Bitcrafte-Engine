@@ -14,7 +14,7 @@ namespace text {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	container_bases::TextContainerView		OutTextContainerType,
+	utility::TextContainerView				OutTextContainerType,
 	typename								KeyType,
 	typename								ValueType
 >

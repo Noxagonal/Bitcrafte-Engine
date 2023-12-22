@@ -43,7 +43,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr PathIteratorBase(
 		const IteratorBaseType<IsOtherConst>			&	other
-	) requires( container_bases::IsConstConvertible<IsConst, IsOtherConst> )
+	) requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
 		:
 		container( const_cast<ContainerType*>( other.container ) ),
 		data( const_cast<ValueType*>( other.data ) )
