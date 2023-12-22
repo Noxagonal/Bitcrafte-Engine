@@ -90,7 +90,6 @@ public:
 	{
 		assert( std::addressof( next_exception ) != this && "next_exception was this exception" );
 		if( std::addressof( next_exception ) == this ) return;
-		if( next_exception.IsEmpty() ) return;
 		this->next = MakeSimpleUniquePtr<Exception>( next_exception );
 	}
 
