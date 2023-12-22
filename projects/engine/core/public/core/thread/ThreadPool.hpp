@@ -54,6 +54,23 @@ concept IsLambdaReturningNonVoid = !IsLambdaReturningVoid<LambdaType, LambdaPara
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
+/// Concept to check if a lambda matches signature.
+template<
+	typename LambdaType,
+	typename LambdaReturnT,
+	typename ...LambdaParamsT
+>
+concept IsLambdaSignature = requires(
+	LambdaType			lambda,
+	LambdaParamsT		...params
+)
+{
+	lambda( std::forward<LambdaParamsT>( params )... );
+	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::same_as<LambdaReturnT>;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
 /// Concept to check if the thread lambda returns a specific type.
 template<
 	typename LambdaType,
@@ -169,7 +186,7 @@ public:
 		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
 		unique_task->locked_to_threads	= GetTaskThreadLockIDs<ThreadType>();
 		unique_task->dependencies		= dependencies;
-		return AddTask( std::move( unique_task ) );
+		return DoAddTask( std::move( unique_task ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +218,7 @@ public:
 	{
 		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
 		unique_task->dependencies		= dependencies;
-		return AddTask( std::move( unique_task ) );
+		return DoAddTask( std::move( unique_task ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +250,7 @@ public:
 	{
 		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
 		unique_task->locked_to_threads	= GetTaskThreadLockIDs<ThreadType>();
-		return AddTask( std::move( unique_task ) );
+		return DoAddTask( std::move( unique_task ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +276,8 @@ public:
 		TaskConstructorArgumentTypePack					&&	...task_constructor_arguments
 	) requires( std::is_base_of_v<Task, TaskType> )
 	{
-		return AddTask( MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... ) );
+		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
+		return DoAddTask( std::move( unique_task ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -284,26 +302,143 @@ public:
 		typename ThreadType,
 		typename LambdaType
 	>
-	TaskIdentifier											ScheduleTaskWithDependencies(
+	TaskIdentifier											ScheduleLambdaTaskToThreadTypeWithDependencies(
 		const List<TaskIdentifier>						&	dependencies,
 		LambdaType										&&	lambda_function
 	)
 	{
 		static_assert(
-			internal::IsLambdaAcceptingParameters<LambdaType, Task&>,
-			"Task lambda must accept reference to a task"
+			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskState, Task&>,
-			"Lambda task must return task state or void"
+			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
-		auto lambda_task = MakeUniquePtr<LambdaTask<LambdaType>>( std::forward<LambdaType>( lambda_function ) );
+		auto unique_task = MakeUniquePtr<LambdaTask<LambdaType>>( std::move( lambda_function ) );
+		unique_task->locked_to_threads	= GetTaskThreadLockIDs<ThreadType>();
+		unique_task->dependencies		= dependencies;
+		return DoAddTask( std::move( unique_task ) );
+	}
 
-		return ScheduleTask<ThreadType, LambdaTask<LambdaType>>(
-			std::move( lambda_task ),
-			dependencies
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Schedules a new task to be run on a thread.
+	///
+	/// @tparam TaskType
+	///	Task type we're scheduling.
+	///
+	/// @tparam ...TaskConstructorArgumentTypePack
+	/// Task constructor argument types.
+	///
+	/// @param dependencies
+	///	Sets which tasks must run before the task we're currently submitting.
+	///
+	/// @param ...task_constructor_arguments
+	/// Arguments passed to task constructor.
+	///
+	/// @return
+	/// Unique id to the task process which can be waited upon by other submits.
+	template<
+		typename											LambdaType
+	>
+	TaskIdentifier											ScheduleLambdaTaskWithDependencies(
+		const List<TaskIdentifier>						&	dependencies,
+		LambdaType										&&	lambda_function
+	)
+	{
+		static_assert(
+			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
+		static_assert(
+			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
+		);
+
+		auto unique_task = MakeUniquePtr<LambdaTask<LambdaType>>( std::move( lambda_function ) );
+		unique_task->dependencies		= dependencies;
+		return DoAddTask( std::move( unique_task ) );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Schedules a new task to be run on a thread.
+	///
+	/// @tparam ThreadType
+	///	Thread type we're locking this task to.
+	///
+	/// @tparam TaskType
+	///	Task type we're scheduling.
+	///
+	/// @tparam ...TaskConstructorArgumentTypePack
+	/// Task constructor argument types.
+	///
+	/// @param ...task_constructor_arguments
+	/// Arguments passed to task constructor.
+	///
+	/// @return
+	/// Unique id to the task process which can be waited upon by other submits.
+	template<
+		typename											ThreadType,
+		typename											LambdaType
+	>
+	TaskIdentifier											ScheduleLambdaTaskToThreadType(
+		LambdaType										&&	lambda_function
+	)
+	{
+		static_assert(
+			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
+		);
+		static_assert(
+			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
+		);
+
+		auto unique_task = MakeUniquePtr<LambdaTask<LambdaType>>();
+		unique_task->locked_to_threads	= GetTaskThreadLockIDs<ThreadType>( std::move( lambda_function ) );
+		return DoAddTask( std::move( unique_task ) );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Schedules a new task to be run on a thread.
+	///
+	/// @tparam TaskType
+	///	Task type we're scheduling.
+	///
+	/// @tparam ...TaskConstructorArgumentTypePack
+	/// Task constructor argument types.
+	///
+	/// @param ...task_constructor_arguments
+	/// Arguments passed to task constructor.
+	///
+	/// @return
+	/// Unique id to the task process which can be waited upon by other submits.
+	template<
+		typename											LambdaType
+	>
+	TaskIdentifier											ScheduleLambdaTask(
+		LambdaType										&&	lambda_function
+	)
+	{
+		static_assert(
+			internal::IsLambdaAcceptingParameters<LambdaType, Task&> || internal::IsLambdaAcceptingParameters<LambdaType>,
+			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
+		);
+		static_assert(
+			internal::IsLambdaReturningVoid<LambdaType, Task&> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
+			internal::IsLambdaReturningVoid<LambdaType> || internal::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
+		);
+
+		auto unique_task = MakeUniquePtr<LambdaTask<LambdaType>>( std::move( lambda_function ) );
+		return DoAddTask( std::move( unique_task ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,6 +474,9 @@ public:
 	) const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void													Run();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Waits until thread pool has no work left to do.
 	///
@@ -358,18 +496,36 @@ private:
 			lambda_function( lambda_function )
 		{}
 
-		virtual TaskState									operator() (
+		virtual TaskExecutionResult							operator() (
 			Thread										&	thread
 		) override
 		{
-			if constexpr( internal::IsLambdaReturningNonVoid<LambdaType, Task&> )
+			constexpr bool non_void1 = internal::IsLambdaSignature<LambdaType, void>;
+			constexpr bool non_void2 = internal::IsLambdaSignature<LambdaType, void, Task&>;
+			constexpr bool non_void3 = internal::IsLambdaSignature<LambdaType, TaskExecutionResult>;
+			constexpr bool non_void4 = internal::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&>;
+
+			if constexpr( internal::IsLambdaSignature<LambdaType, void> )
 			{
-				return lambda_function( *this );
+				lambda_function();
+				return TaskExecutionResult::FINISHED;
+			}
+			else if constexpr( internal::IsLambdaSignature<LambdaType, void, Task&> )
+			{
+				lambda_function();
+				return TaskExecutionResult::FINISHED;
+			}
+			else if constexpr( internal::IsLambdaSignature<LambdaType, TaskExecutionResult> )
+			{
+				return lambda_function();
+			}
+			else if constexpr( internal::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&> )
+			{
+				return lambda_function();
 			}
 			else
 			{
-				lambda_function( *this );
-				return TaskState::FINISHED;
+				lambda_function();
 			}
 		}
 

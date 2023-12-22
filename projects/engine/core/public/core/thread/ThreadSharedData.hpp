@@ -82,6 +82,7 @@ public:
 	std::mutex							thread_exception_mutex;
 	std::atomic_bool					thread_exception_raised				= false;
 	std::atomic_bool					thread_exception_handled			= false;
+	std::atomic<ThreadIdentifier>		thread_exception_id					= 0;
 	diagnostic::Exception				thread_exception;
 
 	mutable std::mutex					task_list_mutex;

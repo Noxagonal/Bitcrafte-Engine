@@ -35,19 +35,22 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Run in thread start before it processes anything else.
-	/// 
-	/// @return
-	/// true if created successful, false to terminate entire thread pool. ThreadEnd() is ran afterwards regardless so you can rely
-	/// that for cleanup.
-	virtual	bool									ThreadBegin()			= 0;
+	///
+	/// @note
+	/// If an exception is thrown in this function, the whole thread pool will be evacuated and an exception is forwarded in the
+	/// main thread. ThreadEnd() is always called so you may use that to do any potential cleanup first.
+	virtual	void									ThreadBegin()					= 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Run when thread pool terminates, this is ran in thread only after all tasks have completed.
+	/// Run when thread is about to terminate.
 	///
-	///	This function is run even if ThreadBegin() returns false, in which case thread pool will terminate immediately. You can rely
-	/// on this function for cleanup if something in ThreadBegin() goes wrong and you need to bail out.
-	virtual void									ThreadEnd()				= 0;
+	/// @note
+	///	This function is run even if ThreadBegin() throws. You can rely on this function for cleanup.
+	///
+	/// @note
+	/// This is a cleanup function and should not throw, any major errors can be left to the OS to deal with.
+	virtual void									ThreadEnd() noexcept			= 0;
 };
 
 

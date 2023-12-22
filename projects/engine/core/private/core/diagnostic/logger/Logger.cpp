@@ -75,6 +75,8 @@ void bc::diagnostic::Logger::Log(
 	const PrintRecord	&	message
 )
 {
+	if( this->create_info.disabled ) [[unlikely]] return;
+
 	auto log_entry = LogEntry {};
 	log_entry.severity		= report_severity;
 	log_entry.message		= message;
@@ -88,6 +90,8 @@ void bc::diagnostic::Logger::Log(
 	const Exception		&	exception
 )
 {
+	if( this->create_info.disabled ) [[unlikely]] return;
+
 	auto current_exception_in_chain = &exception;
 
 	auto log_entry = LogEntry {};
@@ -133,7 +137,7 @@ void bc::diagnostic::Logger::PushLogEntry(
 	auto lock_guard = std::lock_guard( log_mutex );
 
 	if( std::to_underlying( log_entry.severity ) < std::to_underlying( LogReportSeverity::CRITICAL_ERROR ) &&
-		std::to_underlying( log_entry.severity ) < std::to_underlying( create_info.report_severity ) )
+		std::to_underlying( log_entry.severity ) < std::to_underlying( create_info.minimum_report_severity ) )
 	{
 		return;
 	}
@@ -141,7 +145,7 @@ void bc::diagnostic::Logger::PushLogEntry(
 	log_history.PushBack( log_entry );
 
 	if( std::to_underlying( log_entry.severity ) < std::to_underlying( LogReportSeverity::ERROR ) &&
-		std::to_underlying( log_entry.severity ) < std::to_underlying( create_info.display_severity ) )
+		std::to_underlying( log_entry.severity ) < std::to_underlying( create_info.minimum_display_severity ) )
 	{
 		return;
 	}
@@ -149,7 +153,8 @@ void bc::diagnostic::Logger::PushLogEntry(
 	// TODO: Update callbacks here, if we introduced any.
 
 	if( !create_info.print_to_system_console ) return;
- 	auto console_print_complete_message = MakePrintRecord( LogReportSeverityToText( log_entry.severity ), LogReportSeverityToPrintRecordTheme( log_entry.severity ) );
+	auto console_print_complete_message = MakePrintRecord( U"\n\n" );
+ 	console_print_complete_message += MakePrintRecord( LogReportSeverityToText( log_entry.severity ), LogReportSeverityToPrintRecordTheme( log_entry.severity ) );
 	console_print_complete_message += MakePrintRecord( U"\n" );
 	auto console_print_body = log_history.Back().message;
 	console_print_body.AddIndent();

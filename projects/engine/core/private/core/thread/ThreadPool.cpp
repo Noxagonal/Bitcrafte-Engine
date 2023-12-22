@@ -27,17 +27,77 @@ void ThreadPoolWorker(
 	assert( thread_description );
 	assert( thread_shared_data );
 
-	auto success = thread_description->pool_thread->ThreadBegin();
-	if( !success )
+	auto CleanUpThreadForTermination = [ thread_description ](
+		WorkerThreadState new_thread_state
+		)
+		{
+			thread_description->state			= new_thread_state;
+			thread_description->pool_thread->ThreadEnd();
+			thread_description->ready_to_join	= true;
+		};
+
+	auto ReportException = [ thread_shared_data, thread_description ]( const bc::diagnostic::Exception & exception )
+		{
+			// If a thread task raises an exception, we exit the application. It won't happen
+			// immediately however and other threads might run parallel to this thread and need
+			// to be cleaned up, best we can do here is to signal the exception.
+			//
+			// Cleanup is done by the main thread whenever the main thread tries to add a new
+			// task or do a general update. It may take a little while however. Once the main
+			// thread notices that there was an exception, EvacuateThreads() is called which
+			// will join all threads and manually clears the task list.
+
+			auto lock_guard = std::lock_guard( thread_shared_data->thread_exception_mutex );
+
+			if( thread_shared_data->thread_exception_raised ) return;
+			thread_shared_data->thread_exception_raised		= true;
+
+			thread_shared_data->thread_exception			= exception;
+			thread_shared_data->thread_exception_id			= thread_description->thread_id;
+			thread_shared_data->threads_should_exit			= true;
+			thread_shared_data->thread_wakeup.notify_all();
+		};
+
+	auto MakeExceptionFromStlException = []( const std::exception & exception )
+		{
+			auto report = bc::diagnostic::MakePrintRecord( U"stl exception thrown in thread" );
+			report += bc::diagnostic::MakePrintRecord( U"\n" );
+			report += bc::diagnostic::MakePrintRecord_Argument( U"stl exception message", exception.what() ).AddIndent();
+			return bc::diagnostic::MakeException( report );
+		};
+
+	auto thread_start_result = [ ReportException, MakeExceptionFromStlException, thread_description ]() -> bool
+		{
+			try
+			{
+				thread_description->pool_thread->ThreadBegin();
+			}
+			catch( const bc::diagnostic::Exception & e )
+			{
+				ReportException( e );
+				return false;
+			}
+			catch( const std::exception & e )
+			{
+				ReportException( MakeExceptionFromStlException( e ) );
+				return false;
+			}
+			catch( ... )
+			{
+				ReportException( bc::diagnostic::MakeException( "Unknown exception thrown in thread" ) );
+				return false;
+			}
+			return true;
+		}();
+	if( !thread_start_result )
 	{
-		thread_description->state			= WorkerThreadState::INITIALIZATION_ERROR;
-		thread_description->pool_thread->ThreadEnd();
-		thread_description->ready_to_join	= true;
+		CleanUpThreadForTermination( WorkerThreadState::INITIALIZATION_ERROR );
 		return;
 	}
+
 	thread_description->state				= WorkerThreadState::RUNNING;
 
-	while( !thread_shared_data->threads_should_exit )
+	while( !thread_shared_data->threads_should_exit && !thread_description->should_exit )
 	{
 		thread_description->state = WorkerThreadState::RUNNING;
 
@@ -55,58 +115,23 @@ void ThreadPoolWorker(
 			}
 			catch( const bc::diagnostic::Exception & e )
 			{
-				auto lock_guard = std::lock_guard( thread_shared_data->thread_exception_mutex );
-
-				if( thread_shared_data->thread_exception_raised ) break;
-				thread_shared_data->thread_exception_raised		= true;
-
-				thread_shared_data->thread_exception			= e;
-				thread_shared_data->threads_should_exit			= true;
-				thread_shared_data->thread_wakeup.notify_all();
-
-				// If a thread task raises an exception, we exit the application. It won't happen
-				// immediately however and other threads might run parallel to this thread and need
-				// to be cleaned up, best we can do here is to signal the exception.
-				//
-				// Cleanup is done by the main thread whenever the main thread tries to add a new
-				// task or do a general update. It may take a little while however. Once the main
-				// thread notices that there was an exception, EvacuateThreads() is called which
-				// will join all threads and manually clears the task list.
-				//
 				// Breaking makes sure we finish this thread here, this makes sure TaskComplete()
 				// below is not called. If TaskComplete() would be called, the task is removed from
 				// the task list and tasks that might depend on this task may run, we need to make
 				// sure all depending tasks do have an opportunity to run before exiting the
 				// application.
+
+				ReportException( e );
 				break;
 			}
 			catch( const std::exception & e )
 			{
-				auto lock_guard = std::lock_guard( thread_shared_data->thread_exception_mutex );
-
-				if( thread_shared_data->thread_exception_raised ) break;
-				thread_shared_data->thread_exception_raised		= true;
-
-				auto report = bc::diagnostic::MakePrintRecord( U"stl exception thrown in worker thread" );
-				report += bc::diagnostic::MakePrintRecord( U"\n" );
-				report += bc::diagnostic::MakePrintRecord_Argument( U"stl exception message", e.what() ).AddIndent();
-				thread_shared_data->thread_exception			= bc::diagnostic::MakeException( report );
-				thread_shared_data->threads_should_exit			= true;
-				thread_shared_data->thread_wakeup.notify_all();
-
+				ReportException( MakeExceptionFromStlException( e ) );
 				break;
 			}
 			catch( ... )
 			{
-				auto lock_guard = std::lock_guard( thread_shared_data->thread_exception_mutex );
-
-				if( thread_shared_data->thread_exception_raised ) break;
-				thread_shared_data->thread_exception_raised		= true;
-
-				thread_shared_data->thread_exception			= bc::diagnostic::MakeException( "Unknown exception thrown in worker thread" );
-				thread_shared_data->threads_should_exit			= true;
-				thread_shared_data->thread_wakeup.notify_all();
-
+				ReportException( bc::diagnostic::MakeException( "Unknown exception thrown in thread" ) );
 				break;
 			}
 
@@ -145,9 +170,7 @@ void ThreadPoolWorker(
 		}
 	}
 
-	thread_description->pool_thread->ThreadEnd();
-	thread_description->state			= WorkerThreadState::IDLE;
-	thread_description->ready_to_join	= true;
+	CleanUpThreadForTermination( WorkerThreadState::IDLE );
 }
 
 
@@ -264,6 +287,17 @@ std::thread::id bc::thread::ThreadPool::GetThreadSystemID(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void bc::thread::ThreadPool::Run()
+{
+	thread_shared_data->thread_wakeup.notify_all();
+
+	if( thread_shared_data->thread_exception_raised )
+	{
+		CheckAndHandleThreadThrow();
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::thread::ThreadPool::WaitIdle()
 {
 	while( !thread_shared_data->IsTaskListEmpty() )
@@ -347,34 +381,46 @@ void bc::thread::ThreadPool::DoRemoveThread(
 	BHardAssert( GetTaskQueueCount() == 0, "Cannot remove thread, threads cannot be removed when there are any tasks queued" );
 	BHardAssert( std::this_thread::get_id() == main_thread_id, "Cannot remove thread, threads can only be removed by the main thread" );
 
-	auto it = thread_description_list.begin();
-	while( it != thread_description_list.end() )
-	{
-		if( ( *it )->thread_id == thread_id )
+	// Find the thread from thread description list.
+	auto thread = std::find_if( thread_description_list.begin(), thread_description_list.end(),
+		[ thread_id ]( auto & thread_description )
 		{
-			thread_description_list.Erase( it );
-			break;
+			return thread_description->thread_id == thread_id;
 		}
-		++it;
+	);
+	if( thread == thread_description_list.end() ) return;
+
+	// Signal the thread to exit, keep waking up threads until the thread is ready to join.
+	( *thread )->should_exit = true;
+	while( !( *thread )->ready_to_join )
+	{
+		thread_shared_data->thread_wakeup.notify_all();
+		std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
 	}
+	( *thread )->stl_thread.join();
+
+	thread_description_list.Erase( thread );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::thread::ThreadPool::CheckAndHandleThreadThrow()
 {
-	if( std::this_thread::get_id() == main_thread_id )
+	if( std::this_thread::get_id() != main_thread_id ) return;
+
+	auto lock_guard = std::unique_lock( thread_shared_data->thread_exception_mutex );
+
+	if( thread_shared_data->thread_exception_handled.load() ) return;
+
+	if( thread_shared_data->thread_exception_raised && !thread_shared_data->thread_exception_handled )
 	{
-		if( thread_shared_data->thread_exception_handled.load() ) return;
-
-		auto lock_guard = std::unique_lock( thread_shared_data->thread_exception_mutex );
-
-		if( thread_shared_data->thread_exception_raised && !thread_shared_data->thread_exception_handled )
-		{
-			thread_shared_data->thread_exception_handled = true;
-			lock_guard.unlock();
-			EvacuateThreads();
-			diagnostic::Throw( thread_shared_data->thread_exception );
-		}
+		thread_shared_data->thread_exception_handled = true;
+		lock_guard.unlock();
+		EvacuateThreads();
+		auto record = diagnostic::MakePrintRecord_Argument( U"Exception thrown in thread", thread_shared_data->thread_exception_id.load() );
+		record += diagnostic::MakePrintRecord( U"\n" );
+		auto exception = diagnostic::MakeException( record );
+		exception.SetNextException( thread_shared_data->thread_exception );
+		diagnostic::Throw( exception );
 	}
 }
 

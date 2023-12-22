@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <atomic>
 #include <memory>
+#include <thread>
 
 
 
@@ -72,6 +73,7 @@ public:
 	UniquePtr<Thread>							pool_thread;
 	std::thread									stl_thread;
 	std::atomic<WorkerThreadState>				state					= WorkerThreadState::UNINITIALIZED;
+	std::atomic_bool							should_exit				= false;
 	std::atomic_bool							ready_to_join			= false;
 	ThreadIdentifier							thread_id				= 0;
 
