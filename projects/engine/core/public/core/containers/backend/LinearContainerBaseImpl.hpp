@@ -762,7 +762,7 @@ public:
 				this->data_capacity	= new_capacity;
 				return;
 			}
-			auto new_ptr = this->ResizeRange( this->data_ptr, this->data_size, new_capacity );
+			auto new_ptr = this->ResizeRange( this->data_ptr, this->data_size, this->data_capacity, new_capacity );
 			this->data_ptr		= new_ptr;
 			this->data_capacity	= new_capacity;
 		}
