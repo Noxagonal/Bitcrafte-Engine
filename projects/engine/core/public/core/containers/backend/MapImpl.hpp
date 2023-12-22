@@ -158,10 +158,6 @@ public:
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->node,
-			U"Tried to decrement iterator past begin",
-			"Container size", this->container->Size()
-		);
 		if( this->node == nullptr ) {
 			// End. Go to last actual.
 			this->node = this->container->FindRightmostFrom( this->container->root_node );
