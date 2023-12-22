@@ -481,7 +481,7 @@ TEST( ListContainer, MoveableOnlyStructure )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class Array_CopyableOnly_Control
+class List_CopyableOnly_Control
 {
 public:
 	static int32_t copy_counter;
@@ -489,53 +489,60 @@ public:
 
 	size_t data = 0;
 
-	Array_CopyableOnly_Control() {}
-	Array_CopyableOnly_Control( const Array_CopyableOnly_Control & other ) { ++copy_counter; }
-	Array_CopyableOnly_Control( Array_CopyableOnly_Control && other ) { ++move_counter; }
+	List_CopyableOnly_Control() {}
+	List_CopyableOnly_Control( const List_CopyableOnly_Control & other ) { ++copy_counter; }
+	List_CopyableOnly_Control( List_CopyableOnly_Control && other ) { ++move_counter; }
 
-	Array_CopyableOnly_Control & operator=( const Array_CopyableOnly_Control & other ) { ++copy_counter; return *this; }
-	Array_CopyableOnly_Control & operator=( Array_CopyableOnly_Control && other ) { ++move_counter; return *this; }
+	List_CopyableOnly_Control & operator=( const List_CopyableOnly_Control & other ) { ++copy_counter; return *this; }
+	List_CopyableOnly_Control & operator=( List_CopyableOnly_Control && other ) { ++move_counter; return *this; }
 };
-int32_t Array_CopyableOnly_Control::copy_counter		= 0;
-int32_t Array_CopyableOnly_Control::move_counter		= 0;
+int32_t List_CopyableOnly_Control::copy_counter		= 0;
+int32_t List_CopyableOnly_Control::move_counter		= 0;
 
-class Array_CopyableOnly
+class List_CopyableOnly
 {
 public:
 	static int32_t copy_counter;
 
 	size_t data = 0;
 
-	Array_CopyableOnly() {}
-	Array_CopyableOnly( const Array_CopyableOnly & other ) { ++copy_counter; }
-	Array_CopyableOnly( Array_CopyableOnly && other ) = delete;
+	List_CopyableOnly() {}
+	List_CopyableOnly( const List_CopyableOnly & other ) { ++copy_counter; }
+	List_CopyableOnly( List_CopyableOnly && other ) = delete;
 
-	Array_CopyableOnly & operator=( const Array_CopyableOnly & other ) { ++copy_counter; return *this; }
-	Array_CopyableOnly & operator=( Array_CopyableOnly && other ) = delete;
+	List_CopyableOnly & operator=( const List_CopyableOnly & other ) { ++copy_counter; return *this; }
+	List_CopyableOnly & operator=( List_CopyableOnly && other ) = delete;
 };
-int32_t Array_CopyableOnly::copy_counter		= 0;
+int32_t List_CopyableOnly::copy_counter		= 0;
 
-TEST( ListContainer, Array_CopyableOnlyStructure )
+TEST( ListContainer, List_CopyableOnlyStructure )
 {
-	Array_CopyableOnly_Control::copy_counter	= 0;
-	Array_CopyableOnly_Control::move_counter	= 0;
+	List_CopyableOnly_Control::copy_counter	= 0;
+	List_CopyableOnly_Control::move_counter	= 0;
 
-	Array_CopyableOnly::copy_counter			= 0;
+	List_CopyableOnly::copy_counter			= 0;
 
-	using A = bc::List<Array_CopyableOnly>;
-	using B = bc::List<Array_CopyableOnly_Control>;
-	A a;
-	a.PushBack( Array_CopyableOnly() );
-	a.PushBack( Array_CopyableOnly() );
-	a.PushBack( Array_CopyableOnly() );
+	using A = bc::List<List_CopyableOnly>;
+	using B = bc::List<List_CopyableOnly_Control>;
+	A a; a.Reserve( 16 );
+	a.PushBack( List_CopyableOnly() );
+	a.PushBack( List_CopyableOnly() );
+	a.PushBack( List_CopyableOnly() );
+	EXPECT_EQ( List_CopyableOnly::copy_counter, 3 );
 
-	B ac;
-	ac.PushBack( Array_CopyableOnly_Control() );
-	ac.PushBack( Array_CopyableOnly_Control() );
-	ac.PushBack( Array_CopyableOnly_Control() );
+	B ac; ac.Reserve( 16 );
+	ac.PushBack( List_CopyableOnly_Control() );
+	ac.PushBack( List_CopyableOnly_Control() );
+	ac.PushBack( List_CopyableOnly_Control() );
+	EXPECT_EQ( List_CopyableOnly_Control::copy_counter, 0 );
+	EXPECT_EQ( List_CopyableOnly_Control::move_counter, 3 );
 
 	A b = a;
+	EXPECT_EQ( List_CopyableOnly::copy_counter, 6 );
+
 	B bc = ac;
+	EXPECT_EQ( List_CopyableOnly_Control::copy_counter, 3 );
+	EXPECT_EQ( List_CopyableOnly_Control::move_counter, 3 );
 
 	EXPECT_EQ( a.Size(), 3 );
 	EXPECT_EQ( b.Size(), 3 );
@@ -554,8 +561,9 @@ TEST( ListContainer, Array_CopyableOnlyStructure )
 	EXPECT_EQ( bc.Size(), 0 );
 	EXPECT_EQ( cc.Size(), 3 );
 
-	EXPECT_GT( Array_CopyableOnly::copy_counter, Array_CopyableOnly_Control::copy_counter );
-	EXPECT_EQ( Array_CopyableOnly::copy_counter, Array_CopyableOnly_Control::copy_counter + Array_CopyableOnly_Control::move_counter );
+	EXPECT_EQ( List_CopyableOnly::copy_counter, 6 );
+	EXPECT_EQ( List_CopyableOnly_Control::copy_counter, 3 );
+	EXPECT_EQ( List_CopyableOnly_Control::move_counter, 3 );
 };
 
 

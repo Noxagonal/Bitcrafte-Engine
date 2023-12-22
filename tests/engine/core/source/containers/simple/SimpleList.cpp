@@ -317,7 +317,7 @@ TEST( SimpleListContainer, MoveableOnlyStructure )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class SimpleLinearContainer_CopyableOnly_Control
+class SimpleList_CopyableOnly_Control
 {
 public:
 	static int32_t copy_counter;
@@ -325,53 +325,60 @@ public:
 
 	size_t data = 0;
 
-	SimpleLinearContainer_CopyableOnly_Control() noexcept = default;
-	SimpleLinearContainer_CopyableOnly_Control( const SimpleLinearContainer_CopyableOnly_Control & other ) noexcept { ++copy_counter; }
-	SimpleLinearContainer_CopyableOnly_Control( SimpleLinearContainer_CopyableOnly_Control && other ) noexcept { ++move_counter; }
+	SimpleList_CopyableOnly_Control() noexcept = default;
+	SimpleList_CopyableOnly_Control( const SimpleList_CopyableOnly_Control & other ) noexcept { ++copy_counter; }
+	SimpleList_CopyableOnly_Control( SimpleList_CopyableOnly_Control && other ) noexcept { ++move_counter; }
 
-	SimpleLinearContainer_CopyableOnly_Control & operator=( const SimpleLinearContainer_CopyableOnly_Control & other ) noexcept { ++copy_counter; return *this; }
-	SimpleLinearContainer_CopyableOnly_Control & operator=( SimpleLinearContainer_CopyableOnly_Control && other ) noexcept { ++move_counter; return *this; }
+	SimpleList_CopyableOnly_Control & operator=( const SimpleList_CopyableOnly_Control & other ) noexcept { ++copy_counter; return *this; }
+	SimpleList_CopyableOnly_Control & operator=( SimpleList_CopyableOnly_Control && other ) noexcept { ++move_counter; return *this; }
 };
-int32_t SimpleLinearContainer_CopyableOnly_Control::copy_counter		= 0;
-int32_t SimpleLinearContainer_CopyableOnly_Control::move_counter		= 0;
+int32_t SimpleList_CopyableOnly_Control::copy_counter		= 0;
+int32_t SimpleList_CopyableOnly_Control::move_counter		= 0;
 
-class SimpleLinearContainer_CopyableOnly
+class SimpleList_CopyableOnly
 {
 public:
 	static int32_t copy_counter;
 
 	size_t data = 0;
 
-	SimpleLinearContainer_CopyableOnly() noexcept = default;
-	SimpleLinearContainer_CopyableOnly( const SimpleLinearContainer_CopyableOnly & other ) noexcept { ++copy_counter; }
-	SimpleLinearContainer_CopyableOnly( SimpleLinearContainer_CopyableOnly && other ) noexcept = delete;
+	SimpleList_CopyableOnly() noexcept = default;
+	SimpleList_CopyableOnly( const SimpleList_CopyableOnly & other ) noexcept { ++copy_counter; }
+	SimpleList_CopyableOnly( SimpleList_CopyableOnly && other ) noexcept = delete;
 
-	SimpleLinearContainer_CopyableOnly & operator=( const SimpleLinearContainer_CopyableOnly & other ) noexcept { ++copy_counter; return *this; }
-	SimpleLinearContainer_CopyableOnly & operator=( SimpleLinearContainer_CopyableOnly && other ) noexcept = delete;
+	SimpleList_CopyableOnly & operator=( const SimpleList_CopyableOnly & other ) noexcept { ++copy_counter; return *this; }
+	SimpleList_CopyableOnly & operator=( SimpleList_CopyableOnly && other ) noexcept = delete;
 };
-int32_t SimpleLinearContainer_CopyableOnly::copy_counter		= 0;
+int32_t SimpleList_CopyableOnly::copy_counter		= 0;
 
-TEST( SimpleListContainer, SimpleLinearContainer_CopyableOnlyStructure )
+TEST( SimpleListContainer, SimpleList_CopyableOnlyStructure )
 {
-	SimpleLinearContainer_CopyableOnly_Control::copy_counter	= 0;
-	SimpleLinearContainer_CopyableOnly_Control::move_counter	= 0;
+	SimpleList_CopyableOnly_Control::copy_counter	= 0;
+	SimpleList_CopyableOnly_Control::move_counter	= 0;
 
-	SimpleLinearContainer_CopyableOnly::copy_counter			= 0;
+	SimpleList_CopyableOnly::copy_counter			= 0;
 
-	using A = bc::SimpleList<SimpleLinearContainer_CopyableOnly>;
-	using B = bc::SimpleList<SimpleLinearContainer_CopyableOnly_Control>;
-	A a;
-	a.PushBack( SimpleLinearContainer_CopyableOnly() );
-	a.PushBack( SimpleLinearContainer_CopyableOnly() );
-	a.PushBack( SimpleLinearContainer_CopyableOnly() );
+	using A = bc::SimpleList<SimpleList_CopyableOnly>;
+	using B = bc::SimpleList<SimpleList_CopyableOnly_Control>;
+	A a; a.Reserve( 16 );
+	a.PushBack( SimpleList_CopyableOnly() );
+	a.PushBack( SimpleList_CopyableOnly() );
+	a.PushBack( SimpleList_CopyableOnly() );
+	EXPECT_EQ( SimpleList_CopyableOnly::copy_counter, 3 );
 
-	B ac;
-	ac.PushBack( SimpleLinearContainer_CopyableOnly_Control() );
-	ac.PushBack( SimpleLinearContainer_CopyableOnly_Control() );
-	ac.PushBack( SimpleLinearContainer_CopyableOnly_Control() );
+	B ac; ac.Reserve( 16 );
+	ac.PushBack( SimpleList_CopyableOnly_Control() );
+	ac.PushBack( SimpleList_CopyableOnly_Control() );
+	ac.PushBack( SimpleList_CopyableOnly_Control() );
+	EXPECT_EQ( SimpleList_CopyableOnly_Control::copy_counter, 0 );
+	EXPECT_EQ( SimpleList_CopyableOnly_Control::move_counter, 3 );
 
 	A b = a;
+	EXPECT_EQ( SimpleList_CopyableOnly::copy_counter, 6 );
+
 	B bc = ac;
+	EXPECT_EQ( SimpleList_CopyableOnly_Control::copy_counter, 3 );
+	EXPECT_EQ( SimpleList_CopyableOnly_Control::move_counter, 3 );
 
 	EXPECT_EQ( a.Size(), 3 );
 	EXPECT_EQ( b.Size(), 3 );
@@ -390,44 +397,45 @@ TEST( SimpleListContainer, SimpleLinearContainer_CopyableOnlyStructure )
 	EXPECT_EQ( bc.Size(), 0 );
 	EXPECT_EQ( cc.Size(), 3 );
 
-	EXPECT_GT( SimpleLinearContainer_CopyableOnly::copy_counter, SimpleLinearContainer_CopyableOnly_Control::copy_counter );
-	EXPECT_EQ( SimpleLinearContainer_CopyableOnly::copy_counter, SimpleLinearContainer_CopyableOnly_Control::copy_counter + SimpleLinearContainer_CopyableOnly_Control::move_counter );
+	EXPECT_EQ( SimpleList_CopyableOnly::copy_counter, 6 );
+	EXPECT_EQ( SimpleList_CopyableOnly_Control::copy_counter, 3 );
+	EXPECT_EQ( SimpleList_CopyableOnly_Control::move_counter, 3 );
 };
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class SimpleLinearContainer_CtorDtorCounted
+class SimpleList_CtorDtorCounted
 {
 public:
 	static int32_t constructed_counter;
 
 	size_t data = 0;
 
-	SimpleLinearContainer_CtorDtorCounted() noexcept { ++constructed_counter; data = constructed_counter; }
-	SimpleLinearContainer_CtorDtorCounted( const SimpleLinearContainer_CtorDtorCounted & other ) noexcept { ++constructed_counter; data = constructed_counter; }
-	SimpleLinearContainer_CtorDtorCounted( SimpleLinearContainer_CtorDtorCounted && other ) noexcept { ++constructed_counter; data = constructed_counter; }
-	~SimpleLinearContainer_CtorDtorCounted() noexcept { --constructed_counter; }
-	SimpleLinearContainer_CtorDtorCounted & operator=( const SimpleLinearContainer_CtorDtorCounted & other ) noexcept = default;
-	SimpleLinearContainer_CtorDtorCounted & operator=( SimpleLinearContainer_CtorDtorCounted && other ) noexcept = default;
+	SimpleList_CtorDtorCounted() noexcept { ++constructed_counter; data = constructed_counter; }
+	SimpleList_CtorDtorCounted( const SimpleList_CtorDtorCounted & other ) noexcept { ++constructed_counter; data = constructed_counter; }
+	SimpleList_CtorDtorCounted( SimpleList_CtorDtorCounted && other ) noexcept { ++constructed_counter; data = constructed_counter; }
+	~SimpleList_CtorDtorCounted() noexcept { --constructed_counter; }
+	SimpleList_CtorDtorCounted & operator=( const SimpleList_CtorDtorCounted & other ) noexcept = default;
+	SimpleList_CtorDtorCounted & operator=( SimpleList_CtorDtorCounted && other ) noexcept = default;
 };
-int32_t SimpleLinearContainer_CtorDtorCounted::constructed_counter	= 0;
+int32_t SimpleList_CtorDtorCounted::constructed_counter	= 0;
 
 TEST( SimpleListContainer, CtorDtorCounter )
 {
-	SimpleLinearContainer_CtorDtorCounted::constructed_counter		= 0;
+	SimpleList_CtorDtorCounted::constructed_counter		= 0;
 
-	using A = bc::SimpleList<SimpleLinearContainer_CtorDtorCounted>;
+	using A = bc::SimpleList<SimpleList_CtorDtorCounted>;
 	A a;
 
 	a.PushBack( {} );
-	a.PushBack( SimpleLinearContainer_CtorDtorCounted() );
-	a.PushBack( SimpleLinearContainer_CtorDtorCounted {} );
+	a.PushBack( SimpleList_CtorDtorCounted() );
+	a.PushBack( SimpleList_CtorDtorCounted {} );
 	EXPECT_EQ( a.Size(), 3 );
 
 	// a.PushFront( {} );
-	// a.PushFront( SimpleLinearContainer_CtorDtorCounted() );
-	// a.PushFront( SimpleLinearContainer_CtorDtorCounted {} );
+	// a.PushFront( SimpleList_CtorDtorCounted() );
+	// a.PushFront( SimpleList_CtorDtorCounted {} );
 	// EXPECT_EQ( a.Size(), 6 );
 
 	a.EmplaceBack();
@@ -460,7 +468,7 @@ TEST( SimpleListContainer, CtorDtorCounter )
 	a.Clear();
 
 	EXPECT_EQ( a.Size(), 0 );
-	EXPECT_EQ( SimpleLinearContainer_CtorDtorCounted::constructed_counter, 0 );
+	EXPECT_EQ( SimpleList_CtorDtorCounted::constructed_counter, 0 );
 };
 
 
@@ -503,9 +511,9 @@ TEST( SimpleListContainer, SelfAssignment )
 		}
 	}
 	{
-		SimpleLinearContainer_CtorDtorCounted::constructed_counter		= 0;
+		SimpleList_CtorDtorCounted::constructed_counter		= 0;
 
-		using A = bc::SimpleList<SimpleLinearContainer_CtorDtorCounted>;
+		using A = bc::SimpleList<SimpleList_CtorDtorCounted>;
 		using AView = A::ThisViewType<true>;
 
 		A a( 5 );
@@ -514,14 +522,14 @@ TEST( SimpleListContainer, SelfAssignment )
 		a.PushBack( {} );
 		for( size_t i = 0; i < 5; i++ )
 		{
-			a.PushBack( SimpleLinearContainer_CtorDtorCounted() );
+			a.PushBack( SimpleList_CtorDtorCounted() );
 			a = a;
 			a.Append( a );
 		}
 		a.Clear();
 
 		EXPECT_EQ( a.Size(), 0 );
-		EXPECT_EQ( SimpleLinearContainer_CtorDtorCounted::constructed_counter, 0 );
+		EXPECT_EQ( SimpleList_CtorDtorCounted::constructed_counter, 0 );
 	}
 }
 
