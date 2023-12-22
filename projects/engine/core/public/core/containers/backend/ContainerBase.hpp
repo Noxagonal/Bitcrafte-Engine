@@ -206,6 +206,7 @@ protected:
 	constexpr ValueType								*	ResizeRange(
 		ValueType									*	old_location,
 		size_t											old_element_count,
+		size_t											old_reserved_element_count,
 		size_t											new_reserved_element_count
 	) const noexcept requires ( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
@@ -219,25 +220,26 @@ protected:
 		}
 
 		BHardAssert( old_location != nullptr, "Resizing range, old location is nullptr" );
-		BHardAssert( old_element_count > 0, "Resizing range, old element count must be larger than 0" );
 		BHardAssert( old_element_count < 0x0000FFFFFFFFFFFF, "Resizing range, old element count too high, something is not right" );
 
 		BHardAssert( new_reserved_element_count > 0, "Resizing range, new reserved element count must be larger than 0" );
 		BHardAssert( new_reserved_element_count < 0x0000FFFFFFFFFFFF, "Resizing range, new reserved element count too high, something is not right" );
 
-		BHardAssert( old_element_count != new_reserved_element_count, "Resizing range, new reserved element count is the same as the old element count, this check should be done earlier" );
+		BHardAssert( old_reserved_element_count > 0, "Resizing range, old reserved element count must be larger than 0" );
+		BHardAssert( old_reserved_element_count < 0x0000FFFFFFFFFFFF, "Resizing range, old reserved element count too high, something is not right" );
+		BHardAssert( old_reserved_element_count != new_reserved_element_count, "Resizing range, new reserved element count is the same as the old reserved element count, this check should be done earlier" );
 
 		if constexpr( std::is_trivial_v<ValueType> )
 		{
 			// For trivial stuff we can try and reallocate the memory, this can be a cheaper operation than allocating.
-			return static_cast<ValueType*>( this->ReallocateMemory( old_location, old_element_count, new_reserved_element_count ) );
+			return static_cast<ValueType*>( this->ReallocateMemory( old_location, old_reserved_element_count, new_reserved_element_count ) );
 		}
 		else
 		{
 			// ValueType is not trivial, we need to do some extra work.
 			if( this->IsInPlaceReallocateable( old_location, new_reserved_element_count ) )
 			{
-				auto new_location = this->InPlaceReallocateMemory( old_location, old_element_count, new_reserved_element_count );
+				auto new_location = this->InPlaceReallocateMemory( old_location, old_reserved_element_count, new_reserved_element_count );
 				assert( old_location == new_location );
 				return new_location;
 			}
@@ -254,7 +256,7 @@ protected:
 				this->CopyConstructRange( new_location, old_location, old_element_count );
 			}
 			this->DestructRange( old_location, old_element_count );
-			this->FreeMemory( old_location, old_element_count );
+			this->FreeMemory( old_location, old_reserved_element_count );
 			return new_location;
 		}
 	}
@@ -309,11 +311,11 @@ protected:
 	template<typename ValueType>
 	constexpr ValueType								*	InPlaceReallocateMemory(
 		ValueType									*	old_location,
-		size_t											old_element_count,
+		size_t											old_reserved_element_count,
 		size_t											new_reserved_element_count
 	) const
 	{
-		return memory::InPlaceReallocateMemory<ValueType>( old_location, old_element_count, new_reserved_element_count );
+		return memory::InPlaceReallocateMemory<ValueType>( old_location, old_reserved_element_count, new_reserved_element_count );
 	}
 };
 
