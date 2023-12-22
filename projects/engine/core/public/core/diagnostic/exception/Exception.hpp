@@ -108,7 +108,7 @@ private:
 		this->message			= other.message;
 		this->source_location	= other.source_location;
 		this->stack_trace		= other.stack_trace;
-		SetNextException( *other.next );
+		if( !other.next.IsEmpty() ) SetNextException( *other.next );
 	}
 
 public:
