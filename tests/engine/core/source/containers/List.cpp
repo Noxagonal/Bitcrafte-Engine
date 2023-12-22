@@ -5,13 +5,13 @@
 
 
 
+namespace core {
 namespace containers {
-namespace list {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, BasicInit )
+TEST( ListContainer, BasicInit )
 {
 	using A = bc::List<uint32_t>;
 	A a;
@@ -33,7 +33,7 @@ TEST( CoreContainerArray, BasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, ConstructWithSize )
+TEST( ListContainer, ConstructWithSize )
 {
 	using A = bc::List<uint32_t>;
 	A a;
@@ -58,7 +58,7 @@ TEST( CoreContainerArray, ConstructWithSize )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, IndexOperator )
+TEST( ListContainer, IndexOperator )
 {
 	using A = bc::List<uint32_t>;
 	A a { 5, 10, 20 };
@@ -72,7 +72,7 @@ TEST( CoreContainerArray, IndexOperator )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, Erase )
+TEST( ListContainer, Erase )
 {
 	using A = bc::List<uint32_t>;
 	{
@@ -149,7 +149,7 @@ TEST( CoreContainerArray, Erase )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, FrontBack )
+TEST( ListContainer, FrontBack )
 {
 	using A = bc::List<uint32_t>;
 	{
@@ -194,7 +194,7 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, PushBack )
+TEST( ListContainer, PushBack )
 {
 	using A = bc::List<uint32_t>;
 	using B = bc::List<PushObject>;
@@ -221,7 +221,7 @@ TEST( CoreContainerArray, PushBack )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, PushFront )
+TEST( ListContainer, PushFront )
 {
 	using A = bc::List<uint32_t>;
 	using B = bc::List<PushObject>;
@@ -248,7 +248,7 @@ TEST( CoreContainerArray, PushFront )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, MixedPushBackPushFront )
+TEST( ListContainer, MixedPushBackPushFront )
 {
 	using A = bc::List<uint32_t>;
 	A a;
@@ -269,7 +269,7 @@ TEST( CoreContainerArray, MixedPushBackPushFront )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, Append )
+TEST( ListContainer, Append )
 {
 	{
 		using A = bc::List<uint32_t>;
@@ -314,7 +314,7 @@ TEST( CoreContainerArray, Append )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, StructureBasicInit )
+TEST( ListContainer, StructureBasicInit )
 {
 	struct Simple
 	{
@@ -341,7 +341,7 @@ TEST( CoreContainerArray, StructureBasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, StructureInitializerListInit )
+TEST( ListContainer, StructureInitializerListInit )
 {
 	struct Simple
 	{
@@ -370,7 +370,7 @@ TEST( CoreContainerArray, StructureInitializerListInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, StructureCopy )
+TEST( ListContainer, StructureCopy )
 {
 	struct Simple
 	{
@@ -412,7 +412,7 @@ TEST( CoreContainerArray, StructureCopy )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, StructureMove )
+TEST( ListContainer, StructureMove )
 {
 	struct Simple
 	{
@@ -447,7 +447,7 @@ TEST( CoreContainerArray, StructureMove )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, MoveableOnlyStructure )
+TEST( ListContainer, MoveableOnlyStructure )
 {
 	struct MoveableOnly
 	{
@@ -515,7 +515,7 @@ public:
 };
 int32_t Array_CopyableOnly::copy_counter		= 0;
 
-TEST( CoreContainerArray, Array_CopyableOnlyStructure )
+TEST( ListContainer, Array_CopyableOnlyStructure )
 {
 	Array_CopyableOnly_Control::copy_counter	= 0;
 	Array_CopyableOnly_Control::move_counter	= 0;
@@ -577,7 +577,7 @@ public:
 };
 int32_t Array_CtorDtorCounted::constructed_counter	= 0;
 
-TEST( CoreContainerArray, CtorDtorCounter )
+TEST( ListContainer, CtorDtorCounter )
 {
 	Array_CtorDtorCounted::constructed_counter		= 0;
 
@@ -628,7 +628,7 @@ TEST( CoreContainerArray, CtorDtorCounter )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, Iterator )
+TEST( ListContainer, Iterator )
 {
 	using A = bc::List<uint32_t>;
 
@@ -694,7 +694,7 @@ TEST( CoreContainerArray, Iterator )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerArray, SelfAssignment )
+TEST( ListContainer, SelfAssignment )
 {
 	{
 		using A = bc::List<uint32_t>;
@@ -740,7 +740,8 @@ TEST( CoreContainerArray, SelfAssignment )
 		a.Reserve( 50 );
 		a.PushBack( {} );
 		a.Insert( a.begin() + 5, {} );
-		for( size_t i = 0; i < 5; i++ ) {
+		for( size_t i = 0; i < 5; i++ )
+		{
 			a.PushFront( Array_CtorDtorCounted() );
 			a.PushBack( Array_CtorDtorCounted() );
 			a.Insert( a.begin() + 10, Array_CtorDtorCounted() );
@@ -756,5 +757,5 @@ TEST( CoreContainerArray, SelfAssignment )
 
 
 
-} // list
 } // containers
+} // core

@@ -5,13 +5,13 @@
 
 
 
+namespace core {
 namespace containers {
-namespace text {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, BasicInit )
+TEST( TextContainer, BasicInit )
 {
 	using A = bc::Text;
 	using B = bc::Text8;
@@ -81,7 +81,7 @@ TEST( CoreContainerText, BasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, ConstructWithSize )
+TEST( TextContainer, ConstructWithSize )
 {
 	using A = bc::Text32;
 	A a;
@@ -100,7 +100,7 @@ TEST( CoreContainerText, ConstructWithSize )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, IndexOperator )
+TEST( TextContainer, IndexOperator )
 {
 	using A = bc::Text32;
 	A a { char( 5 ), char( 10 ), char( 20 ) };
@@ -114,7 +114,7 @@ TEST( CoreContainerText, IndexOperator )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, Erase )
+TEST( TextContainer, Erase )
 {
 	using A = bc::Text32;
 	{
@@ -192,7 +192,7 @@ TEST( CoreContainerText, Erase )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, FrontBack )
+TEST( TextContainer, FrontBack )
 {
 	using A = bc::Text32;
 	{
@@ -219,7 +219,7 @@ TEST( CoreContainerText, FrontBack )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, PushBack )
+TEST( TextContainer, PushBack )
 {
 	using A = bc::Text32;
 
@@ -236,7 +236,7 @@ TEST( CoreContainerText, PushBack )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, PushFront )
+TEST( TextContainer, PushFront )
 {
 	using A = bc::Text32;
 
@@ -253,7 +253,7 @@ TEST( CoreContainerText, PushFront )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, MixedPushBackPushFront )
+TEST( TextContainer, MixedPushBackPushFront )
 {
 	using A = bc::Text32;
 	A a;
@@ -274,7 +274,7 @@ TEST( CoreContainerText, MixedPushBackPushFront )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, Append )
+TEST( TextContainer, Append )
 {
 	using A = bc::Text32;
 
@@ -347,7 +347,7 @@ TEST( CoreContainerText, Append )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, Replace )
+TEST( TextContainer, Replace )
 {
 	using A = bc::Text32;
 
@@ -375,7 +375,7 @@ TEST( CoreContainerText, Replace )
 
 		a.Replace( U"text", U"test" );
 		EXPECT_EQ( a, U"ing and place a new test somewhere there" );
-		
+
 		a.Replace( U"ing and ", U"" );
 		EXPECT_EQ( a, U"place a new test somewhere there" );
 
@@ -462,7 +462,7 @@ TEST( CoreContainerText, Replace )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, Iterator )
+TEST( TextContainer, Iterator )
 {
 	using A = bc::Text32;
 
@@ -528,7 +528,7 @@ TEST( CoreContainerText, Iterator )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerText, SelfAssignment )
+TEST( TextContainer, SelfAssignment )
 {
 	{
 		using A = bc::Text32;
@@ -568,5 +568,5 @@ TEST( CoreContainerText, SelfAssignment )
 
 
 
-} // text
 } // containers
+} // core

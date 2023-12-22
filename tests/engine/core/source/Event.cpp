@@ -5,8 +5,12 @@
 
 
 
+namespace core {
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreEvent, BasicInitialize )
+TEST( Event, BasicInitialize )
 {
 	using A = bc::Event<>;
 
@@ -18,7 +22,7 @@ TEST( CoreEvent, BasicInitialize )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreEvent, Observers )
+TEST( Event, Observers )
 {
 	using A = bc::Event<>;
 	{
@@ -95,7 +99,7 @@ TEST( CoreEvent, Observers )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreEvent, Callbacks )
+TEST( Event, Callbacks )
 {
 	using A = bc::Event<>;
 
@@ -103,7 +107,7 @@ TEST( CoreEvent, Callbacks )
 	int32_t b_call_counter = 0;
 
 	A a;
-	a.RegisterCallback( [&a_call_counter]()
+	a.RegisterCallback( [ &a_call_counter ]()
 		{
 			++a_call_counter;
 		}
@@ -112,7 +116,7 @@ TEST( CoreEvent, Callbacks )
 	a.Signal();
 	EXPECT_EQ( a_call_counter, 1 );
 
-	a.RegisterCallback( [&a_call_counter]()
+	a.RegisterCallback( [ &a_call_counter ]()
 		{
 			++a_call_counter;
 		}
@@ -127,7 +131,7 @@ TEST( CoreEvent, Callbacks )
 	// Make sure signals also call callbacks from observers.
 	A b;
 	a.RegisterObserver( &b );
-	b.RegisterCallback( [&b_call_counter]()
+	b.RegisterCallback( [ &b_call_counter ]()
 		{
 			++b_call_counter;
 		}
@@ -141,7 +145,7 @@ TEST( CoreEvent, Callbacks )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreEvent, Ordering )
+TEST( Event, Ordering )
 {
 	using A = bc::Event<>;
 
@@ -156,16 +160,18 @@ TEST( CoreEvent, Ordering )
 	A a;
 	A b;
 	a.RegisterObserver( &b );
-	a.RegisterCallback( [&first]()
+	a.RegisterCallback( [ &first ]()
 		{
-			if( first == First::UNDECIDED ) {
+			if( first == First::UNDECIDED )
+			{
 				first = First::A;
 			}
 		}
 	);
-	b.RegisterCallback( [&first]()
+	b.RegisterCallback( [ &first ]()
 		{
-			if( first == First::UNDECIDED ) {
+			if( first == First::UNDECIDED )
+			{
 				first = First::B;
 			}
 		}
@@ -179,7 +185,7 @@ TEST( CoreEvent, Ordering )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreEvent, CyclicOrDoubleDependency )
+TEST( Event, CyclicOrDoubleDependency )
 {
 	using A = bc::Event<>;
 
@@ -195,3 +201,7 @@ TEST( CoreEvent, CyclicOrDoubleDependency )
 	EXPECT_THROW( b.RegisterObserver( &a ), bc::diagnostic::Exception );
 	EXPECT_THROW( a.RegisterObserver( &c ), bc::diagnostic::Exception );
 }
+
+
+
+} // core

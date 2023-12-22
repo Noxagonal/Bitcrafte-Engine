@@ -5,13 +5,13 @@
 
 
 
+namespace core {
 namespace containers {
-namespace simple_list {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, BasicInit )
+TEST( SimpleListContainer, BasicInit )
 {
 	using A = bc::SimpleList<uint32_t>;
 	A a;
@@ -33,7 +33,7 @@ TEST( CoreContainerSimpleLinearContainer, BasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, ConstructWithSize )
+TEST( SimpleListContainer, ConstructWithSize )
 {
 	using A = bc::SimpleList<uint32_t>;
 	A a;
@@ -58,7 +58,7 @@ TEST( CoreContainerSimpleLinearContainer, ConstructWithSize )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, IndexOperator )
+TEST( SimpleListContainer, IndexOperator )
 {
 	using A = bc::SimpleList<uint32_t>;
 	A a { 5, 10, 20 };
@@ -74,7 +74,7 @@ TEST( CoreContainerSimpleLinearContainer, IndexOperator )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, FrontBack )
+TEST( SimpleListContainer, FrontBack )
 {
 	using A = bc::SimpleList<uint32_t>;
 	{
@@ -122,7 +122,7 @@ static_assert( std::is_nothrow_constructible_v<PushObject, size_t>, "Test object
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, PushBack )
+TEST( SimpleListContainer, PushBack )
 {
 	using A = bc::SimpleList<uint32_t>;
 	using B = bc::SimpleList<PushObject>;
@@ -149,7 +149,7 @@ TEST( CoreContainerSimpleLinearContainer, PushBack )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, StructureBasicInit )
+TEST( SimpleListContainer, StructureBasicInit )
 {
 	struct Simple
 	{
@@ -176,7 +176,7 @@ TEST( CoreContainerSimpleLinearContainer, StructureBasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, StructureInitializerListInit )
+TEST( SimpleListContainer, StructureInitializerListInit )
 {
 	struct Simple
 	{
@@ -205,7 +205,7 @@ TEST( CoreContainerSimpleLinearContainer, StructureInitializerListInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, StructureCopy )
+TEST( SimpleListContainer, StructureCopy )
 {
 	struct Simple
 	{
@@ -247,7 +247,7 @@ TEST( CoreContainerSimpleLinearContainer, StructureCopy )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, StructureMove )
+TEST( SimpleListContainer, StructureMove )
 {
 	struct Simple
 	{
@@ -282,7 +282,7 @@ TEST( CoreContainerSimpleLinearContainer, StructureMove )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, MoveableOnlyStructure )
+TEST( SimpleListContainer, MoveableOnlyStructure )
 {
 	struct MoveableOnly
 	{
@@ -351,7 +351,7 @@ public:
 };
 int32_t SimpleLinearContainer_CopyableOnly::copy_counter		= 0;
 
-TEST( CoreContainerSimpleLinearContainer, SimpleLinearContainer_CopyableOnlyStructure )
+TEST( SimpleListContainer, SimpleLinearContainer_CopyableOnlyStructure )
 {
 	SimpleLinearContainer_CopyableOnly_Control::copy_counter	= 0;
 	SimpleLinearContainer_CopyableOnly_Control::move_counter	= 0;
@@ -413,7 +413,7 @@ public:
 };
 int32_t SimpleLinearContainer_CtorDtorCounted::constructed_counter	= 0;
 
-TEST( CoreContainerSimpleLinearContainer, CtorDtorCounter )
+TEST( SimpleListContainer, CtorDtorCounter )
 {
 	SimpleLinearContainer_CtorDtorCounted::constructed_counter		= 0;
 
@@ -466,7 +466,7 @@ TEST( CoreContainerSimpleLinearContainer, CtorDtorCounter )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerSimpleLinearContainer, SelfAssignment )
+TEST( SimpleListContainer, SelfAssignment )
 {
 	{
 		using A = bc::SimpleList<uint32_t>;
@@ -512,7 +512,8 @@ TEST( CoreContainerSimpleLinearContainer, SelfAssignment )
 		a.Resize( 10 );
 		a.Reserve( 50 );
 		a.PushBack( {} );
-		for( size_t i = 0; i < 5; i++ ) {
+		for( size_t i = 0; i < 5; i++ )
+		{
 			a.PushBack( SimpleLinearContainer_CtorDtorCounted() );
 			a = a;
 			a.Append( a );
@@ -526,5 +527,5 @@ TEST( CoreContainerSimpleLinearContainer, SelfAssignment )
 
 
 
-} // simple_list
 } // containers
+} // core

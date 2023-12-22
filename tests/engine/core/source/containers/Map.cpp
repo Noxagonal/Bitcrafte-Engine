@@ -5,13 +5,13 @@
 
 
 
+namespace core {
 namespace containers {
-namespace map {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, BasicInit )
+TEST( MapContainer, BasicInit )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -51,7 +51,7 @@ TEST( CoreContainerMap, BasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, InsertEmplaceValue )
+TEST( MapContainer, InsertEmplaceValue )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -143,7 +143,7 @@ public:
 	size_t value = 0;
 };
 
-TEST( CoreContainerMap, InsertEmplaceObject )
+TEST( MapContainer, InsertEmplaceObject )
 {
 	using A = bc::Map<uint32_t, InsertObject>;
 	using P = bc::Pair<uint32_t, InsertObject>;
@@ -219,7 +219,7 @@ TEST( CoreContainerMap, InsertEmplaceObject )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, Iterator )
+TEST( MapContainer, Iterator )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -390,7 +390,7 @@ TEST( CoreContainerMap, Iterator )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, Erase )
+TEST( MapContainer, Erase )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -491,7 +491,7 @@ TEST( CoreContainerMap, Erase )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, FrontBack )
+TEST( MapContainer, FrontBack )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -518,7 +518,7 @@ TEST( CoreContainerMap, FrontBack )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, Append )
+TEST( MapContainer, Append )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -566,7 +566,7 @@ TEST( CoreContainerMap, Append )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, FindKey )
+TEST( MapContainer, FindKey )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -606,7 +606,7 @@ TEST( CoreContainerMap, FindKey )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, IndexOperator )
+TEST( MapContainer, IndexOperator )
 {
 	using A = bc::Map<uint32_t, uint32_t>;
 	using P = bc::Pair<uint32_t, uint32_t>;
@@ -698,7 +698,7 @@ TEST( CoreContainerMap, IndexOperator )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, StructureBasicInit )
+TEST( MapContainer, StructureBasicInit )
 {
 	struct Simple
 	{
@@ -749,7 +749,7 @@ TEST( CoreContainerMap, StructureBasicInit )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, StructureCopy )
+TEST( MapContainer, StructureCopy )
 {
 	struct Simple
 	{
@@ -804,7 +804,7 @@ TEST( CoreContainerMap, StructureCopy )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, StructureMove )
+TEST( MapContainer, StructureMove )
 {
 	struct Simple
 	{
@@ -854,7 +854,7 @@ TEST( CoreContainerMap, StructureMove )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, MoveableOnlyStructure )
+TEST( MapContainer, MoveableOnlyStructure )
 {
 	struct MoveableOnly
 	{
@@ -929,7 +929,7 @@ TEST( CoreContainerMap, MoveableOnlyStructure )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-TEST( CoreContainerMap, CopyableOnlyStructure )
+TEST( MapContainer, CopyableOnlyStructure )
 {
 	struct CopyableOnly
 	{
@@ -1035,7 +1035,7 @@ public:
 };
 int32_t Map_CopyableOnly::copy_counter		= 0;
 
-TEST( CoreContainerMap, Map_CopyableOnlyStructure )
+TEST( MapContainer, Map_CopyableOnlyStructure )
 {
 	Map_CopyableOnly_Control::copy_counter	= 0;
 	Map_CopyableOnly_Control::move_counter	= 0;
@@ -1102,7 +1102,7 @@ public:
 
 int32_t Map_CtorDtorCounted::constructed_counter	= 0;
 
-TEST( CoreContainerMap, CtorDtorCounter )
+TEST( MapContainer, CtorDtorCounter )
 {
 	Map_CtorDtorCounted::constructed_counter	= 0;
 
@@ -1163,7 +1163,7 @@ TEST( CoreContainerMap, CtorDtorCounter )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( CoreContainerMap, SelfAssignment )
+TEST( MapContainer, SelfAssignment )
 {
 	{
 		using A = bc::Map<uint32_t, uint32_t>;
@@ -1208,5 +1208,5 @@ TEST( CoreContainerMap, SelfAssignment )
 
 
 
-} // map
 } // containers
+} // core
