@@ -283,9 +283,9 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	static constexpr Node																			*	TraverseDownLeftmost(
 		Node																						*	from_node
-	) noexcept
+	) BC_CONTAINER_NOEXCEPT
 	{
-		assert( from_node );
+		BC_ContainerAssert( from_node, U"Empty node" );
 		while( from_node->left ) from_node = from_node->left;
 		return from_node;
 	}
@@ -293,9 +293,9 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr Node																					*	TraverseDownRightmost(
 		Node																						*	from_node
-	) noexcept
+	) BC_CONTAINER_NOEXCEPT
 	{
-		assert( from_node );
+		BC_ContainerAssert( from_node, U"Empty node" );
 		while( from_node->right ) from_node = from_node->right;
 		return from_node;
 	}
@@ -303,11 +303,13 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr Node																					*	TraverseUpUntilComingFromRight(
 		Node																						*	from_node
-	) noexcept
+	) BC_CONTAINER_NOEXCEPT
 	{
-		assert( from_node );
-		assert( ( from_node->parent && from_node->parent->left == from_node ) || ( from_node->parent && from_node->parent->right == from_node ) &&
-			"Node parent does not recognize child." );
+		BC_ContainerAssert( from_node, U"Empty node" );
+		BC_ContainerAssert(
+			( from_node->parent && from_node->parent->left == from_node ) || ( from_node->parent && from_node->parent->right == from_node ),
+			U"Node parent does not recognize child."
+		);
 		while( from_node->parent && from_node->parent->left == from_node ) {
 			from_node = from_node->parent;
 		}
@@ -317,11 +319,13 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr Node																					*	TraverseUpUntilComingFromLeft(
 		Node																						*	from_node
-	) noexcept
+	) BC_CONTAINER_NOEXCEPT
 	{
-		assert( from_node );
-		assert( ( from_node->parent && from_node->parent->left == from_node ) || ( from_node->parent && from_node->parent->right == from_node ) &&
-			"Node parent does not recognize child." );
+		BC_ContainerAssert( from_node, U"Empty node" );
+		BC_ContainerAssert(
+			( from_node->parent && from_node->parent->left == from_node ) || ( from_node->parent && from_node->parent->right == from_node ),
+			U"Node parent does not recognize child."
+		);
 		while( from_node->parent && from_node->parent->right == from_node ) {
 			from_node = from_node->parent;
 		}
