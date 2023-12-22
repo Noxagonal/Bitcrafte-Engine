@@ -2,6 +2,7 @@
 #include <core/PreCompiledHeader.hpp>
 #include <core/CoreComponent.hpp>
 #include <core/diagnostic/logger/Logger.hpp>
+#include <core/thread/ThreadPool.hpp>
 
 
 
@@ -20,7 +21,8 @@ bc::CoreComponent::CoreComponent(
 
 	// TODO: Start memory pool.
 
-	logger = MakeUniquePtr<diagnostic::Logger>( create_info.logger_create_info );
+	logger				= MakeUniquePtr<diagnostic::Logger>( create_info.logger_create_info );
+	thread_pool			= MakeUniquePtr<thread::ThreadPool>( create_info.thread_pool_create_info );
 
 	logger->LogVerbose( "Core component started" );
 }
@@ -32,13 +34,22 @@ bc::CoreComponent::~CoreComponent()
 
 	// Cleanup code here...
 
-	global_core = nullptr;
+	thread_pool			= nullptr;
+	logger				= nullptr;
+
+	global_core			= nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::diagnostic::Logger * bc::CoreComponent::GetLogger()
 {
 	return logger.Get();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bc::thread::ThreadPool * bc::CoreComponent::GetThreadPool()
+{
+	return thread_pool.Get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
