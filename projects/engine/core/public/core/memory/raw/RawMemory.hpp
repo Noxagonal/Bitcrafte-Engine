@@ -58,11 +58,11 @@ inline size_t											CalculateSystemMemoryAllocationInfoInfoChecksum(
 	// Checksum calculation is disabled for shipping builds, errors should have been caught in development builds.
 
 	auto bytes = reinterpret_cast<const uint8_t*>( &allocation_info );
-	auto size = sizeof( SystemMemoryAllocationInfo ) - sizeof( uintptr_t );
-	size_t checksum = 0;
+	auto size = sizeof( SystemMemoryAllocationInfo ) - sizeof( size_t );
+	size_t checksum = 0xDEADBEEFDEADBEEF;
 	for( size_t i = 0; i < size; ++i )
 	{
-		checksum ^= bytes[ i ];
+		checksum = ( checksum << 5 ) + ( checksum + static_cast<size_t>( bytes[ i ] ) );
 	}
 	return checksum;
 
