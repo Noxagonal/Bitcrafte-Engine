@@ -26,7 +26,7 @@ struct LoggerCreateInfo
 	/// @note
 	/// Setting report severity level higher than CRITICAL_ERROR is ignored, critical errors will always be reported, even in
 	/// shipping builds.
-	LogReportSeverity			report_severity					= LogReportSeverity::VERBOSE;
+	LogReportSeverity			minimum_report_severity					= LogReportSeverity::VERBOSE;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -45,7 +45,7 @@ struct LoggerCreateInfo
 	/// @note
 	/// If printing to system console, and display severity is updated, the already printed messages in system console are not
 	/// updated, only new logs in the system console follow the new display severity.
-	LogReportSeverity			display_severity				= LogReportSeverity::WARNING;
+	LogReportSeverity			minimum_display_severity				= LogReportSeverity::WARNING;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -57,7 +57,14 @@ struct LoggerCreateInfo
 	/// @note
 	/// Default: @c true
 	///
-	bool						print_to_system_console			= true;
+	bool						print_to_system_console					= true;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Disable logging altogether.
+	///
+	/// Useful mostly when running tests as it keeps the console clean and takes a whole equation out of the test path.
+	bool						disabled								= false;
 };
 
 
