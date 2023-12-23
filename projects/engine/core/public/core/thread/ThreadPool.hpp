@@ -6,7 +6,7 @@
 #include <core/thread/ThreadDescription.hpp>
 #include <core/thread/Task.hpp>
 
-#include <core/utility/LambdaConcepts.hpp>
+#include <core/utility/concepts/LambdaConcepts.hpp>
 
 #include <core/containers/UniquePtr.hpp>
 #include <core/containers/List.hpp>

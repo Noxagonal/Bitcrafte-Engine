@@ -3,7 +3,7 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/diagnostic/assertion/HardAssert.hpp>
 #include <core/memory/raw/RawMemory.hpp>
-#include <core/utility/ContainerConcepts.hpp>
+#include <core/utility/concepts/ContainerConcepts.hpp>
 
 #include <cstdint>
 
