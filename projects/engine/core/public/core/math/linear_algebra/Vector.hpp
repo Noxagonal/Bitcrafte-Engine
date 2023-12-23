@@ -3,6 +3,7 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/utility/concepts/ValueConcepts.hpp>
 #include <core/utility/math/SmallValues.hpp>
+#include <core/utility/math/FundamentalComparison.hpp>
 
 #include <cstdint>
 #include <type_traits>
@@ -35,6 +36,14 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase() noexcept = default;
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr VectorBase(
+		ValueType															initial_value
+	) noexcept :
+		x( initial_value ),
+		y( initial_value )
+	{}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase(
@@ -184,6 +193,36 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr bool															operator==(
+		VectorBase															other
+	) const
+	{
+		if constexpr( utility::FloatingPointType<ValueType> )
+		{
+			return utility::IsFloatEqual( x, other.x ) && utility::IsFloatEqual( y, other.y );
+		}
+		else
+		{
+			return x == other.x && y == other.y;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr bool															operator!=(
+		VectorBase															other
+	) const
+	{
+		if constexpr( utility::FloatingPointType<ValueType> )
+		{
+			return !utility::IsFloatEqual( x, other.x ) || !utility::IsFloatEqual( y, other.y );
+		}
+		else
+		{
+			return x != other.x || y != other.y;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType														Magnitude() const noexcept
 	{
 		return std::sqrt(
@@ -239,6 +278,15 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase() noexcept = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr VectorBase(
+		ValueType															initial_value
+	) noexcept :
+		x( initial_value ),
+		y( initial_value ),
+		z( initial_value )
+	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase(
@@ -396,6 +444,36 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr bool															operator==(
+		VectorBase															other
+		) const
+	{
+		if constexpr( utility::FloatingPointType<ValueType> )
+		{
+			return utility::IsFloatEqual( x, other.x ) && utility::IsFloatEqual( y, other.y ) && utility::IsFloatEqual( z, other.z );
+		}
+		else
+		{
+			return x == other.x && y == other.y && z == other.z;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr bool															operator!=(
+		VectorBase															other
+		) const
+	{
+		if constexpr( utility::FloatingPointType<ValueType> )
+		{
+			return !utility::IsFloatEqual( x, other.x ) || !utility::IsFloatEqual( y, other.y ) || !utility::IsFloatEqual( z, other.z );
+		}
+		else
+		{
+			return x != other.x || y != other.y || z != other.z;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType														Magnitude() const noexcept
 	{
 		return std::sqrt(
@@ -460,6 +538,16 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase() noexcept = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr VectorBase(
+		ValueType															initial_value
+	) noexcept :
+		x( initial_value ),
+		y( initial_value ),
+		z( initial_value ),
+		w( initial_value )
+	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase(
@@ -622,6 +710,36 @@ public:
 		VectorBase result = *this;
 		result /= scalar;
 		return result;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr bool															operator==(
+		VectorBase															other
+		) const
+	{
+		if constexpr( utility::FloatingPointType<ValueType> )
+		{
+			return utility::IsFloatEqual( x, other.x ) && utility::IsFloatEqual( y, other.y ) && utility::IsFloatEqual( z, other.z ) && utility::IsFloatEqual( w, other.w );
+		}
+		else
+		{
+			return x == other.x && y == other.y && z == other.z && w == other.w;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr bool															operator!=(
+		VectorBase															other
+		) const
+	{
+		if constexpr( utility::FloatingPointType<ValueType> )
+		{
+			return !utility::IsFloatEqual( x, other.x ) || !utility::IsFloatEqual( y, other.y ) || !utility::IsFloatEqual( z, other.z ) || !utility::IsFloatEqual( w, other.w );
+		}
+		else
+		{
+			return x != other.x || y != other.y || z != other.z || w != other.w;
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

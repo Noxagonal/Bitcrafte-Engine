@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <core/math/linear_algebra/Vector.hpp>
+#include <core/utility/math/VectorComparison.hpp>
 
 
 
@@ -53,6 +54,138 @@ TEST( Vector, BasicInitialize )
 		EXPECT_DOUBLE_EQ( a.y, 2.0 );
 		EXPECT_DOUBLE_EQ( a.z, 3.0 );
 		EXPECT_DOUBLE_EQ( a.w, 4.0 );
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( Vector, Comparisons )
+{
+	using A2 = bc::math::Vector2d;
+	using A3 = bc::math::Vector3d;
+	using A4 = bc::math::Vector4d;
+
+	{
+		A2 a {};
+		A3 b {};
+		A4 c {};
+		EXPECT_EQ( a, a );
+		EXPECT_EQ( b, b );
+		EXPECT_EQ( c, c );
+	}
+	{
+		A2 a1 {};
+		A3 b1 {};
+		A4 c1 {};
+		A2 a2 {};
+		A3 b2 {};
+		A4 c2 {};
+		EXPECT_EQ( a1, a2 );
+		EXPECT_EQ( b1, b2 );
+		EXPECT_EQ( c1, c2 );
+	}
+	{
+		A2 a1;
+		A3 b1;
+		A4 c1;
+		A2 a2 {};
+		A3 b2 {};
+		A4 c2 {};
+		EXPECT_EQ( a1, a2 );
+		EXPECT_EQ( b1, b2 );
+		EXPECT_EQ( c1, c2 );
+	}
+	{
+		A2 a { 1.0, 1.0 };
+		A3 b { 1.0, 1.0, 1.0 };
+		A4 c { 1.0, 1.0, 1.0, 1.0 };
+		EXPECT_EQ( a, a );
+		EXPECT_EQ( b, b );
+		EXPECT_EQ( c, c );
+	}
+	{
+		A2 a1;
+		A3 b1;
+		A4 c1;
+		A2 a2 { 1.0, 1.0 };
+		A3 b2 { 1.0, 1.0, 1.0 };
+		A4 c2 { 1.0, 1.0, 1.0, 1.0 };
+		EXPECT_NE( a1, a2 );
+		EXPECT_NE( b1, b2 );
+		EXPECT_NE( c1, c2 );
+	}
+	{
+		A2 a1 {};
+		A3 b1 {};
+		A4 c1 {};
+		A2 a2 { 1.0, 1.0 };
+		A3 b2 { 1.0, 1.0, 1.0 };
+		A4 c2 { 1.0, 1.0, 1.0, 1.0 };
+		EXPECT_NE( a1, a2 );
+		EXPECT_NE( b1, b2 );
+		EXPECT_NE( c1, c2 );
+	}
+	{
+		A2 a1 { 1.0 };
+		A3 b1 { 1.0 };
+		A4 c1 { 1.0 };
+		A2 a2 { 1.0, 1.0 };
+		A3 b2 { 1.0, 1.0, 1.0 };
+		A4 c2 { 1.0, 1.0, 1.0, 1.0 };
+		EXPECT_EQ( a1, a2 );
+		EXPECT_EQ( b1, b2 );
+		EXPECT_EQ( c1, c2 );
+	}
+	{
+		A2 a1;
+		A3 b1;
+		A4 c1;
+		A2 a2 { 0.0 };
+		A3 b2 { 0.0 };
+		A4 c2 { 0.0 };
+		EXPECT_EQ( a1, a2 );
+		EXPECT_EQ( b1, b2 );
+		EXPECT_EQ( c1, c2 );
+	}
+	{
+		A2 am4 { -2.0 };
+		A2 am3 { -1.5 };
+		A2 am2 { -1.0 };
+		A2 am1 { -0.5 };
+		A2 a0 { 0.0 };
+		A2 ap1 { 0.5 };
+		A2 ap2 { 1.0 };
+		A2 ap3 { 1.5 };
+		A2 ap4 { 2 };
+
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am4, 1.5 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am3, 1.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am2, 1.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am1, 1.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, a0,  1.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap1, 1.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap2, 1.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap3, 1.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap4, 1.5 ), false );
+
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am4, 1.0 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am3, 1.0 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am2, 1.0 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am1, 1.0 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, a0,  1.0 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap1, 1.0 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap2, 1.0 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap3, 1.0 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap4, 1.0 ), false );
+
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am4, 0.5 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am3, 0.5 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am2, 0.5 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am1, 0.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, a0,  0.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap1, 0.5 ), true );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap2, 0.5 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap3, 0.5 ), false );
+		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap4, 0.5 ), false );
 	}
 };
 
