@@ -286,7 +286,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::FundamentalType ValueType>
-class alignas( sizeof( ValueType ) * 4 ) VectorBase<3, ValueType>
+class VectorBase<3, ValueType>
 {
 public:
 
@@ -888,9 +888,9 @@ static_assert( sizeof( Vector2f ) == sizeof( float ) * 2 );
 static_assert( sizeof( Vector2d ) == sizeof( double ) * 2 );
 static_assert( sizeof( Vector2i ) == sizeof( int64_t ) * 2 );
 
-static_assert( sizeof( Vector3f ) == sizeof( float ) * 4 );
-static_assert( sizeof( Vector3d ) == sizeof( double ) * 4 );
-static_assert( sizeof( Vector3i ) == sizeof( int64_t ) * 4 );
+static_assert( sizeof( Vector3f ) == sizeof( float ) * 3 );
+static_assert( sizeof( Vector3d ) == sizeof( double ) * 3 );
+static_assert( sizeof( Vector3i ) == sizeof( int64_t ) * 3 );
 
 static_assert( sizeof( Vector4f ) == sizeof( float ) * 4 );
 static_assert( sizeof( Vector4d ) == sizeof( double ) * 4 );
@@ -900,9 +900,9 @@ static_assert( alignof( Vector2f ) == alignof( float ) * 2 );
 static_assert( alignof( Vector2d ) == alignof( double ) * 2 );
 static_assert( alignof( Vector2i ) == alignof( int64_t ) * 2 );
 
-static_assert( alignof( Vector3f ) == alignof( float ) * 4 );
-static_assert( alignof( Vector3d ) == alignof( double ) * 4 );
-static_assert( alignof( Vector3i ) == alignof( int64_t ) * 4 );
+static_assert( alignof( Vector3f ) == alignof( float ) );
+static_assert( alignof( Vector3d ) == alignof( double ) );
+static_assert( alignof( Vector3i ) == alignof( int64_t ) );
 
 static_assert( alignof( Vector4f ) == alignof( float ) * 4 );
 static_assert( alignof( Vector4d ) == alignof( double ) * 4 );
