@@ -35,7 +35,7 @@ constexpr bool							AreValuesWithinRange(
 	ValueType							v1,
 	ValueType							v2,
 	ValueType							range
-)
+) noexcept
 {
 	return v2 <= v1 + range && v2 >= v1 - range;
 }
@@ -61,7 +61,7 @@ template<utility::FloatingPointType		ValueType>
 constexpr bool							IsFloatEqual(
 	ValueType							v1,
 	ValueType							v2
-)
+) noexcept
 {
 	return AreValuesWithinRange( v1, v2, GetSmallValue<ValueType>() );
 }
