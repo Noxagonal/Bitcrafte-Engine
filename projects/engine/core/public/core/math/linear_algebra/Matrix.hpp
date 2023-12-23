@@ -100,7 +100,7 @@ public:
 		const MatrixBase												&	other
 	) noexcept
 	{
-		*this = operator*( other );
+		*this = *this * other;
 		return *this;
 	}
 
@@ -109,13 +109,11 @@ public:
 		const MatrixBase												&	other
 	) const noexcept
 	{
-		MatrixBase r;
 		auto & o = other;
-
-		r.m11	= m11 * o.m11 + m12 * o.m21;		r.m12	= m11 * o.m12 + m12 * o.m22;
-		r.m21	= m21 * o.m11 + m22 * o.m21;		r.m22	= m21 * o.m12 + m22 * o.m21;
-
-		return r;
+		return MatrixBase {
+			m11 * o.m11 + m21 * o.m12,		m12 * o.m11 + m22 * o.m12,
+			m11 * o.m21 + m21 * o.m22,		m12 * o.m21 + m22 * o.m22
+		};
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,13 +121,11 @@ public:
 		const VectorBase<MatrixDimensions, ValueType>					&	other
 	) const noexcept
 	{
-		VectorBase<MatrixDimensions, ValueType> r;
 		auto & o = other;
-
-		r.x	= m11 * o.x + m12 * o.y;
-		r.y	= m21 * o.x + m22 * o.y;
-
-		return r;
+		return VectorBase<MatrixDimensions, ValueType> {
+			m11 * o.x + m12 * o.y,
+			m21 * o.x + m22 * o.y
+		};
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
