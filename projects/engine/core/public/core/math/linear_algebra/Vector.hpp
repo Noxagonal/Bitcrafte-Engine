@@ -4,6 +4,7 @@
 #include <core/utility/concepts/ValueConcepts.hpp>
 #include <core/utility/math/SmallValues.hpp>
 #include <core/utility/math/FundamentalComparison.hpp>
+#include <core/diagnostic/exception/Exception.hpp>
 
 #include <cstdint>
 #include <type_traits>
@@ -220,6 +221,26 @@ public:
 		{
 			return x != other.x || y != other.y;
 		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr const ValueType											&	operator[](
+		size_t																index
+	) const
+	{
+		if( index == 0 ) return x;
+		if( index == 1 ) return y;
+		diagnostic::Throw( U"Index out of range" );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ValueType													&	operator[](
+		size_t																index
+	)
+	{
+		if( index == 0 ) return x;
+		if( index == 1 ) return y;
+		diagnostic::Throw( U"Index out of range" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -471,6 +492,28 @@ public:
 		{
 			return x != other.x || y != other.y || z != other.z;
 		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr const ValueType											&	operator[](
+		size_t																index
+	) const
+	{
+		if( index == 0 ) return x;
+		if( index == 1 ) return y;
+		if( index == 2 ) return z;
+		diagnostic::Throw( U"Index out of range" );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ValueType													&	operator[](
+		size_t																index
+	)
+	{
+		if( index == 0 ) return x;
+		if( index == 1 ) return y;
+		if( index == 2 ) return z;
+		diagnostic::Throw( U"Index out of range" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -740,6 +783,30 @@ public:
 		{
 			return x != other.x || y != other.y || z != other.z || w != other.w;
 		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr const ValueType											&	operator[](
+		size_t																index
+	) const
+	{
+		if( index == 0 ) return x;
+		if( index == 1 ) return y;
+		if( index == 2 ) return z;
+		if( index == 3 ) return w;
+		diagnostic::Throw( U"Index out of range" );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ValueType													&	operator[](
+		size_t																index
+	)
+	{
+		if( index == 0 ) return x;
+		if( index == 1 ) return y;
+		if( index == 2 ) return z;
+		if( index == 3 ) return w;
+		diagnostic::Throw( U"Index out of range" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

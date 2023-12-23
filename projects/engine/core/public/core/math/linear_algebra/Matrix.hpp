@@ -149,6 +149,26 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr const VectorBase<MatrixDimensions, ValueType>				&	operator[](
+		size_t																index
+	) const
+	{
+		if( index == 0 ) return column_1;
+		if( index == 1 ) return column_2;
+		diagnostic::Throw( U"Index out of range" );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr VectorBase<MatrixDimensions, ValueType>					&	operator[](
+		size_t																index
+	)
+	{
+		if( index == 0 ) return column_1;
+		if( index == 1 ) return column_2;
+		diagnostic::Throw( U"Index out of range" );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	static consteval MatrixBase												Identity() noexcept
 	{
 		return MakeIdentity( static_cast<ValueType>( 1 ) );
