@@ -2,8 +2,13 @@
 # Build dir
 build
 out
+
+# IDE related
 .vs
 .vscode
+
+# Temporaries
+temp
 
 # Prerequisites
 *.d
