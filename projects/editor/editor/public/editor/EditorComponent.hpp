@@ -1,12 +1,18 @@
 #pragma once
 
-#include <core/CoreComponent.hpp>
+#include <build_configuration/BuildConfigurationComponent.hpp>
+
+
 
 #include <memory>
 
 
 
 namespace bc {
+namespace core { class CoreComponent; }
+namespace engine { class EngineComponent; }
+namespace window { class Window; }
+
 namespace editor {
 
 
@@ -29,6 +35,12 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::unique_ptr<CoreComponent>								core;
+
+	UniquePtr<bc::engine::EngineComponent>						engine;
+
+	UniquePtr<window::Window>									main_window;
+
+	bool														should_close				= false;
 };
 
 

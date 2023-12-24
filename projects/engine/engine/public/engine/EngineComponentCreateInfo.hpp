@@ -1,0 +1,20 @@
+#pragma once
+
+#include <build_configuration/BuildConfigurationComponent.hpp>
+
+
+
+namespace bc {
+namespace engine {
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct EngineComponentCreateInfo
+{
+};
+
+
+
+} // engine
+} // bc

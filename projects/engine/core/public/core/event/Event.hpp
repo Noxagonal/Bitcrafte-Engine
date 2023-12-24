@@ -41,9 +41,9 @@ namespace bc {
 /// @note
 /// Callbacks are called before propagating the signal to listeners.
 /// 
-/// @tparam ...Args
-///	Signal parameter types. Can be "<>" if no parameters are needed.
-template<typename ...Args>
+/// @tparam ...EventSignalTypePack
+///	Signal parameter types. Can be "<>" if no parameters are passed through signals.
+template<typename ...EventSignalTypePack>
 class Event
 {
 public:
@@ -53,12 +53,12 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Event(
-		const Event<Args...>							&	other
+		const Event<EventSignalTypePack...>						&	other
 	) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Event(
-		Event<Args...>									&&	other
+		Event<EventSignalTypePack...>							&&	other
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,13 +73,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Event												&	operator=(
-		const Event<Args...>							&	other
+	Event														&	operator=(
+		const Event<EventSignalTypePack...>						&	other
 	) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Event												&	operator=(
-		Event<Args...>									&&	other
+	Event														&	operator=(
+		Event<EventSignalTypePack...>							&&	other
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,16 +88,16 @@ public:
 	/// 
 	/// @param event
 	///	Event to signal when this event is signalled.
-	void													RegisterObserver(
-		Event<Args...>									*	event
+	void															RegisterObserver(
+		Event<EventSignalTypePack...>							*	event
 	)
 	{
 		BAssert( listeners.Find( event ) == listeners.end(), "tried registering same observer twice to the same event" );
 		#if BITCRAFTE_DEVELOPMENT_BUILD
 		// Returns true if this is found in any of the other events.
-		auto FindCircularDependencies = []( Event<Args...> * self, Event<Args...> * event ) -> bool
+		auto FindCircularDependencies = []( Event<EventSignalTypePack...> * self, Event<EventSignalTypePack...> * event ) -> bool
 		{
-			auto recursive = [self]( const auto & recursive_func, Event<Args...> * event ) -> bool
+			auto recursive = [self]( const auto & recursive_func, Event<EventSignalTypePack...> * event ) -> bool
 			{
 				for( auto o : event->listeners ) {
 					if( o == self ) return true;
@@ -107,9 +107,9 @@ public:
 			};
 			return recursive( recursive, event );
 		};
-		auto FindDoubleDependencies = []( Event<Args...> * self, Event<Args...> * event ) -> bool
+		auto FindDoubleDependencies = []( Event<EventSignalTypePack...> * self, Event<EventSignalTypePack...> * event ) -> bool
 		{
-			auto recursive = [self]( const auto & recursive_func, Event<Args...> * event ) -> bool
+			auto recursive = [self]( const auto & recursive_func, Event<EventSignalTypePack...> * event ) -> bool
 			{
 				for( auto o : event->listening_to ) {
 					if( o == self ) return true;
@@ -143,8 +143,8 @@ public:
 	/// 
 	/// @return
 	/// returns callback id which can be used to unregister this callback.
-	uint64_t												RegisterCallback(
-		std::function<void( Args... )>						callback
+	uint64_t														RegisterCallback(
+		std::function<void( EventSignalTypePack... )>				callback
 	)
 	{
 		++callback_counter;
@@ -158,8 +158,8 @@ public:
 	/// 
 	/// @param event
 	///	Previously registered event.
-	void													UnRegisterObserver(
-		Event<Args...>									*	event
+	void															UnRegisterObserver(
+		Event<EventSignalTypePack...>							*	event
 	)
 	{
 		auto it = listeners.Find( event );
@@ -175,8 +175,8 @@ public:
 	/// 
 	/// @param callback_id
 	///	Previously registered id you got from Event::RegisterCallback().
-	void													UnRegisterCallback(
-		uint64_t											callback_id
+	void															UnRegisterCallback(
+		uint64_t													callback_id
 	)
 	{
 		auto it = callbacks.Find( callback_id );
@@ -191,18 +191,22 @@ public:
 	///
 	///	Immediately invokes all registered callbacks and signals all listening observer events. Order is callbacks in order they
 	/// were added and then listeners in order they were added.
-	/// 
-	/// @param ...args
+	///
+	/// @tparam ...SignalTypePack
+	/// Type pack of input types to signal.
+	///
+	/// @param ...signal_arguments
 	///	Arguments passed along to all listeners and callbacks as parameters.
-	void													Signal(
-		Args											&&	...args
+	template<typename												...SignalTypePack>
+	void															Signal(
+		SignalTypePack											&&	...signal_arguments
 	)
 	{
 		for( auto & c : callbacks ) {
-			c.second( std::forward<Args>( args )... );
+			c.second( std::forward<SignalTypePack>( signal_arguments )... );
 		}
 		for( auto o : listeners ) {
-			o->Signal( std::forward<Args>( args )... );
+			o->Signal( std::forward<SignalTypePack>( signal_arguments )... );
 		}
 	}
 
@@ -212,7 +216,7 @@ public:
 	///
 	/// @return
 	/// Number of listeners
-	size_t													GetObserverCount()
+	size_t															GetObserverCount()
 	{
 		return listeners.Size();
 	}
@@ -223,7 +227,7 @@ public:
 	///
 	/// @return
 	/// Number of listening_to events.
-	size_t													GetObservingCount()
+	size_t															GetObservingCount()
 	{
 		return listening_to.Size();
 	}
@@ -231,10 +235,10 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<Event<Args...>*>									listeners;
-	List<Event<Args...>*>									listening_to;
-	Map<uint64_t, std::function<void( Args... )>>			callbacks;
-	uint64_t												callback_counter		= 0;
+	List<Event<EventSignalTypePack...>*>							listeners;
+	List<Event<EventSignalTypePack...>*>							listening_to;
+	Map<uint64_t, std::function<void( EventSignalTypePack... )>>	callbacks;
+	uint64_t														callback_counter		= 0;
 };
 
 
