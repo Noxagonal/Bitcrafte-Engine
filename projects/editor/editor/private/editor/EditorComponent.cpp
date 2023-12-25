@@ -34,18 +34,27 @@ public:
 bc::editor::EditorComponent::EditorComponent()
 {
 	// TODO: All of this is temporary, create info and its settings should be thought out properly first.
+
+
+	// Create core.
 	auto core_create_info = CoreComponentCreateInfo {};
 	core_create_info.logger_create_info.minimum_report_severity			= bc::diagnostic::LogReportSeverity::VERBOSE;
 	core_create_info.logger_create_info.minimum_display_severity		= bc::diagnostic::LogReportSeverity::VERBOSE;
 	core_create_info.logger_create_info.print_to_system_console	= true;
-
 	core = std::make_unique<CoreComponent>( core_create_info );
+
+
+
+	// Create threads.
 	auto thread_pool = core->GetThreadPool();
 	thread_pool->AddThread<StandardEditorThread>();
 	thread_pool->AddThread<StandardEditorThread>();
 	thread_pool->AddThread<StandardEditorThread>();
 	thread_pool->AddThread<StandardEditorThread>();
 
+
+
+	// Create engine.
 	auto engine_create_info = bc::engine::EngineComponentCreateInfo {};
 	// TEMP: Selecting vulkan for now.
 	engine_create_info.rhi_selection = bc::engine::EngineComponentCreateInfoRHISelection::VULKAN;
@@ -54,6 +63,9 @@ bc::editor::EditorComponent::EditorComponent()
 	engine_create_info.rhi_create_info.minimum_debug_level = rhi::RHIDebugLevel::WARNING;
 	engine = MakeUniquePtr<bc::engine::EngineComponent>( engine_create_info );
 
+
+
+	// Create main window.
 	auto window_create_info = bc::window::WindowCreateInfo {};
 	main_window = engine->GetWindowComponent()->CreateWindow( window_create_info );
 
