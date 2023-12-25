@@ -60,8 +60,9 @@ VkBool32 VKAPI_PTR VulkanDebugUtilsMessengerCallback(
 		break;
 	}
 
-	auto print_report = bc::diagnostic::MakePrintRecord_Argument( U"Vulkan Validation", message_type );
-	print_report += bc::diagnostic::MakePrintRecord( bc::conversion::ToUTF32( bc::TextView( pCallbackData->pMessage ) ) );
+	auto print_report = bc::diagnostic::MakePrintRecord_Argument( U"Vulkan debug message", message_type );
+	print_report += bc::diagnostic::MakePrintRecord( U"\n" );
+	print_report += bc::diagnostic::MakePrintRecord( bc::conversion::ToUTF32( bc::TextView( pCallbackData->pMessage ) ) ).AddIndent();
 	bc::GetCore()->GetLogger()->Log(
 		report_severity,
 		print_report
