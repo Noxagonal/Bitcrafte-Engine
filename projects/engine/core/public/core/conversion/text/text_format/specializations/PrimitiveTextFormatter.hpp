@@ -30,8 +30,8 @@ class TextFormatter<OutTextContainerType, ValueTextContainerType>
 {
 	using OutTextContainerFullType = typename OutTextContainerType::ThisFullType;
 	using OutTextContainerConstViewType = typename OutTextContainerType::template ThisViewType<true>;
-	using OutTextCharacterType = typename OutTextContainerType::CharacterType;
-	using ValueTextCharacterType = typename ValueTextContainerType::CharacterType;
+	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
+	using ValueTextCharacterType = typename ValueTextContainerType::ContainedCharacterType;
 
 public:
 

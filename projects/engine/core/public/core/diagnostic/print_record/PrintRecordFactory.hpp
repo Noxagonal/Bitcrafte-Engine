@@ -38,6 +38,26 @@ inline PrintRecord											MakePrintRecord(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<utility::TextContainer								ArgumentTextType>
+PrintRecord													MakePrintRecord(
+	ArgumentTextType										text,
+	PrintRecordTheme										theme
+) requires ( !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleTextView32> && !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleText32> )
+{
+	static_assert( !std::is_same_v<ArgumentTextType, SimpleTextView32> );
+	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), theme );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<utility::TextContainer								ArgumentTextType>
+PrintRecord													MakePrintRecord(
+	ArgumentTextType										text
+) requires ( !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleTextView32> && !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleText32> )
+{
+	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), PrintRecordTheme::DEFAULT );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
 	typename												ArgumentTextType,
 	typename												ArgumentValueType

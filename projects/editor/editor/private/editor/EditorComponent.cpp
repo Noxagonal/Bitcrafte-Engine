@@ -49,6 +49,8 @@ bc::editor::EditorComponent::EditorComponent()
 	auto engine_create_info = bc::engine::EngineComponentCreateInfo {};
 	// TEMP: Selecting vulkan for now.
 	engine_create_info.rhi_selection = bc::engine::EngineComponentCreateInfoRHISelection::VULKAN;
+	// TEMP: Enabling debugging here for now.
+	engine_create_info.rhi_create_info.enable_rhi_debug = true;
 	engine = MakeUniquePtr<bc::engine::EngineComponent>( engine_create_info );
 
 	auto window_create_info = bc::window::WindowCreateInfo {};
@@ -64,8 +66,9 @@ bc::editor::EditorComponent::EditorComponent()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::editor::EditorComponent::~EditorComponent()
 {
-	main_window = nullptr;
-	core = nullptr;
+	main_window		= nullptr;
+	engine			= nullptr;
+	core			= nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

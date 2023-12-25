@@ -10,6 +10,8 @@ void bc::memory::internal::FreeRawMemory_Runtime(
 	void			*	location
 ) noexcept
 {
+	if( location == nullptr ) return;
+
 	auto allocation_info = GetSystemMemoryAllocationInfoFromRawPointer( location );
 	BHardAssert( allocation_info, "Couldn't free runtime memory, memory pointer was not allocated from bc::memory utilities" );
 

@@ -277,6 +277,12 @@ private:
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Linear container similar to std::vector.
+///
+/// @tparam ValueType
+/// Type of the contained element.
 template<BC_CONTAINER_VALUE_TYPENAME ValueType>
 class BC_CONTAINER_NAME( List ) :
 	public container_bases::BC_CONTAINER_NAME( LinearContainerBase )<ValueType>

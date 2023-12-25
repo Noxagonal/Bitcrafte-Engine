@@ -964,10 +964,9 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Add value to the front of this container.
+	/// Fills the front of this container with some value, shifts existing values towards the back.
 	///
-	///	Shifts everything else towards the back by one index. This increments the indices of every value already in this
-	/// container.
+	///	This increments the indices of every value already in this container.
 	/// 
 	/// @param value
 	/// Value to add to the front.
@@ -992,7 +991,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Add value to the back of this container a specific number of times.
+	/// Fills the back of this container with some value, container is extended to accommodate the new capacity.
 	/// 
 	/// @param value
 	/// Value to add to the back.
