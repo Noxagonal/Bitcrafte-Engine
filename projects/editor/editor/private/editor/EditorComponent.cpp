@@ -50,7 +50,8 @@ bc::editor::EditorComponent::EditorComponent()
 	// TEMP: Selecting vulkan for now.
 	engine_create_info.rhi_selection = bc::engine::EngineComponentCreateInfoRHISelection::VULKAN;
 	// TEMP: Enabling debugging here for now.
-	engine_create_info.rhi_create_info.enable_rhi_debug = true;
+	engine_create_info.rhi_create_info.enable_debug = true;
+	engine_create_info.rhi_create_info.minimum_debug_level = rhi::RHIDebugLevel::WARNING;
 	engine = MakeUniquePtr<bc::engine::EngineComponent>( engine_create_info );
 
 	auto window_create_info = bc::window::WindowCreateInfo {};
