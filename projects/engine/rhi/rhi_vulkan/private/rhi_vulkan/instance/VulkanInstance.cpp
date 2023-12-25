@@ -81,19 +81,20 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	enabled_extension_names += GetPlatformSpecificInstanceExtensionNames();
 
 	// Vulkan validation
-	if( vulkan_implementation.IsDebugEnabled() )
+	if( vulkan_implementation.GetDebugSettings().debug_enabled )
 	{
 		enabled_layer_names.PushBack( "VK_LAYER_KHRONOS_validation" );
 		enabled_extension_names.PushBack( VK_EXT_DEBUG_UTILS_EXTENSION_NAME );
 	}
 
 	// Setup debug utils messenger
-	// TODO: Give an option to adjust these somewhere.
+
+	auto minimum_debug_level_value = std::to_underlying( vulkan_implementation.GetDebugSettings().minimum_debug_level );
 	auto debug_utils_message_severity = VkDebugUtilsMessageSeverityFlagsEXT {};
-	debug_utils_message_severity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
-	debug_utils_message_severity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
-	debug_utils_message_severity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
-	debug_utils_message_severity |= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	debug_utils_message_severity |= std::to_underlying( RHIDebugLevel::VERBOSE )	>= minimum_debug_level_value ? VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT : 0;
+	debug_utils_message_severity |= std::to_underlying( RHIDebugLevel::INFO )		>= minimum_debug_level_value ? VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT : 0;
+	debug_utils_message_severity |= std::to_underlying( RHIDebugLevel::WARNING )	>= minimum_debug_level_value ? VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT : 0;
+	debug_utils_message_severity |= std::to_underlying( RHIDebugLevel::ERROR )		>= minimum_debug_level_value ? VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT : 0;
 
 	// TODO: Give an option to adjust these somewhere.
 	auto debug_utils_message_type = VkDebugUtilsMessageTypeFlagsEXT {};
@@ -157,7 +158,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 
 	auto create_info = VkInstanceCreateInfo {};
 	create_info.sType						= VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	create_info.pNext						= vulkan_implementation.IsDebugEnabled() ? &validation_features : nullptr;
+	create_info.pNext						= vulkan_implementation.GetDebugSettings().debug_enabled ? &validation_features : nullptr;
 	create_info.flags						= 0;
 	create_info.pApplicationInfo			= &application_info;
 	create_info.enabledLayerCount			= uint32_t( enabled_layer_names_temp.Size() );

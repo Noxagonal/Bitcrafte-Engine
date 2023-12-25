@@ -18,10 +18,27 @@ class VulkanInstance;
 class VulkanImplementation
 {
 public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct ApplicationInfo
 	{
+		ApplicationInfo(
+			const RHIComponentCreateInfo					&	create_info
+		);
+
 		Text32													application_name					= {};
 		utility::Version										application_version					= {};
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	struct DebugSettings
+	{
+		DebugSettings(
+			const RHIComponentCreateInfo					&	create_info
+		);
+
+		bool													debug_enabled						= false;
+		RHIDebugLevel											minimum_debug_level					= RHIDebugLevel::VERBOSE;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,17 +53,27 @@ public:
 	inline const VkAllocationCallbacks						*	GetMainThreadAllocationCallbacks() { return &main_thread_allocation_callbacks; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline bool													IsDebugEnabled() { return debug_enabled; }
+	inline const ApplicationInfo							&	GetApplicationInfo() { return application_info; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const ApplicationInfo							&	GetApplicationInfo() { return application_info; }
+	inline const DebugSettings								&	GetDebugSettings() { return debug_settings; }
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	static ApplicationInfo										CreateApplicationInfo(
+		const RHIComponentCreateInfo						&	create_info
+	);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	static DebugSettings										CreateDebugSettings(
+		const RHIComponentCreateInfo						&	create_info
+	);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VkAllocationCallbacks										main_thread_allocation_callbacks;
 	ApplicationInfo												application_info;
-	bool														debug_enabled						= false;
+	DebugSettings												debug_settings;
 
 	UniquePtr<VulkanInstance>									vulkan_instance;
 };

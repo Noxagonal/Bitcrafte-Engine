@@ -55,14 +55,32 @@ void VKAPI_PTR VulkanMemoryInternalFreeNotification(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::VulkanImplementation::VulkanImplementation(
+bc::rhi::VulkanImplementation::ApplicationInfo::ApplicationInfo(
 	const RHIComponentCreateInfo & create_info
 )
 {
-	application_info.application_name			= create_info.application_name;
-	application_info.application_version		= create_info.application_version;
-	debug_enabled								= create_info.enable_rhi_debug;
+	application_name			= create_info.application_name;
+	application_version			= create_info.application_version;
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bc::rhi::VulkanImplementation::DebugSettings::DebugSettings(
+	const RHIComponentCreateInfo & create_info
+)
+{
+	debug_enabled				= create_info.enable_debug;
+	minimum_debug_level			= create_info.minimum_debug_level;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bc::rhi::VulkanImplementation::VulkanImplementation(
+	const RHIComponentCreateInfo & create_info
+) :
+	application_info( create_info ),
+	debug_settings( create_info )
+{
 	main_thread_allocation_callbacks.pUserData				= this;
 	main_thread_allocation_callbacks.pfnAllocation			= VulkanMemoryAllocationFunction;
 	main_thread_allocation_callbacks.pfnReallocation		= VulkanMemoryReallocationFunction;
