@@ -1,9 +1,10 @@
 
-# Core
+# Engine
 
 cmake_minimum_required(VERSION 3.22)
 
 get_auto_target_name(THIS_TARGET_NAME)
+
 
 if(BITCRAFTE_BUILD_SHARED_ENGINE)
 	set(ENGINE_OUTPUT_TYPE SHARED_LIBRARY)
@@ -11,9 +12,39 @@ else()
 	set(ENGINE_OUTPUT_TYPE STATIC_LIBRARY)
 endif()
 
+
+# Set RHI dependencies
+set(BITCRAFTE_ENGINE_RHI_DEPENDENCIES)
+if(BITCRAFTE_BUILD_RHI_VULKAN)
+	list(APPEND BITCRAFTE_ENGINE_RHI_DEPENDENCIES rhi_vulkan)
+endif()
+if(BITCRAFTE_BUILD_RHI_METAL)
+	list(APPEND BITCRAFTE_ENGINE_RHI_DEPENDENCIES rhi_metal)
+endif()
+
+
+# Make the engine target
 add_engine_component(${THIS_TARGET_NAME}
 	${ENGINE_OUTPUT_TYPE}
 	PUBLIC_LIBRARY_DEPENDENCIES
 		core
 		window
+		rhi
+	PRIVATE_LIBRARY_DEPENDENCIES
+		${BITCRAFTE_ENGINE_RHI_DEPENDENCIES}
 )
+
+
+# Set compile definitions for RHIs.
+if(BITCRAFTE_BUILD_RHI_VULKAN)
+	target_compile_definitions(${THIS_TARGET_NAME}
+		PRIVATE
+			BITCRAFTE_RHI_VULKAN=1
+	)
+endif()
+if(BITCRAFTE_BUILD_RHI_METAL)
+	target_compile_definitions(${THIS_TARGET_NAME}
+		PRIVATE
+			BITCRAFTE_RHI_METAL=1
+	)
+endif()
