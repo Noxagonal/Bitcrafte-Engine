@@ -38,38 +38,38 @@ inline PrintRecord											MakePrintRecord(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::TextContainer								ArgumentTextType>
+template<utility::TextContainer								TextContainerType>
 PrintRecord													MakePrintRecord(
-	ArgumentTextType										text,
+	TextContainerType										text,
 	PrintRecordTheme										theme
-) requires ( !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleTextView32> && !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleText32> )
+) requires ( !std::is_same_v<std::decay_t<TextContainerType>, SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, SimpleText32> )
 {
-	static_assert( !std::is_same_v<ArgumentTextType, SimpleTextView32> );
+	static_assert( !std::is_same_v<TextContainerType, SimpleTextView32> );
 	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), theme );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::TextContainer								ArgumentTextType>
+template<utility::TextContainer								TextContainerType>
 PrintRecord													MakePrintRecord(
-	ArgumentTextType										text
-) requires ( !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleTextView32> && !std::is_same_v<std::decay_t<ArgumentTextType>, SimpleText32> )
+	TextContainerType										text
+) requires ( !std::is_same_v<std::decay_t<TextContainerType>, SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, SimpleText32> )
 {
 	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), PrintRecordTheme::DEFAULT );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	typename												ArgumentTextType,
+	typename												ArgumentDescriptionType,
 	typename												ArgumentValueType
 >
 PrintRecord													MakePrintRecord_Argument(
-	const ArgumentTextType								&	text,
-	const ArgumentValueType								&	argument
-) requires( !std::is_same_v<ArgumentValueType, PrintRecordTheme> )
+	const ArgumentDescriptionType						&	argument_description,
+	const ArgumentValueType								&	argument_value
+) requires( !std::is_same_v<ArgumentValueType, PrintRecordTheme> ) // Prevent PrintRecordTheme from being used as argument
 {
-	auto record = MakePrintRecord( text::TextFormat( U"{}", text ) );
+	auto record = MakePrintRecord( text::TextFormat( U"{}", argument_description ) );
 	record += MakePrintRecord( U": \"" );
-	record += MakePrintRecord( text::TextFormat( U"{}", argument ) );
+	record += MakePrintRecord( text::TextFormat( U"{}", argument_value ) );
 	record += MakePrintRecord( U"\"" );
 	return record;
 }
@@ -78,18 +78,18 @@ namespace internal {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	typename												ArgumentTextType,
+	typename												ArgumentDescriptionType,
 	typename												ArgumentValueType,
 	typename												...RestTypePack
 >
 void														MakePrintRecord_ArgumentList_Collector(
 	PrintRecord											&	out_buffer,
-	const ArgumentTextType								&	text,
-	const ArgumentValueType								&	argument,
+	const ArgumentDescriptionType						&	argument_description,
+	const ArgumentValueType								&	argument_value,
 	const RestTypePack									&	...argument_pack
 )
 {
-	out_buffer += MakePrintRecord_Argument( text, argument );
+	out_buffer += MakePrintRecord_Argument( argument_description, argument_value );
 	if constexpr( sizeof...( argument_pack ) > 0 ) MakePrintRecord_ArgumentList_Collector( out_buffer, argument_pack... );
 }
 
