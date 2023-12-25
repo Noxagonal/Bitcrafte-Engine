@@ -47,6 +47,8 @@ bc::editor::EditorComponent::EditorComponent()
 	thread_pool->AddThread<StandardEditorThread>();
 
 	auto engine_create_info = bc::engine::EngineComponentCreateInfo {};
+	// TEMP: Selecting vulkan for now.
+	engine_create_info.rhi_selection = bc::engine::EngineComponentCreateInfoRHISelection::VULKAN;
 	engine = MakeUniquePtr<bc::engine::EngineComponent>( engine_create_info );
 
 	auto window_create_info = bc::window::WindowCreateInfo {};
