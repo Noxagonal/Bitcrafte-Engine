@@ -131,7 +131,7 @@ void bc::diagnostic::Logger::PushLogEntry(
 )
 {
 #if !BITCRAFTE_DEVELOPMENT_BUILD
-	if( log_entry.severity == ReportSeverity::DEBUG ) return;
+	if( log_entry.severity == LogReportSeverity::DEBUG ) return;
 #endif
 
 	auto lock_guard = std::lock_guard( log_mutex );

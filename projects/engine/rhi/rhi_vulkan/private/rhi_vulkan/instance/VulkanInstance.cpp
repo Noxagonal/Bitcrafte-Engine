@@ -132,6 +132,8 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	validation_features.pDisabledValidationFeatures		= disabled_validation_features.Data();
 
 
+
+	// Set layer and extension names to a struct we can give to VkInstanceCreateInfo struct directly
 	auto enabled_layer_names_temp = List<const char*> {};
 	auto enabled_extension_names_temp = List<const char*> {};
 	for( auto & n : enabled_layer_names )
@@ -142,6 +144,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	{
 		enabled_extension_names_temp.PushBack( n.ToCStr() );
 	}
+
 
 
 	// Set up Vulkan instance
@@ -155,7 +158,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	application_info.pEngineName			= engine_name.ToCStr();
 	application_info.engineVersion			= application::EngineVersion.ToVulkanPacked();
 	application_info.apiVersion				= VK_API_VERSION_1_3;
-
+	
 	auto create_info = VkInstanceCreateInfo {};
 	create_info.sType						= VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	create_info.pNext						= vulkan_implementation.GetDebugSettings().debug_enabled ? &validation_features : nullptr;
@@ -165,11 +168,13 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	create_info.ppEnabledLayerNames			= enabled_layer_names_temp.Data();
 	create_info.enabledExtensionCount		= uint32_t( enabled_extension_names_temp.Size() );
 	create_info.ppEnabledExtensionNames		= enabled_extension_names_temp.Data();
-	vkCreateInstance(
+	BAssertVkResult( vkCreateInstance(
 		&create_info,
 		vulkan_implementation.GetMainThreadAllocationCallbacks(),
 		&vk_instance
-	);
+	) );
+
+	GetCore()->GetLogger()->LogVerbose( U"Vulkan instance created" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

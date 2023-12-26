@@ -43,37 +43,44 @@ bc::editor::EditorComponent::EditorComponent()
 	core_create_info.logger_create_info.print_to_system_console	= true;
 	core = std::make_unique<CoreComponent>( core_create_info );
 
-
-
-	// Create threads.
-	auto thread_pool = core->GetThreadPool();
-	thread_pool->AddThread<StandardEditorThread>();
-	thread_pool->AddThread<StandardEditorThread>();
-	thread_pool->AddThread<StandardEditorThread>();
-	thread_pool->AddThread<StandardEditorThread>();
-
-
-
-	// Create engine.
-	auto engine_create_info = bc::engine::EngineComponentCreateInfo {};
-	// TEMP: Selecting vulkan for now.
-	engine_create_info.rhi_selection = bc::engine::EngineComponentCreateInfoRHISelection::VULKAN;
-	// TEMP: Enabling debugging here for now.
-	engine_create_info.rhi_create_info.enable_debug = true;
-	engine_create_info.rhi_create_info.minimum_debug_level = rhi::RHIDebugLevel::WARNING;
-	engine = MakeUniquePtr<bc::engine::EngineComponent>( engine_create_info );
+	try
+	{
+		// Create threads.
+		auto thread_pool = core->GetThreadPool();
+		thread_pool->AddThread<StandardEditorThread>();
+		thread_pool->AddThread<StandardEditorThread>();
+		thread_pool->AddThread<StandardEditorThread>();
+		thread_pool->AddThread<StandardEditorThread>();
 
 
 
-	// Create main window.
-	auto window_create_info = bc::window::WindowCreateInfo {};
-	main_window = engine->GetWindowComponent()->CreateWindow( window_create_info );
+		// Create engine.
+		auto engine_create_info = bc::engine::EngineComponentCreateInfo {};
+		// TEMP: Selecting vulkan for now.
+		engine_create_info.rhi_selection = bc::engine::EngineComponentCreateInfoRHISelection::VULKAN;
+		// TEMP: Enabling debugging here for now.
+		engine_create_info.rhi_create_info.enable_debug = true;
+		engine_create_info.rhi_create_info.minimum_debug_level = rhi::RHIDebugLevel::WARNING;
+		engine = MakeUniquePtr<bc::engine::EngineComponent>( engine_create_info );
 
-	main_window->events.CloseRequested.RegisterCallback( [ this ]()
-		{
-			should_close = true;
-		}
-	);
+
+
+		// Create main window.
+		auto window_create_info = bc::window::WindowCreateInfo {};
+		main_window = engine->GetWindowComponent()->CreateWindow( window_create_info );
+
+		main_window->events.CloseRequested.RegisterCallback( [ this ]()
+			{
+				should_close = true;
+			}
+		);
+
+	}
+	catch( const diagnostic::Exception & exception )
+	{
+		core->GetLogger()->LogCriticalError( exception.GetMessage() );
+		bc::diagnostic::Panic( "Exception caught while constructing editor" );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
