@@ -710,26 +710,6 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//BC_CONTAINER_NAME( LinearContainerBase )() = default;
 
-protected:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//BC_CONTAINER_NAME( LinearContainerBase )(
-	//	const BC_CONTAINER_NAME( LinearContainerBase )												&	other
-	//)
-	//{
-	//	// Do not use Append() here as it may construct a temporary with same type using this constructor.
-	//	auto other_size = other.Size();BC_CONTAINER_NAME( LinearContainerBase )
-	//
-	//	this->ResizeNoConstruct( other_size, 0 );
-	//
-	//	auto other_it = other.begin();
-	//	for( size_t i = 0; i < other_size; ++i )
-	//	{
-	//		new( &this->data_ptr[ i ] ) ValueType( *other_it );
-	//		++other_it;
-	//	}
-	//}
-
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

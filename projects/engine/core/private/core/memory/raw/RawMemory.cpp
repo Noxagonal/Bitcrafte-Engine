@@ -35,6 +35,7 @@ void * bc::memory::internal::AllocateRawMemory_Runtime(
 	// TODO: Allocate from memory pool once it's implemented.
 	auto system_ptr = new uint8_t[ minimum_required_allocation_size ];
 	if( system_ptr == nullptr ) std::abort();
+	BHardAssert( ( reinterpret_cast<uintptr_t>( system_ptr ) & 0xFFFF000000000000ULL ) == 0ULL, "Allocated memory from system needs to have high 16 bits unused" );
 
 	auto system_allocation_info = CalculateSystemMemoryAllocationInfoFromSystemAllocation(
 		system_ptr,

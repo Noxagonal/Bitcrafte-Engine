@@ -22,31 +22,206 @@ namespace container_bases {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ContainerResource
 {
+private:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	static constexpr uintptr_t UndeadObjectPointerBitMask = 0x0F00000000000000ULL;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename ValueType>
+	static ValueType								*	MakeObjectPointerUndead(
+		ValueType									*	location
+	)
+	{
+		return reinterpret_cast<ValueType*>( reinterpret_cast<uintptr_t>( location ) | UndeadObjectPointerBitMask );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename ValueType>
+	static ValueType								*	MakeObjectPointerAlive(
+		ValueType									*	location
+	)
+	{
+		return reinterpret_cast<ValueType*>( reinterpret_cast<uintptr_t>( location ) & ~UndeadObjectPointerBitMask );
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename ValueType>
+	static bool											IsObjectPointerUndead(
+		ValueType									*	location
+	)
+	{
+		return ( reinterpret_cast<uintptr_t>( location ) & UndeadObjectPointerBitMask ) == UndeadObjectPointerBitMask;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Do construct element.
+	///
+	/// This is a special function that can be used when constructing a single object that may throw.
+	///
+	/// @tparam ValueType
+	/// Type of the element to construct.
+	///
+	/// @tparam ...ConstructorArgumentTypePack
+	/// Parameter pack for types sent to the constructor of the element.
+	///
+	/// @param location
+	/// Memory location where the object should be constructed.
+	///
+	/// @param ...constructor_arguments
+	/// Constructor arguments as parameter pack sent to the constructor of the element.
+	///
+	/// @return
+	/// Pointer to memory location where the object was constructed.
+	template<typename ValueType, typename ...ConstructorArgumentTypePack>
+	static constexpr ValueType						*	DoConstructElement(
+		ValueType									*	location,
+		ConstructorArgumentTypePack					&&	...constructor_arguments
+	)
+	{
+		if( std::is_constant_evaluated() )
+		{
+			new( location ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+		}
+		else
+		{
+			// Assert some common Visual studio fault addresses.
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Constructing object, destination is in memory outside of process" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Constructing object, destination is in freed memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Constructing object, destination is in uninitialized global memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Constructing object, destination is in uninitialized stack memory" );
+
+			// Construct in place with the temporary pointer, which contains the original address, if contained value
+			// throws in its constructor, then original location will remain modified.
+			new( location ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			return location;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Destruct element.
+	///
+	/// This is a conditional operation, input location accepts undead object pointers as well as alive ones. If an undead object
+	/// pointer is encoutered, its alive version is returned and destruction of the object is not attempted.
+	///
+	/// @tparam ValueType
+	/// Type of the value we try to destruct.
+	///
+	/// @param location
+	/// Memory location of the object.
+	///
+	/// @return
+	/// Pointer to the object location in memory when it was alive.
+	template<typename ValueType>
+	static constexpr ValueType						*	DoDestructElement(
+		ValueType									*	location
+	)
+	{
+		if( std::is_constant_evaluated() )
+		{
+			location->~ValueType();
+		}
+		else
+		{
+			// Assert some common Visual studio fault addresses.
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Destructing range, location is in memory outside of process" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Destructing range, location is in freed memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Destructing range, location is in uninitialized global memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Destructing range, location is in uninitialized stack memory" );
+
+			if( IsObjectPointerUndead( location ) )
+			{
+				return MakeObjectPointerAlive( location );
+			}
+
+			location->~ValueType();
+			return location;
+		}
+	}
+
 protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Construct a range of elements.
+	/// Construct a single element.
+	///
+	/// This is a special function that can be used when constructing a single object that may throw.
 	///
 	/// @tparam ValueType
-	/// Type of the element we want to construct.
+	/// Type of the element to construct.
 	///
-	/// @tparam ...ConstructorArgumentsTypePack
-	/// Parameter types given as arguments to the Type constructor.
+	/// @tparam ...ConstructorArgumentTypePack
+	/// Parameter pack for types sent to the constructor of the element.
 	///
-	/// @param destination
-	/// Pointer to the first element in a linear array to construct.
-	///
-	/// @param element_count
-	/// Number of elements to construct.
+	/// @param [in|out] location
+	/// Memory location where the object should be constructed, note that this value will also be modified, specifically the address
+	/// will be made "undead" by modifying the high bits of it. This value can then be used to detect if the object construction
+	/// failed. This is useful when a container goes out of scope, it can determine if the destructor for the value should be called
+	/// or not.
 	///
 	/// @param ...constructor_arguments
-	/// Arguments passed to the constructor of each of the elements.
-	template<typename ValueType, typename ...ConstructorArgumentsTypePack>
+	/// Constructor arguments as parameter pack sent to the constructor of the element.
+	template<typename ValueType, typename ...ConstructorArgumentTypePack>
+	static constexpr void								ConstructElement(
+		ValueType									*&	location,
+		ConstructorArgumentTypePack					&&	...constructor_arguments
+	)
+	{
+		if( std::is_constant_evaluated() )
+		{
+			new( location ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+		}
+		else
+		{
+			// This piece of code solves a very specific problem.
+			// Constructor of the contained type may throw during construction, if it does, the destructor for the
+			// contained type should not be called.
+			// By the time we reach this function, this object is likely already alive but the contained object is not,
+			// however we already have memory allocated for it, which means when this container goes out of scope, eg.
+			// in stack unwinding, this container will try to destruct the contained object too.
+			// Since x64 only uses 48 least significant bits of the address, we can use the 8 most significant bits of
+			// the address to indicate we tried but failed constructing the object. The original address is kept intact
+			// but cannot be used. At destruction, we detect this change in the destruction function and skip
+			// destruction if we found the modified address.
+
+			// Make pointer undead first, so if constructor throws, it will be handled accordingly.
+			volatile auto temp = location;
+			location = MakeObjectPointerUndead( location );
+			location = DoConstructElement( temp, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Destruct element.
+	///
+	/// This is a conditional operation, input location accepts undead object pointers as well as alive ones. If an undead object
+	/// pointer is encoutered, its alive version is returned and destruction of the object is not attempted.
+	///
+	/// @tparam ValueType
+	/// Type of the value we try to destruct.
+	///
+	/// @param [in|out] location
+	/// Memory location of the object.
+	///
+	/// @return
+	/// Pointer to the object location in memory when it was alive.
+	template<typename ValueType>
+	static constexpr void								DestructElement(
+		ValueType									*&	location
+	)
+	{
+		location = DoDestructElement( location );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename ValueType, typename ...ConstructorArgumentTypePack>
 	constexpr void										ConstructRange(
 		ValueType									*	destination,
 		size_t											element_count,
-		ConstructorArgumentsTypePack				&&	...constructor_arguments
+		ConstructorArgumentTypePack					&&	...constructor_arguments
 	) const
 	{
 		static_assert( sizeof( size_t ) == 8, "This function is build for 64 bit systems only" );
@@ -66,22 +241,13 @@ protected:
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Constructing range, element count too high, something is not right" );
 
 		auto end = destination + element_count;
-		for( ValueType * it = destination; it < end; ++it )
+		for( size_t i = 0; i < element_count; ++i )
 		{
-			new( it ) ValueType( std::forward<ConstructorArgumentsTypePack>( constructor_arguments )... );
+			new( &destination[ i ] ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Construct range of elements by using another range of elements as a source.
-	///
-	/// @tparam ValueType
-	/// Type of the element we want to construct.
-	///
-	/// @param destination 
-	/// @param source 
-	/// @param element_count 
 	template<typename ValueType>
 	constexpr void										CopyConstructRange(
 		ValueType									*	destination,
@@ -168,15 +334,6 @@ protected:
 		if( location == nullptr ) return;
 		if( element_count == 0 ) return;
 
-		if( !std::is_constant_evaluated() )
-		{
-			// Assert some common Visual studio fault addresses.
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Destructing range, location is in memory outside of process" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Destructing range, location is in freed memory" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Destructing range, location is in uninitialized global memory" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Destructing range, location is in uninitialized stack memory" );
-		}
-
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Destructing range, element count too high, something is not right" );
 
 		auto end = location + element_count;
@@ -189,14 +346,17 @@ protected:
 		}
 
 		#if BITCRAFTE_DEVELOPMENT_BUILD
+
+		// Fill destructed object memory range with byte 0xCB. This is used to catch errors in development builds.
 		if( !std::is_constant_evaluated() )
 		{
 			auto uninitialize_memory_ptr = reinterpret_cast<uint8_t*>( location );
 			for( size_t i = 0; i < element_count * sizeof( ValueType ); ++i )
 			{
-				uninitialize_memory_ptr[ i ] = 0xcd;
+				uninitialize_memory_ptr[ i ] = 0xCB;
 			}
 		}
+
 		#endif
 	}
 

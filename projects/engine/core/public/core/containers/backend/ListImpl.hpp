@@ -281,6 +281,10 @@ private:
 /// @brief
 /// Linear container similar to std::vector.
 ///
+/// @warning
+/// Constructors of the contained type should not throw. If you need to construct a class or struct which constructor can throw,
+/// look into heap allocating single-value containers like UniquePtr which can handle constructor throw.
+///
 /// @tparam ValueType
 /// Type of the contained element.
 template<BC_CONTAINER_VALUE_TYPENAME ValueType>

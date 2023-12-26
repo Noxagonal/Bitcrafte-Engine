@@ -270,10 +270,17 @@ inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPoin
 	void											*	raw_location
 )
 {
-	if( raw_location == nullptr ) return nullptr; // raw_location was nullptr, return.
+	if( raw_location == nullptr )
+	{
+		return nullptr;
+	}
 
 	auto raw_ptr_position = reinterpret_cast<uintptr_t>( raw_location );
-	if( raw_ptr_position % alignof( SystemMemoryAllocationInfo ) ) return nullptr; // raw_location isn't aligned to SystemMemoryAllocationInfo, which is the minimum, return.
+	if( raw_ptr_position % alignof( SystemMemoryAllocationInfo ) )
+	{
+		// raw_location isn't aligned to SystemMemoryAllocationInfo, which is the minimum, return.
+		return nullptr;
+	}
 
 	auto raw_location_bytes = reinterpret_cast<uint8_t*>( raw_location );
 
@@ -281,7 +288,11 @@ inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPoin
 
 	#if BITCRAFTE_DEVELOPMENT_BUILD
 	auto allocation_info_checksum = CalculateSystemMemoryAllocationInfoInfoChecksum( *allocation_info );
-	if( allocation_info->checksum != allocation_info_checksum ) return nullptr; // Checksum mismatch, this is not a runtime allocated memory block.
+	if( allocation_info->checksum != allocation_info_checksum )
+	{
+		// Checksum mismatch, this is not a runtime allocated memory block.
+		return nullptr;
+	}
 	#endif
 
 	return allocation_info;
