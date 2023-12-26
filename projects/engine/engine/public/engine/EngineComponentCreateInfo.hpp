@@ -1,7 +1,7 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <window/WindowComponentCreateInfo.hpp>
+#include <window_manager/WindowManagerComponentCreateInfo.hpp>
 #include <rhi/RHIComponentCreateInfo.hpp>
 
 
@@ -22,10 +22,10 @@ enum class EngineComponentCreateInfoRHISelection
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct EngineComponentCreateInfo
 {
-	window::WindowComponentCreateInfo						window_create_info			= {};
+	window_manager::WindowManagerComponentCreateInfo		window_manager_create_info			= {};
 
-	EngineComponentCreateInfoRHISelection					rhi_selection				= EngineComponentCreateInfoRHISelection::NONE;
-	rhi::RHIComponentCreateInfo								rhi_create_info				= {};
+	EngineComponentCreateInfoRHISelection					rhi_selection					= EngineComponentCreateInfoRHISelection::NONE;
+	rhi::RHIComponentCreateInfo								rhi_create_info					= {};
 };
 
 

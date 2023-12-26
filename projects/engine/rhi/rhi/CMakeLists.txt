@@ -9,5 +9,4 @@ add_engine_rhi_component(${THIS_TARGET_NAME}
 	OBJECT_LIBRARY
 	PUBLIC_LIBRARY_DEPENDENCIES
 		core
-		window
 )

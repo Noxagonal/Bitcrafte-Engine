@@ -6,6 +6,7 @@
 #include <core/diagnostic/exception/Exception.hpp>
 
 #include <core/thread/ThreadDescription.hpp>
+#include <core/thread/Task.hpp>
 
 #include <atomic>
 #include <mutex>

@@ -17,3 +17,8 @@ bc::rhi::RHIComponent::~RHIComponent()
 {
 
 }
+
+void bc::rhi::RHIComponent::TestFunc()
+{
+
+}

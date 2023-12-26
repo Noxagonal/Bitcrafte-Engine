@@ -83,6 +83,7 @@ private:
 		if( std::is_constant_evaluated() )
 		{
 			new( location ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			return location;
 		}
 		else
 		{
@@ -122,6 +123,7 @@ private:
 		if( std::is_constant_evaluated() )
 		{
 			location->~ValueType();
+			return location;
 		}
 		else
 		{

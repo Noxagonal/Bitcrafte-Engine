@@ -10,7 +10,7 @@
 
 namespace bc {
 
-namespace window { class WindowComponent; }
+namespace window_manager { class WindowManagerComponent; }
 namespace rhi { class RHIComponent; }
 
 namespace engine {
@@ -34,7 +34,7 @@ public:
 	void															Run();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	window::WindowComponent										*	GetWindowComponent();
+	window_manager::WindowManagerComponent						*	GetWindowManagerComponent();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	rhi::RHIComponent											*	GetRHIComponent();
@@ -42,7 +42,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static UniquePtr<window::WindowComponent>						CreateWindowComponent(
+	static UniquePtr<window_manager::WindowManagerComponent>		CreateWindowManagerComponent(
 		const EngineComponentCreateInfo							&	create_info
 	);
 
@@ -54,7 +54,7 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	EngineComponentCreateInfo										create_info_copy;
 
-	UniquePtr<window::WindowComponent>								window_component;
+	UniquePtr<window_manager::WindowManagerComponent>				window_manager_component;
 	UniquePtr<rhi::RHIComponent>									rhi_component;
 };
 

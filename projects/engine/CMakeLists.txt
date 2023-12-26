@@ -88,17 +88,30 @@ endfunction()
 
 
 
-# Determine which RHIs should be included in the built.
-if(APPLE)
-	if(NOT DEFINED BITCRAFTE_BUILD_RHI_METAL)
-	    set(BITCRAFTE_BUILD_RHI_METAL ON CACHE BOOL "Include Metal RHI" FORCE)
+# Determine which window components should be included in the built.
+if(WIN32)
+	if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_WIN32)
+	    set(BITCRAFTE_BUILD_WINDOW_WIN32 ON CACHE BOOL "Build Windows window component" FORCE)
 	endif()
-	if(NOT DEFINED BITCRAFTE_BUILD_RHI_VULKAN)
-	    set(BITCRAFTE_BUILD_RHI_VULKAN OFF CACHE BOOL "Include Vulkan RHI" FORCE)
+endif()
+if(LINUX)
+	if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_WAYLAND)
+	    set(BITCRAFTE_BUILD_WINDOW_WAYLAND ON CACHE BOOL "Build Wayland window component" FORCE)
 	endif()
-else()
+elseif(APPLE)
+	message(FATAL_ERROR "Please add window component here")
+endif()
+
+
+
+# Determine which RHI components should be included in the built.
+if(WIN32 OR LINUX)
 	if(NOT DEFINED BITCRAFTE_BUILD_RHI_VULKAN)
 	    set(BITCRAFTE_BUILD_RHI_VULKAN ON CACHE BOOL "Include Vulkan RHI" FORCE)
+	endif()
+elseif(APPLE)
+	if(NOT DEFINED BITCRAFTE_BUILD_RHI_METAL)
+	    set(BITCRAFTE_BUILD_RHI_METAL ON CACHE BOOL "Include Metal RHI" FORCE)
 	endif()
 endif()
 

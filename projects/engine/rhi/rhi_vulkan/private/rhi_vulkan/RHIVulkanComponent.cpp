@@ -1,7 +1,7 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/RHIVulkanComponent.hpp>
-#include <rhi_vulkan/vulkan_implementation/VulkanImplementation.hpp>
+#include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
 
 
 
@@ -11,7 +11,7 @@ bc::rhi::RHIVulkanComponent::RHIVulkanComponent(
 ) :
 	RHIComponent( create_info )
 {
-	implementation = CreateVulkanImplementation( create_info );
+	implementation = CreateRHIVulkanImpl( create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,9 +21,9 @@ bc::rhi::RHIVulkanComponent::~RHIVulkanComponent()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::rhi::VulkanImplementation> bc::rhi::RHIVulkanComponent::CreateVulkanImplementation(
+bc::UniquePtr<bc::rhi::RHIVulkanImpl> bc::rhi::RHIVulkanComponent::CreateRHIVulkanImpl(
 	const RHIComponentCreateInfo & create_info
 )
 {
-	return MakeUniquePtr<VulkanImplementation>( create_info );
+	return MakeUniquePtr<RHIVulkanImpl>( create_info );
 }

@@ -4,7 +4,6 @@
 #include <rhi/RHIComponent.hpp>
 
 #include <core/containers/UniquePtr.hpp>
-#include <core/utility/version/Version.hpp>
 
 
 
@@ -13,7 +12,7 @@ namespace rhi {
 
 
 
-class VulkanImplementation;
+class RHIVulkanImpl;
 
 
 
@@ -33,12 +32,12 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static UniquePtr<VulkanImplementation>						CreateVulkanImplementation(
+	static UniquePtr<RHIVulkanImpl>								CreateRHIVulkanImpl(
 		const RHIComponentCreateInfo						&	create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	UniquePtr<VulkanImplementation>								implementation;
+	UniquePtr<RHIVulkanImpl>									implementation;
 };
 
 

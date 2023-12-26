@@ -11,7 +11,7 @@
 namespace bc {
 namespace core { class CoreComponent; }
 namespace engine { class EngineComponent; }
-namespace window { class Window; }
+namespace window_manager { class Window; }
 
 namespace editor {
 
@@ -38,7 +38,7 @@ private:
 
 	UniquePtr<bc::engine::EngineComponent>						engine;
 
-	UniquePtr<window::Window>									main_window;
+	UniquePtr<window_manager::Window>							main_window;
 
 	bool														should_close				= false;
 };

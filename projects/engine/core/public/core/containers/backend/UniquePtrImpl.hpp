@@ -84,7 +84,7 @@ public:
 	template<typename OtherValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )(
 		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
-		) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> )
+	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> )
 	{
 		this->data_ptr = other.data_ptr;
 		other.data_ptr = nullptr;

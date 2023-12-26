@@ -4,8 +4,8 @@
 #include <core/thread/ThreadPool.hpp>
 
 #include <engine/EngineComponent.hpp>
-#include <window/WindowComponent.hpp>
-#include <window/window/Window.hpp>
+#include <window_manager/WindowManagerComponent.hpp>
+#include <window_manager/window/Window.hpp>
 
 #include <iostream>
 
@@ -66,8 +66,8 @@ bc::editor::EditorComponent::EditorComponent()
 
 
 		// Create main window.
-		auto window_create_info = bc::window::WindowCreateInfo {};
-		main_window = engine->GetWindowComponent()->CreateWindow( window_create_info );
+		auto window_create_info = bc::window_manager::WindowCreateInfo {};
+		main_window = engine->GetWindowManagerComponent()->CreateWindow( window_create_info );
 
 		main_window->events.CloseRequested.RegisterCallback( [ this ]()
 			{
