@@ -1,12 +1,14 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
-#include <rhi_vulkan/instance/VulkanInstance.hpp>
-#include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
-#include <core/application/ApplicationInfo.hpp>
-#include <rhi_vulkan/platform/PlatformHeadersInclude.hpp>
-#include <rhi_vulkan/platform/PlatformSpecificExtensionNames.hpp>
-#undef ERROR
+#include <rhi_vulkan/vk/instance/VulkanInstance.hpp>
 #include <core/CoreComponent.hpp>
+
+#include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
+#include <rhi_vulkan/platform/PlatformHeadersInclude.hpp>
+#undef ERROR
+#include <rhi_vulkan/platform/PlatformSpecificExtensionNames.hpp>
+
+#include <core/application/ApplicationInfo.hpp>
 #include <core/diagnostic/logger/Logger.hpp>
 
 
@@ -175,6 +177,8 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	) );
 
 	GetCore()->GetLogger()->LogVerbose( U"Vulkan instance created" );
+
+	physical_devices = FetchPhysicalDevices();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,4 +188,21 @@ bc::rhi::VulkanInstance::~VulkanInstance()
 		vk_instance,
 		vulkan_implementation.GetMainThreadAllocationCallbacks()
 	);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bc::List<bc::rhi::VulkanPhysicalDevice> bc::rhi::VulkanInstance::FetchPhysicalDevices() const
+{
+	auto physical_device_count = uint32_t {};
+	BAssertVkResult( vkEnumeratePhysicalDevices( vk_instance, &physical_device_count, nullptr ) );
+	auto vk_physical_devices = List<VkPhysicalDevice>( physical_device_count );
+	BAssertVkResult( vkEnumeratePhysicalDevices( vk_instance, &physical_device_count, vk_physical_devices.Data() ) );
+
+	auto result = List<VulkanPhysicalDevice> {};
+	result.Reserve( vk_physical_devices.Size() );
+	for( size_t i = 0; i < vk_physical_devices.Size(); i++ )
+	{
+		result.EmplaceBack( vulkan_implementation, vk_physical_devices[ i ] );
+	}
+	return result;
 }

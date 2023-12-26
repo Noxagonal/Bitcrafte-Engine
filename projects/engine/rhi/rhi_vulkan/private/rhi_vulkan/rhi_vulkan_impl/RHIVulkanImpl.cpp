@@ -2,7 +2,7 @@
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
 #include <core/memory/raw/RawMemory.hpp>
-#include <rhi_vulkan/instance/VulkanInstance.hpp>
+#include <rhi_vulkan/vk/instance/VulkanInstance.hpp>
 
 
 

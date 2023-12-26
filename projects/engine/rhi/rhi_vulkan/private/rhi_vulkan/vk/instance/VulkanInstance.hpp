@@ -2,6 +2,13 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/containers/List.hpp>
+#include <core/containers/Text.hpp>
+
+#include <rhi_vulkan/vk/physical_device/VulkanPhysicalDevice.hpp>
+
+#include <vulkan/vulkan.h>
+
 
 
 namespace bc {
@@ -27,17 +34,24 @@ public:
 	~VulkanInstance();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	const List<VulkanPhysicalDevice>			&	GetPhysicalDevices() { return physical_devices; }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline operator VkInstance() { return vk_instance; }
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkInstance												vk_instance						= nullptr;
+	List<VulkanPhysicalDevice>						FetchPhysicalDevices() const;
 
-	List<Text>												enabled_layer_names;
-	List<Text>												enabled_extension_names;
-
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIVulkanImpl								&	vulkan_implementation;
+	VkInstance										vk_instance						= nullptr;
+
+	List<Text>										enabled_layer_names;
+	List<Text>										enabled_extension_names;
+
+	List<VulkanPhysicalDevice>						physical_devices;
 };
 
 
