@@ -22,9 +22,9 @@
 
 
 // Include window components.
-#if BITCRAFTE_WINDOW_WIN32
+#if BITCRAFTE_WINDOW_MANAGER_WIN32
 #include <window_manager_win32/WindowManagerWin32Component.hpp>
-#elif BITCRAFTE_WINDOW_WAYLAND
+#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 #include <window_manager_wayland/WindowManagerWaylandComponent.hpp>
 #else
 #warning "No Window component included, using dummy interface"
@@ -81,16 +81,14 @@ bc::UniquePtr<bc::window_manager::WindowManagerComponent> bc::engine::EngineComp
 	const EngineComponentCreateInfo & create_info
 )
 {
-	#if BITCRAFTE_WINDOW_WIN32
+	#if BITCRAFTE_WINDOW_MANAGER_WIN32
 	return MakeUniquePtr<window_manager::WindowManagerWin32Component>( create_info.window_manager_create_info );
 
-	#elif BITCRAFTE_WINDOW_WAYLAND
+	#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 	return MakeUniquePtr<window_manager::WindowManagerWaylandComponent>( create_info.window_manager_create_info );
 
 	#else
-	bc::GetCore()->GetLogger()->LogWarning( U"Creating dummy window component" );
-	return MakeUniquePtr<window_manager::WindowManagerComponent>( create_info.window_manager_create_info );
-
+	#error "No window manager selected"
 	#endif // Window manager selection
 }
 
@@ -113,8 +111,7 @@ bc::UniquePtr<bc::rhi::RHIComponent> bc::engine::EngineComponent::CreateRHICompo
 	}
 	#endif // BITCRAFTE_RHI_METAL
 
-	bc::GetCore()->GetLogger()->LogWarning( U"Creating dummy RHI component" );
-	return MakeUniquePtr<rhi::RHIComponent>( create_info.rhi_create_info );
+	return {};
 }
 
 

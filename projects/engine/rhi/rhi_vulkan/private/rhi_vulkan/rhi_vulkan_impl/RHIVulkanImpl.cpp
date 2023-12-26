@@ -96,3 +96,61 @@ bc::rhi::RHIVulkanImpl::~RHIVulkanImpl()
 {
 	vulkan_instance = nullptr;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int64_t bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice() const
+{
+	auto & physical_device_list = vulkan_instance->GetPhysicalDeviceList();
+
+	auto device_scores = [ &physical_device_list ]() -> List<uint64_t>
+		{
+			List<uint64_t> result( physical_device_list.Size() );
+			for( size_t i=0; i < physical_device_list.Size(); ++i )
+			{
+				auto & pd = physical_device_list[ i ];
+				auto & s = result[ i ];
+				auto & p = pd.GetProperties();
+				s += 1000; // some intial score
+				s += uint64_t( p.properties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ) * 16000;
+				s += uint64_t( p.properties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ) * 5000;
+				s += uint64_t( p.properties.properties.limits.maxImageDimension2D );
+				s += uint64_t( p.properties.properties.limits.maxPerStageDescriptorUniformBuffers ) * 20;
+				s += uint64_t( p.properties.properties.limits.maxPerStageDescriptorSampledImages ) * 40;
+				s += uint64_t( p.properties.properties.limits.maxVertexInputBindings ) * 10;
+				s += uint64_t( p.properties.properties.limits.maxComputeWorkGroupInvocations );
+				s += uint64_t( p.properties.properties.limits.maxSamplerAnisotropy ) * 200;
+
+				// Check if physical device can present
+				auto can_present			= false;
+				auto queue_family_list		= pd.GetQueueFamilyPropertyList();
+				for( auto & f : queue_family_list )
+				{
+					if( f.can_present )
+					{
+						can_present = true;
+						break;
+					}
+				}
+
+				// If the physical device cannot present anything we won't even consider it
+				if( !can_present )
+				{
+					s = 0;
+				}
+			}
+			return result;
+		}();
+
+	auto best_physical_device_index		= int64_t { -1 };
+	auto best_score_so_far				= uint64_t {};
+	for( size_t i = 0; i < physical_device_list.Size(); ++i )
+	{
+		if( device_scores[ i ] > best_score_so_far )
+		{
+			best_score_so_far			= device_scores[ i ];
+			best_physical_device_index	= i;
+		}
+	}
+
+	return best_physical_device_index;
+}

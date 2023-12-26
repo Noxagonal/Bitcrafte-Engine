@@ -2,6 +2,7 @@
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/RHIVulkanComponent.hpp>
 #include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
+#include <rhi_vulkan/vk/instance/VulkanInstance.hpp>
 
 
 
@@ -11,13 +12,13 @@ bc::rhi::RHIVulkanComponent::RHIVulkanComponent(
 ) :
 	RHIComponent( create_info )
 {
-	implementation = CreateRHIVulkanImpl( create_info );
+	rhi_vulkan_impl = CreateRHIVulkanImpl( create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanComponent::~RHIVulkanComponent()
 {
-	implementation = nullptr;
+	rhi_vulkan_impl = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,4 +27,23 @@ bc::UniquePtr<bc::rhi::RHIVulkanImpl> bc::rhi::RHIVulkanComponent::CreateRHIVulk
 )
 {
 	return MakeUniquePtr<RHIVulkanImpl>( create_info );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bc::List<bc::Text> bc::rhi::RHIVulkanComponent::GetGraphicsCardList()
+{
+	auto physical_device_list = rhi_vulkan_impl->GetVulkanInstance().GetPhysicalDeviceList();
+	auto result = List<Text>();
+	result.Reserve( physical_device_list.Size() );
+	for( auto & p : physical_device_list )
+	{
+		result.PushBack( p.GetProperties().properties.properties.deviceName );
+	}
+	return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int64_t bc::rhi::RHIVulkanComponent::GetPrimaryGraphicsCardIndex()
+{
+	return rhi_vulkan_impl->GetBestPhysicalDevice();
 }

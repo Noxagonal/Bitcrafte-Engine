@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/containers/List.hpp>
+
 #include <vulkan/vulkan.h>
 
 
@@ -21,8 +23,38 @@ class VulkanPhysicalDevice
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	struct MemoryPropertiesInfo
+	{
+		MemoryPropertiesInfo(
+			VkPhysicalDevice								vk_physical_device
+		);
+
+		VkPhysicalDeviceMemoryProperties2					memory_properties			= {};
+	};
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	struct PropertiesInfo
+	{
+		PropertiesInfo(
+			VkPhysicalDevice								vk_physical_device
+		);
+		VkPhysicalDeviceProperties2							properties					= {};
+	};
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	struct QueueFamilyInfo
+	{
+		QueueFamilyInfo(
+			VkQueueFamilyProperties2						queue_family_properties,
+			bool											can_present
+		);
+		VkQueueFamilyProperties2							queue_family_properties		= {};
+		bool												can_present					= {};
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VulkanPhysicalDevice(
-		RHIVulkanImpl									&	vulkan_implementation,
+		RHIVulkanImpl									&	rhi_vulkan_impl,
 		VkPhysicalDevice									vk_physical_device
 	);
 
@@ -30,36 +62,30 @@ public:
 	~VulkanPhysicalDevice();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const VkPhysicalDeviceMemoryProperties2		&	GetMemoryProperties() const { return memory_properties; }
+	inline const MemoryPropertiesInfo					&	GetMemoryProperties() const { return memory_properties; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const VkPhysicalDeviceProperties2			&	GetProperties() const { return properties; }
+	inline const PropertiesInfo							&	GetProperties() const { return properties; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const List<VkQueueFamilyProperties2>			&	GetQueueFamilyPropertyList() const { return queue_family_property_list; }
+	inline const List<QueueFamilyInfo>					&	GetQueueFamilyPropertyList() const { return queue_family_property_list; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline operator VkPhysicalDevice() { return vk_physical_device; }
 
 private:
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkPhysicalDeviceMemoryProperties2						FetchMemoryProperties() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkPhysicalDeviceProperties2								FetchProperties() const;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<VkQueueFamilyProperties2>							FetchQueueFamilyPropertyList();
+	List<QueueFamilyInfo>									FetchQueueFamilyPropertyList();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VkPhysicalDevice										vk_physical_device					= VK_NULL_HANDLE;
 
-	VkPhysicalDeviceMemoryProperties2						memory_properties					= {};
-	VkPhysicalDeviceProperties2								properties							= {};
-	List<VkQueueFamilyProperties2>							queue_family_property_list			= {};
+	MemoryPropertiesInfo									memory_properties;
+	PropertiesInfo											properties;
+	List<QueueFamilyInfo>									queue_family_property_list;
 
-	RHIVulkanImpl										&	vulkan_implementation;
+	RHIVulkanImpl										&	rhi_vulkan_impl;
 };
 
 

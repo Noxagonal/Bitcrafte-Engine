@@ -13,25 +13,9 @@ else()
 endif()
 
 
-# Set RHI component dependencies
-set(BITCRAFTE_ENGINE_RHI_COMPONENT_DEPENDENCIES)
-if(BITCRAFTE_BUILD_RHI_VULKAN)
-	list(APPEND BITCRAFTE_ENGINE_RHI_COMPONENT_DEPENDENCIES rhi_vulkan)
-endif()
-if(BITCRAFTE_BUILD_RHI_METAL)
-	list(APPEND BITCRAFTE_ENGINE_RHI_COMPONENT_DEPENDENCIES rhi_metal)
-endif()
 
-
-# Set window component dependencies
-set(BITCRAFTE_ENGINE_WINDOW_COMPONENT_DEPENDENCIES)
-if(BITCRAFTE_BUILD_WINDOW_WIN32)
-	list(APPEND BITCRAFTE_ENGINE_WINDOW_COMPONENT_DEPENDENCIES window_manager_win32)
-endif()
-if(BITCRAFTE_BUILD_WINDOW_WAYLAND)
-	list(APPEND BITCRAFTE_ENGINE_WINDOW_COMPONENT_DEPENDENCIES window_manager_wayland)
-endif()
-
+get_window_manager_component_dependencies(BITCRAFTE_ENGINE_WINDOW_MANAGER_COMPONENT_DEPENDENCIES)
+get_rhi_component_dependencies(BITCRAFTE_ENGINE_RHI_COMPONENT_DEPENDENCIES)
 
 # Make the engine target
 add_engine_component(${THIS_TARGET_NAME}
@@ -41,36 +25,9 @@ add_engine_component(${THIS_TARGET_NAME}
 		rhi
 		window_manager
 	PRIVATE_LIBRARY_DEPENDENCIES
+		${BITCRAFTE_ENGINE_WINDOW_MANAGER_COMPONENT_DEPENDENCIES}
 		${BITCRAFTE_ENGINE_RHI_COMPONENT_DEPENDENCIES}
-		${BITCRAFTE_ENGINE_WINDOW_COMPONENT_DEPENDENCIES}
 )
 
-
-# Set compile definitions for RHI components.
-if(BITCRAFTE_BUILD_RHI_VULKAN)
-	target_compile_definitions(${THIS_TARGET_NAME}
-		PRIVATE
-			BITCRAFTE_RHI_VULKAN=1
-	)
-endif()
-if(BITCRAFTE_BUILD_RHI_METAL)
-	target_compile_definitions(${THIS_TARGET_NAME}
-		PRIVATE
-			BITCRAFTE_RHI_METAL=1
-	)
-endif()
-
-
-# Set compile definitions for window components.
-if(BITCRAFTE_BUILD_WINDOW_WIN32)
-	target_compile_definitions(${THIS_TARGET_NAME}
-		PRIVATE
-			BITCRAFTE_WINDOW_WIN32=1
-	)
-endif()
-if(BITCRAFTE_BUILD_WINDOW_WAYLAND)
-	target_compile_definitions(${THIS_TARGET_NAME}
-		PRIVATE
-			BITCRAFTE_WINDOW_WAYLAND=1
-	)
-endif()
+set_window_manager_component_defines(${THIS_TARGET_NAME})
+set_rhi_component_defines(${THIS_TARGET_NAME})

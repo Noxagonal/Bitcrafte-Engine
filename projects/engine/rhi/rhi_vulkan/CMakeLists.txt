@@ -15,3 +15,5 @@ add_engine_rhi_component(${THIS_TARGET_NAME}
 	PRIVATE_LIBRARY_DEPENDENCIES
 		Vulkan::Vulkan
 )
+
+set_window_manager_component_defines(${THIS_TARGET_NAME})

@@ -20,8 +20,8 @@ VkBool32 VKAPI_PTR VulkanDebugUtilsMessengerCallback(
 	void*											pUserData
 )
 {
-	auto vulkan_implementation = reinterpret_cast<bc::rhi::RHIVulkanImpl*>( pUserData );
-	assert( vulkan_implementation );
+	auto rhi_vulkan_impl = reinterpret_cast<bc::rhi::RHIVulkanImpl*>( pUserData );
+	assert( rhi_vulkan_impl );
 
 	auto report_severity	= bc::diagnostic::LogReportSeverity::NONE;
 	switch( messageSeverity )
@@ -75,15 +75,15 @@ VkBool32 VKAPI_PTR VulkanDebugUtilsMessengerCallback(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanInstance::VulkanInstance(
-	RHIVulkanImpl & vulkan_implementation
+	RHIVulkanImpl & rhi_vulkan_impl
 ) :
-	vulkan_implementation( vulkan_implementation )
+	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 	enabled_extension_names.PushBack( VK_KHR_SURFACE_EXTENSION_NAME );
 	enabled_extension_names += GetPlatformSpecificInstanceExtensionNames();
 
 	// Vulkan validation
-	if( vulkan_implementation.GetDebugSettings().debug_enabled )
+	if( rhi_vulkan_impl.GetDebugSettings().debug_enabled )
 	{
 		enabled_layer_names.PushBack( "VK_LAYER_KHRONOS_validation" );
 		enabled_extension_names.PushBack( VK_EXT_DEBUG_UTILS_EXTENSION_NAME );
@@ -91,7 +91,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 
 	// Setup debug utils messenger
 
-	auto minimum_debug_level_value = std::to_underlying( vulkan_implementation.GetDebugSettings().minimum_debug_level );
+	auto minimum_debug_level_value = std::to_underlying( rhi_vulkan_impl.GetDebugSettings().minimum_debug_level );
 	auto debug_utils_message_severity = VkDebugUtilsMessageSeverityFlagsEXT {};
 	debug_utils_message_severity |= std::to_underlying( RHIDebugLevel::VERBOSE )	>= minimum_debug_level_value ? VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT : 0;
 	debug_utils_message_severity |= std::to_underlying( RHIDebugLevel::INFO )		>= minimum_debug_level_value ? VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT : 0;
@@ -112,7 +112,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	debug_utils_messenger_create_info.messageSeverity	= debug_utils_message_severity;
 	debug_utils_messenger_create_info.messageType		= debug_utils_message_type;
 	debug_utils_messenger_create_info.pfnUserCallback	= VulkanDebugUtilsMessengerCallback;
-	debug_utils_messenger_create_info.pUserData			= &vulkan_implementation;
+	debug_utils_messenger_create_info.pUserData			= &rhi_vulkan_impl;
 
 
 
@@ -151,19 +151,19 @@ bc::rhi::VulkanInstance::VulkanInstance(
 
 	// Set up Vulkan instance
 	Text engine_name = application::EngineName;
-	Text8 application_name = bc::conversion::ToUTF8( vulkan_implementation.GetApplicationInfo().application_name);
+	Text8 application_name = bc::conversion::ToUTF8( rhi_vulkan_impl.GetApplicationInfo().application_name);
 	auto application_info = VkApplicationInfo {};
 	application_info.sType					= VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	application_info.pNext					= nullptr;
 	application_info.pApplicationName		= reinterpret_cast<const char*>( application_name.ToCStr() );
-	application_info.applicationVersion		= vulkan_implementation.GetApplicationInfo().application_version.ToVulkanPacked();
+	application_info.applicationVersion		= rhi_vulkan_impl.GetApplicationInfo().application_version.ToVulkanPacked();
 	application_info.pEngineName			= engine_name.ToCStr();
 	application_info.engineVersion			= application::EngineVersion.ToVulkanPacked();
 	application_info.apiVersion				= VK_API_VERSION_1_3;
 	
 	auto create_info = VkInstanceCreateInfo {};
 	create_info.sType						= VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	create_info.pNext						= vulkan_implementation.GetDebugSettings().debug_enabled ? &validation_features : nullptr;
+	create_info.pNext						= rhi_vulkan_impl.GetDebugSettings().debug_enabled ? &validation_features : nullptr;
 	create_info.flags						= 0;
 	create_info.pApplicationInfo			= &application_info;
 	create_info.enabledLayerCount			= uint32_t( enabled_layer_names_temp.Size() );
@@ -172,7 +172,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	create_info.ppEnabledExtensionNames		= enabled_extension_names_temp.Data();
 	BAssertVkResult( vkCreateInstance(
 		&create_info,
-		vulkan_implementation.GetMainThreadAllocationCallbacks(),
+		rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
 		&vk_instance
 	) );
 
@@ -186,7 +186,7 @@ bc::rhi::VulkanInstance::~VulkanInstance()
 {
 	vkDestroyInstance(
 		vk_instance,
-		vulkan_implementation.GetMainThreadAllocationCallbacks()
+		rhi_vulkan_impl.GetMainThreadAllocationCallbacks()
 	);
 }
 
@@ -202,7 +202,7 @@ bc::List<bc::rhi::VulkanPhysicalDevice> bc::rhi::VulkanInstance::FetchPhysicalDe
 	result.Reserve( vk_physical_devices.Size() );
 	for( size_t i = 0; i < vk_physical_devices.Size(); i++ )
 	{
-		result.EmplaceBack( vulkan_implementation, vk_physical_devices[ i ] );
+		result.EmplaceBack( rhi_vulkan_impl, vk_physical_devices[ i ] );
 	}
 	return result;
 }

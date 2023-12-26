@@ -1,10 +1,8 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <rhi/RHIComponentCreateInfo.hpp>
 
-#include <core/containers/List.hpp>
-#include <core/containers/Text.hpp>
+#include <vulkan/vulkan.h>
 
 
 
@@ -13,24 +11,34 @@ namespace rhi {
 
 
 
+class RHIVulkanImpl;
+class VulkanPhysicalDevice;
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class RHIComponent
+class VulkanDevice
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIComponent(
-		const RHIComponentCreateInfo								&	create_info
+	VulkanDevice(
+		RHIVulkanImpl									&	rhi_vulkan_impl,
+		VulkanPhysicalDevice							&	physical_device
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual ~RHIComponent();
+	~VulkanDevice();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual List<Text>													GetGraphicsCardList() = 0;
+	inline operator VkDevice() { return vk_device; }
+
+private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual int64_t														GetPrimaryGraphicsCardIndex() = 0;
+	RHIVulkanImpl										&	rhi_vulkan_impl;
+	VulkanPhysicalDevice								&	physical_device;
+	VkDevice												vk_device							= VK_NULL_HANDLE;
 };
 
 
