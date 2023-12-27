@@ -4,6 +4,7 @@
 #include <core/thread/ThreadPool.hpp>
 
 #include <engine/EngineComponent.hpp>
+#include <rhi/RHIComponent.hpp>
 #include <window_manager/WindowManagerComponent.hpp>
 #include <window_manager/window/Window.hpp>
 
@@ -55,14 +56,29 @@ bc::editor::EditorComponent::EditorComponent()
 
 
 		// Create engine.
-		auto engine_create_info = bc::engine::EngineComponentCreateInfo {};
+		auto engine_create_info = engine::EngineComponentCreateInfo {};
 		// TEMP: Selecting vulkan for now.
-		engine_create_info.rhi_selection = bc::engine::EngineComponentCreateInfoRHISelection::VULKAN;
+		engine_create_info.rhi_selection = engine::EngineComponentCreateInfoRHISelection::VULKAN;
 		// TEMP: Enabling debugging here for now.
 		engine_create_info.rhi_create_info.enable_debug = true;
 		engine_create_info.rhi_create_info.minimum_debug_level = rhi::RHIDebugLevel::WARNING;
-		engine = MakeUniquePtr<bc::engine::EngineComponent>( engine_create_info );
+		engine = MakeUniquePtr<engine::EngineComponent>( engine_create_info );
 
+
+		{
+			auto gpus = engine->GetRHIComponent()->GetGraphicsCardList();
+			auto report = diagnostic::MakePrintRecord( U"GPUs found on system" );
+			report += diagnostic::MakePrintRecord( U"\n" );
+			for( size_t i = 0; i < gpus.Size(); i++ )
+			{
+				report += diagnostic::MakePrintRecord_Argument( i, gpus[ i ] ).AddIndent();
+			}
+			core->GetLogger()->LogInfo( report );
+		}
+
+		auto engine_start_info = engine::EngineComponentStartInfo {};
+		engine_start_info.rhi_start_info.use_device = engine->GetRHIComponent()->GetPrimaryGraphicsCardIndex();
+		engine->Start( engine_start_info );
 
 
 		// Create main window.

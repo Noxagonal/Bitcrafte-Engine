@@ -2,6 +2,8 @@
 #include <engine/PreCompiledHeader.hpp>
 
 #include <engine/EngineComponent.hpp>
+#include <engine/EngineComponentStartInfo.hpp>
+
 #include <core/CoreComponent.hpp>
 #include <rhi/RHIComponent.hpp>
 #include <window_manager/WindowManagerComponent.hpp>
@@ -56,6 +58,14 @@ bc::engine::EngineComponent::~EngineComponent()
 	window_manager_component	= nullptr;
 
 	global_engine				= nullptr;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void bc::engine::EngineComponent::Start(
+	const EngineComponentStartInfo & engine_start_info
+)
+{
+	rhi_component->Start( engine_start_info.rhi_start_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

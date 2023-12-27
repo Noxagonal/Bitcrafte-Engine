@@ -71,7 +71,7 @@ public:
 	inline const List<QueueFamilyInfo>					&	GetQueueFamilyPropertyList() const { return queue_family_property_list; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline operator VkPhysicalDevice() { return vk_physical_device; }
+	inline operator VkPhysicalDevice() const { return vk_physical_device; }
 
 private:
 

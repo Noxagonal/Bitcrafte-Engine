@@ -90,7 +90,6 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	}
 
 	// Setup debug utils messenger
-
 	auto minimum_debug_level_value = std::to_underlying( rhi_vulkan_impl.GetDebugSettings().minimum_debug_level );
 	auto debug_utils_message_severity = VkDebugUtilsMessageSeverityFlagsEXT {};
 	debug_utils_message_severity |= std::to_underlying( RHIDebugLevel::VERBOSE )	>= minimum_debug_level_value ? VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT : 0;
@@ -136,15 +135,15 @@ bc::rhi::VulkanInstance::VulkanInstance(
 
 
 	// Set layer and extension names to a struct we can give to VkInstanceCreateInfo struct directly
-	auto enabled_layer_names_temp = List<const char*> {};
-	auto enabled_extension_names_temp = List<const char*> {};
+	auto enabled_layer_names_c_str = List<const char*> {};
+	auto enabled_extension_names_c_str = List<const char*> {};
 	for( auto & n : enabled_layer_names )
 	{
-		enabled_layer_names_temp.PushBack( n.ToCStr() );
+		enabled_layer_names_c_str.PushBack( n.ToCStr() );
 	}
 	for( auto & n : enabled_extension_names )
 	{
-		enabled_extension_names_temp.PushBack( n.ToCStr() );
+		enabled_extension_names_c_str.PushBack( n.ToCStr() );
 	}
 
 
@@ -166,10 +165,10 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	create_info.pNext						= rhi_vulkan_impl.GetDebugSettings().debug_enabled ? &validation_features : nullptr;
 	create_info.flags						= 0;
 	create_info.pApplicationInfo			= &application_info;
-	create_info.enabledLayerCount			= uint32_t( enabled_layer_names_temp.Size() );
-	create_info.ppEnabledLayerNames			= enabled_layer_names_temp.Data();
-	create_info.enabledExtensionCount		= uint32_t( enabled_extension_names_temp.Size() );
-	create_info.ppEnabledExtensionNames		= enabled_extension_names_temp.Data();
+	create_info.enabledLayerCount			= uint32_t( enabled_layer_names_c_str.Size() );
+	create_info.ppEnabledLayerNames			= enabled_layer_names_c_str.Data();
+	create_info.enabledExtensionCount		= uint32_t( enabled_extension_names_c_str.Size() );
+	create_info.ppEnabledExtensionNames		= enabled_extension_names_c_str.Data();
 	BAssertVkResult( vkCreateInstance(
 		&create_info,
 		rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
