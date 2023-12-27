@@ -3,16 +3,25 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <rhi/RHIComponentCreateInfo.hpp>
 
+#include <core/event/Event.hpp>
+
 
 
 namespace bc {
+
+namespace window_manager {
+class WindowManagerComponent;
+class Window;
+}
+
 namespace rhi {
 
 
 
+struct RHIComponentStartInfo;
 class VulkanInstance;
 class VulkanDevice;
-struct RHIComponentStartInfo;
+class WindowContext;
 
 
 
@@ -45,7 +54,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIVulkanImpl(
-		const RHIComponentCreateInfo & create_info
+		window_manager::WindowManagerComponent				&	window_manager_component,
+		const RHIComponentCreateInfo						&	create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,8 +88,15 @@ private:
 	ApplicationInfo												application_info;
 	DebugSettings												debug_settings;
 
+	window_manager::WindowManagerComponent					&	window_manager_component;
+
 	UniquePtr<VulkanInstance>									vulkan_instance;
 	UniquePtr<VulkanDevice>										vulkan_device;
+
+	List<UniquePtr<WindowContext>>								window_context_list;
+
+	Event<window_manager::Window*>								OnWindowCreated;
+	Event<window_manager::Window*>								OnWindowBeingDestroyed;
 };
 
 

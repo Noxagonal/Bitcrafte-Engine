@@ -107,17 +107,19 @@ bc::UniquePtr<bc::rhi::RHIComponent> bc::engine::EngineComponent::CreateRHICompo
 	const EngineComponentCreateInfo & create_info
 )
 {
+	assert( !window_manager_component.IsEmpty() && "Window manager must have been added by this point as RHI needs it" );
+
 	#if BITCRAFTE_RHI_VULKAN
 	if( create_info.rhi_selection == EngineComponentCreateInfoRHISelection::VULKAN )
 	{
-		return MakeUniquePtr<rhi::RHIVulkanComponent>( create_info.rhi_create_info );
+		return MakeUniquePtr<rhi::RHIVulkanComponent>( *window_manager_component, create_info.rhi_create_info );
 	}
 	#endif // BITCRAFTE_RHI_VULKAN
 
 	#if BITCRAFTE_RHI_METAL
 	if( create_info.rhi_selection == EngineComponentCreateInfoRHISelection::VULKAN )
 	{
-		return MakeUniquePtr<rhi::RHIVulkanComponent>( create_info.rhi_create_info );
+		return MakeUniquePtr<rhi::RHIVulkanComponent>( *window_manager_component, create_info.rhi_create_info );
 	}
 	#endif // BITCRAFTE_RHI_METAL
 

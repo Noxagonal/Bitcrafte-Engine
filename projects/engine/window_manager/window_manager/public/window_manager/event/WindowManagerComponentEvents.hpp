@@ -19,12 +19,12 @@ struct WindowManagerComponentEvents
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Event that fires when window has just been created.
-	Event<Window*>											WindowCreated;
+	Event<Window*>											OnWindowCreated;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Event that fires just before window is going to be destroyed.
-	Event<Window*>											WindowBeingDestroyed;
+	Event<Window*>											OnWindowBeingDestroyed;
 };
 
 

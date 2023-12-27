@@ -50,12 +50,12 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static UniquePtr<window_manager::WindowManagerComponent>		CreateWindowManagerComponent(
+	UniquePtr<window_manager::WindowManagerComponent>				CreateWindowManagerComponent(
 		const EngineComponentCreateInfo							&	create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static UniquePtr<rhi::RHIComponent>								CreateRHIComponent(
+	UniquePtr<rhi::RHIComponent>									CreateRHIComponent(
 		const EngineComponentCreateInfo							&	create_info
 	);
 

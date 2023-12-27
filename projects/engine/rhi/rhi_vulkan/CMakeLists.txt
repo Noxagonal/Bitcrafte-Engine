@@ -12,6 +12,7 @@ add_engine_rhi_component(${THIS_TARGET_NAME}
 	PUBLIC_LIBRARY_DEPENDENCIES
 		core
 		rhi
+		window_manager
 	PRIVATE_LIBRARY_DEPENDENCIES
 		Vulkan::Vulkan
 )

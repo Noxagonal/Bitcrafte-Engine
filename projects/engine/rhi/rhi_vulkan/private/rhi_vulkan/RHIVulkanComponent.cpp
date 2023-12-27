@@ -8,11 +8,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanComponent::RHIVulkanComponent(
-	const RHIComponentCreateInfo & create_info
+	window_manager::WindowManagerComponent		&	window_manager_component,
+	const RHIComponentCreateInfo				&	create_info
 ) :
 	RHIComponent( create_info )
 {
-	rhi_vulkan_impl = CreateRHIVulkanImpl( create_info );
+	rhi_vulkan_impl = CreateRHIVulkanImpl( window_manager_component, create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,10 +32,11 @@ void bc::rhi::RHIVulkanComponent::Start(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::UniquePtr<bc::rhi::RHIVulkanImpl> bc::rhi::RHIVulkanComponent::CreateRHIVulkanImpl(
-	const RHIComponentCreateInfo & create_info
+	window_manager::WindowManagerComponent		&	window_manager_component,
+	const RHIComponentCreateInfo				&	create_info
 )
 {
-	return MakeUniquePtr<RHIVulkanImpl>( create_info );
+	return MakeUniquePtr<RHIVulkanImpl>( window_manager_component, create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -32,5 +32,4 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerWin32
 )
 {
 	return win32_manager->CreateWindow( window_create_info );
-	return {};
 }

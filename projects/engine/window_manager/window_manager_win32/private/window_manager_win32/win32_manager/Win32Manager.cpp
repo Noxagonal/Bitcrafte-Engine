@@ -472,7 +472,7 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::Win32Manager::Crea
 {
 	auto new_window = MakeUniquePtr<Win32Window>( *this, window_create_info );
 	active_window_list.PushBack( new_window.Get() );
-	window_manager_win32_component.events.WindowCreated.Signal( new_window.Get() );
+	window_manager_win32_component.events.OnWindowCreated.Signal( new_window.Get() );
 	return new_window;
 }
 
@@ -481,7 +481,7 @@ void bc::window_manager::Win32Manager::NotifyWindowBeingDestroyed(
 	bc::window_manager::Win32Window * window_ptr
 )
 {
-	window_manager_win32_component.events.WindowBeingDestroyed.Signal( window_ptr );
+	window_manager_win32_component.events.OnWindowBeingDestroyed.Signal( window_ptr );
 	active_window_list.Erase( window_ptr );
 }
 

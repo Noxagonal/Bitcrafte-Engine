@@ -8,6 +8,9 @@
 
 
 namespace bc {
+
+namespace window_manager { class WindowManagerComponent; }
+
 namespace rhi {
 
 
@@ -23,6 +26,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIVulkanComponent(
+		window_manager::WindowManagerComponent						&	window_manager_component,
 		const RHIComponentCreateInfo								&	create_info
 	);
 
@@ -44,6 +48,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	static UniquePtr<RHIVulkanImpl>										CreateRHIVulkanImpl(
+		window_manager::WindowManagerComponent						&	window_manager_component,
 		const RHIComponentCreateInfo								&	create_info
 	);
 

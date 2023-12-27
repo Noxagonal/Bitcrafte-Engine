@@ -1,11 +1,14 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
+
 #include <core/memory/raw/RawMemory.hpp>
 #include <rhi_vulkan/vk/instance/VulkanInstance.hpp>
 #include <rhi_vulkan/vk/device/VulkanDevice.hpp>
 #include <rhi/RHIComponentStartInfo.hpp>
 
+#include <window_manager/WindowManagerComponent.hpp>
+#include <rhi_vulkan/window_context/WindowContext.hpp>
 
 
 
@@ -58,7 +61,7 @@ void VKAPI_PTR VulkanMemoryInternalFreeNotification(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanImpl::ApplicationInfo::ApplicationInfo(
-	const RHIComponentCreateInfo & create_info
+	const RHIComponentCreateInfo		&	create_info
 )
 {
 	application_name			= create_info.application_name;
@@ -78,8 +81,10 @@ bc::rhi::RHIVulkanImpl::DebugSettings::DebugSettings(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanImpl::RHIVulkanImpl(
-	const RHIComponentCreateInfo & create_info
+	window_manager::WindowManagerComponent		&	window_manager_component,
+	const RHIComponentCreateInfo				&	create_info
 ) :
+	window_manager_component( window_manager_component ),
 	application_info( create_info ),
 	debug_settings( create_info )
 {
@@ -107,6 +112,26 @@ void bc::rhi::RHIVulkanImpl::Start(
 {
 	auto & selected_physical_device = vulkan_instance->GetPhysicalDeviceList()[ rhi_start_info.use_device ];
 	vulkan_device = MakeUniquePtr<VulkanDevice>( *this, selected_physical_device, rhi_start_info );
+
+	window_manager_component.events.OnWindowCreated.RegisterObserver( &OnWindowCreated );
+	window_manager_component.events.OnWindowBeingDestroyed.RegisterObserver( &OnWindowBeingDestroyed );
+
+	OnWindowCreated.RegisterCallback( [ this ]( window_manager::Window * window )
+		{
+			window_context_list.PushBack( MakeUniquePtr<WindowContext>( *this, window ) );
+		}
+	);
+	OnWindowBeingDestroyed.RegisterCallback( [ this ]( window_manager::Window * window )
+		{
+			auto it = std::find_if( window_context_list.begin(), window_context_list.end(), [ window ]( auto & window_context )
+				{
+					return window_context->GetWindow() == window;
+				}
+			);
+			if( it == window_context_list.end() ) return;
+			window_context_list.Erase( it );
+		}
+	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
