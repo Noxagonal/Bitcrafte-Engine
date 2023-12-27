@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <window_manager/WindowManagerComponentCreateInfo.hpp>
-
+#include <window_manager/event/WindowManagerComponentEvents.hpp>
 #include <window_manager/window/Window.hpp>
 
 #include <core/containers/UniquePtr.hpp>
@@ -35,6 +35,8 @@ public:
 	virtual UniquePtr<Window>									CreateWindow(
 		const WindowCreateInfo								&	window_create_info
 	) = 0;
+
+	WindowManagerComponentEvents								events;
 
 private:
 };

@@ -4,6 +4,7 @@
 
 #include <window_manager/window/Window.hpp>
 #include <window_manager_win32/window/Win32Window.hpp>
+#include <window_manager_win32/WindowManagerWin32Component.hpp>
 
 
 
@@ -426,8 +427,10 @@ LRESULT CALLBACK WndProc(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::Win32Manager::Win32Manager(
-	const WindowManagerComponentCreateInfo & window_manager_component_create_info
-)
+	WindowManagerWin32Component				&	window_manager_win32_component,
+	const WindowManagerComponentCreateInfo	&	window_manager_component_create_info
+) :
+	window_manager_win32_component( window_manager_win32_component )
 {
 	// Register window class
 	window_class					= { 0 };
@@ -469,14 +472,16 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::Win32Manager::Crea
 {
 	auto new_window = MakeUniquePtr<Win32Window>( *this, window_create_info );
 	active_window_list.PushBack( new_window.Get() );
+	window_manager_win32_component.events.WindowCreated.Signal( new_window.Get() );
 	return new_window;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::Win32Manager::NotifyWindowDestroyed(
+void bc::window_manager::Win32Manager::NotifyWindowBeingDestroyed(
 	bc::window_manager::Win32Window * window_ptr
 )
 {
+	window_manager_win32_component.events.WindowBeingDestroyed.Signal( window_ptr );
 	active_window_list.Erase( window_ptr );
 }
 

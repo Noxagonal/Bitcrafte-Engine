@@ -18,9 +18,11 @@ namespace window_manager {
 
 
 struct WindowManagerComponentCreateInfo;
-class Window;
+class WindowManagerWin32Component;
 class Win32Window;
+
 struct WindowCreateInfo;
+class Window;
 
 
 
@@ -31,6 +33,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Win32Manager(
+		WindowManagerWin32Component								&	window_manager_win32_component,
 		const WindowManagerComponentCreateInfo					&	window_manager_component_create_info
 	);
 
@@ -46,7 +49,7 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void															NotifyWindowDestroyed(
+	void															NotifyWindowBeingDestroyed(
 		Win32Window												*	window_ptr
 	);
 
@@ -59,10 +62,11 @@ private:
 	void															ProcessMessages();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	WindowManagerWin32Component									&	window_manager_win32_component;
+
 	Text16															window_class_name			= "BitCrafteEngineWindowClass";
 	WNDCLASSW														window_class				= {};
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	List<Win32Window*>												active_window_list;
 };
 

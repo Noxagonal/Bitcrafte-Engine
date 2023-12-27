@@ -11,7 +11,7 @@ bc::window_manager::WindowManagerWin32Component::WindowManagerWin32Component(
 ) :
 	WindowManagerComponent( create_info )
 {
-	win32_manager = MakeUniquePtr<Win32Manager>( create_info );
+	win32_manager = MakeUniquePtr<Win32Manager>( *this, create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
