@@ -44,10 +44,13 @@ bc::window_manager::Win32Window::Win32Window(
 	settings( window_create_info ),
 	win32_manager( win32_manager )
 {
-	style		= settings.MakeWindowStyle();
+	platform_handles.hWnd		= NULL;
+	platform_handles.hInstance	= win32_manager.GetWindowClass().hInstance;
+
+	style = settings.MakeWindowStyle();
 
 	// Create a window
-	window_handle = CreateWindowExW(
+	platform_handles.hWnd = CreateWindowExW(
 		0,
 		win32_manager.GetWindowClass().lpszClassName,
 		L"My Window",
@@ -56,25 +59,25 @@ bc::window_manager::Win32Window::Win32Window(
 		NULL, NULL, NULL, NULL
 	);
 
-	if( window_handle == NULL )
+	if( platform_handles.hWnd == NULL )
 	{
 		MessageBoxW( NULL, L"Window Creation Failed!", L"Error", MB_ICONEXCLAMATION | MB_OK );
 		BHardAssert( 0, "Window registration failed" );
 	}
 
 	// Set user data to this so we can use this window class later.
-	SetWindowLongPtr( window_handle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>( this ) );
+	SetWindowLongPtr( platform_handles.hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>( this ) );
 
 	// Show and update the window
-	ShowWindow( window_handle, SW_SHOWNORMAL );
-	UpdateWindow( window_handle );
+	ShowWindow( platform_handles.hWnd, SW_SHOWNORMAL );
+	UpdateWindow( platform_handles.hWnd );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::Win32Window::~Win32Window()
 {
 	win32_manager.NotifyWindowBeingDestroyed( this );
-	DestroyWindow( window_handle );
+	DestroyWindow( platform_handles.hWnd );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,4 +121,10 @@ void bc::window_manager::Win32Window::SetResizeable(
 void bc::window_manager::Win32Window::Update()
 {
 	// TODO
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void * bc::window_manager::Win32Window::GetPlatformSpecificHandles()
+{
+	return &platform_handles;
 }

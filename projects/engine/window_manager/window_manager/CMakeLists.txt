@@ -10,3 +10,5 @@ add_engine_window_manager_component(${THIS_TARGET_NAME}
 	PUBLIC_LIBRARY_DEPENDENCIES
 		core
 )
+
+set_window_manager_component_defines(${THIS_TARGET_NAME})

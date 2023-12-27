@@ -2,6 +2,8 @@
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/window_context/WindowContext.hpp>
 
+#include <rhi_vulkan/vk/surface/VulkanWindowSurface.hpp>
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -12,9 +14,11 @@ bc::rhi::WindowContext::WindowContext(
 	rhi_vulkan_impl( rhi_vulkan_impl ),
 	window( window )
 {
-	window;
+	window_surface = MakeUniquePtr<VulkanWindowSurface>( rhi_vulkan_impl, window );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::WindowContext::~WindowContext()
-{}
+{
+	window_surface = nullptr;
+}

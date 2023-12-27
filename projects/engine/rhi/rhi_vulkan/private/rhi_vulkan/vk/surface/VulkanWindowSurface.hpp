@@ -13,33 +13,29 @@ namespace rhi {
 
 
 class RHIVulkanImpl;
-class VulkanWindowSurface;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class WindowContext
+class VulkanWindowSurface
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	WindowContext(
-		RHIVulkanImpl										&	rhi_vulkan_impl,
-		window_manager::Window								*	window
+	VulkanWindowSurface(
+		RHIVulkanImpl								&	rhi_vulkan_impl,
+		window_manager::Window						*	window
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~WindowContext();
-
-	inline window_manager::Window							*	GetWindow() { return window; }
+	~VulkanWindowSurface();
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIVulkanImpl											&	rhi_vulkan_impl;
-	window_manager::Window									*	window;
-
-	UniquePtr<VulkanWindowSurface>								window_surface;
+	VkSurfaceKHR										vk_surface						= VK_NULL_HANDLE;
+	RHIVulkanImpl									&	rhi_vulkan_impl;
+	window_manager::Window							*	window							= nullptr;
 };
 
 

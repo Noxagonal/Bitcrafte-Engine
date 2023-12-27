@@ -4,17 +4,12 @@
 #include <vulkan/vulkan.h>
 
 // Add appropriate platform specific includes.
-#if BITCRAFTE_PLATFORM_WINDOWS
+#if BITCRAFTE_WINDOW_MANAGER_WIN32
 #include <Windows.h>
+#undef ERROR
 #include <vulkan/vulkan_win32.h>
-#elif BITCRAFTE_PLATFORM_LINUX
+#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 #include <vulkan/vulkan_wayland.h>
-#elif BITCRAFTE_PLATFORM_APPLE
-#include <vulkan/vulkan_macos.h>
-#elif BITCRAFTE_PLATFORM_IOS
-#include <vulkan/vulkan_ios.h>
-#elif BITCRAFTE_PLATFORM_ANDROID
-#include <vulkan/vulkan_android.h>
 #else
 #error "Please add platform support here"
 #endif

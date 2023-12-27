@@ -4,9 +4,10 @@
 #include <window_manager/window/Window.hpp>
 
 #include <Windows.h>
-
 // Prevent polluting CreateWindow all over the place
 #undef CreateWindow
+
+#include <window_manager/platform/handles/WindowPlatformHandles.hpp>
 
 
 
@@ -62,7 +63,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Win32Window(
-		Win32Manager								&	win32_manager,
+		Win32Manager									&	win32_manager,
 		const WindowCreateInfo							&	window_create_info
 	);
 
@@ -90,15 +91,19 @@ public:
 	inline const RuntimeInfo							&	GetRuntimeInfo() { return runtime_info; }
 	inline const Settings								&	GetSettings() { return settings; }
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual void										*	GetPlatformSpecificHandles();
+
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Win32Manager									&	win32_manager;
+	Win32Manager										&	win32_manager;
 
 	RuntimeInfo												runtime_info;
 	Settings												settings;
 
-	HWND													window_handle				= NULL;
+	WindowManagerWin32PlatformHandles						platform_handles			= {};
+
 	DWORD													style						= {};
 };
 
