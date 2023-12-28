@@ -299,6 +299,16 @@ public:
 			( this->data <= this->container->Data() + this->container->Size() );
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr explicit operator bool() noexcept
+	{
+		if( this->container == nullptr ) return false;
+		if( this->data == nullptr ) return false;
+		if( this->data < this->container->Data() ) return false;
+		if( this->data >= this->container->Data() + this->container->Size() ) return false;
+		return true;
+	}
+
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
