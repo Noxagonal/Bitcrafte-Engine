@@ -46,12 +46,16 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIVulkanImpl								&	rhi_vulkan_impl;
-	VkInstance										vk_instance						= nullptr;
+	VkInstance										vk_instance									= nullptr;
 
 	List<Text>										enabled_layer_names;
 	List<Text>										enabled_extension_names;
 
 	List<VulkanPhysicalDevice>						physical_devices;
+
+	PFN_vkCreateDebugUtilsMessengerEXT				vkCreateDebugUtilsMessengerEXT_func			= nullptr;
+	PFN_vkDestroyDebugUtilsMessengerEXT				vkDestroyDebugUtilsMessengerEXT_func		= nullptr;
+	VkDebugUtilsMessengerEXT						debug_utils_messenger						= VK_NULL_HANDLE;
 };
 
 

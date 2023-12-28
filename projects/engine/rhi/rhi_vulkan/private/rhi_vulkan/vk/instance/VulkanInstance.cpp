@@ -79,6 +79,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
+	enabled_extension_names.PushBack( VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME );
 	enabled_extension_names.PushBack( VK_KHR_SURFACE_EXTENSION_NAME );
 	enabled_extension_names += GetPlatformSpecificInstanceExtensionNames();
 
@@ -177,12 +178,39 @@ bc::rhi::VulkanInstance::VulkanInstance(
 
 	GetCore()->GetLogger()->LogVerbose( U"Vulkan instance created" );
 
+	// Vulkan validation
+	if( rhi_vulkan_impl.GetDebugSettings().debug_enabled )
+	{
+		vkCreateDebugUtilsMessengerEXT_func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr( vk_instance, "vkCreateDebugUtilsMessengerEXT" );
+		assert( vkCreateDebugUtilsMessengerEXT_func );
+
+		vkDestroyDebugUtilsMessengerEXT_func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr( vk_instance, "vkDestroyDebugUtilsMessengerEXT" );
+		assert( vkDestroyDebugUtilsMessengerEXT_func );
+
+		BAssertVkResult( vkCreateDebugUtilsMessengerEXT_func(
+			vk_instance,
+			&debug_utils_messenger_create_info,
+			rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
+			&debug_utils_messenger
+		) );
+	}
+
 	physical_devices = FetchPhysicalDevices();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanInstance::~VulkanInstance()
 {
+	if( debug_utils_messenger )
+	{
+		vkDestroyDebugUtilsMessengerEXT_func(
+			vk_instance,
+			debug_utils_messenger,
+			rhi_vulkan_impl.GetMainThreadAllocationCallbacks()
+		);
+		debug_utils_messenger = VK_NULL_HANDLE;
+	}
+
 	vkDestroyInstance(
 		vk_instance,
 		rhi_vulkan_impl.GetMainThreadAllocationCallbacks()
