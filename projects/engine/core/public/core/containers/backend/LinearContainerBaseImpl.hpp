@@ -606,7 +606,7 @@ protected:
 	{
 		auto it = this->data_ptr;
 		auto it_end = this->data_ptr + this->data_size;
-		if( it != it_end )
+		while( it != it_end )
 		{
 			if( *it == value )
 			{
@@ -633,7 +633,7 @@ protected:
 	{
 		auto it = this->data_ptr;
 		auto it_end = this->data_ptr + this->data_size;
-		if( it != it_end )
+		while( it != it_end )
 		{
 			if( *it == value )
 			{
