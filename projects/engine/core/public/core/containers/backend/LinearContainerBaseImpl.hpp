@@ -645,6 +645,65 @@ protected:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container.
+	///
+	/// @param value
+	///	Value to find.
+	/// 
+	/// @return
+	/// Pointer to value position where value was found.
+	template<typename LambdaType>
+	[[nodiscard]]
+	constexpr const ValueType																		*	DoFindIf(
+		LambdaType																					&&	lambda
+	) const BC_CONTAINER_NOEXCEPT
+	{
+		auto it = this->data_ptr;
+		auto it_end = this->data_ptr + this->data_size;
+		while( it != it_end )
+		{
+			if( lambda( *it ) )
+			{
+				return it;
+			}
+			++it;
+		}
+		return it;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container if lambda returns true.
+	///
+	/// @tparam LambdaType
+	/// Type of the lambda which is used to search.
+	///
+	/// @param lambda
+	///	Lambda function that is invoked to test if we found what we're looking for.
+	/// 
+	/// @return
+	/// Iterator to value position where value was found.
+	template<typename LambdaType>
+	[[nodiscard]]
+	constexpr ValueType																				*	DoFindIf(
+		LambdaType																					&&	lambda
+	) BC_CONTAINER_NOEXCEPT
+	{
+		auto it = this->data_ptr;
+		auto it_end = this->data_ptr + this->data_size;
+		while( it != it_end )
+		{
+			if( lambda( *it ) )
+			{
+				return it;
+			}
+			++it;
+		}
+		return it;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																						*	data_ptr				= {};
 	size_t																								data_size				= {};
 };

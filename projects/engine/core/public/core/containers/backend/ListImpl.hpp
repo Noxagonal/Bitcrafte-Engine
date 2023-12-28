@@ -174,7 +174,7 @@ public:
 	///	Value to find.
 	/// 
 	/// @return
-	/// Pointer to value position where value was found.
+	/// Iterator to value position where value was found.
 	[[nodiscard]]
 	constexpr ConstIterator																				Find(
 		const ValueType																				&	value
@@ -191,13 +191,55 @@ public:
 	///	Value to find.
 	/// 
 	/// @return
-	/// Pointer to value position where value was found.
+	/// Iterator to value position where value was found.
 	[[nodiscard]]
 	constexpr IteratorBase<IsConst>																		Find(
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		return IteratorBase<IsConst>( this, this->DoFind( value ) );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container if lambda returns true.
+	///
+	/// @tparam LambdaType
+	/// Type of the lambda which is used to search.
+	///
+	/// @param lambda
+	///	Lambda function that is invoked to test if we found what we're looking for.
+	/// 
+	/// @return
+	/// Iterator to value position where value was found.
+	template<typename LambdaType>
+	[[nodiscard]]
+	constexpr ConstIterator																				FindIf(
+		LambdaType																					&&	lambda
+	) const BC_CONTAINER_NOEXCEPT
+	{
+		return IteratorBase<IsConst>( this, this->DoFindIf( lambda ) );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container if lambda returns true.
+	///
+	/// @tparam LambdaType
+	/// Type of the lambda which is used to search.
+	///
+	/// @param lambda
+	///	Lambda function that is invoked to test if we found what we're looking for.
+	/// 
+	/// @return
+	/// Iterator to value position where value was found.
+	template<typename LambdaType>
+	[[nodiscard]]
+	constexpr IteratorBase<IsConst>																		FindIf(
+		LambdaType																					&&	lambda
+	) BC_CONTAINER_NOEXCEPT
+	{
+		return IteratorBase<IsConst>( this, this->DoFindIf( lambda ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -728,7 +770,7 @@ public:
 	///	Value to find.
 	/// 
 	/// @return
-	/// Pointer to value position where value was found.
+	/// Iterator to value position where value was found.
 	[[nodiscard]]
 	constexpr ConstIterator																				Find(
 		const ValueType																				&	value
@@ -746,13 +788,57 @@ public:
 	///	Value to find.
 	/// 
 	/// @return
-	/// Pointer to value position where value was found.
+	/// Iterator to value position where value was found.
 	[[nodiscard]]
 	constexpr Iterator																					Find(
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).Find( value );
+		return Iterator { this, result.GetData() };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container if lambda returns true.
+	///
+	/// @tparam LambdaType
+	/// Type of the lambda which is used to search.
+	///
+	/// @param lambda
+	///	Lambda function that is invoked to test if we found what we're looking for.
+	/// 
+	/// @return
+	/// Iterator to value position where value was found.
+	template<typename LambdaType>
+	[[nodiscard]]
+	constexpr ConstIterator																				FindIf(
+		LambdaType																					&&	lambda
+	) const BC_CONTAINER_NOEXCEPT
+	{
+		auto result = ThisViewType<true>( *this ).FindIf( lambda );
+		return ConstIterator { this, result.GetData() };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurance of a specific value in this container if lambda returns true.
+	///
+	/// @tparam LambdaType
+	/// Type of the lambda which is used to search.
+	///
+	/// @param lambda
+	///	Lambda function that is invoked to test if we found what we're looking for.
+	/// 
+	/// @return
+	/// Iterator to value position where value was found.
+	template<typename LambdaType>
+	[[nodiscard]]
+	constexpr Iterator																					FindIf(
+		LambdaType																					&&	lambda
+	) BC_CONTAINER_NOEXCEPT
+	{
+		auto result = ThisViewType<true>( *this ).FindIf( lambda );
 		return Iterator { this, result.GetData() };
 	}
 
