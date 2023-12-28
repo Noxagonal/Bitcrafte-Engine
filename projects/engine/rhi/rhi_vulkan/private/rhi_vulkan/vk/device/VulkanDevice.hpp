@@ -34,6 +34,9 @@ public:
 	~VulkanDevice();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	const VulkanPhysicalDevice							&	GetVulkanPhysicalDevice() { return physical_device; }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Queue												&	GetPrimaryRenderQueue() { return primary_render_queue; }
 	Queue												&	GetSecondaryRenderQueue() { return secondary_render_queue; }
 	Queue												&	GetPrimaryComputeQueue() { return primary_compute_queue; }
