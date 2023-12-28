@@ -60,33 +60,11 @@ void VKAPI_PTR VulkanMemoryInternalFreeNotification(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIVulkanImpl::ApplicationInfo::ApplicationInfo(
-	const RHIComponentCreateInfo		&	create_info
-)
-{
-	application_name			= create_info.application_name;
-	application_version			= create_info.application_version;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIVulkanImpl::DebugSettings::DebugSettings(
-	const RHIComponentCreateInfo & create_info
-)
-{
-	debug_enabled				= create_info.enable_debug;
-	minimum_debug_level			= create_info.minimum_debug_level;
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanImpl::RHIVulkanImpl(
 	window_manager::WindowManagerComponent		&	window_manager_component,
 	const RHIComponentCreateInfo				&	create_info
 ) :
-	window_manager_component( window_manager_component ),
-	application_info( create_info ),
-	debug_settings( create_info )
+	window_manager_component( window_manager_component )
 {
 	main_thread_allocation_callbacks.pUserData				= this;
 	main_thread_allocation_callbacks.pfnAllocation			= VulkanMemoryAllocationFunction;
@@ -94,6 +72,14 @@ bc::rhi::RHIVulkanImpl::RHIVulkanImpl(
 	main_thread_allocation_callbacks.pfnFree				= VulkanMemoryFreeFunction;
 	main_thread_allocation_callbacks.pfnInternalAllocation	= VulkanMemoryInternalAllocationNotification;
 	main_thread_allocation_callbacks.pfnInternalFree		= VulkanMemoryInternalFreeNotification;
+
+	// Fill out application info
+	application_info.application_name			= create_info.application_name;
+	application_info.application_version		= create_info.application_version;
+
+	// Fill out debug settings
+	debug_settings.debug_enabled				= create_info.enable_debug;
+	debug_settings.minimum_debug_level			= create_info.minimum_debug_level;
 
 	vulkan_instance		= MakeUniquePtr<VulkanInstance>( *this );
 }
@@ -118,7 +104,16 @@ void bc::rhi::RHIVulkanImpl::Start(
 
 	OnWindowCreated.RegisterCallback( [ this ]( window_manager::Window * window )
 		{
-			window_context_list.PushBack( MakeUniquePtr<WindowContext>( *this, window ) );
+			auto window_context_create_info = WindowContextCreateInfo {};
+			// TODO: Hard-coded value for now. Eventually this should be get from global settings.
+			// Also this option is only the initial value, the user should be able change this at runtime.
+			// Internally this means recreating the swapchain.
+			// This might also be the wrong place for swapchain considerations. Initial swapchain should be
+			// pretty self contained, besides reading some initial global settings.
+			// Window should decide the swapchain settings but I'm not sure where to put these settings yet.
+			window_context_create_info.swapchain_create_info.use_v_sync = true;
+
+			window_context_list.PushBack( MakeUniquePtr<WindowContext>( *this, window, window_context_create_info ) );
 		}
 	);
 	OnWindowBeingDestroyed.RegisterCallback( [ this ]( window_manager::Window * window )
@@ -135,7 +130,7 @@ void bc::rhi::RHIVulkanImpl::Start(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int64_t bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice() const
+int64_t bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice()
 {
 	auto & physical_device_list = vulkan_instance->GetPhysicalDeviceList();
 

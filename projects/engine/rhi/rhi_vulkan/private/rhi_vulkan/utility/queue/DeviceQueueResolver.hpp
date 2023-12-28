@@ -1,7 +1,7 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <rhi_vulkan/vk/queue/Queue.hpp>
+#include <rhi_vulkan/vk/queue/VulkanQueue.hpp>
 #include <rhi_vulkan/vk/physical_device/VulkanPhysicalDevice.hpp>
 
 #include <core/containers/List.hpp>
@@ -55,7 +55,7 @@ public:
 	const List<VkDeviceQueueCreateInfo>					&	GetDeviceQueueCreateInfos();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<Queue>												GetQueues(
+	List<VulkanQueue>										GetVulkanQueues(
 		VkDevice											device
 	);
 

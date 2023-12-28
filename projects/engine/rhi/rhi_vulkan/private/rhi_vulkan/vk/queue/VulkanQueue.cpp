@@ -1,11 +1,11 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
-#include <rhi_vulkan/vk/queue/Queue.hpp>
+#include <rhi_vulkan/vk/queue/VulkanQueue.hpp>
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::Queue::Submit(
+void bc::rhi::VulkanQueue::Submit(
 	const bc::List<VkCommandBuffer>							&	command_buffers,
 	const bc::List<Pair<VkSemaphore, VkPipelineStageFlags>>	&	wait_semaphores,
 	const bc::List<VkSemaphore>								&	signal_semaphores,
@@ -41,7 +41,7 @@ void bc::rhi::Queue::Submit(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::Queue::Submit(
+void bc::rhi::VulkanQueue::Submit(
 	const bc::List<SubmitInfo>		&	submit_infos,
 	VkFence								fence )
 {
@@ -82,7 +82,7 @@ void bc::rhi::Queue::Submit(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::Queue::Present(
+void bc::rhi::VulkanQueue::Present(
 	const bc::List<VkSemaphore>				&	wait_semaphores,
 	const bc::List<SwapchainPresentInfo>		&	swapchains
 )
@@ -121,31 +121,31 @@ void bc::rhi::Queue::Present(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-VkQueue bc::rhi::Queue::GetQueue() const
+VkQueue bc::rhi::VulkanQueue::GetQueue() const
 {
 	return queue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t bc::rhi::Queue::GetQueueFamilyIndex() const
+uint32_t bc::rhi::VulkanQueue::GetQueueFamilyIndex() const
 {
 	return queue_family_index;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-VkBool32 bc::rhi::Queue::SupportsPresentation() const
+VkBool32 bc::rhi::VulkanQueue::SupportsPresentation() const
 {
 	return supports_presentation;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const VkQueueFamilyProperties & bc::rhi::Queue::GetQueueFamilyProperties() const
+const VkQueueFamilyProperties & bc::rhi::VulkanQueue::GetQueueFamilyProperties() const
 {
 	return queue_family_properties;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t bc::rhi::Queue::GetBasedOn() const
+uint32_t bc::rhi::VulkanQueue::GetBasedOn() const
 {
 	return based_on;
 }

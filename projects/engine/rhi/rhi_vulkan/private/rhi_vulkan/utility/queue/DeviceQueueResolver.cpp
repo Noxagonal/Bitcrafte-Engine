@@ -159,11 +159,11 @@ const bc::List<VkDeviceQueueCreateInfo> & bc::rhi::DeviceQueueResolver::GetDevic
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::List<bc::rhi::Queue> bc::rhi::DeviceQueueResolver::GetQueues(
+bc::List<bc::rhi::VulkanQueue> bc::rhi::DeviceQueueResolver::GetVulkanQueues(
 	VkDevice device
 )
 {
-	List<Queue> ret( queue_get_info.Size() );
+	List<VulkanQueue> ret( queue_get_info.Size() );
 	for( uint32_t i=0; i < ret.Size(); ++i )
 	{
 		ret[ i ].queue_mutex				= nullptr;

@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanDevice::VulkanDevice(
 	RHIVulkanImpl						&	rhi_vulkan_impl,
-	const VulkanPhysicalDevice			&	physical_device,
+	VulkanPhysicalDevice				&	physical_device,
 	const RHIComponentStartInfo			&	rhi_start_info
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl ),
@@ -76,7 +76,7 @@ bc::rhi::VulkanDevice::VulkanDevice(
 		&vk_device
 	) );
 
-	auto logical_queues			= queue_resolver.GetQueues( vk_device );
+	auto logical_queues			= queue_resolver.GetVulkanQueues( vk_device );
 	primary_render_queue		= logical_queues[ 0 ];
 	secondary_render_queue		= logical_queues[ 1 ];
 	primary_compute_queue		= logical_queues[ 2 ];

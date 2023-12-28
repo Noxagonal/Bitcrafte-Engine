@@ -33,10 +33,6 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct ApplicationInfo
 	{
-		ApplicationInfo(
-			const RHIComponentCreateInfo					&	create_info
-		);
-
 		Text32													application_name					= {};
 		utility::Version										application_version					= {};
 	};
@@ -44,10 +40,6 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct DebugSettings
 	{
-		DebugSettings(
-			const RHIComponentCreateInfo					&	create_info
-		);
-
 		bool													debug_enabled						= false;
 		RHIDebugLevel											minimum_debug_level					= RHIDebugLevel::VERBOSE;
 	};
@@ -67,7 +59,8 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	int64_t														GetBestPhysicalDevice() const;
+	int64_t														GetBestPhysicalDevice();
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline const VkAllocationCallbacks						*	GetMainThreadAllocationCallbacks() { return &main_thread_allocation_callbacks; }
 
