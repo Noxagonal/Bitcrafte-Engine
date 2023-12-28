@@ -42,7 +42,7 @@ bc::UniquePtr<bc::rhi::RHIVulkanImpl> bc::rhi::RHIVulkanComponent::CreateRHIVulk
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::List<bc::Text> bc::rhi::RHIVulkanComponent::GetGraphicsCardList()
 {
-	auto physical_device_list = rhi_vulkan_impl->GetVulkanInstance().GetPhysicalDeviceList();
+	auto & physical_device_list = rhi_vulkan_impl->GetVulkanInstance().GetPhysicalDeviceList();
 	auto result = List<Text>();
 	result.Reserve( physical_device_list.Size() );
 	for( auto & p : physical_device_list )

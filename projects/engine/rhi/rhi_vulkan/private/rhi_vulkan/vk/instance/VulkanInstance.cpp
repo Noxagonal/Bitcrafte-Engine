@@ -13,6 +13,7 @@
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 VkBool32 VKAPI_PTR VulkanDebugUtilsMessengerCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT			messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT					messageTypes,
