@@ -47,7 +47,7 @@ bc::List<bc::Text> bc::rhi::RHIVulkanComponent::GetGraphicsCardList()
 	result.Reserve( physical_device_list.Size() );
 	for( auto & p : physical_device_list )
 	{
-		result.PushBack( p.GetProperties().properties.properties.deviceName );
+		result.PushBack( p.GetProperties().properties.deviceName );
 	}
 	return result;
 }

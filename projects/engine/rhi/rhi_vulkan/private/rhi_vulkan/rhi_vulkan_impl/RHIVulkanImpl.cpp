@@ -148,21 +148,21 @@ int64_t bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice() const
 				auto & s = result[ i ];
 				auto & p = pd.GetProperties();
 				s += 1000; // some intial score
-				s += uint64_t( p.properties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ) * 16000;
-				s += uint64_t( p.properties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ) * 5000;
-				s += uint64_t( p.properties.properties.limits.maxImageDimension2D );
-				s += uint64_t( p.properties.properties.limits.maxPerStageDescriptorUniformBuffers ) * 20;
-				s += uint64_t( p.properties.properties.limits.maxPerStageDescriptorSampledImages ) * 40;
-				s += uint64_t( p.properties.properties.limits.maxVertexInputBindings ) * 10;
-				s += uint64_t( p.properties.properties.limits.maxComputeWorkGroupInvocations );
-				s += uint64_t( p.properties.properties.limits.maxSamplerAnisotropy ) * 200;
+				s += uint64_t( p.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ) * 16000;
+				s += uint64_t( p.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ) * 5000;
+				s += uint64_t( p.properties.limits.maxImageDimension2D );
+				s += uint64_t( p.properties.limits.maxPerStageDescriptorUniformBuffers ) * 20;
+				s += uint64_t( p.properties.limits.maxPerStageDescriptorSampledImages ) * 40;
+				s += uint64_t( p.properties.limits.maxVertexInputBindings ) * 10;
+				s += uint64_t( p.properties.limits.maxComputeWorkGroupInvocations );
+				s += uint64_t( p.properties.limits.maxSamplerAnisotropy ) * 200;
 
 				// Check if physical device can present
-				auto can_present			= false;
-				auto queue_family_list		= pd.GetQueueFamilyPropertyList();
-				for( auto & f : queue_family_list )
+				auto can_present						= false;
+				auto queue_family_can_present_list		= pd.GetQueueFamilyProperties().can_present;
+				for( auto p : queue_family_can_present_list )
 				{
-					if( f.can_present )
+					if( p )
 					{
 						can_present = true;
 						break;

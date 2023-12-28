@@ -17,17 +17,17 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	physical_device( physical_device ),
 	vk_instance( rhi_vulkan_impl.GetVulkanInstance() ),
 	queue_types( queue_types ),
-	queue_family_property_list( physical_device.GetQueueFamilyPropertyList() )
+	queue_family_properties( physical_device.GetQueueFamilyProperties() )
 {
 	BHardAssert( queue_types.Size() > 0, "No queue types requested" );
 
 	// available queues for the family, we can substract from this to test if queues are available or not
-	auto available_queues		= List<uint32_t>( queue_family_property_list.Size() );
+	auto available_queues		= List<uint32_t>( queue_family_properties.queue_family_properties.Size() );
 	// family allocations, outside List represents the queue family, inside List represents indices to the queue_types
-	auto family_allocations		= List<List<uint32_t>>( queue_family_property_list.Size() );
-	for( size_t i = 0; i < queue_family_property_list.Size(); ++i )
+	auto family_allocations		= List<List<uint32_t>>( queue_family_properties.queue_family_properties.Size() );
+	for( size_t i = 0; i < queue_family_properties.queue_family_properties.Size(); ++i )
 	{
-		available_queues[ i ]	= queue_family_property_list[ i ].queue_family_properties.queueFamilyProperties.queueCount;
+		available_queues[ i ]	= queue_family_properties.queue_family_properties[ i ].queueFamilyProperties.queueCount;
 	}
 	// queueGetInfo tells how to get the queues from the device after device creation
 	queue_get_info.Resize( this->queue_types.Size() );
@@ -42,9 +42,9 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	for( uint32_t q = 0; q < this->queue_types.Size(); ++q )
 	{
 		uint32_t family_candidate = UINT32_MAX;
-		for( uint32_t f = 0; f < queue_family_property_list.Size(); ++f )
+		for( uint32_t f = 0; f < queue_family_properties.queue_family_properties.Size(); ++f )
 		{
-			if( queue_family_property_list[ f ].queue_family_properties.queueFamilyProperties.queueFlags & this->queue_types[ q ].first )
+			if( queue_family_properties.queue_family_properties[ f ].queueFamilyProperties.queueFlags & this->queue_types[ q ].first )
 			{
 				if( available_queues[ f ] )
 				{
@@ -54,8 +54,8 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 						family_candidate = f;
 					}
 					else if( available_queues[ family_candidate ] &&
-						queue_family_property_list[ f ].queue_family_properties.queueFamilyProperties.queueFlags <
-						queue_family_property_list[ family_candidate ].queue_family_properties.queueFamilyProperties.queueFlags )
+						queue_family_properties.queue_family_properties[ f ].queueFamilyProperties.queueFlags <
+						queue_family_properties.queue_family_properties[ family_candidate ].queueFamilyProperties.queueFlags )
 					{
 						// found a better candidate family.
 						// A family with less flags is usually more specialized. Also lower value flags are preferred over high value flags
@@ -97,7 +97,7 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 			{
 				if( !( a == t ) && queue_allocated_test[ t ] )
 				{
-					if( queue_family_property_list[ queue_get_info[ t ].queue_family_index ].queue_family_properties.queueFamilyProperties.queueFlags & this->queue_types[ a ].first )
+					if( queue_family_properties.queue_family_properties[ queue_get_info[ t ].queue_family_index ].queueFamilyProperties.queueFlags & this->queue_types[ a ].first )
 					{
 						if( candidate == UINT32_MAX )
 						{
@@ -125,9 +125,9 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	}
 
 	// build queue create infos
-	queue_priorities.Resize( queue_family_property_list.Size() );
-	queue_create_infos.Reserve( queue_family_property_list.Size() );
-	for( size_t i = 0; i < queue_family_property_list.Size(); ++i )
+	queue_priorities.Resize( queue_family_properties.queue_family_properties.Size() );
+	queue_create_infos.Reserve( queue_family_properties.queue_family_properties.Size() );
+	for( size_t i = 0; i < queue_family_properties.queue_family_properties.Size(); ++i )
 	{
 		queue_priorities[ i ].Resize( family_allocations[ i ].Size() );
 		for( size_t p = 0; p < family_allocations[ i ].Size(); ++p )
@@ -183,9 +183,9 @@ bc::List<bc::rhi::Queue> bc::rhi::DeviceQueueResolver::GetQueues(
 			{
 				vkGetDeviceQueue( device, queue_get_info[ i ].queue_family_index, queue_get_info[ i ].queue_index, &ret[ i ].queue );
 				ret[ i ].queue_family_index			= queue_get_info[ i ].queue_family_index;
-				ret[ i ].supports_presentation		= queue_family_property_list[ ret[ i ].queue_family_index ].can_present;
+				ret[ i ].supports_presentation		= queue_family_properties.can_present[ ret[ i ].queue_family_index ];
 				//ret[ i ].supports_presentation	= glfwGetPhysicalDevicePresentationSupport( ref_instance, ref_physical_device, ret[ i ].queue_family_index );
-				ret[ i ].queue_family_properties	= queue_family_property_list[ queue_get_info[ i ].queue_family_index ].queue_family_properties.queueFamilyProperties;
+				ret[ i ].queue_family_properties	= queue_family_properties.queue_family_properties[ queue_get_info[ i ].queue_family_index ].queueFamilyProperties;
 				ret[ i ].queue_mutex				= std::make_shared<std::mutex>();
 			}
 		}

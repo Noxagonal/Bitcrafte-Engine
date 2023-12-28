@@ -23,33 +23,10 @@ class VulkanPhysicalDevice
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	struct MemoryPropertiesInfo
-	{
-		MemoryPropertiesInfo(
-			VkPhysicalDevice								vk_physical_device
-		);
-
-		VkPhysicalDeviceMemoryProperties2					memory_properties			= {};
-	};
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	struct PropertiesInfo
-	{
-		PropertiesInfo(
-			VkPhysicalDevice								vk_physical_device
-		);
-		VkPhysicalDeviceProperties2							properties					= {};
-	};
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct QueueFamilyInfo
 	{
-		QueueFamilyInfo(
-			VkQueueFamilyProperties2						queue_family_properties,
-			bool											can_present
-		);
-		VkQueueFamilyProperties2							queue_family_properties		= {};
-		bool												can_present					= {};
+		List<VkQueueFamilyProperties2>						queue_family_properties;
+		List<bool>											can_present;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,13 +39,16 @@ public:
 	~VulkanPhysicalDevice();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const MemoryPropertiesInfo					&	GetMemoryProperties() const { return memory_properties; }
+	inline const VkPhysicalDeviceMemoryProperties2		&	GetMemoryProperties() const { return vk_memory_properties; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const PropertiesInfo							&	GetProperties() const { return properties; }
+	inline const VkPhysicalDeviceProperties2			&	GetProperties() const { return vk_properties; }
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	inline const VkPhysicalDeviceFeatures2				&	GetFeatures() const { return vk_features; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const List<QueueFamilyInfo>					&	GetQueueFamilyPropertyList() const { return queue_family_property_list; }
+	inline const QueueFamilyInfo						&	GetQueueFamilyProperties() const { return queue_family_properties; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline operator VkPhysicalDevice() const { return vk_physical_device; }
@@ -76,14 +56,12 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<QueueFamilyInfo>									FetchQueueFamilyPropertyList();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VkPhysicalDevice										vk_physical_device					= VK_NULL_HANDLE;
 
-	MemoryPropertiesInfo									memory_properties;
-	PropertiesInfo											properties;
-	List<QueueFamilyInfo>									queue_family_property_list;
+	VkPhysicalDeviceMemoryProperties2						vk_memory_properties;
+	VkPhysicalDeviceProperties2								vk_properties;
+	VkPhysicalDeviceFeatures2								vk_features;
+	QueueFamilyInfo											queue_family_properties;
 
 	RHIVulkanImpl										&	rhi_vulkan_impl;
 };

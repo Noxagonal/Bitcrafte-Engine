@@ -80,7 +80,7 @@ private:
 	List<QueueGetInfo>										queue_get_info;
 	List<List<float>>										queue_priorities;
 
-	const List<VulkanPhysicalDevice::QueueFamilyInfo>	&	queue_family_property_list;
+	const VulkanPhysicalDevice::QueueFamilyInfo			&	queue_family_properties;
 };
 
 
