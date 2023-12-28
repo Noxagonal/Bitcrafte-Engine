@@ -75,7 +75,7 @@ private:
 	/// @return
 	/// Pointer to memory location where the object was constructed.
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	static constexpr ValueType						*	DoConstructElement(
+	static constexpr ValueType						*	DoTryConstructElement(
 		ValueType									*	location,
 		ConstructorArgumentTypePack					&&	...constructor_arguments
 	)
@@ -116,7 +116,7 @@ private:
 	/// @return
 	/// Pointer to the object location in memory when it was alive.
 	template<typename ValueType>
-	static constexpr ValueType						*	DoDestructElement(
+	static constexpr ValueType						*	DoTryDestructElement(
 		ValueType									*	location
 	)
 	{
@@ -166,7 +166,7 @@ protected:
 	/// @param ...constructor_arguments
 	/// Constructor arguments as parameter pack sent to the constructor of the element.
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	static constexpr void								ConstructElement(
+	static constexpr void								TryConstructElement(
 		ValueType									*&	location,
 		ConstructorArgumentTypePack					&&	...constructor_arguments
 	)
@@ -191,7 +191,7 @@ protected:
 			// Make pointer undead first, so if constructor throws, it will be handled accordingly.
 			volatile auto temp = location;
 			location = MakeObjectPointerUndead( location );
-			location = DoConstructElement( temp, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			location = DoTryConstructElement( temp, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
 		}
 	}
 
@@ -211,11 +211,11 @@ protected:
 	/// @return
 	/// Pointer to the object location in memory when it was alive.
 	template<typename ValueType>
-	static constexpr void								DestructElement(
+	static constexpr void								TryDestructElement(
 		ValueType									*&	location
 	)
 	{
-		location = DoDestructElement( location );
+		location = DoTryDestructElement( location );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
