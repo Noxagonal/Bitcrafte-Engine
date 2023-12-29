@@ -184,7 +184,6 @@ bc::List<bc::rhi::VulkanQueue> bc::rhi::DeviceQueueResolver::GetVulkanQueues(
 				vkGetDeviceQueue( device, queue_get_info[ i ].queue_family_index, queue_get_info[ i ].queue_index, &ret[ i ].queue );
 				ret[ i ].queue_family_index			= queue_get_info[ i ].queue_family_index;
 				ret[ i ].supports_presentation		= queue_family_properties.can_present[ ret[ i ].queue_family_index ];
-				//ret[ i ].supports_presentation	= glfwGetPhysicalDevicePresentationSupport( ref_instance, ref_physical_device, ret[ i ].queue_family_index );
 				ret[ i ].queue_family_properties	= queue_family_properties.queue_family_properties[ queue_get_info[ i ].queue_family_index ].queueFamilyProperties;
 				ret[ i ].queue_mutex				= std::make_shared<std::mutex>();
 			}

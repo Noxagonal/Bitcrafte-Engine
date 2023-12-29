@@ -57,7 +57,7 @@ public:
 	VkSwapchainKHR										GetVkSwapchain() { return vk_swapchain; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline explicit operator VkSwapchainKHR() { return vk_swapchain; }
+	inline operator VkSwapchainKHR() { return vk_swapchain; }
 
 private:
 
