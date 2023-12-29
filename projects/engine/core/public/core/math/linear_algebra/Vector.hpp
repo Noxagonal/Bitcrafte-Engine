@@ -872,14 +872,17 @@ private:
 using Vector2f = VectorBase<2, float>;
 using Vector2d = VectorBase<2, double>;
 using Vector2i = VectorBase<2, int64_t>;
+using Vector2u = VectorBase<2, uint64_t>;
 
 using Vector3f = VectorBase<3, float>;
 using Vector3d = VectorBase<3, double>;
 using Vector3i = VectorBase<3, int64_t>;
+using Vector3u = VectorBase<3, uint64_t>;
 
 using Vector4f = VectorBase<4, float>;
 using Vector4d = VectorBase<4, double>;
 using Vector4i = VectorBase<4, int64_t>;
+using Vector4u = VectorBase<4, uint64_t>;
 
 
 
@@ -887,26 +890,32 @@ using Vector4i = VectorBase<4, int64_t>;
 static_assert( sizeof( Vector2f ) == sizeof( float ) * 2 );
 static_assert( sizeof( Vector2d ) == sizeof( double ) * 2 );
 static_assert( sizeof( Vector2i ) == sizeof( int64_t ) * 2 );
+static_assert( sizeof( Vector2u ) == sizeof( uint64_t ) * 2 );
 
 static_assert( sizeof( Vector3f ) == sizeof( float ) * 3 );
 static_assert( sizeof( Vector3d ) == sizeof( double ) * 3 );
 static_assert( sizeof( Vector3i ) == sizeof( int64_t ) * 3 );
+static_assert( sizeof( Vector3u ) == sizeof( uint64_t ) * 3 );
 
 static_assert( sizeof( Vector4f ) == sizeof( float ) * 4 );
 static_assert( sizeof( Vector4d ) == sizeof( double ) * 4 );
 static_assert( sizeof( Vector4i ) == sizeof( int64_t ) * 4 );
+static_assert( sizeof( Vector4u ) == sizeof( uint64_t ) * 4 );
 
 static_assert( alignof( Vector2f ) == alignof( float ) * 2 );
 static_assert( alignof( Vector2d ) == alignof( double ) * 2 );
 static_assert( alignof( Vector2i ) == alignof( int64_t ) * 2 );
+static_assert( alignof( Vector2u ) == alignof( uint64_t ) * 2 );
 
 static_assert( alignof( Vector3f ) == alignof( float ) );
 static_assert( alignof( Vector3d ) == alignof( double ) );
 static_assert( alignof( Vector3i ) == alignof( int64_t ) );
+static_assert( alignof( Vector3u ) == alignof( uint64_t ) );
 
 static_assert( alignof( Vector4f ) == alignof( float ) * 4 );
 static_assert( alignof( Vector4d ) == alignof( double ) * 4 );
 static_assert( alignof( Vector4i ) == alignof( int64_t ) * 4 );
+static_assert( alignof( Vector4u ) == alignof( uint64_t ) * 4 );
 
 
 
