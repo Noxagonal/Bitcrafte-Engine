@@ -69,9 +69,6 @@ function(add_editor_component
 	
 	set_target_properties(${EDITOR_COMPONENT_NAME}
 		PROPERTIES
-			ARCHIVE_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/lib/editor/"
-			LIBRARY_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/lib/editor/"
-			RUNTIME_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/bin/editor/"
 			FOLDER							"projects/editor"
 	)
 

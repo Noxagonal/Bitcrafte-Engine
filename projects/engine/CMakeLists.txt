@@ -69,9 +69,6 @@ function(add_engine_component
 	
 	set_target_properties(${ENGINE_COMPONENT_NAME}
 		PROPERTIES
-			ARCHIVE_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/lib/engine/"
-			LIBRARY_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/lib/engine/"
-			RUNTIME_OUTPUT_DIRECTORY		"${PROJECT_BINARY_DIR}/bin/engine/"
 			FOLDER							"projects/engine"
 	)
 
@@ -88,6 +85,109 @@ function(add_engine_component
 	)
 
 endfunction()
+
+
+
+# Determine which window components should be included in the built.
+if(WIN32)
+	if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_MANAGER_WIN32)
+	    set(BITCRAFTE_BUILD_WINDOW_MANAGER_WIN32 ON CACHE BOOL "Build Windows window manager component" FORCE)
+	endif()
+endif()
+if(LINUX)
+	if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND)
+	    set(BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND ON CACHE BOOL "Build Wayland window manager component" FORCE)
+	endif()
+elseif(APPLE)
+	message(FATAL_ERROR "Please add window manager component here")
+endif()
+
+
+
+# Determine which RHI components should be included in the built.
+if(WIN32 OR LINUX)
+	if(NOT DEFINED BITCRAFTE_BUILD_RHI_VULKAN)
+	    set(BITCRAFTE_BUILD_RHI_VULKAN ON CACHE BOOL "Include Vulkan RHI" FORCE)
+	endif()
+elseif(APPLE)
+	if(NOT DEFINED BITCRAFTE_BUILD_RHI_METAL)
+	    set(BITCRAFTE_BUILD_RHI_METAL ON CACHE BOOL "Include Metal RHI" FORCE)
+	endif()
+endif()
+
+
+
+# Get window manager component dependencies based on build settings.
+function(get_window_manager_component_dependencies
+	COMPONENT_DEPENDENCIES
+)
+	set(DEPENDENCY_LIST)
+	if(BITCRAFTE_BUILD_WINDOW_MANAGER_WIN32)
+		list(APPEND DEPENDENCY_LIST window_manager_win32)
+	endif()
+	if(BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND)
+		list(APPEND DEPENDENCY_LIST window_manager_wayland)
+	endif()
+	set(${COMPONENT_DEPENDENCIES} ${DEPENDENCY_LIST} PARENT_SCOPE)
+endfunction()
+
+
+
+# Get RHI component dependencies based on build settings.
+function(get_rhi_component_dependencies
+	COMPONENT_DEPENDENCIES
+)
+	set(DEPENDENCY_LIST)
+	if(BITCRAFTE_BUILD_RHI_VULKAN)
+		list(APPEND DEPENDENCY_LIST rhi_vulkan)
+	endif()
+	if(BITCRAFTE_BUILD_RHI_METAL)
+		list(APPEND DEPENDENCY_LIST rhi_metal)
+	endif()
+	set(${COMPONENT_DEPENDENCIES} ${DEPENDENCY_LIST} PARENT_SCOPE)
+endfunction()
+
+
+
+# Set compile definitions for window components based on build settings.
+function(set_window_manager_component_defines
+	THIS_TARGET_NAME
+)
+	if(BITCRAFTE_BUILD_WINDOW_MANAGER_WIN32)
+		target_compile_definitions(${THIS_TARGET_NAME}
+			PRIVATE
+				BITCRAFTE_WINDOW_MANAGER_WIN32=1
+		)
+	endif()
+	if(BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND)
+		target_compile_definitions(${THIS_TARGET_NAME}
+			PRIVATE
+				BITCRAFTE_WINDOW_MANAGER_WAYLAND=1
+		)
+	endif()
+endfunction()
+
+
+
+# Set compile definitions for window components based on build settings.
+function(set_rhi_component_defines
+	THIS_TARGET_NAME
+)
+	if(BITCRAFTE_BUILD_RHI_VULKAN)
+		target_compile_definitions(${THIS_TARGET_NAME}
+			PRIVATE
+				BITCRAFTE_RHI_VULKAN=1
+		)
+	endif()
+	if(BITCRAFTE_BUILD_RHI_METAL)
+		target_compile_definitions(${THIS_TARGET_NAME}
+			PRIVATE
+				BITCRAFTE_RHI_METAL=1
+		)
+	endif()
+endfunction()
+
+
 
 # Add all subdirectories automatically.
 get_subdirectories(SUB_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})

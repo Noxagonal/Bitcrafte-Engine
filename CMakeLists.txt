@@ -66,6 +66,10 @@ option(BITCRAFTE_BUILD_SHARED_ENGINE
 	"Build engine as a shared library instead of a static library"
 	ON
 )
+option(BITCRAFTE_BUILD_TESTS
+	"Build tests"
+	OFF
+)
 
 # Check and enforce interprocedural optimization (IPO/LTO)
 check_ipo_supported(RESULT IPO_SUPPORT_RESULT OUTPUT IPO_SUPPORT_OUTPUT)
@@ -91,3 +95,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 add_subdirectory("projects")
+
+if(${BITCRAFTE_BUILD_TESTS})
+	add_subdirectory("tests")
+endif()

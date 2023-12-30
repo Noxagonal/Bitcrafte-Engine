@@ -1,0 +1,20 @@
+#pragma once
+
+#include <build_configuration/BuildConfigurationComponent.hpp>
+
+
+
+namespace bc {
+namespace window_manager {
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct WindowManagerComponentCreateInfo
+{
+
+};
+
+
+} // window
+} // bc

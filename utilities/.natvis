@@ -2,7 +2,7 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-	<Type Name="vext::vext_internal::SimpleLinearContainerBase&lt;*&gt;">
+	<Type Name="bc::List&lt;*&gt;">
 		<DisplayString>{{ size={data_size} }}</DisplayString>
 		<Expand>
 			<Item Name="[size]" ExcludeView="simple">data_size</Item>
@@ -14,7 +14,7 @@
 		</Expand>
 	</Type>
 
-	<Type Name="vext::vext_internal::SimpleLinearContainerViewBase&lt;*&gt;">
+	<Type Name="bc::ListViewBase&lt;*&gt;">
 		<DisplayString>{{ size={data_size} }}</DisplayString>
 		<Expand>
 			<Item Name="[size]" ExcludeView="simple">data_size</Item>
@@ -25,62 +25,21 @@
 		</Expand>
 	</Type>
 
-	<Type Name="vext::vext_internal::SimpleTextBase&lt;*&gt;">
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
-		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
+	
+
+	<Type Name="bc::SimpleList&lt;*&gt;">
+		<DisplayString>{{ size={data_size} }}</DisplayString>
 		<Expand>
 			<Item Name="[size]" ExcludeView="simple">data_size</Item>
 			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
-			<Synthetic Name="[text]" ExcludeView="simple">
-				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
-				<Expand>
-					<ArrayItems>
-						<Size>data_size</Size>
-						<ValuePointer>data_ptr</ValuePointer>
-					</ArrayItems>
-				</Expand>
-			</Synthetic>
+			<ArrayItems>
+				<Size>data_size</Size>
+				<ValuePointer>data_ptr</ValuePointer>
+			</ArrayItems>
 		</Expand>
 	</Type>
 
-	<Type Name="vext::vext_internal::SimpleTextViewBase&lt;*&gt;">
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
-		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<Synthetic Name="[text]" ExcludeView="simple">
-				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
-				<Expand>
-					<ArrayItems>
-						<Size>data_size</Size>
-						<ValuePointer>data_ptr</ValuePointer>
-					</ArrayItems>
-				</Expand>
-			</Synthetic>
-		</Expand>
-	</Type>
-
-
-
-	<Type Name="vext::List&lt;*&gt;">
-        <DisplayString>{{ size={data_size} }}</DisplayString>
-        <Expand>
-            <Item Name="[size]" ExcludeView="simple">data_size</Item>
-            <Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
-            <ArrayItems>
-                <Size>data_size</Size>
-                <ValuePointer>data_ptr</ValuePointer>
-            </ArrayItems>
-        </Expand>
-    </Type>
-
-	<Type Name="vext::ListViewBase&lt;*&gt;">
+	<Type Name="bc::SimpleListViewBase&lt;*&gt;">
 		<DisplayString>{{ size={data_size} }}</DisplayString>
 		<Expand>
 			<Item Name="[size]" ExcludeView="simple">data_size</Item>
@@ -91,7 +50,9 @@
 		</Expand>
 	</Type>
 
-	<Type Name="vext::TextBase&lt;*&gt;">
+	
+
+	<Type Name="bc::TextBase&lt;*&gt;">
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
@@ -112,7 +73,7 @@
 		</Expand>
 	</Type>
 
-	<Type Name="vext::TextViewBase&lt;*&gt;">
+	<Type Name="bc::TextViewBase&lt;*&gt;">
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
@@ -132,35 +93,56 @@
 		</Expand>
 	</Type>
 
-	<Type Name="vext::LinkedList&lt;*&gt;">
-		<DisplayString Condition="size == 0">empty</DisplayString>
-		<DisplayString Condition="size &gt; 0">{{ size = {size} }}</DisplayString>
+
+	
+	<Type Name="bc::SimpleTextBase&lt;*&gt;">
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
+		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
 		<Expand>
-			<LinkedListItems Condition="first != nullptr">
-				<HeadPointer>first</HeadPointer>
-				<NextPointer>ahead</NextPointer>
-				<ValueNode>data</ValueNode>
-			</LinkedListItems>
+			<Item Name="[size]" ExcludeView="simple">data_size</Item>
+			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
+			<Synthetic Name="[text]" ExcludeView="simple">
+				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>data_size</Size>
+						<ValuePointer>data_ptr</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
 		</Expand>
 	</Type>
 
-	<Type Name="vext::LinkedListViewBase&lt;*&gt;">
-		<DisplayString Condition="size == 0">empty</DisplayString>
-		<DisplayString Condition="size &gt; 0">{{ size = {size} }}</DisplayString>
+	<Type Name="bc::SimpleTextViewBase&lt;*&gt;">
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
+		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
+		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
 		<Expand>
-			<LinkedListItems Condition="first != nullptr">
-				<HeadPointer>first</HeadPointer>
-				<NextPointer>ahead</NextPointer>
-				<ValueNode>data</ValueNode>
-			</LinkedListItems>
+			<Item Name="[size]" ExcludeView="simple">data_size</Item>
+			<Synthetic Name="[text]" ExcludeView="simple">
+				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>data_size</Size>
+						<ValuePointer>data_ptr</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
 		</Expand>
 	</Type>
 
-	<Type Name="vext::Pair&lt;*,*&gt;">
+
+
+	<Type Name="bc::Pair&lt;*,*&gt;">
 		<DisplayString>{first} : {second}</DisplayString>
 	</Type>
 
-	<Type Name="vext::Map&lt;*,*&gt;">
+	<Type Name="bc::Map&lt;*,*&gt;">
 		<DisplayString>{{size={size}}}</DisplayString>
 		<Expand>
 			<Item Name="[size]">size</Item>
@@ -174,7 +156,7 @@
 		</Expand>
 	</Type>
 
-	<Type Name="vext::MapViewBase&lt;*,*&gt;">
+	<Type Name="bc::MapViewBase&lt;*,*&gt;">
 		<DisplayString>{{size={size}}}</DisplayString>
 		<Expand>
 			<Item Name="[size]">size</Item>
@@ -188,7 +170,7 @@
 		</Expand>
 	</Type>
 
-	<Type Name="vext::container_bases::MapNode&lt;*,*&gt;">
+	<Type Name="bc::container_bases::MapNode&lt;*,*&gt;">
 		<DisplayString>{{key={data.first}}}</DisplayString>
 		<Expand>
 			<Item Name="[parent]">parent</Item>

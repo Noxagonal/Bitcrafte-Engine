@@ -1,0 +1,6 @@
+
+#undef BC_CONTAINER_NOEXCEPT
+#undef BC_CONTAINER_NAME
+#undef BC_CONTAINER_VALUE_TYPENAME
+
+#undef BC_ContainerAssert
