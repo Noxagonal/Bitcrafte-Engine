@@ -1202,8 +1202,9 @@ protected:
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
 	{
 		BC_ContainerAssert(
-			at >= this->data_ptr && at < this->data_ptr + this->data_size,
-			U"Iterator out of range or it points to the end"
+			( this->data_ptr == nullptr && at == nullptr ) ||
+			( at >= this->data_ptr && at <= this->data_ptr + this->data_size ),
+			U"Iterator out of range"
 		);
 
 		size_t at_index = at - this->data_ptr;
@@ -1227,8 +1228,9 @@ protected:
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert(
-			at >= this->data_ptr && at < this->data_ptr + this->data_size,
-			U"Iterator out of range or it points to the end"
+			( this->data_ptr == nullptr && at == nullptr ) ||
+			( at >= this->data_ptr && at <= this->data_ptr + this->data_size ),
+			U"Iterator out of range"
 		);
 
 		auto CopyFunc = [ this, count, &at, headroom ](

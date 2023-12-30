@@ -699,7 +699,8 @@ public:
 	/// How much extra space is reserved if the capacity is expanded.
 	///
 	/// @return
-	/// Iterator to the next value after inserted value.
+	/// Iterator to the next value after inserted value, which is the original value that was occupying the spot that we inserted
+	/// into.
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const ValueType																				&	value,
@@ -707,7 +708,7 @@ public:
 		size_t																							headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
 	{
-		BC_ContainerAssert( at.GetContainer() && at.GetData(), U"Empty iterator" );
+		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
@@ -740,7 +741,8 @@ public:
 	/// How much extra space is reserved if the capacity is expanded.
 	///
 	/// @return
-	/// Iterator one past the the last inserted value. Or first original value after insertion.
+	/// Iterator to the next value after inserted value, which is the original value that was occupying the spot that we inserted
+	/// into.
 	template<utility::ContainerView OtherContainerType>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
@@ -749,7 +751,7 @@ public:
 		size_t																							headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
-		BC_ContainerAssert( at.GetContainer() && at.GetData(), "Empty iterator" );
+		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
 		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
 		return Iterator {
 			this,
