@@ -1,6 +1,7 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/rhi_memory_pool/RHIMemoryPool.hpp>
+#include <rhi_vulkan/rhi_memory_pool/RHIPoolMemoryHandle.hpp>
 
 #include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
 #include <rhi_vulkan/vk/device/VulkanDevice.hpp>
@@ -24,64 +25,6 @@ VkDeviceSize CalculateAlignmentForBuffer(
 	);
 
 	return VkDeviceSize( ( ( ( int64_t( unaligned_size ) - 1 ) / buffer_alignment ) + 1 ) * buffer_alignment );
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemory::RHIPoolMemory(
-	RHIVulkanImpl		&	rhi_vulkan_impl,
-	RHIMemoryPool		&	rhi_memory_pool
-) :
-	rhi_vulkan_impl( rhi_vulkan_impl ),
-	rhi_memory_pool( rhi_memory_pool )
-{
-	BAssertVkResult( vkMapMemory(
-		rhi_vulkan_impl.GetVulkanDevice(),
-		memory,
-		offset,
-		size,
-		0,
-		&mapped_memory
-	) );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemory::RHIPoolMemory(
-	RHIVulkanImpl		&	rhi_vulkan_impl,
-	RHIMemoryPool		&	rhi_memory_pool,
-	VkDeviceMemory			memory,
-	VkDeviceSize			offset,
-	VkDeviceSize			size,
-	VkDeviceSize			alignment,
-	uint64_t				chunk_id,
-	uint64_t				block_id,
-	uint32_t				memory_type_index,
-	bool					is_non_linear
-) :
-	rhi_vulkan_impl( rhi_vulkan_impl ),
-	rhi_memory_pool( rhi_memory_pool ),
-	memory( memory ),
-	offset( offset ),
-	size( size ),
-	alignment( alignment ),
-	chunk_id( chunk_id ),
-	block_id( block_id ),
-	memory_type_index( memory_type_index ),
-	is_non_linear( is_non_linear )
-{
-	is_allocated = true;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemory::~RHIPoolMemory()
-{
-	vkUnmapMemory(
-		rhi_vulkan_impl.GetVulkanDevice(),
-		memory
-	);
-
-	rhi_memory_pool.FreePoolMemory( *this );
 }
 
 
@@ -125,60 +68,55 @@ bc::rhi::RHIMemoryPool::~RHIMemoryPool()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemory bc::rhi::RHIMemoryPool::AllocateBufferMemory(
+bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateBufferMemory(
 	VkBuffer						buffer,
-	const VkBufferCreateInfo	&	buffer_create_info,
-	VkMemoryPropertyFlags			property_flags
+	VkMemoryPropertyFlagBits		property_flags
 )
 {
 	auto memory_requirements		= GetBufferMemoryRequirements( buffer );
-	auto memory_type_index			= FindMemoryTypeIndex( memory_requirements, property_flags );
 
-	if( memory_type_index == UINT32_MAX ) return MakeEmptyPoolMemory();
 	return AllocateMemory(
 		true,
 		memory_requirements,
-		memory_type_index
+		property_flags
 	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemory bc::rhi::RHIMemoryPool::AllocateImageMemory(
+bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateImageMemory(
 	VkImage							image,
-	const VkImageCreateInfo		&	image_create_info,
-	VkMemoryPropertyFlags			property_flags
+	VkImageTiling					image_tiling_info,
+	VkMemoryPropertyFlagBits		property_flags
 )
 {
 	auto memory_requirements		= GetImageMemoryRequirements( image );
-	auto memory_type_index			= FindMemoryTypeIndex( memory_requirements, property_flags );
 
-	if( memory_type_index == UINT32_MAX ) return MakeEmptyPoolMemory();
 	return AllocateMemory(
-		image_create_info.tiling != VK_IMAGE_TILING_OPTIMAL,
+		image_tiling_info == VK_IMAGE_TILING_LINEAR,
 		memory_requirements,
-		memory_type_index
+		property_flags
 	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemory bc::rhi::RHIMemoryPool::AllocateMemory(
-	bool										is_non_linear,
+bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateMemory(
+	bool										is_linear,
 	internal::RHIPoolMemoryRequirements		&	memory_requirements,
-	uint32_t									memory_type_index
+	VkMemoryPropertyFlagBits					property_flags
 )
 {
 	// TODO: add tests and error reports
-
+	auto memory_type_index = FindMemoryTypeIndex( memory_requirements, property_flags );
 	assert( memory_type_index != UINT32_MAX );
 
 	List<internal::RHIMemoryPoolChunk> * chunk_group = nullptr;
-	if( is_non_linear )
+	if( is_linear )
 	{
-		chunk_group = &non_linear_chunks[ memory_type_index ];
+		chunk_group = &linear_chunks[ memory_type_index ];
 	}
 	else
 	{
-		chunk_group = &linear_chunks[ memory_type_index ];
+		chunk_group = &non_linear_chunks[ memory_type_index ];
 	}
 
 	internal::RHIMemoryPoolChunk			*	selected_chunk	= nullptr;
@@ -195,31 +133,31 @@ bc::rhi::RHIPoolMemory bc::rhi::RHIMemoryPool::AllocateMemory(
 	{
 		auto				buffer_image_granularity	= physical_device_properties.limits.bufferImageGranularity;
 		VkDeviceSize		chunk_size					= 0;
-		if( is_non_linear )
+		if( is_linear )
 		{
-			chunk_size		= ( ( std::max( memory_requirements.memory_requirements.size, non_linear_chunk_size ) + buffer_image_granularity - 1 ) / buffer_image_granularity ) * buffer_image_granularity;
+			chunk_size		= ( ( std::max( memory_requirements.memory_requirements.size, linear_chunk_size ) + buffer_image_granularity - 1 ) / buffer_image_granularity ) * buffer_image_granularity;
 		}
 		else
 		{
-			chunk_size		= ( ( std::max( memory_requirements.memory_requirements.size, linear_chunk_size ) + buffer_image_granularity - 1 ) / buffer_image_granularity ) * buffer_image_granularity;
+			chunk_size		= ( ( std::max( memory_requirements.memory_requirements.size, non_linear_chunk_size ) + buffer_image_granularity - 1 ) / buffer_image_granularity ) * buffer_image_granularity;
 		}
 		auto allocatedChunkInfo	= AllocateChunk( chunk_group, chunk_size, memory_type_index );
 		selected_chunk		= allocatedChunkInfo.second;
 
 		// ran out of device memory
-		if( !selected_chunk ) return MakeEmptyPoolMemory();
+		if( selected_chunk->result != VK_SUCCESS ) return {};
 
 		selected_block = AllocateBlock( *selected_chunk, memory_requirements );
 
 		// should never happen, error
-		assert( selected_block );
-		if( !selected_block ) return MakeEmptyPoolMemory();
+		assert( selected_block->size > 0 );
+		if( selected_block->size == 0 ) return {};
 	}
 
-	// construct RHIPoolMemory
-	return RHIPoolMemory(
-		rhi_vulkan_impl,
-		*this,
+	// construct RHIPoolMemoryHandle
+	return RHIPoolMemoryHandle(
+		&rhi_vulkan_impl,
+		this,
 		selected_chunk->memory,
 		selected_block->offset,
 		selected_block->size,
@@ -227,18 +165,19 @@ bc::rhi::RHIPoolMemory bc::rhi::RHIMemoryPool::AllocateMemory(
 		selected_chunk->id,
 		selected_block->id,
 		memory_type_index,
-		is_non_linear
+		property_flags,
+		is_linear
 	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::RHIMemoryPool::FreePoolMemory(
-	RHIPoolMemory & memory
+	RHIPoolMemoryHandle & memory
 )
 {
 	if( memory.is_allocated )
 	{
-		FreeBlock( memory.memory_type_index, memory.is_non_linear, memory.chunk_id, memory.block_id );
+		FreeBlock( memory.memory_type_index, memory.is_linear, memory.chunk_id, memory.block_id );
 	}
 	memory.is_allocated		= false;
 }
@@ -252,26 +191,58 @@ bc::rhi::internal::RHIMemoryPoolChunk::Block * bc::rhi::RHIMemoryPool::AllocateB
 	auto alignment				= memory_requirements.memory_requirements.alignment;
 	auto size					= memory_requirements.memory_requirements.size;
 
+	auto InsertChunkBlock = [ &chunk ](
+		List<internal::RHIMemoryPoolChunk::Block>::Iterator		where,
+		VkDeviceSize											offset,
+		VkDeviceSize											size,
+		VkDeviceSize											alignment
+		) -> internal::RHIMemoryPoolChunk::Block*
+		{
+			auto block = internal::RHIMemoryPoolChunk::Block {};
+			block.id		= chunk.block_id_counter;
+			block.offset	= offset;
+			block.size		= size;
+			block.alignment	= alignment;
+			return ( chunk.blocks.Insert( where, block ) - 1 ).Get();
+		};
+
+	if( chunk.blocks.IsEmpty() ) return InsertChunkBlock( chunk.blocks.begin(), 0, size, alignment );
+
 	for( auto b = chunk.blocks.begin(); b != chunk.blocks.end(); ++b )
 	{
-		if( b->id != UINT64_MAX )
+		auto prev = b - 1;
+
+		auto range_begin	= prev->offset + prev->size;
+		auto range_end		= b->offset;
+		range_begin			= ( ( range_begin + alignment - 1 ) / alignment ) * alignment;
+		auto range_size		= range_end - range_begin;
+
+		if( range_size >= size )
 		{
-			auto prev = b;
-			--prev;
-
-			auto range_begin	= prev->offset + prev->size;
-			auto range_end		= b->offset;
-			range_begin			= ( ( range_begin + alignment - 1 ) / alignment ) * alignment;
-			auto range_size		= range_end - range_begin;
-
-			if( range_size >= size )
-			{
-				auto block		= chunk.blocks.Insert( b, { chunk.block_id_counter, range_begin, size, alignment } );
-				++chunk.block_id_counter;
-				return &( *block );
-			}
+			return InsertChunkBlock( b, range_begin, size, alignment );
 		}
 	}
+
+	//for( auto b = chunk.blocks.begin(); b != chunk.blocks.end(); ++b )
+	//{
+	//	if( b->id != UINT64_MAX )
+	//	{
+	//		auto prev = b - 1;
+	//		
+	//		auto range_begin	= prev->offset + prev->size;
+	//		auto range_end		= b->offset;
+	//		range_begin			= ( ( range_begin + alignment - 1 ) / alignment ) * alignment;
+	//		auto range_size		= range_end - range_begin;
+	//		
+	//		if( range_size >= size )
+	//		{
+	//			auto block		= chunk.blocks.Insert( b, { chunk.block_id_counter, range_begin, size, alignment } );
+	//			++chunk.block_id_counter;
+	//			--block;
+	//			return &( *block );
+	//		}
+	//	}
+	//}
 	return nullptr;
 }
 
@@ -307,13 +278,6 @@ bc::Pair<VkResult, bc::rhi::internal::RHIMemoryPoolChunk*> bc::rhi::RHIMemoryPoo
 	new_chunk->memory	= memory;
 	new_chunk->size		= size;
 	new_chunk->result	= result;
-	// To make make the code more compact we're going to push some dummy limits in front and back.
-	// This will make sure we don't have to check if we're at the front or back of the list when searching for a free spot
-	// ^^^^
-	// This was me years ago, I have no idea what I was thinking, this is not clear code.
-	// TODO: Clean this up.
-	new_chunk->blocks.PushFront( { UINT64_MAX, 0, 0, 1 } );
-	new_chunk->blocks.PushBack( { UINT64_MAX - 1, size, 0, 1 } );
 
 	return { result, new_chunk };
 }
@@ -321,7 +285,7 @@ bc::Pair<VkResult, bc::rhi::internal::RHIMemoryPoolChunk*> bc::rhi::RHIMemoryPoo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::RHIMemoryPool::FreeBlock(
 	uint32_t	memory_type_index,
-	bool		is_non_linear,
+	bool		is_linear,
 	uint64_t	chunk_id,
 	uint64_t	block_id
 )
@@ -331,13 +295,13 @@ void bc::rhi::RHIMemoryPool::FreeBlock(
 	assert( block_id != UINT64_MAX );
 
 	List<internal::RHIMemoryPoolChunk> * chunk_group = nullptr;
-	if( is_non_linear )
+	if( is_linear )
 	{
-		chunk_group = &non_linear_chunks[ memory_type_index ];
+		chunk_group = &linear_chunks[ memory_type_index ];
 	}
 	else
 	{
-		chunk_group = &linear_chunks[ memory_type_index ];
+		chunk_group = &non_linear_chunks[ memory_type_index ];
 	}
 
 	internal::RHIMemoryPoolChunk * selected_chunk = nullptr;
@@ -362,7 +326,7 @@ void bc::rhi::RHIMemoryPool::FreeBlock(
 			break;
 		}
 	}
-	if( selected_chunk->blocks.Size() <= 2 )
+	if( selected_chunk->blocks.IsEmpty() )
 	{
 		FreeChunk( *chunk_group, *selected_chunk );
 	}
@@ -426,7 +390,7 @@ bc::rhi::internal::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetImageMem
 )
 {
 	auto dedicated_image_memory_requirements = VkImageMemoryRequirementsInfo2 {};
-	dedicated_image_memory_requirements.sType	= VK_STRUCTURE_TYPE_BUFFER_MEMORY_REQUIREMENTS_INFO_2;
+	dedicated_image_memory_requirements.sType	= VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2;
 	dedicated_image_memory_requirements.pNext	= nullptr;
 	dedicated_image_memory_requirements.image	= image;
 
@@ -468,10 +432,4 @@ uint32_t bc::rhi::RHIMemoryPool::FindMemoryTypeIndex(
 		}
 	}
 	return UINT32_MAX;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemory bc::rhi::RHIMemoryPool::MakeEmptyPoolMemory()
-{
-	return RHIPoolMemory( rhi_vulkan_impl, *this );
 }

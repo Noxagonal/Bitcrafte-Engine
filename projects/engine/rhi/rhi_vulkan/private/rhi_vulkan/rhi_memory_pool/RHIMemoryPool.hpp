@@ -10,7 +10,7 @@ namespace bc {
 namespace rhi {
 
 class RHIVulkanImpl;
-class RHIPoolMemory;
+class RHIPoolMemoryHandle;
 class RHIMemoryPool;
 
 namespace internal {
@@ -23,19 +23,19 @@ struct RHIMemoryPoolChunk
 	// Block is a single virtual allocation from the Chunk. Aka, assignment from a single pool.
 	struct Block
 	{
-		uint64_t									id									= UINT64_MAX;
-		VkDeviceSize								offset								= 0;
-		VkDeviceSize								size								= 0;
-		VkDeviceSize								alignment							= 1;
+		uint64_t										id									= UINT64_MAX;
+		VkDeviceSize									offset								= 0;
+		VkDeviceSize									size								= 0;
+		VkDeviceSize									alignment							= 1;
 	};
 
-	uint64_t										id									= UINT64_MAX;
-	VkDeviceMemory									memory								= VK_NULL_HANDLE;
-	VkDeviceSize									size								= 0;
-	List<RHIMemoryPoolChunk::Block>					blocks;
-	VkResult										result								= VK_RESULT_MAX_ENUM;
+	uint64_t											id									= UINT64_MAX;
+	VkDeviceMemory										memory								= VK_NULL_HANDLE;
+	VkDeviceSize										size								= 0;
+	List<RHIMemoryPoolChunk::Block>						blocks;
+	VkResult											result								= VK_RESULT_MAX_ENUM;
 
-	uint64_t										block_id_counter					= 0;
+	uint64_t											block_id_counter					= 0;
 };
 
 
@@ -43,9 +43,9 @@ struct RHIMemoryPoolChunk
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct RHIPoolMemoryRequirements
 {
-	VkMemoryRequirements							memory_requirements						= {};
-	bool											prefers_dedicated_allocation			= {};
-	bool											requires_dedicated_allocation			= {};
+	VkMemoryRequirements								memory_requirements						= {};
+	bool												prefers_dedicated_allocation			= {};
+	bool												requires_dedicated_allocation			= {};
 };
 
 
@@ -55,106 +55,9 @@ struct RHIPoolMemoryRequirements
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class RHIPoolMemory
-{
-	friend class RHIMemoryPool;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIPoolMemory(
-		RHIVulkanImpl								&	rhi_vulkan_impl,
-		RHIMemoryPool								&	rhi_memory_pool
-	);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIPoolMemory(
-		RHIVulkanImpl								&	rhi_vulkan_impl,
-		RHIMemoryPool								&	rhi_memory_pool,
-		VkDeviceMemory									memory,
-		VkDeviceSize									offset,
-		VkDeviceSize									size,
-		VkDeviceSize									alignment,
-		uint64_t										chunk_id,
-		uint64_t										block_id,
-		uint32_t										memory_type_index,
-		bool											is_non_linear
-	);
-
-public:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~RHIPoolMemory();
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Copy memory into the backing buffer from external location.
-	///
-	/// @tparam ValueType
-	/// Type of the value we're copying.
-	/// 
-	/// @param data
-	/// Linear container where the data is copied from.
-	template<typename T>
-	void												DataCopy(
-		const List<T>								&	data
-	)
-	{
-		return DataCopy<T>( data.Data(), VkDeviceSize( data.Size() ) );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Copy memory into the backing buffer from external location.
-	///
-	/// @tparam ValueType
-	/// Type of the value we're copying.
-	/// 
-	/// @param data
-	/// Linear container where the data is copied from.
-	template<typename T>
-	void												DataCopy(
-		const T										*	data,
-		VkDeviceSize									count
-	)
-	{
-		VkDeviceSize byte_size = sizeof( T ) * count;
-		BAssert( byte_size < size, U"Cannot copy to buffer, buffer size too small" );
-
-		std::memcpy( mapped_memory, data, byte_size );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline VkDeviceMemory								GetVulkanMemory() const { return memory; }
-	inline VkDeviceSize									GetOffset() const { return offset; }
-	inline VkDeviceSize									GetSize() const { return size; }
-	inline VkDeviceSize									GetAlignment() const { return alignment; }
-
-private:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void											*	mapped_memory						= {};
-
-	RHIVulkanImpl									&	rhi_vulkan_impl;
-	RHIMemoryPool									&	rhi_memory_pool;
-
-	VkDeviceMemory										memory								= VK_NULL_HANDLE;
-	VkDeviceSize										offset								= 0;
-	VkDeviceSize										size								= 0;
-	VkDeviceSize										alignment							= 0;
-
-	uint64_t											chunk_id							= UINT64_MAX;
-	uint64_t											block_id							= UINT64_MAX;
-	uint32_t											memory_type_index					= UINT32_MAX;
-	bool												is_non_linear					:1	= true;
-	bool												is_allocated					:1	= false;
-	bool												is_host_visible					:1	= false;
-};
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class RHIMemoryPool
 {
-	friend class RHIPoolMemory;
+	friend class RHIPoolMemoryHandle;
 	friend struct RHIMemoryPoolDataImpl;
 
 public:
@@ -185,10 +88,9 @@ public:
 	/// 
 	/// @return
 	/// Handle to pool memory.
-	RHIPoolMemory										AllocateBufferMemory(
+	RHIPoolMemoryHandle									AllocateBufferMemory(
 		VkBuffer										buffer,
-		const VkBufferCreateInfo					&	buffer_create_info,
-		VkMemoryPropertyFlags							property_flags
+		VkMemoryPropertyFlagBits						property_flags
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,24 +108,24 @@ public:
 	/// 
 	/// @return
 	/// Handle to pool memory.
-	RHIPoolMemory										AllocateImageMemory(
+	RHIPoolMemoryHandle									AllocateImageMemory(
 		VkImage											image,
-		const VkImageCreateInfo						&	image_create_info,
-		VkMemoryPropertyFlags							property_flags
+		VkImageTiling									image_tiling_info,
+		VkMemoryPropertyFlagBits						property_flags
 	);
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIPoolMemory										AllocateMemory(
-		bool											is_non_linear,
+	RHIPoolMemoryHandle									AllocateMemory(
+		bool											is_linear,
 		internal::RHIPoolMemoryRequirements			&	memory_requirements,
-		uint32_t										memory_type_index
+		VkMemoryPropertyFlagBits						property_flags
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void												FreePoolMemory(
-		RHIPoolMemory								&	memory
+		RHIPoolMemoryHandle							&	memory
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +144,7 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void												FreeBlock(
 		uint32_t										memory_type_index,
-		bool											is_non_linear,
+		bool											is_linear,
 		uint64_t										chunk_id,
 		uint64_t										block_id
 	);
@@ -273,9 +175,6 @@ private:
 		internal::RHIPoolMemoryRequirements			&	memory_requirements,
 		VkMemoryPropertyFlags							property_flags
 	);
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIPoolMemory										MakeEmptyPoolMemory();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIVulkanImpl									&	rhi_vulkan_impl;
