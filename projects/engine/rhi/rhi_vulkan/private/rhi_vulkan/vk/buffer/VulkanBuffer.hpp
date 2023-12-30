@@ -1,0 +1,57 @@
+#pragma once
+
+#include <build_configuration/BuildConfigurationComponent.hpp>
+
+#include <rhi_vulkan/vk/buffer/VulkanBufferCreateInfo.hpp>
+#include <rhi_vulkan/rhi_memory_pool/RHIPoolMemoryHandle.hpp>
+
+
+
+namespace bc {
+namespace rhi {
+
+
+
+class RHIVulkanImpl;
+class RHIPoolMemoryHandle;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class VulkanBuffer
+{
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	VulkanBuffer(
+		RHIVulkanImpl						&	rhi_vulkan_impl,
+		const VulkanBufferCreateInfo		&	create_info
+	);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	~VulkanBuffer();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	inline operator VkBuffer() { return vk_buffer; }
+
+private:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	VkBuffer									vk_buffer								= VK_NULL_HANDLE;
+	VkBufferView								vk_image_view							= VK_NULL_HANDLE;
+
+	RHIPoolMemoryHandle							buffer_memory_handle;
+
+	RHIVulkanImpl							&	rhi_vulkan_impl;
+
+	VkDeviceSize								size									= {};
+	VkFormat									format									= {};
+
+	bool										is_sparse								= {};
+	bool										is_host_visible							= {};
+};
+
+
+
+} // rhi
+} // bc
