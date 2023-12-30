@@ -19,14 +19,12 @@ bc::rhi::VulkanImage::VulkanImage(
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
-	// Might need VkImageSwapchainCreateInfoKHR for image_create_info.pNext later.
-
-	auto IsImageFormatSparse = [ &create_info ]()
+	auto IsImageSparse = [ &create_info ]()
 		{
 			return
-				create_info.image_format & VK_IMAGE_CREATE_SPARSE_BINDING_BIT ||
-				create_info.image_format & VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT ||
-				create_info.image_format & VK_IMAGE_CREATE_SPARSE_ALIASED_BIT;
+				create_info.image_flags & VK_IMAGE_CREATE_SPARSE_BINDING_BIT ||
+				create_info.image_flags & VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT ||
+				create_info.image_flags & VK_IMAGE_CREATE_SPARSE_ALIASED_BIT;
 		};
 
 	auto GetImageSize = [ &rhi_vulkan_impl, &create_info ]() -> math::Vector2u
@@ -57,8 +55,7 @@ bc::rhi::VulkanImage::VulkanImage(
 	auto CreateImage = [ &create_info, &rhi_vulkan_impl ](
 		math::Vector2u	size,
 		uint32_t		mip_level_count,
-		VkImageTiling	image_tiling_info,
-		bool			is_host_visible
+		VkImageTiling	image_tiling_info
 		)
 		{
 			void * image_create_info_pNext		= nullptr;
@@ -74,7 +71,7 @@ bc::rhi::VulkanImage::VulkanImage(
 			auto image_create_info = VkImageCreateInfo {};
 			image_create_info.sType					= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 			image_create_info.pNext					= image_create_info_pNext;
-			image_create_info.flags					= create_info.image_create_flags;
+			image_create_info.flags					= create_info.image_flags;
 			image_create_info.imageType				= VK_IMAGE_TYPE_2D;
 			image_create_info.format				= create_info.image_format;
 			image_create_info.extent				= { uint32_t( size.x ), uint32_t( size.y ), 1 };
@@ -171,7 +168,7 @@ bc::rhi::VulkanImage::VulkanImage(
 
 	image_format	= create_info.image_format;
 
-	is_sparse		= IsImageFormatSparse();
+	is_sparse		= IsImageSparse();
 	image_size		= GetImageSize();
 	mip_levels		= CalculateMipLevels( image_size );
 	is_host_visible	= create_info.is_host_visible;
@@ -181,8 +178,7 @@ bc::rhi::VulkanImage::VulkanImage(
 	vk_image = CreateImage(
 		image_size,
 		uint32_t( mip_levels.Size() ),
-		image_tiling_info,
-		is_host_visible
+		image_tiling_info
 	);
 
 	image_memory_handle = AllocateMemory(
@@ -201,8 +197,6 @@ bc::rhi::VulkanImage::VulkanImage(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanImage::~VulkanImage()
 {
-	image_memory_handle = nullptr;
-
 	vkDestroyImageView(
 		rhi_vulkan_impl.GetVulkanDevice(),
 		vk_image_view,
@@ -213,4 +207,5 @@ bc::rhi::VulkanImage::~VulkanImage()
 		vk_image,
 		rhi_vulkan_impl.GetMainThreadAllocationCallbacks()
 	);
+	image_memory_handle = nullptr;
 }

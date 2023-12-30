@@ -19,8 +19,7 @@ class VulkanSwapchain;
 
 struct VulkanImageCreateInfo
 {
-	VkImageType											image_type									= {};
-	VkImageCreateFlags									image_create_flags							= {};
+	VkImageCreateFlagBits								image_flags									= {};
 	VkFormat											image_format								= {};
 	math::Vector2u										image_size									= {};
 	uint32_t											image_array_layers							= {};
