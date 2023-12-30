@@ -22,6 +22,7 @@ struct RHIComponentStartInfo;
 class VulkanInstance;
 class VulkanDevice;
 class WindowContext;
+class RHIMemoryPool;
 
 
 
@@ -59,6 +60,9 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	inline RHIMemoryPool									&	GetRHIMemoryPool() { return *memory_pool; };
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	int64_t														GetBestPhysicalDevice();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +86,8 @@ private:
 	VkAllocationCallbacks										main_thread_allocation_callbacks;
 	ApplicationInfo												application_info;
 	DebugSettings												debug_settings;
+
+	UniquePtr<RHIMemoryPool>									memory_pool;
 
 	window_manager::WindowManagerComponent					&	window_manager_component;
 

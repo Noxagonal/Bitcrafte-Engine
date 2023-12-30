@@ -1,6 +1,7 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
+#include <rhi_vulkan/rhi_memory_pool/RHIMemoryPool.hpp>
 
 #include <core/memory/raw/RawMemory.hpp>
 #include <rhi_vulkan/vk/instance/VulkanInstance.hpp>
@@ -98,6 +99,12 @@ void bc::rhi::RHIVulkanImpl::Start(
 {
 	auto & selected_physical_device = vulkan_instance->GetPhysicalDeviceList()[ rhi_start_info.use_device ];
 	vulkan_device = MakeUniquePtr<VulkanDevice>( *this, selected_physical_device, rhi_start_info );
+
+	auto memory_pool_create_info = RHIMemoryPoolCreateInfo {};
+	// Hard coded for now, would be better to query a better size from the system.
+	memory_pool_create_info.linear_allocation_chunk_size		= 1024 * 1024 * 128;
+	memory_pool_create_info.non_linear_allocation_chunk_size	= 1024 * 1024 * 512;
+	memory_pool = MakeUniquePtr<RHIMemoryPool>( *this, memory_pool_create_info );
 
 	window_manager_component.events.OnWindowCreated.RegisterObserver( &OnWindowCreated );
 	window_manager_component.events.OnWindowBeingDestroyed.RegisterObserver( &OnWindowBeingDestroyed );
