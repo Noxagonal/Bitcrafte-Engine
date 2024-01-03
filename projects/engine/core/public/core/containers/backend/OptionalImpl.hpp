@@ -220,6 +220,10 @@ public:
 	/// If contained value has already been constructed and alive, it is destructed first, however, memory is recycled and the new
 	/// object will share the old pointer.
 	///
+	/// @warning
+	/// If constructor of the new object throws, the old contained value is destructed and is unrecoverable. The Optional is in a
+	/// cleared state.
+	///
 	/// @tparam ...ConstructorArgumentTypePack
 	/// Types of arguments sent to the contained value constructor.
 	///
@@ -230,10 +234,9 @@ public:
 		ConstructorArgumentTypePack																	&&	...constructor_arguments
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto temp = BC_CONTAINER_NAME( Optional )<ValueType>( );
-		this->ConstructStackElement( temp.data, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
-		temp.has_data = true;
-		*this = std::move( temp );
+		this->Clear();
+		this->ConstructStackElement( this->data, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+		this->has_data = true;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
