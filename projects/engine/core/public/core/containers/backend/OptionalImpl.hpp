@@ -32,8 +32,8 @@ class BC_CONTAINER_NAME( Optional ) : private container_bases::ContainerResource
 	class NonTrivialType
 	{
 	public:
-		NonTrivialType() {};
-		uint8_t dummy_value;
+		inline NonTrivialType() {}
+		uint8_t dummy_value = {};
 	};
 	static_assert( !std::is_trivial_v<NonTrivialType> );
 	static_assert( sizeof( NonTrivialType ) == 1 );
