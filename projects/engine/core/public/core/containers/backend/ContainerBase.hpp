@@ -75,7 +75,7 @@ private:
 	/// @return
 	/// Pointer to memory location where the object was constructed.
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	static constexpr ValueType						*	DoTryConstructElement(
+	static constexpr ValueType						*	DoTryConstructHeapElement(
 		ValueType									*	location,
 		ConstructorArgumentTypePack					&&	...constructor_arguments
 	)
@@ -116,7 +116,7 @@ private:
 	/// @return
 	/// Pointer to the object location in memory when it was alive.
 	template<typename ValueType>
-	static constexpr ValueType						*	DoTryDestructElement(
+	static constexpr ValueType						*	DoTryDestructHeapElement(
 		ValueType									*	location
 	)
 	{
@@ -147,7 +147,7 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Construct a single element.
+	/// Try constructing a single element.
 	///
 	/// This is a special function that can be used when constructing a single object that may throw.
 	///
@@ -166,7 +166,7 @@ protected:
 	/// @param ...constructor_arguments
 	/// Constructor arguments as parameter pack sent to the constructor of the element.
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	static constexpr void								TryConstructElement(
+	static constexpr void								TryConstructHeapElement(
 		ValueType									*&	location,
 		ConstructorArgumentTypePack					&&	...constructor_arguments
 	)
@@ -191,13 +191,13 @@ protected:
 			// Make pointer undead first, so if constructor throws, it will be handled accordingly.
 			volatile auto temp = location;
 			location = MakeObjectPointerUndead( location );
-			location = DoTryConstructElement( temp, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			location = DoTryConstructHeapElement( temp, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Destruct element.
+	/// Try destructing a single element.
 	///
 	/// This is a conditional operation, input location accepts undead object pointers as well as alive ones. If an undead object
 	/// pointer is encoutered, its alive version is returned and destruction of the object is not attempted.
@@ -211,11 +211,56 @@ protected:
 	/// @return
 	/// Pointer to the object location in memory when it was alive.
 	template<typename ValueType>
-	static constexpr void								TryDestructElement(
+	static constexpr void								TryDestructHeapElement(
 		ValueType									*&	location
 	)
 	{
-		location = DoTryDestructElement( location );
+		location = DoTryDestructHeapElement( location );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Construct a single element.
+	///
+	/// This is a simple call to the object constructor, object constructor may throw but nothing is done about it it does.
+	///
+	/// @tparam ValueType
+	/// Type of the element to construct.
+	///
+	/// @tparam ...ConstructorArgumentTypePack
+	/// Parameter pack for types sent to the constructor of the element.
+	///
+	/// @param object
+	/// Reference to would be object that we want to construct.
+	///
+	/// @param ...constructor_arguments
+	/// Constructor arguments as parameter pack sent to the constructor of the element.
+	template<typename ValueType, typename ...ConstructorArgumentTypePack>
+	static constexpr void								ConstructStackElement(
+		ValueType									&	object,
+		ConstructorArgumentTypePack					&&	...constructor_arguments
+	)
+	{
+		new( &object ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Destruct a single element.
+	///
+	/// This is a simple call to the object destructor, no undead operations are performed.
+	///
+	/// @tparam ValueType
+	/// Type of the object we try to destruct.
+	///
+	/// @param object
+	/// Reference to object to destruct.
+	template<typename ValueType>
+	static constexpr void								DestructStackElement(
+		ValueType									&	object
+	)
+	{
+		object.~ValueType();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -4,9 +4,8 @@
 #include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 
 #define BC_CONTAINER_IMPLEMENTATION_NORMAL 1
-#include <core/containers/backend/UniquePtrImpl.hpp>
+#include <core/containers/backend/OptionalImpl.hpp>
 #undef BC_CONTAINER_IMPLEMENTATION_NORMAL
-
 
 
 namespace bc {
@@ -15,28 +14,27 @@ namespace bc {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Make unique pointer container and construct its contained value.
+/// Make optional container and construct its contained value.
 ///
-/// Functionally this is very similar to std::make_unique, except it uses engine provided memory pool and engine provided
-/// assertions.
+/// Functionally this is very similar to std::optional, except it uses engine provided assertions.
 ///
 /// @tparam ValueType
-/// Contained value type of the unique pointer.
+/// Contained value type of the optional.
 ///
 /// @tparam ...ConstructorArgumentTypePack
-/// Parameter types forwarded to value constructor.
+/// Parameter types forwarded to contained value constructor.
 ///
 /// @param ...constructor_arguments
 /// Arguments forwarded to contained value constructor.
 ///
 /// @return
-/// A new unique pointer with its contained value constructed.
+/// A new optional container with its contained value constructed.
 template<typename ValueType, typename ...ConstructorArgumentTypePack>
-UniquePtr<ValueType>									MakeUniquePtr(
+Optional<ValueType>										MakeOptional(
 	ConstructorArgumentTypePack						&&	...constructor_arguments
 )
 {
-	auto result = UniquePtr<ValueType> {};
+	auto result = Optional<ValueType> {};
 	result.Emplace( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
 	return result;
 }

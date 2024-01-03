@@ -1,9 +1,9 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
 
-#if BI_CONTAINER_IMPLEMENTATION_NORMAL
+#if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/containers/backend/LinearContainerBaseNormal.hpp>
-#elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
+#elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
 #include <core/containers/backend/LinearContainerBaseSimple.hpp>
 #else
 #error "Container implementation type not given"
