@@ -1,8 +1,8 @@
 #pragma once
 
-#define BI_CONTAINER_IMPLEMENTATION_SIMPLE 1
+#define BC_CONTAINER_IMPLEMENTATION_SIMPLE 1
 #include <core/containers/backend/UniquePtrImpl.hpp>
-#undef BI_CONTAINER_IMPLEMENTATION_SIMPLE
+#undef BC_CONTAINER_IMPLEMENTATION_SIMPLE
 
 
 namespace bc {

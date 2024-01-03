@@ -3,6 +3,6 @@
 #include <core/diagnostic/assertion/Assert.hpp>
 #include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 
-#define BI_CONTAINER_IMPLEMENTATION_NORMAL 1
+#define BC_CONTAINER_IMPLEMENTATION_NORMAL 1
 #include <core/containers/backend/PairImplNormal.hpp>
-#undef BI_CONTAINER_IMPLEMENTATION_NORMAL
+#undef BC_CONTAINER_IMPLEMENTATION_NORMAL

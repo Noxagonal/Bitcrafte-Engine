@@ -1,8 +1,8 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
 
-#if BI_CONTAINER_IMPLEMENTATION_NORMAL
-#elif BI_CONTAINER_IMPLEMENTATION_SIMPLE
+#if BC_CONTAINER_IMPLEMENTATION_NORMAL
+#elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
 #else
 #error "Container implementation type not given"
 #endif
