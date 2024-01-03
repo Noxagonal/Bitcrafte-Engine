@@ -174,7 +174,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
 		ValueType																					&&	other_value
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> && BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
 	{
 		if( this->has_data )
 		{
