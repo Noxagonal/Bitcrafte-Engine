@@ -25,7 +25,7 @@ namespace bc {
 ///
 /// @tparam ValueType
 /// Type of the contained object/element.
-template<typename ValueType>
+template<BC_CONTAINER_VALUE_TYPENAME ValueType>
 class BC_CONTAINER_NAME( Optional ) : private container_bases::ContainerResource
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
