@@ -298,3 +298,105 @@ VkImageAspectFlagBits bc::rhi::CreateAspectMaskFromFormat(
 	assert( 0 );
 	return {};
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+VkFormat bc::rhi::GetVulkanFormatFromRHIColorFormat(
+	ColorFormat color_format
+)
+{
+	switch( color_format )
+	{
+	case bc::rhi::ColorFormat::NONE:
+		return VK_FORMAT_UNDEFINED;
+	case bc::rhi::ColorFormat::R8_UNorm:
+		return VK_FORMAT_R8_UNORM;
+	case bc::rhi::ColorFormat::R8_G8_UNorm:
+		return VK_FORMAT_R8_UNORM;
+	case bc::rhi::ColorFormat::R8_G8_B8_UNorm:
+		return VK_FORMAT_R8G8B8_UNORM;
+	case bc::rhi::ColorFormat::R8_G8_B8_A8_UNorm:
+		return VK_FORMAT_R8G8B8A8_UNORM;
+	case bc::rhi::ColorFormat::B8_G8_R8_A8_UNorm:
+		return VK_FORMAT_B8G8R8A8_UNORM;
+	case bc::rhi::ColorFormat::R8_G8_B8_A8_SRGB:
+		return VK_FORMAT_R8G8B8A8_SRGB;
+	case bc::rhi::ColorFormat::B8_G8_R8_A8_SRGB:
+		return VK_FORMAT_B8G8R8A8_SRGB;
+	case bc::rhi::ColorFormat::R16_UNorm:
+		return VK_FORMAT_R16_UNORM;
+	case bc::rhi::ColorFormat::R16_G16_UNorm:
+		return VK_FORMAT_R16G16_UNORM;
+	case bc::rhi::ColorFormat::R16_G16_B16_UNorm:
+		return VK_FORMAT_R16G16B16_UNORM;
+	case bc::rhi::ColorFormat::R16_G16_B16_A16_UNorm:
+		return VK_FORMAT_R16G16B16A16_UNORM;
+	case bc::rhi::ColorFormat::R16_SFloat:
+		return VK_FORMAT_R16_SFLOAT;
+	case bc::rhi::ColorFormat::R16_G16_SFloat:
+		return VK_FORMAT_R16G16_SFLOAT;
+	case bc::rhi::ColorFormat::R16_G16_B16_SFloat:
+		return VK_FORMAT_R16G16B16_SFLOAT;
+	case bc::rhi::ColorFormat::R16_G16_B16_A16_SFloat:
+		return VK_FORMAT_R16G16B16A16_SFLOAT;
+	case bc::rhi::ColorFormat::R32_SFloat:
+		return VK_FORMAT_R32_SFLOAT;
+	case bc::rhi::ColorFormat::R32_G32_SFloat:
+		return VK_FORMAT_R32G32_SFLOAT;
+	case bc::rhi::ColorFormat::R32_G32_B32_SFloat:
+		return VK_FORMAT_R32G32B32_SFLOAT;
+	case bc::rhi::ColorFormat::R32_G32_B32_A32_SFloat:
+		return VK_FORMAT_R32G32B32A32_SFLOAT;
+
+	case bc::rhi::ColorFormat::R4_G4_UNorm:
+		return VK_FORMAT_R4G4_UNORM_PACK8;
+	case bc::rhi::ColorFormat::R4_G4_B4_A4_UNorm:
+		return VK_FORMAT_R4G4B4A4_UNORM_PACK16;
+	case bc::rhi::ColorFormat::R5_G6_B5_UNorm:
+		return VK_FORMAT_R5G6B5_UNORM_PACK16;
+	case bc::rhi::ColorFormat::R5_G5_B5_A1_UNorm:
+		return VK_FORMAT_R5G5B5A1_UNORM_PACK16;
+	case bc::rhi::ColorFormat::A2_R10_G10_B10_UNorm:
+		return VK_FORMAT_A2R10G10B10_UNORM_PACK32;
+	case bc::rhi::ColorFormat::A2_B10_G10_R10_UNorm:
+		return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+	case bc::rhi::ColorFormat::B10_G11_R11_UFloat:
+		return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
+	case bc::rhi::ColorFormat::E5_B9_G9_R9_UFloat:
+		return VK_FORMAT_E5B9G9R9_UFLOAT_PACK32;
+	case bc::rhi::ColorFormat::BC1_RGB_UNorm:
+		return VK_FORMAT_BC1_RGB_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::BC1_RGBA_UNorm:
+		return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::BC3_RGBA_UNorm:
+		return VK_FORMAT_BC3_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::BC4_R_UNorm:
+		return VK_FORMAT_BC4_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::BC5_RG_UNorm:
+		return VK_FORMAT_BC5_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::BC5_RG_SNorm:
+		return VK_FORMAT_BC5_SNORM_BLOCK;
+	case bc::rhi::ColorFormat::BC6H_RGB_SFloat:
+		return VK_FORMAT_BC6H_SFLOAT_BLOCK;
+	case bc::rhi::ColorFormat::BC7_RGBA_UNorm:
+		return VK_FORMAT_BC7_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::ASTC_4x4_RGBA_UNorm:
+		return VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::ASTC_5x5_RGBA_UNorm:
+		return VK_FORMAT_ASTC_5x5_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::ASTC_6x6_RGBA_UNorm:
+		return VK_FORMAT_ASTC_6x6_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::ASTC_8x8_RGBA_UNorm:
+		return VK_FORMAT_ASTC_8x8_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::ASTC_10x10_RGBA_UNorm:
+		return VK_FORMAT_ASTC_10x10_UNORM_BLOCK;
+	case bc::rhi::ColorFormat::ASTC_12x12_RGBA_UNorm:
+		return VK_FORMAT_ASTC_12x12_UNORM_BLOCK;
+
+	case bc::rhi::ColorFormat::D32_SFloat:
+		return VK_FORMAT_D32_SFLOAT;
+	case bc::rhi::ColorFormat::D32_SFloat_S8:
+		return VK_FORMAT_D32_SFLOAT_S8_UINT;
+	}
+
+	return VK_FORMAT_UNDEFINED;
+}
