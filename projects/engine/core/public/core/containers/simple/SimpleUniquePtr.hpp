@@ -13,7 +13,8 @@ namespace bc {
 /// @brief
 /// Make unique pointer container and construct its contained value.
 ///
-/// Functionally this is very similar to std::make_unique, except it uses engine provided memory pool.
+/// Functionally this is very similar to std::make_unique, except it uses engine provided memory pool and engine provided
+/// assertions.
 ///
 /// @tparam ValueType
 /// Contained value type of the unique pointer.

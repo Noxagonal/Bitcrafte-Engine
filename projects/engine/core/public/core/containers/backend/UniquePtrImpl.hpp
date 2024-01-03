@@ -193,9 +193,9 @@ public:
 		ConstructorArgumentTypePack																	&&	...constructor_arguments
 	)
 	{
-		if( this->data_ptr ) this->TryDestructElement( this->data_ptr );
+		if( this->data_ptr ) this->TryDestructHeapElement( this->data_ptr );
 		if( this->data_ptr == nullptr ) this->AllocateContainedMemory();
-		this->TryConstructElement( this->data_ptr, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+		this->TryConstructHeapElement( this->data_ptr, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ public:
 	constexpr void																						Clear() BC_CONTAINER_NOEXCEPT
 	{
 		if( this->data_ptr == nullptr ) return;
-		this->TryDestructElement( this->data_ptr );
+		this->TryDestructHeapElement( this->data_ptr );
 		this->FreeContainedMemory();
 	}
 
