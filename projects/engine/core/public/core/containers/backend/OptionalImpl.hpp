@@ -25,15 +25,15 @@ namespace bc {
 ///
 /// @tparam ValueType
 /// Type of the contained object/element.
-template<typename ValueType>
+template<BC_CONTAINER_VALUE_TYPENAME ValueType>
 class BC_CONTAINER_NAME( Optional ) : private container_bases::ContainerResource
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	class NonTrivialType
 	{
 	public:
-		NonTrivialType() {};
-		uint8_t dummy_value;
+		inline NonTrivialType() {}
+		uint8_t dummy_value = {};
 	};
 	static_assert( !std::is_trivial_v<NonTrivialType> );
 	static_assert( sizeof( NonTrivialType ) == 1 );
@@ -174,7 +174,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
 		ValueType																					&&	other_value
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> && BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
 	{
 		if( this->has_data )
 		{
@@ -220,6 +220,10 @@ public:
 	/// If contained value has already been constructed and alive, it is destructed first, however, memory is recycled and the new
 	/// object will share the old pointer.
 	///
+	/// @warning
+	/// If constructor of the new object throws, the old contained value is destructed and is unrecoverable. The Optional is in a
+	/// cleared state.
+	///
 	/// @tparam ...ConstructorArgumentTypePack
 	/// Types of arguments sent to the contained value constructor.
 	///
@@ -230,10 +234,9 @@ public:
 		ConstructorArgumentTypePack																	&&	...constructor_arguments
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto temp = BC_CONTAINER_NAME( Optional )<ValueType>( );
-		this->ConstructStackElement( temp.data, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
-		temp.has_data = true;
-		*this = std::move( temp );
+		this->Clear();
+		this->ConstructStackElement( this->data, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+		this->has_data = true;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
