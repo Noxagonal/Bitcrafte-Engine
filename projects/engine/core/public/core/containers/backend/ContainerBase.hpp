@@ -219,6 +219,51 @@ protected:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Construct a single element.
+	///
+	/// This is a simple call to the object constructor, object constructor may throw but nothing is done about it it does.
+	///
+	/// @tparam ValueType
+	/// Type of the element to construct.
+	///
+	/// @tparam ...ConstructorArgumentTypePack
+	/// Parameter pack for types sent to the constructor of the element.
+	///
+	/// @param object
+	/// Reference to would be object that we want to construct.
+	///
+	/// @param ...constructor_arguments
+	/// Constructor arguments as parameter pack sent to the constructor of the element.
+	template<typename ValueType, typename ...ConstructorArgumentTypePack>
+	static constexpr void								ConstructStackElement(
+		ValueType									&	object,
+		ConstructorArgumentTypePack					&&	...constructor_arguments
+	)
+	{
+		new( &object ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Destruct a single element.
+	///
+	/// This is a simple call to the object destructor, no undead operations are performed.
+	///
+	/// @tparam ValueType
+	/// Type of the object we try to destruct.
+	///
+	/// @param object
+	/// Reference to object to destruct.
+	template<typename ValueType>
+	static constexpr void								DestructStackElement(
+		ValueType									&	object
+	)
+	{
+		object.~ValueType();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
 	constexpr void										ConstructRange(
 		ValueType									*	destination,
