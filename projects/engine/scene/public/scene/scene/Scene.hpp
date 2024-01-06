@@ -5,7 +5,7 @@
 
 
 namespace bc {
-namespace world {
+namespace scene {
 
 
 
@@ -26,5 +26,5 @@ private:
 
 
 
-} // world
+} // scene
 } // bc
