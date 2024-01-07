@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <scene/entity/component/Component.hpp>
+
 
 
 namespace bc {
@@ -11,16 +13,18 @@ namespace scene {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Provides scene loading, unloading and other utilities and settings related to everything within the game world.
-class World
+/// Provides a base for all mesh component types.
+///
+/// This class should not be used directly, see StaticMeshComponent and DynamicMeshComponent for instantiable classes.
+class MeshComponent : public Component
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	World();
+	MeshComponent();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~World();
+	virtual ~MeshComponent() override;
 
 private:
 };

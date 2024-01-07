@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <scene/entity/component/mesh/MeshComponent.hpp>
+
 
 
 namespace bc {
@@ -11,16 +13,19 @@ namespace scene {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Provides scene loading, unloading and other utilities and settings related to everything within the game world.
-class World
+/// Static mesh component is used to display unchanging mesh in the scene.
+///
+/// This is the fastest way of rendering meshes, use whenever possible, however it can only be used for meshes that do not
+/// change during runtime.
+class StaticMeshComponent : public MeshComponent
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	World();
+	StaticMeshComponent();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~World();
+	virtual ~StaticMeshComponent() override;
 
 private:
 };
