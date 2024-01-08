@@ -18,7 +18,7 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t VectorLength, utility::FundamentalType ValueType>
+template<size_t DimensionCount, utility::FundamentalType ValueType>
 class VectorBase;
 
 
@@ -29,7 +29,7 @@ class alignas( sizeof( ValueType ) * 2 ) VectorBase<2, ValueType>
 {
 public:
 
-	static constexpr size_t VectorLength = 2;
+	static constexpr size_t DimensionCount = 2;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																x				= {};
@@ -56,19 +56,19 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr VectorBase(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) noexcept requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
 		CopyOther( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr VectorBase												&	operator=(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) noexcept requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
 		CopyOther( other );
 	}
@@ -253,6 +253,12 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ValueType														Length() const noexcept
+	{
+		return Magnitude();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
@@ -269,12 +275,12 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr void															CopyOther(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) noexcept requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
-		if constexpr( OtherVectorLength == 2 )
+		if constexpr( OtherDimensionCount == 2 )
 		{
 			x = other.x;
 			y = other.y;
@@ -290,7 +296,7 @@ class VectorBase<3, ValueType>
 {
 public:
 
-	static constexpr size_t VectorLength = 3;
+	static constexpr size_t DimensionCount = 3;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																x				= {};
@@ -321,19 +327,19 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr VectorBase(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) noexcept requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
 		CopyOther( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr VectorBase												&	operator=(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) noexcept requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
 		CopyOther( other );
 	}
@@ -527,6 +533,12 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ValueType														Length() const noexcept
+	{
+		return Magnitude();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
@@ -543,18 +555,18 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr void															CopyOther(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) requires( OtherDimensionCount <= DimensionCount )
 	{
-		if constexpr( OtherVectorLength == 2 )
+		if constexpr( OtherDimensionCount == 2 )
 		{
 			x = other.x;
 			y = other.y;
 			z = {};
 		}
-		if constexpr( OtherVectorLength == 3 )
+		if constexpr( OtherDimensionCount == 3 )
 		{
 			x = other.x;
 			y = other.y;
@@ -571,7 +583,7 @@ class alignas( sizeof( ValueType ) * 4 ) VectorBase<4, ValueType>
 {
 public:
 
-	static constexpr size_t VectorLength = 4;
+	static constexpr size_t DimensionCount = 4;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																x					= {};
@@ -606,19 +618,19 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr VectorBase(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) noexcept requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
 		CopyOther( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr VectorBase												&	operator=(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) noexcept requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
 		CopyOther( other );
 	}
@@ -819,6 +831,12 @@ public:
 			w * w
 		);
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ValueType														Length() const noexcept
+	{
+		return Magnitude();
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase													Normalized() const noexcept
@@ -837,26 +855,26 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherVectorLength>
+	template<size_t OtherDimensionCount>
 	constexpr void															CopyOther(
-		const VectorBase<OtherVectorLength, ValueType>					&	other
-	) requires( OtherVectorLength <= VectorLength )
+		const VectorBase<OtherDimensionCount, ValueType>				&	other
+	) noexcept requires( OtherDimensionCount <= DimensionCount )
 	{
-		if constexpr( OtherVectorLength == 2 )
+		if constexpr( OtherDimensionCount == 2 )
 		{
 			x = other.x;
 			y = other.y;
 			z = {};
 			w = {};
 		}
-		if constexpr( OtherVectorLength == 3 )
+		if constexpr( OtherDimensionCount == 3 )
 		{
 			x = other.x;
 			y = other.y;
 			z = other.z;
 			w = {};
 		}
-		if constexpr( OtherVectorLength == 4 )
+		if constexpr( OtherDimensionCount == 4 )
 		{
 			x = other.x;
 			y = other.y;
