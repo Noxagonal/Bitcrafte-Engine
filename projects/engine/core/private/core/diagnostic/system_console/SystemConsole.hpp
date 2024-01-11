@@ -179,7 +179,7 @@ void								SystemConsolePrint(
 )
 {
 	static_assert( CharacterArraySize > 0 );
-	SystemConsolePrint( SimpleTextViewBase<CharacterType, true>( text, CharacterArraySize ), foreground_color, background_color );
+	SystemConsolePrint( bc::internal::SimpleTextViewBase<CharacterType, true>( text, CharacterArraySize ), foreground_color, background_color );
 }
 
 
@@ -211,7 +211,7 @@ void								SystemConsolePrint(
 )
 {
 	static_assert( CharacterArraySize > 0 );
-	SystemConsolePrint( SimpleTextViewBase<CharacterType, true> { text, CharacterArraySize }, theme );
+	SystemConsolePrint( bc::internal::SimpleTextViewBase<CharacterType, true> { text, CharacterArraySize }, theme );
 }
 
 

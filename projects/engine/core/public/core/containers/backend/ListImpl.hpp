@@ -1,5 +1,6 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
+#include <core/containers/backend/ContainerUtilities.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/containers/backend/LinearContainerBaseNormal.hpp>
@@ -144,7 +145,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
-		return container_bases::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +164,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
-		return container_bases::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +181,7 @@ public:
 		const ValueType																				&	value
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFind( value ) );
+		return IteratorBase<IsConst>( this, container_bases::internal::DoLinearSearch<ValueType, true>( this->data_ptr, this->data_size, value ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +198,7 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFind( value ) );
+		return IteratorBase<IsConst>( this, container_bases::internal::DoLinearSearch<ValueType, IsConst>( this->data_ptr, this->data_size, value ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +219,7 @@ public:
 		LambdaType																					&&	lambda
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFindIf( lambda ) );
+		return IteratorBase<IsConst>( this, container_bases::internal::DoLinearSearchIf<ValueType, true>( this->data_ptr, this->data_size, lambda ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +240,7 @@ public:
 		LambdaType																					&&	lambda
 	) BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFindIf( lambda ) );
+		return IteratorBase<IsConst>( this, container_bases::internal::DoLinearSearchIf<ValueType, IsConst>( this->data_ptr, this->data_size, lambda ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -384,7 +385,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )(
 		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( other );
 	}
@@ -400,7 +401,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )(
 		std::initializer_list<ValueType>																init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( init_list );
 	}
@@ -409,7 +410,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( List )(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( other );
 	}
@@ -425,7 +426,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )																&	operator=(
 		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		if( std::addressof( other ) == this ) return *this;
 
@@ -447,7 +448,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( List )																&	operator=(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		if( other.Data() >= this->Data() && other.Data() < this->Data() + this->Size() )
 		{
@@ -465,7 +466,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )																&	operator=(
 		std::initializer_list<ValueType>																init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Clear();
 		this->Append( init_list );
@@ -483,7 +484,7 @@ public:
 	/// Reference to this.
 	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
 		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + other.Size();
 		this->Append( other, 1, reserve_space );
@@ -502,7 +503,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + other.Size();
 		this->Append( other, 1, reserve_space );
@@ -520,7 +521,7 @@ public:
 	/// Reference to this.
 	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
 		const std::initializer_list<ValueType>														&	init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + init_list.size();
 		this->Append( init_list, 1, reserve_space );
@@ -543,7 +544,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
-		return container_bases::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -562,7 +563,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
-		return container_bases::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -580,7 +581,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return true;
 
-		return container_bases::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -598,7 +599,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return false;
 
-		return container_bases::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -706,7 +707,7 @@ public:
 		const ValueType																				&	value,
 		size_t																							count			= 1,
 		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
@@ -749,7 +750,7 @@ public:
 		const OtherContainerType																	&	other,
 		size_t																							count			= 1,
 		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
 		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );

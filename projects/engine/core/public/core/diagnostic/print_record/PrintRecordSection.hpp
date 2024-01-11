@@ -15,7 +15,7 @@ namespace diagnostic {
 struct PrintRecordSection
 {
 	PrintRecordTheme						theme					= PrintRecordTheme::DEFAULT;
-	SimpleText32							text;
+	bc::internal::SimpleText32				text;
 	size_t									indent					= {};
 };
 

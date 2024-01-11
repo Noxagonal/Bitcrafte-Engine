@@ -12,6 +12,7 @@
 
 
 namespace bc {
+BC_CONTAINER_NAMESPACE_START;
 
 
 
@@ -277,6 +278,7 @@ static_assert( !utility::TextContainer<BC_CONTAINER_NAME( UniquePtr )<char32_t>>
 
 
 
+BC_CONTAINER_NAMESPACE_END;
 } // bc
 
 

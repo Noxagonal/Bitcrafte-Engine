@@ -5,7 +5,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::SimpleTextView32 bc::diagnostic::LogReportSeverityToText(
+bc::internal::SimpleTextView32 bc::diagnostic::LogReportSeverityToText(
 	bc::diagnostic::LogReportSeverity e
 )
 {

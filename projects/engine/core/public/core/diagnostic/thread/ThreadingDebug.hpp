@@ -45,7 +45,7 @@ public:
 	~SingleThreadAccessScopeTracker();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	SimpleText										position_key;
+	bc::internal::SimpleText						position_key;
 	std::thread::id									thread_id;
 };
 

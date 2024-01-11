@@ -601,119 +601,6 @@ public:
 protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Find the first occurance of a specific value in this container.
-	///
-	/// @param value
-	///	Value to find.
-	/// 
-	/// @return
-	/// Pointer to value position where value was found.
-	[[nodiscard]]
-	constexpr const ValueType																		*	DoFind(
-		const ValueType																				&	value
-	) const BC_CONTAINER_NOEXCEPT
-	{
-		auto it = this->data_ptr;
-		auto it_end = this->data_ptr + this->data_size;
-		while( it != it_end )
-		{
-			if( *it == value )
-			{
-				return it;
-			}
-			++it;
-		}
-		return it;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Find the first occurance of a specific value in this container.
-	///
-	/// @param value
-	///	Value to find.
-	/// 
-	/// @return
-	/// Pointer to value position where value was found.
-	[[nodiscard]]
-	constexpr ValueType																				*	DoFind(
-		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT
-	{
-		auto it = this->data_ptr;
-		auto it_end = this->data_ptr + this->data_size;
-		while( it != it_end )
-		{
-			if( *it == value )
-			{
-				return it;
-			}
-			++it;
-		}
-		return it;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Find the first occurance of a specific value in this container.
-	///
-	/// @param value
-	///	Value to find.
-	/// 
-	/// @return
-	/// Pointer to value position where value was found.
-	template<typename LambdaType>
-	[[nodiscard]]
-	constexpr const ValueType																		*	DoFindIf(
-		LambdaType																					&&	lambda
-	) const BC_CONTAINER_NOEXCEPT
-	{
-		auto it = this->data_ptr;
-		auto it_end = this->data_ptr + this->data_size;
-		while( it != it_end )
-		{
-			if( lambda( *it ) )
-			{
-				return it;
-			}
-			++it;
-		}
-		return it;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Find the first occurance of a specific value in this container if lambda returns true.
-	///
-	/// @tparam LambdaType
-	/// Type of the lambda which is used to search.
-	///
-	/// @param lambda
-	///	Lambda function that is invoked to test if we found what we're looking for.
-	/// 
-	/// @return
-	/// Iterator to value position where value was found.
-	template<typename LambdaType>
-	[[nodiscard]]
-	constexpr ValueType																				*	DoFindIf(
-		LambdaType																					&&	lambda
-	) BC_CONTAINER_NOEXCEPT
-	{
-		auto it = this->data_ptr;
-		auto it_end = this->data_ptr + this->data_size;
-		while( it != it_end )
-		{
-			if( lambda( *it ) )
-			{
-				return it;
-			}
-			++it;
-		}
-		return it;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																						*	data_ptr				= {};
 	size_t																								data_size				= {};
 };
@@ -860,7 +747,7 @@ public:
 		const OtherContainerType																	&	other,
 		size_t																							count				= 1,
 		size_t																							headroom			= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		size_t old_size				= this->Size();
 		size_t other_size			= other.Size();
@@ -897,7 +784,7 @@ public:
 		const std::initializer_list<ValueType>														&	init_list,
 		size_t																							count				= 1,
 		size_t																							headroom			= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		size_t old_size				= this->Size();
 		size_t other_size			= init_list.size();
@@ -940,7 +827,7 @@ public:
 	/// Value to add to the front.
 	constexpr void																						PushFront(
 		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ShiftRight( 0, 1, reserve_space );
@@ -958,12 +845,12 @@ public:
 	/// Value to add to the front via move. Falls back to copying if more is not possible.
 	constexpr void																						PushFront(
 		ValueType																					&&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ShiftRight( 0, 1, reserve_space );
 		// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-		if constexpr( std::is_move_constructible_v<ValueType> )
+		if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 		{
 			new( &this->data_ptr[ 0 ] ) ValueType( std::move( value ) );
 		}
@@ -981,7 +868,7 @@ public:
 	/// Value to add to the back.
 	constexpr void																						PushBack(
 		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ResizeNoConstruct( reserve_space, reserve_space );
@@ -996,12 +883,12 @@ public:
 	/// Value to add to the back via move. Falls back to copying if more is not possible.
 	constexpr void																						PushBack(
 		ValueType																					&&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ResizeNoConstruct( reserve_space, reserve_space );
 		// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-		if constexpr( std::is_move_constructible_v<ValueType> )
+		if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 		{
 			new( &this->data_ptr[ this->data_size - 1 ] ) ValueType( std::move( value ) );
 		}
@@ -1029,7 +916,7 @@ public:
 		const ValueType																				&	value,
 		size_t																							count,
 		size_t																							headroom			= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->ShiftRight( 0, count, headroom );
 		for( size_t i = 0; i < count; i++ )
@@ -1054,7 +941,7 @@ public:
 		const ValueType																				&	value,
 		size_t																							count,
 		size_t																							headroom			= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto old_size = this->data_size;
 		auto reserve_space = this->data_size + count;
@@ -1080,7 +967,7 @@ public:
 	template<typename ...ConstructorArgumentsTypePack>
 	constexpr void																						EmplaceFront(
 		ConstructorArgumentsTypePack																&&	...constructor_args
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ShiftRight( 0, 1, reserve_space );
@@ -1099,7 +986,7 @@ public:
 	template<typename ...ConstructorArgumentsTypePack>
 	constexpr void																						EmplaceBack(
 		ConstructorArgumentsTypePack																&&	...constructor_args
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ResizeNoConstruct( reserve_space, reserve_space );
@@ -1134,8 +1021,8 @@ protected:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
-		auto iterator = this->DoFind( value );
-		if( iterator > this->data_ptr + this->data_size ) return iterator;
+		auto iterator = container_bases::internal::DoLinearSearch<ValueType, false>( this->data_ptr, this->data_size, value );
+		if( iterator >= this->data_ptr + this->data_size ) return iterator;
 		return this->DoErase( iterator );
 	}
 
@@ -1177,7 +1064,7 @@ protected:
 		auto it_last			= this->data_ptr + this->data_size - 1;
 		while( to_it != it_end )
 		{
-			if constexpr( std::is_move_assignable_v<ValueType> )
+			if constexpr( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
 			{
 				*from_it = std::move( *( to_it ) );
 			}
@@ -1199,7 +1086,7 @@ protected:
 		const ValueType																				&	value,
 		size_t																							count			= 1,
 		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		BC_ContainerAssert(
 			( this->data_ptr == nullptr && at == nullptr ) ||
@@ -1225,7 +1112,7 @@ protected:
 		const OtherContainerType																	&	other,
 		size_t																							count			= 1,
 		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert(
 			( this->data_ptr == nullptr && at == nullptr ) ||
@@ -1346,7 +1233,7 @@ protected:
 		size_t																							start_position,
 		size_t																							amount,
 		size_t																							headroom
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		// TODO: Should combine shift and resize to the same copy-loop
 		// if new memory is being allocated at the same time.
@@ -1380,7 +1267,7 @@ protected:
 			for( size_t i = copy_range_end - 1; i >= copy_range_begin; --i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-				if constexpr( std::is_move_constructible_v<ValueType> )
+				if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 				{
 					new( &this->data_ptr[ i ] ) ValueType( std::move( this->data_ptr[ i - amount ] ) );
 				}
@@ -1394,7 +1281,7 @@ protected:
 			for( size_t i = overlap_range_end - 1; i >= overlap_range_begin; --i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-				if constexpr( std::is_move_constructible_v<ValueType> )
+				if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 				{
 					this->data_ptr[ i ] = std::move( this->data_ptr[ i - amount ] );
 				}
@@ -1418,7 +1305,7 @@ protected:
 	constexpr void																						ShiftLeft(
 		// size_t																							start_position,
 		// size_t																							amount
-	) requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
+	) requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		// TODO: Implement start_position and amount parameters.
 
@@ -1429,7 +1316,7 @@ protected:
 
 			// Construct the first value from the next value.
 			// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-			if constexpr( std::is_move_constructible_v<ValueType> )
+			if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 			{
 				new( &this->data_ptr[ 0 ] ) ValueType( std::move( this->data_ptr[ 1 ] ) );
 			}
@@ -1441,7 +1328,7 @@ protected:
 			for( size_t i = 1; i < this->data_size; ++i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-				if constexpr( std::is_move_assignable_v<ValueType> )
+				if constexpr( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
 				{
 					this->data_ptr[ i ] = std::move( this->data_ptr[ i + 1 ] );
 				}

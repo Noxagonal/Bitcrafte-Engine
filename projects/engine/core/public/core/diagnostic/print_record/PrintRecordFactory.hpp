@@ -17,7 +17,7 @@ namespace diagnostic {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline PrintRecord											MakePrintRecord(
-	SimpleTextView32										text,
+	bc::internal::SimpleTextView32							text,
 	PrintRecordTheme										theme
 )
 {
@@ -31,7 +31,7 @@ inline PrintRecord											MakePrintRecord(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline PrintRecord											MakePrintRecord(
-	SimpleTextView32										text
+	bc::internal::SimpleTextView32							text
 )
 {
 	return MakePrintRecord( text, PrintRecordTheme::DEFAULT );
@@ -42,19 +42,19 @@ template<utility::TextContainer								TextContainerType>
 PrintRecord													MakePrintRecord(
 	TextContainerType										text,
 	PrintRecordTheme										theme
-) requires ( !std::is_same_v<std::decay_t<TextContainerType>, SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, SimpleText32> )
+) requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal::SimpleText32> )
 {
-	static_assert( !std::is_same_v<TextContainerType, SimpleTextView32> );
-	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), theme );
+	static_assert( !std::is_same_v<TextContainerType, bc::internal::SimpleTextView32> );
+	return MakePrintRecord( text::TextFormat( bc::internal::SimpleTextView32( U"{}" ), text ), theme );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainer								TextContainerType>
 PrintRecord													MakePrintRecord(
 	TextContainerType										text
-) requires ( !std::is_same_v<std::decay_t<TextContainerType>, SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, SimpleText32> )
+) requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal::SimpleText32> )
 {
-	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), PrintRecordTheme::DEFAULT );
+	return MakePrintRecord( text::TextFormat( bc::internal::SimpleTextView32( U"{}" ), text ), PrintRecordTheme::DEFAULT );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ template<
 	typename												...ArgumentTypePack
 >
 PrintRecord													MakePrintRecord_AssertText(
-	SimpleTextView32										title,
+	bc::internal::SimpleTextView32							title,
 	const ArgumentTypePack								&	...argument_pack
 )
 {

@@ -37,7 +37,7 @@ void bc::diagnostic::AssertMainThread(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::mutex										access_tracker_map_mutex;
-bc::Map<bc::SimpleText, uint32_t>				access_tracker_map;
+bc::Map<bc::internal::SimpleText, uint32_t>		access_tracker_map;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::diagnostic::SingleThreadAccessScopeTracker::SingleThreadAccessScopeTracker(
@@ -45,8 +45,8 @@ bc::diagnostic::SingleThreadAccessScopeTracker::SingleThreadAccessScopeTracker(
 )
 {
 	position_key.Reserve( 64 );
-	position_key.Append( bc::SimpleTextView( source_location.GetFile() ) );
-	position_key.Append( bc::SimpleTextView( source_location.GetFunction() ) );
+	position_key.Append( bc::internal::SimpleTextView( source_location.GetFile() ) );
+	position_key.Append( bc::internal::SimpleTextView( source_location.GetFunction() ) );
 	conversion::PrimitiveToText( position_key, source_location.GetLine() );
 
 	std::lock_guard<std::mutex> lock_guard( access_tracker_map_mutex );

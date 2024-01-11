@@ -21,6 +21,7 @@
 
 
 namespace bc {
+BC_CONTAINER_NAMESPACE_START;
 
 
 
@@ -432,7 +433,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Map )(
 		const std::initializer_list<ContainedPairType>												&	init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		this->Append( init_list );
 	}
@@ -440,7 +441,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Map )(
 		const BC_CONTAINER_NAME( Map )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> )
 	{
 		this->Append( other );
 	}
@@ -462,7 +463,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Map )																&	operator=(
 		const std::initializer_list<ContainedPairType>												&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> )
 	{
 		this->Clear();
 		this->Append( other );
@@ -472,7 +473,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Map )																&	operator=(
 		const BC_CONTAINER_NAME( Map )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> )
 	{
 		if( &other == this ) return *this;
 
@@ -504,7 +505,7 @@ public:
 	/// Reference to this.
 	constexpr BC_CONTAINER_NAME( Map )																&	operator+=(
 		const std::initializer_list<ContainedPairType>												&	init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		this->Append( init_list );
 		return *this;
@@ -525,7 +526,7 @@ public:
 	{
 		if( other.root_node == this->root_node && other.Size() == this->Size() ) return true;
 
-		return container_bases::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -543,7 +544,7 @@ public:
 	{
 		if( other.root_node == this->root_node && other.Size() == this->Size() ) return true;
 
-		return container_bases::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -560,7 +561,7 @@ public:
 	/// Reference to this.
 	constexpr BC_CONTAINER_NAME( Map )																&	operator+=(
 		const BC_CONTAINER_NAME( Map )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		this->Append( other );
 		return *this;
@@ -580,7 +581,7 @@ public:
 	/// Value paired with with given key.
 	constexpr ValueType																				&	operator[](
 		const KeyType																				&	key
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> && std::is_default_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> && std::is_default_constructible_v<ValueType> )
 	{
 		auto find_node_result = this->FindNode( key );
 		if( find_node_result.found ) {
@@ -714,7 +715,7 @@ public:
 	constexpr void																						Append(
 		const OtherContainerType																	&	other,
 		size_t																							count					= 1
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_same_v<ContainedPairType, typename OtherContainerType::ContainedPairType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && std::is_same_v<ContainedPairType, typename OtherContainerType::ContainedPairType> )
 	{
 		if constexpr( std::is_same_v<OtherContainerType, ThisType> ||
 			std::is_same_v<OtherContainerType, ThisViewType<true>> ||
@@ -759,7 +760,7 @@ public:
 	constexpr void																						Append(
 		const std::initializer_list<ContainedPairType>												&	init_list,
 		size_t																							count					= 1
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> )
 	{
 		auto old_size				= this->Size();
 		size_t other_size			= init_list.size();
@@ -788,7 +789,7 @@ public:
 	/// Iterator to inserted element.
 	constexpr Iterator																					Insert(
 		const ContainedPairType																		&	pair
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		auto find_node_result = this->FindNode( pair.first );
 		if( find_node_result.found ) {
@@ -816,11 +817,11 @@ public:
 	/// Iterator to inserted element.
 	constexpr Iterator																					Insert(
 		ContainedPairType																			&&	pair
-	) BC_CONTAINER_NOEXCEPT requires( std::is_move_constructible_v<ContainedPairType> && ( std::is_move_assignable_v<ValueType> || std::is_copy_assignable_v<ValueType> ) )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ContainedPairType> && ( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> || BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> ) )
 	{
 		auto find_node_result = this->FindNode( pair.first );
 		if( find_node_result.found ) {
-			if constexpr( std::is_move_assignable_v<ValueType> ) {
+			if constexpr( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> ) {
 				find_node_result.closest_node->data.second = std::move( pair.second );
 			} else {
 				find_node_result.closest_node->data.second = pair.second;
@@ -854,7 +855,7 @@ public:
 	constexpr Iterator																					Emplace(
 		const KeyType																				&	key,
 		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> && std::is_copy_assignable_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		auto find_node_result = this->FindNode( key );
 		if( find_node_result.found ) {
@@ -893,7 +894,7 @@ public:
 	{
 		auto find_node_result = this->FindNode( key );
 		if( find_node_result.found ) {
-			if constexpr( std::is_move_assignable_v<ValueType> ) {
+			if constexpr( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> ) {
 				std::swap( find_node_result.closest_node->data.second, value );
 			} else {
 				find_node_result.closest_node->data.second = value;
@@ -902,11 +903,11 @@ public:
 		} else {
 			auto new_node = this->AllocateNode();
 			this->AddNodeToTree( find_node_result, new_node );
-			if constexpr( std::is_move_constructible_v<KeyType> && std::is_move_constructible_v<ValueType> ) {
+			if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<KeyType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> ) {
 				this->ConstructNode( new_node, std::move( key ), std::move( value ) );
-			} else if constexpr( std::is_move_constructible_v<KeyType> ) {
+			} else if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<KeyType> ) {
 				this->ConstructNode( new_node, std::move( key ), value );
-			} else if constexpr( std::is_move_constructible_v<ValueType> ) {
+			} else if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> ) {
 				this->ConstructNode( new_node, key, std::move( value ) );
 			} else {
 				this->ConstructNode( new_node, key, value );
@@ -1287,7 +1288,7 @@ private:
 		Node																						*	node,
 		const KeyType																				&	key,
 		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<KeyType> && std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<KeyType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->ConstructRange( &node->data, 1, key, value );
 	}
@@ -1297,7 +1298,7 @@ private:
 		Node																						*	node,
 		const KeyType																				&	key,
 		ValueType																					&&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<KeyType> || std::is_move_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<KeyType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		this->ConstructRange( &node->data, 1, key, std::move( value ) );
 	}
@@ -1307,7 +1308,7 @@ private:
 		Node																						*	node,
 		KeyType																						&&	key,
 		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_move_constructible_v<KeyType> && std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<KeyType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->ConstructRange( &node->data, 1, std::move( key ), value );
 	}
@@ -1317,7 +1318,7 @@ private:
 		Node																						*	node,
 		KeyType																						&&	key,
 		ValueType																					&&	value
-	) BC_CONTAINER_NOEXCEPT requires( std::is_move_constructible_v<KeyType> && std::is_move_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<KeyType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		this->ConstructRange( &node->data, 1, std::move( key ), std::move( value ) );
 	}
@@ -1326,7 +1327,7 @@ private:
 	constexpr void																						CopyConstructNode(
 		Node																						*	node,
 		const ContainedPairType																		&	pair
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ContainedPairType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> )
 	{
 		this->CopyConstructRange( &node->data, &pair, 1 );
 	}
@@ -1335,7 +1336,7 @@ private:
 	constexpr void																						MoveConstructNode(
 		Node																						*	node,
 		ContainedPairType																			&&	pair
-	) noexcept requires( std::is_move_constructible_v<ContainedPairType> )
+	) noexcept requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ContainedPairType> )
 	{
 		this->MoveConstructRange( &node->data, &pair, 1 );
 	}
@@ -1788,7 +1789,8 @@ inline void RunTests_Containers_Map()
 
 
 
-}
+BC_CONTAINER_NAMESPACE_END;
+} // bc
 
 
 
