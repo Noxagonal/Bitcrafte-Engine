@@ -234,8 +234,9 @@ concept LinearContainer = requires(
 	requires( LinearContainerEditableView<ContainerType> );
 	requires( Container<ContainerType> );
 
-	container.Reserve( size );
-	container.Resize( size );
+	container[ 0 ];
+	// container.Reserve( size );
+	// container.Resize( size );
 };
 
 
