@@ -569,37 +569,37 @@ TEST( ListContainer, List_CopyableOnlyStructure )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class Array_CtorDtorCounted
+class List_CtorDtorCounted
 {
 public:
 	static int32_t constructed_counter;
 
 	size_t data = 0;
 
-	Array_CtorDtorCounted() { ++constructed_counter; data = constructed_counter; }
-	Array_CtorDtorCounted( const Array_CtorDtorCounted & other ) { ++constructed_counter; data = constructed_counter; }
-	Array_CtorDtorCounted( Array_CtorDtorCounted && other ) { ++constructed_counter; data = constructed_counter; }
-	~Array_CtorDtorCounted() { --constructed_counter; }
-	Array_CtorDtorCounted & operator=( const Array_CtorDtorCounted & other ) = default;
-	Array_CtorDtorCounted & operator=( Array_CtorDtorCounted && other ) = default;
+	List_CtorDtorCounted() { ++constructed_counter; data = constructed_counter; }
+	List_CtorDtorCounted( const List_CtorDtorCounted & other ) { ++constructed_counter; data = constructed_counter; }
+	List_CtorDtorCounted( List_CtorDtorCounted && other ) { ++constructed_counter; data = constructed_counter; }
+	~List_CtorDtorCounted() { --constructed_counter; }
+	List_CtorDtorCounted & operator=( const List_CtorDtorCounted & other ) = default;
+	List_CtorDtorCounted & operator=( List_CtorDtorCounted && other ) = default;
 };
-int32_t Array_CtorDtorCounted::constructed_counter	= 0;
+int32_t List_CtorDtorCounted::constructed_counter	= 0;
 
 TEST( ListContainer, CtorDtorCounter )
 {
-	Array_CtorDtorCounted::constructed_counter		= 0;
+	List_CtorDtorCounted::constructed_counter		= 0;
 
-	using A = bc::List<Array_CtorDtorCounted>;
+	using A = bc::List<List_CtorDtorCounted>;
 	A a;
 
 	a.PushBack( {} );
-	a.PushBack( Array_CtorDtorCounted() );
-	a.PushBack( Array_CtorDtorCounted {} );
+	a.PushBack( List_CtorDtorCounted() );
+	a.PushBack( List_CtorDtorCounted {} );
 	EXPECT_EQ( a.Size(), 3 );
 
 	a.PushFront( {} );
-	a.PushFront( Array_CtorDtorCounted() );
-	a.PushFront( Array_CtorDtorCounted {} );
+	a.PushFront( List_CtorDtorCounted() );
+	a.PushFront( List_CtorDtorCounted {} );
 	EXPECT_EQ( a.Size(), 6 );
 
 	a.EmplaceBack();
@@ -630,7 +630,7 @@ TEST( ListContainer, CtorDtorCounter )
 	a.Clear();
 
 	EXPECT_EQ( a.Size(), 0 );
-	EXPECT_EQ( Array_CtorDtorCounted::constructed_counter, 0 );
+	EXPECT_EQ( List_CtorDtorCounted::constructed_counter, 0 );
 };
 
 
@@ -739,9 +739,9 @@ TEST( ListContainer, SelfAssignment )
 		}
 	}
 	{
-		Array_CtorDtorCounted::constructed_counter		= 0;
+		List_CtorDtorCounted::constructed_counter		= 0;
 
-		using A = bc::List<Array_CtorDtorCounted>;
+		using A = bc::List<List_CtorDtorCounted>;
 		using AView = A::ThisViewType<true>;
 		A a( 5 );
 		a.Resize( 10 );
@@ -750,16 +750,16 @@ TEST( ListContainer, SelfAssignment )
 		a.Insert( a.begin() + 5, {} );
 		for( size_t i = 0; i < 5; i++ )
 		{
-			a.PushFront( Array_CtorDtorCounted() );
-			a.PushBack( Array_CtorDtorCounted() );
-			a.Insert( a.begin() + 10, Array_CtorDtorCounted() );
+			a.PushFront( List_CtorDtorCounted() );
+			a.PushBack( List_CtorDtorCounted() );
+			a.Insert( a.begin() + 10, List_CtorDtorCounted() );
 			a = a;
 			a.Append( a );
 		}
 		a.Clear();
 
 		EXPECT_EQ( a.Size(), 0 );
-		EXPECT_EQ( Array_CtorDtorCounted::constructed_counter, 0 );
+		EXPECT_EQ( List_CtorDtorCounted::constructed_counter, 0 );
 	}
 }
 
