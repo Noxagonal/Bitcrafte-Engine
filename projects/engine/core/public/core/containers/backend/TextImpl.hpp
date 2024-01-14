@@ -101,8 +101,8 @@ public:
 		IteratorBase<IsOtherConst>																		end_iterator
 	) BC_CONTAINER_NOEXCEPT requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
 		Base(
-			begin_iterator.Get(),
-			end_iterator.Get() - begin_iterator.Get()
+			begin_iterator.GetAddress(),
+			end_iterator.GetAddress() - begin_iterator.GetAddress()
 		)
 	{
 		BC_ContainerAssert( begin_iterator.GetContainer() == end_iterator.GetContainer(),
@@ -650,8 +650,8 @@ public:
 			U"End iterator container text", conversion::ToUTF32( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> { end_iterator.container->Data(), end_iterator.container->Size() } ),
 			U"End iterator points to index", end_iterator.GetIndex()
 		);
-		size_t begin_position = begin_iterator.Get() - this->data_ptr;
-		size_t end_position = end_iterator.Get() - this->data_ptr;
+		size_t begin_position = begin_iterator.GetAddress() - this->data_ptr;
+		size_t end_position = end_iterator.GetAddress() - this->data_ptr;
 		size_t length;
 		if( end_position < begin_position ) {
 			length = 0;
@@ -659,7 +659,7 @@ public:
 			length = end_position - begin_position;
 		}
 
-		return { begin_iterator.GetData(), length };
+		return { begin_iterator.GetAddress(), length };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1404,7 +1404,7 @@ public:
 		);
 		return Iterator {
 			this,
-			this->DoErase( at.GetData() )
+			this->DoErase( at.GetAddress() )
 		};
 	}
 
@@ -1436,7 +1436,7 @@ public:
 		);
 		return Iterator {
 			this,
-			this->DoErase( from.GetData(), to.GetData() )
+			this->DoErase( from.GetAddress(), to.GetAddress() )
 		};
 	}
 
@@ -1468,12 +1468,12 @@ public:
 		size_t																							headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> )
 	{
-		BC_ContainerAssert( at.GetContainer() && at.GetData(), U"Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() && at.Get(), U"Empty iterator" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
-				at.GetData(),
+				at.GetAddress(),
 				character,
 				count,
 				headroom
@@ -1510,12 +1510,12 @@ public:
 		size_t																							headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> && std::is_same_v<CharacterType, typename OtherContainerType::ContainedValueType> )
 	{
-		BC_ContainerAssert( at.GetContainer() && at.GetData(), U"Empty iterator" );
+		BC_ContainerAssert( at.GetContainer() && at.Get(), U"Empty iterator" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
-				at.GetData(),
+				at.GetAddress(),
 				other,
 				count,
 				headroom
@@ -1751,7 +1751,7 @@ public:
 	) const noexcept
 	{
 		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1777,7 +1777,7 @@ public:
 	) const noexcept
 	{
 		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1803,7 +1803,7 @@ public:
 	) const noexcept
 	{
 		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1829,7 +1829,7 @@ public:
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

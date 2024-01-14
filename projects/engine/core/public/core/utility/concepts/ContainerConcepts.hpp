@@ -23,7 +23,7 @@ concept ContainerIterator = requires(
 	typename Type::IteratorContainerType;
 
 	container = type.GetContainer();
-	data = type.GetData();
+	data = type.Get();
 };
 
 

@@ -644,7 +644,7 @@ public:
 		);
 		return Iterator {
 			this,
-			this->DoErase( at.GetData() )
+			this->DoErase( at.GetAddress() )
 		};
 	}
 
@@ -676,7 +676,7 @@ public:
 		);
 		return Iterator {
 			this,
-			this->DoErase( from.GetData(), to.GetData() )
+			this->DoErase( from.GetAddress(), to.GetAddress() )
 		};
 	}
 
@@ -714,7 +714,7 @@ public:
 		return Iterator {
 			this,
 			this->DoInsert(
-				at.GetData(),
+				at.GetAddress(),
 				value,
 				count,
 				headroom
@@ -757,7 +757,7 @@ public:
 		return Iterator {
 			this,
 			this->DoInsert(
-				at.GetData(),
+				at.GetAddress(),
 				other,
 				count,
 				headroom
@@ -780,7 +780,7 @@ public:
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).Find( value );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -798,7 +798,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).Find( value );
-		return Iterator { this, result.GetData() };
+		return Iterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -820,7 +820,7 @@ public:
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).FindIf( lambda );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -842,7 +842,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).FindIf( lambda );
-		return Iterator { this, result.GetData() };
+		return Iterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -255,13 +255,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ContainedValueType																*	GetData() const noexcept
+	constexpr const ContainedValueType																*	GetAddress() noexcept
 	{
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ContainedValueType																	*	GetData() noexcept requires( IsConst == false )
+	constexpr ContainedValueType																	*	GetAddress() noexcept requires( IsConst == false )
 	{
 		return this->data;
 	}
