@@ -24,13 +24,13 @@ struct alignas( 64 ) SystemMemoryAllocationInfo
 	void					*	system_allocated_location		= nullptr;
 	void					*	payload_location				= nullptr;
 
-	size_t						system_allocation_size			= 0;
-	size_t						payload_size					= 0;
-	size_t						payload_alignment_requirement	= 0;
+	u64							system_allocation_size			= 0;
+	u64							payload_size					= 0;
+	u64							payload_alignment_requirement	= 0;
 
-	size_t						reserved[ 2 ]					= {};
+	u64							reserved[ 2 ]					= {};
 
-	size_t						checksum						= 0;
+	u64							checksum						= 0;
 };
 static_assert( sizeof( SystemMemoryAllocationInfo ) == 64 );
 static_assert( alignof( SystemMemoryAllocationInfo ) == 64 );
@@ -50,7 +50,7 @@ static_assert( alignof( SystemMemoryAllocationInfo ) == 64 );
 ///
 /// @return
 /// Checksum for SystemMemoryAllocationInfo.
-inline size_t											CalculateSystemMemoryAllocationInfoInfoChecksum(
+inline u64												CalculateSystemMemoryAllocationInfoInfoChecksum(
 	const SystemMemoryAllocationInfo				&	allocation_info
 )
 {
@@ -58,11 +58,11 @@ inline size_t											CalculateSystemMemoryAllocationInfoInfoChecksum(
 	// Checksum calculation is disabled for shipping builds, errors should have been caught in development builds.
 
 	auto bytes = reinterpret_cast<const u8*>( &allocation_info );
-	auto size = sizeof( SystemMemoryAllocationInfo ) - sizeof( size_t );
-	size_t checksum = 0xDEADBEEFDEADBEEF;
-	for( size_t i = 0; i < size; ++i )
+	auto size = sizeof( SystemMemoryAllocationInfo ) - sizeof( u64 );
+	u64 checksum = 0xDEADBEEFDEADBEEF;
+	for( u64 i = 0; i < size; ++i )
 	{
-		checksum = ( checksum << 5 ) + ( checksum + static_cast<size_t>( bytes[ i ] ) );
+		checksum = ( checksum << 5 ) + ( checksum + static_cast<u64>( bytes[ i ] ) );
 	}
 	return checksum;
 
@@ -89,7 +89,7 @@ inline size_t											CalculateSystemMemoryAllocationInfoInfoChecksum(
 ///	Aligned pointer.
 inline void											*	AlignMemoryToRequirement(
 	void											*	location,
-	size_t												alignment_requirement
+	u64													alignment_requirement
 )
 {
 	auto is_alignment_requirement_power_of_2 = ( alignment_requirement & ( alignment_requirement - 1 ) ) == 0;
@@ -125,9 +125,9 @@ inline void											*	AlignMemoryToRequirement(
 /// @return
 /// Required allocation size that has enough space for both SystemMemoryAllocationInfo and the payload at its correct alignment
 /// requirement.
-inline size_t											CalculateMinimumRequiredSystemMemoryAllocationSize(
-	size_t												payload_size,
-	size_t												payload_alignment_requirement
+inline u64												CalculateMinimumRequiredSystemMemoryAllocationSize(
+	u64													payload_size,
+	u64													payload_alignment_requirement
 )
 {
 	if( payload_alignment_requirement < alignof( SystemMemoryAllocationInfo ) ) payload_alignment_requirement = alignof( SystemMemoryAllocationInfo );
@@ -163,9 +163,9 @@ inline size_t											CalculateMinimumRequiredSystemMemoryAllocationSize(
 /// New allocation info that can be used to store memory allocation info in front of the pointer given to user.
 inline SystemMemoryAllocationInfo						CalculateSystemMemoryAllocationInfoFromSystemAllocation(
 	void											*	system_allocated_location,
-	size_t												system_allocated_size,
-	size_t												payload_size,
-	size_t												payload_alignment_requirement
+	u64													system_allocated_size,
+	u64													payload_size,
+	u64													payload_alignment_requirement
 )
 {
 	auto is_payload_alignment_requirement_power_of_2 = ( payload_alignment_requirement & ( payload_alignment_requirement - 1 ) ) == 0;
@@ -309,7 +309,7 @@ inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPoin
 ///
 /// @return
 /// Unused space left after the payload.
-inline size_t											CalculateUnusedPayloadSpaceInAllocation(
+inline u64												CalculateUnusedPayloadSpaceInAllocation(
 	const SystemMemoryAllocationInfo				&	allocation_info
 )
 {
@@ -318,7 +318,7 @@ inline size_t											CalculateUnusedPayloadSpaceInAllocation(
 		"Unable to calculate unused space in allocation, payload location was before system allocation location"
 	);
 
-	auto payload_offset_to_system_ptr = reinterpret_cast<size_t>( allocation_info.payload_location ) - reinterpret_cast<size_t>( allocation_info.system_allocated_location );
+	auto payload_offset_to_system_ptr = reinterpret_cast<u64>( allocation_info.payload_location ) - reinterpret_cast<u64>( allocation_info.system_allocated_location );
 	BHardAssert(
 		allocation_info.system_allocation_size >= payload_offset_to_system_ptr + allocation_info.payload_size,
 		"Unable to calculate unused space in allocation, apparent system allocation size was smaller than actual space required by the payload"
@@ -342,7 +342,7 @@ inline size_t											CalculateUnusedPayloadSpaceInAllocation(
 /// True if allocation can accomodate the new size, false if new size does not fit into already allocated memory.
 inline bool												IsInPlaceReallocateable_Runtime(
 	const SystemMemoryAllocationInfo				&	allocation_info,
-	size_t												new_size
+	u64													new_size
 )
 {
 	auto allocation_remaining_payload_size = CalculateUnusedPayloadSpaceInAllocation( allocation_info );
@@ -368,7 +368,7 @@ inline bool												IsInPlaceReallocateable_Runtime(
 /// Pointer to payload start, this is the same as original payload pointer.
 inline void											*	InPlaceReallocateMemory_Runtime(
 	SystemMemoryAllocationInfo						&	allocation_info,
-	size_t												new_size
+	u64													new_size
 )
 {
 	assert( IsInPlaceReallocateable_Runtime( allocation_info, new_size ) && "Not in place reallocateable, size too large" );
@@ -407,10 +407,10 @@ inline void											*	InPlaceReallocateMemory_Runtime(
 template<typename ValueType>
 constexpr inline void			FreeMemory_Consteval(
 	ValueType				*	location,
-	size_t 						count
+	u64							count
 ) noexcept
 {
-	std::allocator<ValueType>{}.deallocate( location, count );
+	std::allocator<ValueType>{}.deallocate( location, size_t( count ) );
 }
 
 
@@ -437,11 +437,11 @@ constexpr inline void			FreeMemory_Consteval(
 /// Pointer to beginning of allocated memory.
 template<typename ValueType>
 constexpr ValueType			*	AllocateMemory_Consteval(
-	size_t						count,
-	size_t						alignment_requirement
+	u64							count,
+	u64							alignment_requirement
 ) noexcept
 {
-	return std::allocator<ValueType>{}.allocate( count );
+	return std::allocator<ValueType>{}.allocate( size_t( count ) );
 }
 
 
@@ -478,13 +478,13 @@ constexpr ValueType			*	AllocateMemory_Consteval(
 template<typename ValueType>
 constexpr ValueType			*	ReallocateMemory_Consteval(
 	ValueType				*	old_location,
-	size_t 						old_count,
-	size_t						new_count
+	u64							old_count,
+	u64							new_count
 ) noexcept
 {
 	auto new_location = AllocateMemory_Consteval<ValueType>( new_count, alignof( ValueType ) );
 	auto common_length = old_count < new_count ? old_count : new_count;
-	for (size_t i = 0; i < common_length; i++)
+	for( u64 i = 0; i < common_length; i++ )
 	{
 		if constexpr( std::is_move_assignable_v<ValueType> ) new_location[ i ] = std::move( old_location[ i ] );
 		if constexpr( std::is_copy_assignable_v<ValueType> ) new_location[ i ] = old_location[ i ];
@@ -530,8 +530,8 @@ void							FreeRawMemory_Runtime(
 /// Pointer to beginning of allocated memory.
 BITCRAFTE_ENGINE_API
 void						*	AllocateRawMemory_Runtime(
-	size_t						size,
-	size_t						alignment_requirement
+	u64							size,
+	u64							alignment_requirement
 ) noexcept;
 
 
@@ -560,7 +560,7 @@ void						*	AllocateRawMemory_Runtime(
 BITCRAFTE_ENGINE_API
 void						*	ReallocateRawMemory_Runtime(
 	void					*	old_location,
-	size_t						new_size
+	u64							new_size
 ) noexcept;
 
 
@@ -573,7 +573,7 @@ void						*	ReallocateRawMemory_Runtime(
 template<typename ValueType>
 constexpr void					FreeMemory(
 	ValueType				*	location,
-	size_t 						count
+	u64							count
 ) noexcept
 {
 	if( std::is_constant_evaluated() )
@@ -599,8 +599,8 @@ constexpr void					FreeMemory(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename ValueType>
 constexpr ValueType			*	AllocateMemory(
-	size_t						count,
-	size_t						alignment_requirement
+	u64							count,
+	u64							alignment_requirement
 ) noexcept
 {
 	if( std::is_constant_evaluated() )
@@ -622,8 +622,8 @@ constexpr ValueType			*	AllocateMemory(
 template<typename ValueType>
 constexpr ValueType			*	ReallocateMemory(
 	ValueType				*	old_location,
-	size_t						old_count,
-	size_t						new_count
+	u64							old_count,
+	u64							new_count
 ) noexcept
 {
 	static_assert( std::is_trivial_v<ValueType>, "Type must be trivial for it to be reallocated via this function" );
@@ -656,7 +656,7 @@ constexpr ValueType			*	ReallocateMemory(
 template<typename ValueType>
 constexpr bool					IsInPlaceReallocateable(
 	const ValueType			*	location,
-	size_t						new_count
+	u64							new_count
 )
 {
 	if( std::is_constant_evaluated() )
@@ -676,8 +676,8 @@ constexpr bool					IsInPlaceReallocateable(
 template<typename ValueType>
 constexpr ValueType				*	InPlaceReallocateMemory(
 	ValueType					*	old_location,
-	size_t							old_count,
-	size_t							new_count
+	u64								old_count,
+	u64								new_count
 )
 {
 	if( std::is_constant_evaluated() )

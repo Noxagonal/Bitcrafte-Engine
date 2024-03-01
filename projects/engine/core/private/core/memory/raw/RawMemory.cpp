@@ -23,8 +23,8 @@ void bc::memory::internal::FreeRawMemory_Runtime(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void * bc::memory::internal::AllocateRawMemory_Runtime(
-	size_t				size,
-	size_t				alignment_requirement
+	u64				size,
+	u64				alignment_requirement
 ) noexcept
 {
 	auto minimum_required_allocation_size = CalculateMinimumRequiredSystemMemoryAllocationSize(
@@ -53,7 +53,7 @@ void * bc::memory::internal::AllocateRawMemory_Runtime(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void * bc::memory::internal::ReallocateRawMemory_Runtime(
 	void			*	old_location,
-	size_t				new_size
+	u64					new_size
 ) noexcept
 {
 	auto old_allocation_info = GetSystemMemoryAllocationInfoFromRawPointer( old_location );
@@ -78,7 +78,7 @@ void * bc::memory::internal::ReallocateRawMemory_Runtime(
 	);
 
 	auto common_size = ( old_size < new_size ) ? old_size : new_size;
-	for( size_t i = 0; i < common_size; ++i )
+	for( u64 i = 0; i < common_size; ++i )
 	{
 		reinterpret_cast<u8*>( new_ptr )[ i ] = reinterpret_cast<u8*>( old_location )[ i ];
 	}
