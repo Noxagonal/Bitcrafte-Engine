@@ -162,7 +162,7 @@ std::basic_ostream<char8_t> & operator<<(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
 	const char8_t						*	raw_text,
-	size_t									raw_text_length,
+	u64										raw_text_length,
 	bc::diagnostic::PrintRecordColor		foreground_color,
 	bc::diagnostic::PrintRecordColor		background_color
 )
@@ -223,7 +223,7 @@ void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::internal::SetupSystemConsole(
-	size_t characters_per_line_num
+	u64 characters_per_line_num
 )
 {
 	HANDLE std_out_handle = GetStdHandle( STD_OUTPUT_HANDLE );
@@ -298,7 +298,7 @@ void bc::diagnostic::internal::SetupSystemConsole(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::SetupSystemConsole(
-	size_t characters_per_line_num
+	u64 characters_per_line_num
 )
 {
 	auto set_characters_per_line_syscall_string = TextFormat( "stty cols {}", characters_per_line_num );
@@ -310,7 +310,7 @@ void bc::diagnostic::SetupSystemConsole(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
 	const char8_t						*	raw_text,
-	size_t									raw_text_length,
+	u64										raw_text_length,
 	bc::diagnostic::PrintRecordColor		foreground_color,
 	bc::diagnostic::PrintRecordColor		background_color
 )

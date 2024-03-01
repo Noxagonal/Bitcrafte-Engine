@@ -8,7 +8,7 @@
 [[noreturn]]
 void bc::diagnostic::internal::PanicInternal(
 	const char						*	message_ptr,
-	size_t								message_length,
+	u64									message_length,
 	bc::diagnostic::SourceLocation		source_location
 )
 {

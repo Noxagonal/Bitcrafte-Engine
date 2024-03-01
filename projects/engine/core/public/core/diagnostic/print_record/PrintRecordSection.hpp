@@ -16,7 +16,7 @@ struct PrintRecordSection
 {
 	PrintRecordTheme						theme					= PrintRecordTheme::DEFAULT;
 	bc::internal::SimpleText32				text;
-	size_t									indent					= {};
+	u64										indent					= {};
 };
 
 

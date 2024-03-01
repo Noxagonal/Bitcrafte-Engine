@@ -29,7 +29,7 @@ namespace internal {
 ///	Color of the background of the letters you wish to print. ( not entire console window )
 void								SystemConsolePrintRawUTF8(
 	const char8_t				*	raw_text,
-	size_t							raw_text_length,
+	u64								raw_text_length,
 	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
 	PrintRecordColor				background_color		= PrintRecordColor::DEFAULT
 );
@@ -43,7 +43,7 @@ void								SystemConsolePrintRawUTF8(
 /// more readable, however, the console window does not expand to a new size, rather a scroll bar appears on the bottom of the
 /// console window.
 void								SetupSystemConsole(
-	size_t							characters_per_line_num
+	u64								characters_per_line_num
 );
 
 
@@ -171,7 +171,7 @@ void								SystemConsolePrint(
 /// 
 /// @param background_color
 ///	Color of the background of the letters you wish to print. ( not entire console window )
-template<utility::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
+template<utility::TextContainerCharacterType CharacterType, u64 CharacterArraySize>
 void								SystemConsolePrint(
 	const CharacterType				( &text )[ CharacterArraySize ],
 	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
@@ -204,7 +204,7 @@ void								SystemConsolePrint(
 /// 
 /// @param theme
 ///	Text and background color of the message according to a theme.
-template<utility::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
+template<utility::TextContainerCharacterType CharacterType, u64 CharacterArraySize>
 void								SystemConsolePrint(
 	const CharacterType				( &text )[ CharacterArraySize ],
 	PrintRecordTheme				theme

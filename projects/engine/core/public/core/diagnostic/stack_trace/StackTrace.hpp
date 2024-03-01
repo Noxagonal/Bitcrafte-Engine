@@ -50,7 +50,7 @@ public:
 	/// @return
 	/// New stack trace to this location.
 	static inline constexpr StackTrace								Current(
-		size_t														leaf_calls_to_ignore				= 0
+		u64															leaf_calls_to_ignore				= 0
 	)
 	{
 		// TODO

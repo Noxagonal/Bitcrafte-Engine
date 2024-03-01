@@ -335,7 +335,7 @@ inline void												Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
-template<utility::TextContainerCharacterType CharacterType, size_t StringArraySize>
+template<utility::TextContainerCharacterType CharacterType, u64 StringArraySize>
 void													Throw [[noreturn]] (
 	const CharacterType( &message )[ StringArraySize ],
 	const SourceLocation							&	source_location				= SourceLocation::Current()

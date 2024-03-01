@@ -49,7 +49,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<typename CharacterType, size_t StringArraySize>
+	template<typename CharacterType, u64 StringArraySize>
 	constexpr PrintRecord(
 		const CharacterType( &c_string )[ StringArraySize ]
 	)

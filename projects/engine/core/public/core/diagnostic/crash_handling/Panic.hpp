@@ -16,7 +16,7 @@ namespace internal {
 BITCRAFTE_ENGINE_API
 void								PanicInternal(
 	const char					*	message_ptr,
-	size_t							message_length,
+	u64								message_length,
 	SourceLocation					source_location
 );
 
@@ -27,7 +27,7 @@ void								PanicInternal(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t MessageLength>
+template<u64 MessageLength>
 [[noreturn]]
 void								Panic(
 	const char						( &message )[ MessageLength ],
