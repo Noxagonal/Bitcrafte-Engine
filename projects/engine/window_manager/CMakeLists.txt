@@ -76,9 +76,9 @@ endfunction()
 
 
 add_subdirectory("window_manager")
-if(BITCRAFTE_BUILD_WINDOW_WIN32)
+if(BITCRAFTE_BUILD_WINDOW_MANAGER_WIN32)
 	add_subdirectory("window_manager_win32")
 endif()
-if(BITCRAFTE_BUILD_WINDOW_WAYLAND)
+if(BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND)
 	add_subdirectory("window_manager_wayland")
 endif()
