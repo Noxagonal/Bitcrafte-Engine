@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/data_types/FundamentalTypes.hpp>
+
 #include <chrono>
 
 
