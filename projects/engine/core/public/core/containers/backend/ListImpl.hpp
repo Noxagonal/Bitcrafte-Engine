@@ -97,7 +97,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		const ValueType																				*	from_data,
-		size_t																							size
+		u64																								size
 	) noexcept requires( IsDataConst == true )
 		:
 		Base(
@@ -109,7 +109,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		ValueType																					*	from_data,
-		size_t																							size
+		u64																								size
 	) noexcept requires( IsDataConst == false )
 		:
 		Base(
@@ -417,7 +417,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr explicit BC_CONTAINER_NAME( List )(
-		size_t																							initial_size
+		u64																								initial_size
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Resize( initial_size );
@@ -705,8 +705,8 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const ValueType																				&	value,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
+		u64																								count			= 1,
+		u64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
@@ -748,8 +748,8 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
+		u64																								count			= 1,
+		u64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );

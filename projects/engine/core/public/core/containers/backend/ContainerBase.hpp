@@ -268,11 +268,11 @@ protected:
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
 	constexpr void										ConstructRange(
 		ValueType									*	destination,
-		size_t											element_count,
+		u64												element_count,
 		ConstructorArgumentTypePack					&&	...constructor_arguments
 	) const
 	{
-		static_assert( sizeof( size_t ) == 8, "This function is build for 64 bit systems only" );
+		static_assert( sizeof( u64 ) == 8, "This function is build for 64 bit systems only" );
 
 		if( !std::is_constant_evaluated() )
 		{
@@ -289,7 +289,7 @@ protected:
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Constructing range, element count too high, something is not right" );
 
 		auto end = destination + element_count;
-		for( size_t i = 0; i < element_count; ++i )
+		for( u64 i = 0; i < element_count; ++i )
 		{
 			new( &destination[ i ] ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
 		}
@@ -300,10 +300,10 @@ protected:
 	constexpr void										CopyConstructRange(
 		ValueType									*	destination,
 		const ValueType								*	source,
-		size_t											element_count
+		u64												element_count
 	) const requires( std::is_copy_constructible_v<ValueType> )
 	{
-		static_assert( sizeof( size_t ) == 8, "This function is build for 64 bit systems only" );
+		static_assert( sizeof( u64 ) == 8, "This function is build for 64 bit systems only" );
 
 		if( !std::is_constant_evaluated() )
 		{
@@ -327,7 +327,7 @@ protected:
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Copy constructing range, element count too high, something is not right" );
 
 		auto end = destination + element_count;
-		for( size_t i = 0; i < element_count; ++i )
+		for( u64 i = 0; i < element_count; ++i )
 		{
 			new( &destination[ i ] ) ValueType( source[ i ] );
 		}
@@ -338,10 +338,10 @@ protected:
 	constexpr void										MoveConstructRange(
 		ValueType									*	destination,
 		ValueType									*	source,
-		size_t											element_count
+		u64												element_count
 	) const requires( std::is_move_constructible_v<ValueType> )
 	{
-		static_assert( sizeof( size_t ) == 8, "This function is build for 64 bit systems only" );
+		static_assert( sizeof( u64 ) == 8, "This function is build for 64 bit systems only" );
 
 		if( !std::is_constant_evaluated() )
 		{
@@ -364,7 +364,7 @@ protected:
 		BHardAssert( element_count > 0, "Move constructing range, element count must be larger than 0" );
 		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Move constructing range, element count too high, something is not right" );
 
-		for( size_t i = 0; i < element_count; ++i )
+		for( u64 i = 0; i < element_count; ++i )
 		{
 			new( &destination[ i ] ) ValueType( std::move( source[ i ] ) );
 		}
@@ -374,10 +374,10 @@ protected:
 	template<typename ValueType>
 	constexpr void										DestructRange(
 		ValueType									*	location,
-		size_t											element_count
+		u64												element_count
 	) const noexcept
 	{
-		static_assert( sizeof( size_t ) == 8, "This function is build for 64 bit systems only" );
+		static_assert( sizeof( u64 ) == 8, "This function is build for 64 bit systems only" );
 
 		if( location == nullptr ) return;
 		if( element_count == 0 ) return;
@@ -399,7 +399,7 @@ protected:
 		if( !std::is_constant_evaluated() )
 		{
 			auto uninitialize_memory_ptr = reinterpret_cast<u8*>( location );
-			for( size_t i = 0; i < element_count * sizeof( ValueType ); ++i )
+			for( u64 i = 0; i < element_count * sizeof( ValueType ); ++i )
 			{
 				uninitialize_memory_ptr[ i ] = 0xCB;
 			}
@@ -413,9 +413,9 @@ protected:
 	[[nodiscard]]
 	constexpr ValueType								*	ResizeRange(
 		ValueType									*	old_location,
-		size_t											old_element_count,
-		size_t											old_reserved_element_count,
-		size_t											new_reserved_element_count
+		u64												old_element_count,
+		u64												old_reserved_element_count,
+		u64												new_reserved_element_count
 	) const noexcept requires ( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		if( !std::is_constant_evaluated() )
@@ -473,7 +473,7 @@ protected:
 	template<typename ValueType>
 	[[nodiscard]]
 	constexpr ValueType								*	AllocateMemory(
-		size_t											new_element_count
+		u64												new_element_count
 	) const noexcept
 	{
 		return memory::AllocateMemory<ValueType>( new_element_count, alignof( ValueType ) );
@@ -484,8 +484,8 @@ protected:
 	[[nodiscard]]
 	constexpr ValueType								*	ReallocateMemory(
 		ValueType									*	old_location,
-		size_t											old_element_count,
-		size_t											new_element_count
+		u64												old_element_count,
+		u64												new_element_count
 	) const noexcept
 	{
 		static_assert( std::is_trivial_v<ValueType>, "ValueType must be trivial for it to be reallocated via this function" );
@@ -497,7 +497,7 @@ protected:
 	template<typename ValueType>
 	constexpr void										FreeMemory(
 		ValueType									*	location,
-		size_t											element_count
+		u64												element_count
 	) const noexcept
 	{
 		if( location == nullptr ) return;
@@ -509,7 +509,7 @@ protected:
 	template<typename ValueType>
 	constexpr bool										IsInPlaceReallocateable(
 		const ValueType								*	location,
-		size_t											new_reserved_element_count
+		u64												new_reserved_element_count
 	) const
 	{
 		return memory::IsInPlaceReallocateable<ValueType>( location, new_reserved_element_count );
@@ -519,8 +519,8 @@ protected:
 	template<typename ValueType>
 	constexpr ValueType								*	InPlaceReallocateMemory(
 		ValueType									*	old_location,
-		size_t											old_reserved_element_count,
-		size_t											new_reserved_element_count
+		u64												old_reserved_element_count,
+		u64												new_reserved_element_count
 	) const
 	{
 		return memory::InPlaceReallocateMemory<ValueType>( old_location, old_reserved_element_count, new_reserved_element_count );

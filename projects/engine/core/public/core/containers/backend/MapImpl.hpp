@@ -174,12 +174,12 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )													&	operator+=(
-		size_t																							value
+		u64																								value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		for( size_t i = 0; i < value; ++i ) {
+		for( u64 i = 0; i < value; ++i ) {
 			++( *this );
 		}
 		return *this;
@@ -187,12 +187,12 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )													&	operator-=(
-		size_t																							value
+		u64																								value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		for( size_t i = 0; i < value; ++i ) {
+		for( u64 i = 0; i < value; ++i ) {
 			--( *this );
 		}
 		return *this;
@@ -200,7 +200,7 @@ public:
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )														operator+(
-		size_t																							value
+		u64																								value
 	) BC_CONTAINER_NOEXCEPT const
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -212,7 +212,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )														operator-(
-		size_t																							value
+		u64																								value
 	) BC_CONTAINER_NOEXCEPT const
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -414,7 +414,7 @@ protected:
 	using Node					= container_bases::BC_CONTAINER_NAME( MapNode )<KeyType, ValueType>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	size_t						size				= 0;
+	u64							size				= 0;
 	Node					*	root_node			= nullptr;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -714,7 +714,7 @@ public:
 	template<utility::ContainerView OtherContainerType>
 	constexpr void																						Append(
 		const OtherContainerType																	&	other,
-		size_t																							count					= 1
+		u64																								count					= 1
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && std::is_same_v<ContainedPairType, typename OtherContainerType::ContainedPairType> )
 	{
 		if constexpr( std::is_same_v<OtherContainerType, ThisType> ||
@@ -728,14 +728,14 @@ public:
 			}
 		}
 
-		auto old_size				= this->Size();
-		size_t other_size			= other.Size();
-		size_t total_insert_size	= other_size * count;
+		u64 old_size				= this->Size();
+		u64 other_size				= other.Size();
+		u64 total_insert_size		= other_size * count;
 
-		for( size_t c = 0; c < count; ++c )
+		for( u64 c = 0; c < count; ++c )
 		{
 			auto other_it			= other.begin();
-			for( size_t i = 0; i < other_size; ++i )
+			for( u64 i = 0; i < other_size; ++i )
 			{
 				this->Insert( *other_it );
 				++other_it;
@@ -759,16 +759,16 @@ public:
 	///	How many times the other elements are added to this list.
 	constexpr void																						Append(
 		const std::initializer_list<ContainedPairType>												&	init_list,
-		size_t																							count					= 1
+		u64																								count					= 1
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> )
 	{
-		auto old_size				= this->Size();
-		size_t other_size			= init_list.size();
-		size_t total_insert_size	= other_size * count;
+		u64 old_size			= this->Size();
+		u64 other_size			= init_list.size();
+		u64 total_insert_size	= other_size * count;
 
-		for( size_t c = 0; c < count; ++c ) {
+		for( u64 c = 0; c < count; ++c ) {
 			auto other_it			= init_list.begin();
-			for( size_t i = 0; i < other_size; ++i ) {
+			for( u64 i = 0; i < other_size; ++i ) {
 				this->Insert( *other_it );
 				++other_it;
 			}
@@ -1009,11 +1009,11 @@ public:
 			auto temp_node_list_size = this->size;
 			Node ** temp_node_list = this->AllocateMemory<Node*>( temp_node_list_size );
 			auto it = this->begin();
-			for( size_t i = 0; i < this->size; ++i ) {
+			for( u64 i = 0; i < this->size; ++i ) {
 				temp_node_list[ i ] = it.GetData();
 				++it;
 			}
-			for( size_t i = 0; i < this->size; ++i ) {
+			for( u64 i = 0; i < this->size; ++i ) {
 				Node * node = temp_node_list[ i ];
 				this->DestructNode( node );
 				this->DeallocateNode( node );
@@ -1030,7 +1030,7 @@ public:
 	/// 
 	/// @return
 	/// Current number of elements stored inside this map.
-	constexpr size_t																					Size() const noexcept
+	constexpr u64																						Size() const noexcept
 	{
 		return this->size;
 	}
@@ -1546,11 +1546,11 @@ public:
 	}
 
 private:
-	void RecursivePrint( Node * node, size_t inlining = 0 ) const
+	void RecursivePrint( Node * node, u64 inlining = 0 ) const
 	{
 		auto AddSpaces = [inlining]()
 		{
-			for( size_t i = 0; i < inlining; ++i ) {
+			for( u64 i = 0; i < inlining; ++i ) {
 				std::cout << "  ";
 			}
 		};

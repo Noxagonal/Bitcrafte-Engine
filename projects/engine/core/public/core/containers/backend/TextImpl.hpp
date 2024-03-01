@@ -121,7 +121,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		const CharacterType( &c_string )[ ArraySize ]
 	) noexcept requires( IsConst == true ) :
@@ -134,7 +134,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		const CharacterType																			*	ptr,
-		const size_t																					size
+		const u64																						size
 	) noexcept requires( IsConst == true ) :
 		Base(
 			ptr,
@@ -155,7 +155,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		CharacterType																				*	ptr,
-		const size_t																					size
+		const u64																						size
 	) noexcept requires( IsConst == false ) :
 		Base(
 			ptr,
@@ -170,13 +170,13 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( IsConst == true ) :
 		Base(
 			begin_ptr,
-			size_t( end_ptr - begin_ptr )
+			u64( end_ptr - begin_ptr )
 		)
 	{
 		BC_ContainerAssert( begin_ptr <= end_ptr,
 			U"Begin pointer is after end pointer, begin must appear before end memory pointer",
-			U"Begin points at memory location", reinterptet_cast<size_t>( begin_ptr ),
-			U"End points at memory location", reinterptet_cast<size_t>( end_ptr )
+			U"Begin points at memory location", reinterptet_cast<u64>( begin_ptr ),
+			U"End points at memory location", reinterptet_cast<u64>( end_ptr )
 		);
 	}
 
@@ -187,13 +187,13 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( IsConst == false ) :
 		Base(
 			begin_ptr,
-			size_t( end_ptr - begin_ptr )
+			u64( end_ptr - begin_ptr )
 		)
 	{
 		BC_ContainerAssert( begin_ptr <= end_ptr,
 			U"Begin pointer is after end pointer, begin must appear before end memory pointer",
-			U"Begin points at memory location", reinterptet_cast<size_t>( begin_ptr ),
-			U"End points at memory location", reinterptet_cast<size_t>( end_ptr )
+			U"Begin points at memory location", reinterptet_cast<u64>( begin_ptr ),
+			U"End points at memory location", reinterptet_cast<u64>( end_ptr )
 		);
 	}
 
@@ -288,7 +288,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator==(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -308,7 +308,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator!=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -328,7 +328,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator==(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -348,7 +348,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator!=(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -389,17 +389,17 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr size_t																		CountCharacters(
+	[[nodiscard]] constexpr u64																			CountCharacters(
 		CharacterType																					character,
-		size_t																							start_position					= 0,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								start_position					= 0,
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
-		auto counter = size_t {};
+		auto counter = u64 {};
 
 		auto my_size = this->data_size;
 		start_position = std::min( start_position, my_size );
@@ -429,14 +429,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr size_t																		CountCharacters(
+	[[nodiscard]] constexpr u64																			CountCharacters(
 		CharacterType																					character,
 		ConstIterator																					start_position,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( start_position.container == this, U"Wrong iterator used on this container" );
@@ -447,7 +447,7 @@ public:
 			U"Container size", this->Size(),
 			U"Start position", start_position.GetIndex_NoCheck()
 		);
-		size_t position = start_position.data - this->data_ptr;
+		u64 position = start_position.data - this->data_ptr;
 		return this->CountCharacters( character, position, search_length );
 	}
 
@@ -463,14 +463,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
-		size_t																							start_position					= 0,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								start_position					= 0,
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		auto my_size = this->Size();
@@ -499,14 +499,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
 		ConstIterator																					start_position,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( start_position.container == this, U"Wrong iterator used on this container" );
@@ -517,7 +517,7 @@ public:
 			U"Container size", this->Size(),
 			U"Start position", start_position.GetIndex_NoCheck()
 		);
-		size_t position = start_position.data - this->data_ptr;
+		u64 position = start_position.data - this->data_ptr;
 		return this->FindCharacter( character, position, search_length );
 	}
 
@@ -533,14 +533,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																Find(
 		ThisViewType<true>																				text_to_find,
-		size_t																							start_position					= 0,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								start_position					= 0,
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		auto my_size = this->Size();
@@ -575,14 +575,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																Find(
 		ThisViewType<true>																				text_to_find,
 		ConstIterator																					start_position,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( start_position.container == this, U"Wrong iterator used on this container" );
@@ -593,7 +593,7 @@ public:
 			U"Container size", this->Size(),
 			U"Start position", start_position.GetIndex_NoCheck()
 		);
-		size_t position = start_position.data - this->data_ptr;
+		u64 position = start_position.data - this->data_ptr;
 		return this->Find( text_to_find, position, search_length );
 	}
 
@@ -610,8 +610,8 @@ public:
 	/// @return
 	/// A new text view containing a range to data in this text view.
 	constexpr BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsConst>									SubText(
-		size_t																							start_position,
-		size_t																							size							= std::numeric_limits<size_t>::max()
+		u64																								start_position,
+		u64																								size							= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		if( start_position >= this->data_size ) return {};
@@ -650,9 +650,9 @@ public:
 			U"End iterator container text", conversion::ToUTF32( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> { end_iterator.container->Data(), end_iterator.container->Size() } ),
 			U"End iterator points to index", end_iterator.GetIndex()
 		);
-		size_t begin_position = begin_iterator.GetAddress() - this->data_ptr;
-		size_t end_position = end_iterator.GetAddress() - this->data_ptr;
-		size_t length;
+		u64 begin_position = begin_iterator.GetAddress() - this->data_ptr;
+		u64 end_position = end_iterator.GetAddress() - this->data_ptr;
+		u64 length;
 		if( end_position < begin_position ) {
 			length = 0;
 		} else {
@@ -831,7 +831,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )(
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
@@ -840,7 +840,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )(
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -851,7 +851,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextBase )(
 		CharacterType																					fill_with_character,
-		size_t																							initialize_with_size			= 1
+		u64																								initialize_with_size			= 1
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->FillBack( fill_with_character, initialize_with_size );
@@ -909,7 +909,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
@@ -920,7 +920,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -1003,7 +1003,7 @@ public:
 	/// 
 	/// @return
 	/// New text object.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const BC_CONTAINER_NOEXCEPT
@@ -1024,7 +1024,7 @@ public:
 	/// 
 	/// @return
 	/// New text object.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
 		const char( &c_string )[ ArraySize ]
 	) const BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -1116,7 +1116,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
@@ -1134,7 +1134,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -1294,7 +1294,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator==(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -1314,7 +1314,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator!=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -1334,7 +1334,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator==(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -1354,7 +1354,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool																						operator!=(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -1464,8 +1464,8 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const CharacterType																			&	character,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
+		u64																								count			= 1,
+		u64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> )
 	{
 		BC_ContainerAssert( at.GetContainer() && at.Get(), U"Empty iterator" );
@@ -1506,8 +1506,8 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
+		u64																								count			= 1,
+		u64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> && std::is_same_v<CharacterType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer() && at.Get(), U"Empty iterator" );
@@ -1546,12 +1546,12 @@ public:
 	/// @return
 	/// Iterator to the first original character after insertion. Eg. If inserting "HH" at position <tt>begin() + 2</tt> then
 	/// returned iterator points to <tt>begin() + 4</tt>.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const CharacterType( &c_string )[ ArraySize ],
-		size_t																							count							= 1,
-		size_t																							headroom						= 0
+		u64																								count							= 1,
+		u64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
 		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> {c_string, ArraySize }, count, headroom );
@@ -1580,12 +1580,12 @@ public:
 	/// @return
 	/// Iterator to the first original character after insertion. Eg. If inserting "HH" at position <tt>begin() + 2</tt> then
 	/// returned iterator points to <tt>begin() + 4</tt>.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const char( &c_string )[ ArraySize ],
-		size_t																							count							= 1,
-		size_t																							headroom						= 0
+		u64																								count							= 1,
+		u64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
 		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<char, true> {c_string, ArraySize }, count, headroom );
@@ -1595,22 +1595,22 @@ public:
 	template<utility::TextContainerCharacterType OtherT>
 	void																								Append(
 		const std::initializer_list<OtherT>															&	init_list,
-		size_t																							count							= 1,
-		size_t																							headroom						= 0
+		u64																								count							= 1,
+		u64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
 		// Cannot use this->Base::Append() because other element type is always allowed to be char which is not necessarily
 		// the same type as this element type. Base::Append() only handles inputs with same element types as this.
-		size_t old_size				= this->Size();
-		size_t other_size			= init_list.size();
-		size_t total_insert_size	= other_size * count;
+		u64 old_size			= this->Size();
+		u64 other_size			= init_list.size();
+		u64 total_insert_size	= other_size * count;
 
 		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
-		for( size_t c = 0; c < count; ++c ) {
+		for( u64 c = 0; c < count; ++c ) {
 			auto other_it			= init_list.begin();
 			auto write_location		= other_size * c + old_size;
-			for( size_t i = 0; i < other_size; ++i ) {
+			for( u64 i = 0; i < other_size; ++i ) {
 				new( &this->data_ptr[ write_location + i ] ) CharacterType( *other_it );
 				++other_it;
 			}
@@ -1621,22 +1621,22 @@ public:
 	template<utility::TextContainerView OtherContainerType>
 	void																								Append(
 		const OtherContainerType																	&	other,
-		size_t																							count							= 1,
-		size_t																							headroom						= 0
+		u64																								count							= 1,
+		u64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, typename OtherContainerType::ContainedCharacterType> || std::is_same_v<char, typename OtherContainerType::ContainedCharacterType> )
 	{
 		// Cannot use this->Base::Append() because other container element type is always allowed to be char which is not
 		// necessarily the same type as this element type. Base::Append() only handles inputs with same element types as this.
-		size_t old_size				= this->Size();
-		size_t other_size			= other.Size();
-		size_t total_insert_size	= other_size * count;
+		u64 old_size			= this->Size();
+		u64 other_size			= other.Size();
+		u64 total_insert_size	= other_size * count;
 
 		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
-		for( size_t c = 0; c < count; ++c ) {
+		for( u64 c = 0; c < count; ++c ) {
 			auto other_it			= other.begin();
 			auto write_location		= other_size * c + old_size;
-			for( size_t i = 0; i < other_size; ++i ) {
+			for( u64 i = 0; i < other_size; ++i ) {
 				new( &this->data_ptr[ write_location + i ] ) CharacterType( *other_it );
 				++other_it;
 			}
@@ -1649,11 +1649,11 @@ public:
 	///
 	/// @param c_string
 	///	Other text to append elements from.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr void																						Append(
 		const CharacterType( &c_string )[ ArraySize ],
-		size_t																							count							= 1,
-		size_t																							headroom						= 0
+		u64																								count							= 1,
+		u64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize }, count, headroom );
@@ -1668,11 +1668,11 @@ public:
 	///
 	/// @param c_string
 	/// Other text to append elements from.
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr void																						Append(
 		const char( &c_string )[ ArraySize ],
-		size_t																							count							= 1,
-		size_t																							headroom						= 0
+		u64																								count							= 1,
+		u64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize }, count, headroom );
@@ -1690,14 +1690,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr size_t																		CountCharacters(
+	[[nodiscard]] constexpr u64																			CountCharacters(
 		CharacterType																					character,
-		size_t																							start_position					= 0,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								start_position					= 0,
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		return ThisViewType<true>( *this ).CountCharacters( character, start_position, search_length );
@@ -1715,14 +1715,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr size_t																		CountCharacters(
+	[[nodiscard]] constexpr u64																			CountCharacters(
 		CharacterType																					character,
 		ConstIterator																					start_position,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		return ThisViewType<true>( *this ).CountCharacters( character, start_position, search_length );
@@ -1740,14 +1740,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
-		size_t																							start_position					= 0,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								start_position					= 0,
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
@@ -1766,14 +1766,14 @@ public:
 	///
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	///
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
 		ConstIterator																					start_position,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
@@ -1792,14 +1792,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																Find(
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_find,
-		size_t																							start_position					= 0,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								start_position					= 0,
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const noexcept
 	{
 		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
@@ -1818,14 +1818,14 @@ public:
 	/// 
 	/// @param search_length
 	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<size_t>::max()</tt>.
+	/// <tt>std::numeric_limits<u64>::max()</tt>.
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																Find(
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_find,
 		ConstIterator																					start_position,
-		size_t																							search_length					= std::numeric_limits<size_t>::max()
+		u64																								search_length					= std::numeric_limits<u64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
@@ -1836,13 +1836,13 @@ public:
 	void																								Replace(
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_replace,
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											replace_with,
-		size_t																							start_position					= 0,
-		size_t																							count							= 1
+		u64																								start_position					= 0,
+		u64																								count							= 1
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto ReplaceRange = [this, replace_with]( size_t from, size_t replace_text_start, size_t amount )
+		auto ReplaceRange = [this, replace_with]( u64 from, u64 replace_text_start, u64 amount )
 		{
-			for( size_t i = 0; i < amount; ++i ) {
+			for( u64 i = 0; i < amount; ++i ) {
 				this->data_ptr[ from + i ] = replace_with[ replace_text_start + i ];
 			}
 		};
@@ -1850,12 +1850,12 @@ public:
 		if( text_to_replace.IsEmpty() ) return;
 
 		auto search_position = start_position;
-		for( size_t i = 0; i < count; ++i ) {
+		for( u64 i = 0; i < count; ++i ) {
 			auto it = this->Find( text_to_replace, search_position );
 			if( it == this->end() ) {
 				return;
 			}
-			size_t it_index = it.GetIndex();
+			u64 it_index = it.GetIndex();
 			i64 size_diff = i64( replace_with.Size() ) - i64( text_to_replace.Size() );
 			if( size_diff < 0 ) {
 				this->Erase( it, it + -size_diff );
@@ -1883,15 +1883,15 @@ public:
 	/// @return
 	/// New text container instance.
 	constexpr BC_CONTAINER_NAME( TextBase )																SubText(
-		size_t																							start_position,
-		size_t																							size							= std::numeric_limits<size_t>::max()
+		u64																								start_position,
+		u64																								size							= std::numeric_limits<u64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		if( start_position >= this->data_size ) return {};
 		auto length = std::min( this->data_size - start_position, size );
 		BC_CONTAINER_NAME( TextBase ) ret;
 		ret.Resize( length );
-		for( size_t i = 0; i < length; ++i ) {
+		for( u64 i = 0; i < length; ++i ) {
 			ret[ i ] = this->data_ptr[ i + start_position ];
 		}
 
@@ -1917,9 +1917,9 @@ public:
 	{
 		BC_ContainerAssert( reinterpret_cast<void*>( begin_it.container ) == this, U"Wrong start iterator used on TextBase::SubText" );
 		BC_ContainerAssert( reinterpret_cast<void*>( end_it.container ) == this, U"Wrong end iterator used on TextBase::SubText" );
-		size_t begin_position = begin_it.GetIndex();
-		size_t end_position = end_it.GetIndex();
-		size_t length;
+		u64 begin_position	= begin_it.GetIndex();
+		u64 end_position	= end_it.GetIndex();
+		u64 length;
 		if( end_position < begin_position ) {
 			length = 0;
 		} else {
@@ -1928,7 +1928,7 @@ public:
 
 		BC_CONTAINER_NAME( TextBase ) ret;
 		ret.Resize( length );
-		for( size_t i = 0; i < length; ++i ) {
+		for( u64 i = 0; i < length; ++i ) {
 			ret[ i ] = this->data_ptr[ i + begin_position ];
 		}
 

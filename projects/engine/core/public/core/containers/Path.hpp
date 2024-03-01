@@ -132,7 +132,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr IteratorSelfType										operator+(
-		size_t														amount
+		u64															amount
 	) const
 	{
 		BAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -150,7 +150,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr IteratorSelfType										operator-(
-		size_t														amount
+		u64															amount
 	) const
 	{
 		BAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -168,7 +168,7 @@ public:
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr IteratorSelfType									&	operator+=(
-		size_t amount
+		u64															amount
 	)
 	{
 		BAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -185,7 +185,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr IteratorSelfType									&	operator-=(
-		size_t amount
+		u64															amount
 	)
 	{
 		BAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -292,7 +292,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr Path(
 		const char32_t( &c_string )[ ArraySize ]
 	)
@@ -302,8 +302,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const TextBase<char32_t>							&	operator[](
-		size_t														section_index
-		) const
+		u64															section_index
+	) const
 	{
 		BAssert( section_index < Size(),
 			diagnostic::MakePrintRecord_AssertText( U"Index out of range",
@@ -316,8 +316,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr TextBase<char32_t>								&	operator[](
-		size_t														section_index
-		)
+		u64															section_index
+	)
 	{
 		BAssert( section_index < Size(),
 			diagnostic::MakePrintRecord_AssertText( U"Index out of range",
@@ -331,7 +331,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr Path												&	operator=(
 		const Path												&	new_path
-		) = default;
+	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr Path												&	operator=(
@@ -348,7 +348,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr Path												&	operator=(
 		const char32_t( &new_path )[ ArraySize ]
 		)
@@ -377,7 +377,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool													operator==(
 		const char32_t( &c_string )[ ArraySize ]
 		) const
@@ -406,7 +406,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t ArraySize>
+	template<u64 ArraySize>
 	constexpr bool													operator!=(
 		const char32_t( &c_string )[ ArraySize ]
 		) const
@@ -466,7 +466,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void													Erase(
-		size_t														section_index
+		u64															section_index
 	)
 	{
 		auto it = sections.begin() + section_index;
@@ -495,7 +495,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void													Replace(
-		size_t														section_index,
+		u64															section_index,
 		TextViewBase<char32_t, true>								new_name
 	)
 	{
@@ -593,10 +593,10 @@ public:
 		const Path												&	with
 	) const
 	{
-		size_t max_sections = std::min( sections.Size(), with.sections.Size() );
+		u64 max_sections = std::min( sections.Size(), with.sections.Size() );
 		Path ret;
 		ret.sections.Reserve( max_sections );
-		for( size_t i = 0; i < max_sections; ++i )
+		for( u64 i = 0; i < max_sections; ++i )
 		{
 			if( sections[ i ] == with.sections[ i ] )
 			{
@@ -633,9 +633,9 @@ public:
 		static_assert( BackstepType < container_bases::PathBackstepType::COUNT, "Please add test for each BackstepType type" );
 
 		auto common_parent = GetCommonParent( to );
-		size_t backstep_count = Size() - common_parent.Size();
+		u64 backstep_count = Size() - common_parent.Size();
 		Path ret;
-		for( size_t i = 0; i < backstep_count; ++i )
+		for( u64 i = 0; i < backstep_count; ++i )
 		{
 			if constexpr( BackstepType == container_bases::PathBackstepType::DOUBLE_DOTS )
 			{
@@ -646,7 +646,7 @@ public:
 				ret.sections.EmplaceBack( "<" );
 			}
 		}
-		for( size_t i = common_parent.Size(); i < to.Size(); ++i )
+		for( u64 i = common_parent.Size(); i < to.Size(); ++i )
 		{
 			ret.PushBack( to[ i ] );
 		}
@@ -666,7 +666,7 @@ public:
 	/// @return
 	/// TextView object containing the name of the section.
 	constexpr const TextBase<char32_t>							&	GetSection(
-		size_t														section_index
+		u64															section_index
 	) const
 	{
 		BAssert( section_index < Size(),
@@ -691,7 +691,7 @@ public:
 	/// @return
 	/// New text object containing the name of the section.
 	constexpr TextBase<char32_t>								&	GetSection(
-		size_t														section_index
+		u64															section_index
 	)
 	{
 		BAssert( section_index < Size(),
@@ -832,12 +832,12 @@ public:
 		auto & last = Back();
 		last = stem;
 
-		size_t append_extension_from_position;
+		u64 append_extension_from_position;
 		for( append_extension_from_position = 0; append_extension_from_position < new_extension_name.Size(); ++append_extension_from_position )
 		{
 			if( new_extension_name[ append_extension_from_position ] != '.' ) break;
 		}
-		size_t extension_append_size = append_extension_from_position - new_extension_name.Size();
+		u64 extension_append_size = append_extension_from_position - new_extension_name.Size();
 
 		last.Append( TextViewBase<char32_t, true>( &new_extension_name[ append_extension_from_position ], extension_append_size ) );
 	}
@@ -899,7 +899,7 @@ public:
 	/// 
 	/// @return
 	/// Number of sections.
-	constexpr size_t												Size() const
+	constexpr u64													Size() const
 	{
 		return sections.Size();
 	}
@@ -958,7 +958,7 @@ public:
 	{
 		if( sections.IsEmpty() ) return {};
 		TextBase<char32_t>ret;
-		for( size_t i = 0; i < sections.Size() - 1; ++i )
+		for( u64 i = 0; i < sections.Size() - 1; ++i )
 		{
 			ret.Append( sections[ i ] );
 			ret.PushBack( GetPrimarySeparatorCharacter() );
@@ -1023,7 +1023,7 @@ private:
 		auto * current_section = &sections.Back();
 		bool previous_character_was_separator = false;
 
-		for( size_t i = 0; i < from_text.Size(); ++i )
+		for( u64 i = 0; i < from_text.Size(); ++i )
 		{
 			if( IsSeparatorCharacter( from_text[ i ] ) )
 			{
@@ -1084,7 +1084,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr bool													IsBackstepSection(
-		size_t														index
+		u64															index
 	) const
 	{
 		return IsBackstepSection( GetSection( index ) );
