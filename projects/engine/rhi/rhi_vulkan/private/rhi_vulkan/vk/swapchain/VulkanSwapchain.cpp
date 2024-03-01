@@ -8,7 +8,7 @@
 #include <rhi_vulkan/vk/surface/VulkanWindowSurface.hpp>
 #include <rhi_vulkan/vk/device/VulkanDevice.hpp>
 #include <rhi_vulkan/vk/physical_device/VulkanPhysicalDevice.hpp>
-#include <core/math/linear_algebra/Vector.hpp>
+#include <core/math/Vector.hpp>
 
 
 

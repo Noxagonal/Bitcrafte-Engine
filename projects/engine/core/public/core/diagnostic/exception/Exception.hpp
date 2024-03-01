@@ -290,7 +290,7 @@ inline void												Throw [[noreturn]] (
 inline void												Throw [[noreturn]] (
 	const bc::internal::SimpleTextView32				message,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
-)
+	)
 {
 	Throw(
 		MakeException(

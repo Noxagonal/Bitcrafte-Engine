@@ -200,7 +200,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return utility::IsFloatEqual( x, other.x ) && utility::IsFloatEqual( y, other.y );
+			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y );
 		}
 		else
 		{
@@ -215,7 +215,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return !utility::IsFloatEqual( x, other.x ) || !utility::IsFloatEqual( y, other.y );
+			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y );
 		}
 		else
 		{
@@ -262,7 +262,7 @@ public:
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
-		if( magnitude <= utility::GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
+		if( magnitude <= GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
 		return *this / magnitude;
 	}
 
@@ -477,7 +477,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return utility::IsFloatEqual( x, other.x ) && utility::IsFloatEqual( y, other.y ) && utility::IsFloatEqual( z, other.z );
+			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y ) && IsFloatEqual( z, other.z );
 		}
 		else
 		{
@@ -492,7 +492,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return !utility::IsFloatEqual( x, other.x ) || !utility::IsFloatEqual( y, other.y ) || !utility::IsFloatEqual( z, other.z );
+			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y ) || !IsFloatEqual( z, other.z );
 		}
 		else
 		{
@@ -542,7 +542,7 @@ public:
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
-		if( magnitude <= utility::GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
+		if( magnitude <= GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
 		return *this / magnitude;
 	}
 
@@ -774,7 +774,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return utility::IsFloatEqual( x, other.x ) && utility::IsFloatEqual( y, other.y ) && utility::IsFloatEqual( z, other.z ) && utility::IsFloatEqual( w, other.w );
+			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y ) && IsFloatEqual( z, other.z ) && IsFloatEqual( w, other.w );
 		}
 		else
 		{
@@ -789,7 +789,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return !utility::IsFloatEqual( x, other.x ) || !utility::IsFloatEqual( y, other.y ) || !utility::IsFloatEqual( z, other.z ) || !utility::IsFloatEqual( w, other.w );
+			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y ) || !IsFloatEqual( z, other.z ) || !IsFloatEqual( w, other.w );
 		}
 		else
 		{
@@ -842,7 +842,7 @@ public:
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
-		if( magnitude <= utility::GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
+		if( magnitude <= GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
 		return *this / magnitude;
 	}
 

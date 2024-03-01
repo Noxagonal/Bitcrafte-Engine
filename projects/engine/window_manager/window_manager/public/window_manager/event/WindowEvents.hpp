@@ -5,7 +5,7 @@
 #include <window_manager/event/WindowEventEnums.hpp>
 
 #include <core/containers/Text.hpp>
-#include <core/math/linear_algebra/Vector.hpp>
+#include <core/math/Vector.hpp>
 
 #include <core/event/Event.hpp>
 

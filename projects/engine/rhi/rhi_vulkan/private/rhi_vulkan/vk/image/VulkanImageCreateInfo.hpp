@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <core/math/linear_algebra/Vector.hpp>
+#include <core/math/Vector.hpp>
 
 #include <vulkan/vulkan.h>
 
