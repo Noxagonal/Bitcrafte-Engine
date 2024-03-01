@@ -27,17 +27,17 @@ bc::rhi::VulkanImage::VulkanImage(
 				create_info.image_flags & VK_IMAGE_CREATE_SPARSE_ALIASED_BIT;
 		};
 
-	auto GetImageSize = [ &rhi_vulkan_impl, &create_info ]() -> math::Vector2u
+	auto GetImageSize = [ &rhi_vulkan_impl, &create_info ]() -> math::Vec2u32
 		{
 			auto result = create_info.image_size;
 			auto max_image_extent = rhi_vulkan_impl.GetVulkanDevice().GetVulkanPhysicalDevice().GetProperties().properties.limits.maxImageDimension2D;
-			result = { std::min( result.x, u64( max_image_extent ) ), std::min( result.y, u64( max_image_extent ) ) };
+			result = { std::min( result.x, max_image_extent ), std::min( result.y, max_image_extent ) };
 			return result;
 		};
 
-	auto CalculateMipLevels = [ &create_info ]( math::Vector2u full_size ) -> List<math::Vector2u>
+	auto CalculateMipLevels = [ &create_info ]( math::Vec2u32 full_size ) -> List<math::Vec2u32>
 		{
-			auto result = List<math::Vector2u> {};
+			auto result = List<math::Vec2u32> {};
 			result.Reserve( 16 );
 
 			auto current = full_size;
@@ -53,8 +53,8 @@ bc::rhi::VulkanImage::VulkanImage(
 		};
 
 	auto CreateImage = [ &create_info, &rhi_vulkan_impl ](
-		math::Vector2u	size,
-		u32		mip_level_count,
+		math::Vec2u32	size,
+		u32				mip_level_count,
 		VkImageTiling	image_tiling_info
 		)
 		{
@@ -130,7 +130,7 @@ bc::rhi::VulkanImage::VulkanImage(
 
 	auto CreateImageView = [ &create_info, &rhi_vulkan_impl ](
 		VkImage						image,
-		List<math::Vector2u>	&	mip_levels,
+		List<math::Vec2u32>		&	mip_levels,
 		VkImageAspectFlagBits		image_aspect_mask
 		)
 		{

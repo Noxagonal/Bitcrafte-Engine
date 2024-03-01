@@ -887,53 +887,71 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using Vector2f = VectorBase<2, f32>;
-using Vector2d = VectorBase<2, f64>;
-using Vector2i = VectorBase<2, i64>;
-using Vector2u = VectorBase<2, u64>;
+using Vec2f32 = VectorBase<2, f32>;
+using Vec2f64 = VectorBase<2, f64>;
+using Vec2i32 = VectorBase<2, i32>;
+using Vec2u32 = VectorBase<2, u32>;
+using Vec2i64 = VectorBase<2, i64>;
+using Vec2u64 = VectorBase<2, u64>;
 
-using Vector3f = VectorBase<3, f32>;
-using Vector3d = VectorBase<3, f64>;
-using Vector3i = VectorBase<3, i64>;
-using Vector3u = VectorBase<3, u64>;
+using Vec3f32 = VectorBase<3, f32>;
+using Vec3f64 = VectorBase<3, f64>;
+using Vec3i32 = VectorBase<3, i32>;
+using Vec3u32 = VectorBase<3, u32>;
+using Vec3i64 = VectorBase<3, i64>;
+using Vec3u64 = VectorBase<3, u64>;
 
-using Vector4f = VectorBase<4, f32>;
-using Vector4d = VectorBase<4, f64>;
-using Vector4i = VectorBase<4, i64>;
-using Vector4u = VectorBase<4, u64>;
+using Vec4f32 = VectorBase<4, f32>;
+using Vec4f64 = VectorBase<4, f64>;
+using Vec4i32 = VectorBase<4, i32>;
+using Vec4u32 = VectorBase<4, u32>;
+using Vec4i64 = VectorBase<4, i64>;
+using Vec4u64 = VectorBase<4, u64>;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static_assert( sizeof( Vector2f ) == sizeof( f32 ) * 2 );
-static_assert( sizeof( Vector2d ) == sizeof( f64 ) * 2 );
-static_assert( sizeof( Vector2i ) == sizeof( i64 ) * 2 );
-static_assert( sizeof( Vector2u ) == sizeof( u64 ) * 2 );
+static_assert( sizeof( Vec2f32 ) == sizeof( f32 ) * 2 );
+static_assert( sizeof( Vec2f64 ) == sizeof( f64 ) * 2 );
+static_assert( sizeof( Vec2i32 ) == sizeof( i32 ) * 2 );
+static_assert( sizeof( Vec2u32 ) == sizeof( u32 ) * 2 );
+static_assert( sizeof( Vec2i64 ) == sizeof( i64 ) * 2 );
+static_assert( sizeof( Vec2u64 ) == sizeof( u64 ) * 2 );
 
-static_assert( sizeof( Vector3f ) == sizeof( f32 ) * 3 );
-static_assert( sizeof( Vector3d ) == sizeof( f64 ) * 3 );
-static_assert( sizeof( Vector3i ) == sizeof( i64 ) * 3 );
-static_assert( sizeof( Vector3u ) == sizeof( u64 ) * 3 );
+static_assert( sizeof( Vec3f32 ) == sizeof( f32 ) * 3 );
+static_assert( sizeof( Vec3f64 ) == sizeof( f64 ) * 3 );
+static_assert( sizeof( Vec3i32 ) == sizeof( i32 ) * 3 );
+static_assert( sizeof( Vec3u32 ) == sizeof( u32 ) * 3 );
+static_assert( sizeof( Vec3i64 ) == sizeof( i64 ) * 3 );
+static_assert( sizeof( Vec3u64 ) == sizeof( u64 ) * 3 );
 
-static_assert( sizeof( Vector4f ) == sizeof( f32 ) * 4 );
-static_assert( sizeof( Vector4d ) == sizeof( f64 ) * 4 );
-static_assert( sizeof( Vector4i ) == sizeof( i64 ) * 4 );
-static_assert( sizeof( Vector4u ) == sizeof( u64 ) * 4 );
+static_assert( sizeof( Vec4f32 ) == sizeof( f32 ) * 4 );
+static_assert( sizeof( Vec4f64 ) == sizeof( f64 ) * 4 );
+static_assert( sizeof( Vec4i32 ) == sizeof( i32 ) * 4 );
+static_assert( sizeof( Vec4u32 ) == sizeof( u32 ) * 4 );
+static_assert( sizeof( Vec4i64 ) == sizeof( i64 ) * 4 );
+static_assert( sizeof( Vec4u64 ) == sizeof( u64 ) * 4 );
 
-static_assert( alignof( Vector2f ) == alignof( f32 ) * 2 );
-static_assert( alignof( Vector2d ) == alignof( f64 ) * 2 );
-static_assert( alignof( Vector2i ) == alignof( i64 ) * 2 );
-static_assert( alignof( Vector2u ) == alignof( u64 ) * 2 );
+static_assert( alignof( Vec2f32 ) == alignof( f32 ) * 2 );
+static_assert( alignof( Vec2f64 ) == alignof( f64 ) * 2 );
+static_assert( alignof( Vec2i32 ) == alignof( i32 ) * 2 );
+static_assert( alignof( Vec2u32 ) == alignof( u32 ) * 2 );
+static_assert( alignof( Vec2i64 ) == alignof( i64 ) * 2 );
+static_assert( alignof( Vec2u64 ) == alignof( u64 ) * 2 );
 
-static_assert( alignof( Vector3f ) == alignof( f32 ) );
-static_assert( alignof( Vector3d ) == alignof( f64 ) );
-static_assert( alignof( Vector3i ) == alignof( i64 ) );
-static_assert( alignof( Vector3u ) == alignof( u64 ) );
+static_assert( alignof( Vec3f32 ) == alignof( f32 ) );
+static_assert( alignof( Vec3f64 ) == alignof( f64 ) );
+static_assert( alignof( Vec3i32 ) == alignof( i32 ) );
+static_assert( alignof( Vec3u32 ) == alignof( u32 ) );
+static_assert( alignof( Vec3i64 ) == alignof( i64 ) );
+static_assert( alignof( Vec3u64 ) == alignof( u64 ) );
 
-static_assert( alignof( Vector4f ) == alignof( f32 ) * 4 );
-static_assert( alignof( Vector4d ) == alignof( f64 ) * 4 );
-static_assert( alignof( Vector4i ) == alignof( i64 ) * 4 );
-static_assert( alignof( Vector4u ) == alignof( u64 ) * 4 );
+static_assert( alignof( Vec4f32 ) == alignof( f32 ) * 4 );
+static_assert( alignof( Vec4f64 ) == alignof( f64 ) * 4 );
+static_assert( alignof( Vec4i32 ) == alignof( i32 ) * 4 );
+static_assert( alignof( Vec4u32 ) == alignof( u32 ) * 4 );
+static_assert( alignof( Vec4i64 ) == alignof( i64 ) * 4 );
+static_assert( alignof( Vec4u64 ) == alignof( u64 ) * 4 );
 
 
 

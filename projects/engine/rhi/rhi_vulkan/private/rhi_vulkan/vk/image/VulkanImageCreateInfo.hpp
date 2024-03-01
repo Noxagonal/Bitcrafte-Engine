@@ -21,7 +21,7 @@ struct VulkanImageCreateInfo
 {
 	VkImageCreateFlagBits								image_flags									= {};
 	VkFormat											image_format								= {};
-	math::Vector2u										image_size									= {};
+	math::Vec2u32										image_size									= {};
 	u32													image_array_layers							= {};
 	VkSampleCountFlagBits								image_samples								= {};
 	VkImageUsageFlagBits								image_usage									= {};

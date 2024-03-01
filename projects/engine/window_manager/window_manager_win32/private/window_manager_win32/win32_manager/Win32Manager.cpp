@@ -228,7 +228,7 @@ LRESULT CALLBACK WndProc(
 	case WM_MOVE:
 	{
 		auto window_position = MAKEPOINTS( l_param );
-		win32_window->events.PositionChanged.Signal( bc::math::Vector2i { static_cast<i64>( window_position.x ), static_cast<i64>( window_position.y ) } );
+		win32_window->events.PositionChanged.Signal( bc::math::Vec2i32 { static_cast<i32>( window_position.x ), static_cast<i32>( window_position.y ) } );
 		break;
 	}
 
@@ -260,7 +260,7 @@ LRESULT CALLBACK WndProc(
 				win32_window->events.StateChanged.Signal( win32_window->runtime_info.current_windows_state );
 			}
 		}
-		win32_window->events.SizeChanged.Signal( bc::math::Vector2i { static_cast<i64>( LOWORD( l_param ) ), static_cast<i64>( HIWORD( l_param ) ) } );
+		win32_window->events.SizeChanged.Signal( bc::math::Vec2i32 { static_cast<i32>( LOWORD( l_param ) ), static_cast<i32>( HIWORD( l_param ) ) } );
 		break;
 	}
 
@@ -347,7 +347,7 @@ LRESULT CALLBACK WndProc(
 			SetUpMouseLeaveTracking();
 		}
 		auto mouse_pos = MAKEPOINTS( l_param );
-		win32_window->events.MousePosition.Signal( bc::math::Vector2d { static_cast<f64>( mouse_pos.x ), static_cast<f64>( mouse_pos.y ) } );
+		win32_window->events.MousePosition.Signal( bc::math::Vec2f64 { static_cast<f64>( mouse_pos.x ), static_cast<f64>( mouse_pos.y ) } );
 		break;
 	}
 
@@ -358,11 +358,11 @@ LRESULT CALLBACK WndProc(
 	}
 
 	case WM_MOUSEWHEEL:
-		win32_window->events.MouseScroll.Signal( bc::math::Vector2d { 0.0, static_cast<f64>( GET_WHEEL_DELTA_WPARAM( w_param ) ) } );
+		win32_window->events.MouseScroll.Signal( bc::math::Vec2f64 { 0.0, static_cast<f64>( GET_WHEEL_DELTA_WPARAM( w_param ) ) } );
 		break;
 
 	case WM_MOUSEHWHEEL:
-		win32_window->events.MouseScroll.Signal( bc::math::Vector2d { static_cast<f64>( GET_WHEEL_DELTA_WPARAM( w_param ), 0.0 ) } );
+		win32_window->events.MouseScroll.Signal( bc::math::Vec2f64 { static_cast<f64>( GET_WHEEL_DELTA_WPARAM( w_param ), 0.0 ) } );
 		break;
 
 
