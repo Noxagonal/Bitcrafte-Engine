@@ -216,7 +216,7 @@ public:
 	///
 	/// @return
 	/// Number of listeners
-	size_t															GetObserverCount()
+	u64															GetObserverCount()
 	{
 		return listeners.Size();
 	}
@@ -227,7 +227,7 @@ public:
 	///
 	/// @return
 	/// Number of listening_to events.
-	size_t															GetObservingCount()
+	u64															GetObservingCount()
 	{
 		return listening_to.Size();
 	}
