@@ -95,7 +95,7 @@ concept STLContainer = requires(
 template<typename ContainerType>
 concept ContainerView = requires(
 	ContainerType											container,
-	size_t													size,
+	u64														size,
 	typename ContainerType::ConstIterator					const_iterator
 	)
 {
@@ -228,7 +228,7 @@ concept LinearContainerEditableView = requires(
 template<typename ContainerType>
 concept LinearContainer = requires(
 	ContainerType											container,
-	size_t													size
+	u64														size
 )
 {
 	requires( LinearContainerEditableView<ContainerType> );
@@ -291,7 +291,7 @@ concept TextContainerEditableView = requires(
 template<typename ContainerType>
 concept TextContainer = requires(
 	ContainerType											container,
-	size_t													size
+	u64														size
 	)
 {
 	requires( LinearContainer<ContainerType> );
