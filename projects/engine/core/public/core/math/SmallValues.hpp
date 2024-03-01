@@ -2,6 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/data_types/FundamentalTypes.hpp>
 
 #include <cstdint>
 #include <cfloat>
