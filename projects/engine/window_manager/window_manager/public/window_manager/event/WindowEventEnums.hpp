@@ -12,14 +12,14 @@ namespace window_manager {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class MouseButtonAction : int32_t
+enum class MouseButtonAction : i32
 {
 	RELEASED				= 0,	///< Button was lift up.
 	PRESSED					= 1,	///< Button was pressed down.
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class KeyboardButtonAction : int32_t
+enum class KeyboardButtonAction : i32
 {
 	RELEASED				= 0,	///< Button was lift up.
 	PRESSED					= 1,	///< Button was pressed down.
@@ -27,7 +27,7 @@ enum class KeyboardButtonAction : int32_t
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class MouseButton : int32_t
+enum class MouseButton : i32
 {
 	BUTTON_1				= 0,		///< Left mouse button
 	BUTTON_2				= 1,		///< Right mouse button
@@ -41,7 +41,7 @@ enum class MouseButton : int32_t
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class ModifierKeyFlags : int32_t
+enum class ModifierKeyFlags : i32
 {
 	SHIFT					= 0x0001,	///< Shift key, either left or right
 	CONTROL					= 0x0002,	///< Ctrl key, either left or right
@@ -82,7 +82,7 @@ inline ModifierKeyFlags		operator&=(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class KeyboardButton : int32_t
+enum class KeyboardButton : i32
 {
 	KEY_UNKNOWN				= -1,	///< Unrecognized keyboard button
 
@@ -211,7 +211,7 @@ enum class KeyboardButton : int32_t
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class WindowState : int32_t
+enum class WindowState : i32
 {
 	WINDOWED				= 0,	///< Window is in normal windowed mode.
 	FULLSCREEN				= 1,	///< Window is in fullscreen mode.

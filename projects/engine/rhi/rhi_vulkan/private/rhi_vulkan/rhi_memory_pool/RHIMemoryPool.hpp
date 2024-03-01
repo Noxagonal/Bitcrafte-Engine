@@ -23,19 +23,19 @@ struct RHIMemoryPoolChunk
 	// Block is a single virtual allocation from the Chunk. Aka, assignment from a single pool.
 	struct Block
 	{
-		uint64_t										id									= UINT64_MAX;
+		u64												id									= std::numeric_limits<u64>::max();
 		VkDeviceSize									offset								= 0;
 		VkDeviceSize									size								= 0;
 		VkDeviceSize									alignment							= 1;
 	};
 
-	uint64_t											id									= UINT64_MAX;
+	u64													id									= std::numeric_limits<u64>::max();
 	VkDeviceMemory										memory								= VK_NULL_HANDLE;
 	VkDeviceSize										size								= 0;
 	List<RHIMemoryPoolChunk::Block>						blocks;
 	VkResult											result								= VK_RESULT_MAX_ENUM;
 
-	uint64_t											block_id_counter					= 0;
+	u64													block_id_counter					= 0;
 };
 
 
@@ -138,15 +138,15 @@ private:
 	Pair<VkResult, internal::RHIMemoryPoolChunk*>		AllocateChunk(
 		List<internal::RHIMemoryPoolChunk>			*	chunk_group,
 		VkDeviceSize									size,
-		uint32_t										memory_type_index
+		u32												memory_type_index
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void												FreeBlock(
-		uint32_t										memory_type_index,
+		u32												memory_type_index,
 		bool											is_linear,
-		uint64_t										chunk_id,
-		uint64_t										block_id
+		u64												chunk_id,
+		u64												block_id
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ private:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	uint32_t											FindMemoryTypeIndex(
+	u32											FindMemoryTypeIndex(
 		internal::RHIPoolMemoryRequirements			&	memory_requirements,
 		VkMemoryPropertyFlags							property_flags
 	);
@@ -182,7 +182,7 @@ private:
 	VkPhysicalDeviceMemoryProperties					physical_device_memory_properties			= {};
 	VkPhysicalDeviceProperties							physical_device_properties					= {};
 
-	uint64_t											chunk_id_counter							= {};
+	u64													chunk_id_counter							= {};
 
 	VkDeviceSize										linear_chunk_size							= {};
 	VkDeviceSize										non_linear_chunk_size						= {};

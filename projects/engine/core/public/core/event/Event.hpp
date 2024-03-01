@@ -143,7 +143,7 @@ public:
 	/// 
 	/// @return
 	/// returns callback id which can be used to unregister this callback.
-	uint64_t														RegisterCallback(
+	u64																RegisterCallback(
 		std::function<void( EventSignalTypePack... )>				callback
 	)
 	{
@@ -176,7 +176,7 @@ public:
 	/// @param callback_id
 	///	Previously registered id you got from Event::RegisterCallback().
 	void															UnRegisterCallback(
-		uint64_t													callback_id
+		u64															callback_id
 	)
 	{
 		auto it = callbacks.Find( callback_id );
@@ -237,8 +237,8 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	List<Event<EventSignalTypePack...>*>							listeners;
 	List<Event<EventSignalTypePack...>*>							listening_to;
-	Map<uint64_t, std::function<void( EventSignalTypePack... )>>	callbacks;
-	uint64_t														callback_counter		= 0;
+	Map<u64, std::function<void( EventSignalTypePack... )>>			callbacks;
+	u64																callback_counter		= 0;
 };
 
 

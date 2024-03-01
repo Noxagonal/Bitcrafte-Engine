@@ -33,7 +33,7 @@ struct SubmitInfo
 struct SwapchainPresentInfo
 {
 	VkSwapchainKHR												swapchain;
-	uint32_t													image_index;
+	u32													image_index;
 };
 
 
@@ -69,7 +69,7 @@ public:
 	VkQueue														GetQueue() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	uint32_t													GetQueueFamilyIndex() const;
+	u32													GetQueueFamilyIndex() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VkBool32													SupportsPresentation() const;
@@ -78,17 +78,17 @@ public:
 	const VkQueueFamilyProperties							&	GetQueueFamilyProperties() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	uint32_t													GetBasedOn() const;
+	u32													GetBasedOn() const;
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::shared_ptr<std::mutex>									queue_mutex;						///< Mutex for queue submissions, only one thread must submit work at a time for single queue.
 	VkQueue														queue						= {};	///< VkQueue handle.
-	uint32_t													queue_family_index			= {};	///< Index of the queue family.
+	u32													queue_family_index			= {};	///< Index of the queue family.
 	VkBool32													supports_presentation		= {};	///< VK_TRUE if you can present using this queue, VK_FALSE if you can not.
 	VkQueueFamilyProperties										queue_family_properties		= {};	///< Typical VkQueueFamilyProperties.
-	uint32_t													based_on					= {};	///< Which other queue this one is based off.
+	u32													based_on					= {};	///< Which other queue this one is based off.
 };
 
 

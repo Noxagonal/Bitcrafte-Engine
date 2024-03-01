@@ -129,9 +129,9 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	auto validation_features = VkValidationFeaturesEXT {};
 	validation_features.sType							= VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
 	validation_features.pNext							= &debug_utils_messenger_create_info;
-	validation_features.enabledValidationFeatureCount	= uint32_t( enabled_validation_features.Size() );
+	validation_features.enabledValidationFeatureCount	= u32( enabled_validation_features.Size() );
 	validation_features.pEnabledValidationFeatures		= enabled_validation_features.Data();
-	validation_features.disabledValidationFeatureCount	= uint32_t( disabled_validation_features.Size() );
+	validation_features.disabledValidationFeatureCount	= u32( disabled_validation_features.Size() );
 	validation_features.pDisabledValidationFeatures		= disabled_validation_features.Data();
 
 
@@ -167,9 +167,9 @@ bc::rhi::VulkanInstance::VulkanInstance(
 	create_info.pNext						= rhi_vulkan_impl.GetDebugSettings().debug_enabled ? &validation_features : nullptr;
 	create_info.flags						= 0;
 	create_info.pApplicationInfo			= &application_info;
-	create_info.enabledLayerCount			= uint32_t( enabled_layer_names_c_str.Size() );
+	create_info.enabledLayerCount			= u32( enabled_layer_names_c_str.Size() );
 	create_info.ppEnabledLayerNames			= enabled_layer_names_c_str.Data();
-	create_info.enabledExtensionCount		= uint32_t( enabled_extension_names_c_str.Size() );
+	create_info.enabledExtensionCount		= u32( enabled_extension_names_c_str.Size() );
 	create_info.ppEnabledExtensionNames		= enabled_extension_names_c_str.Data();
 	BAssertVkResult( vkCreateInstance(
 		&create_info,
@@ -221,7 +221,7 @@ bc::rhi::VulkanInstance::~VulkanInstance()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::List<bc::rhi::VulkanPhysicalDevice> bc::rhi::VulkanInstance::FetchPhysicalDevices() const
 {
-	auto physical_device_count = uint32_t {};
+	auto physical_device_count = u32 {};
 	BAssertVkResult( vkEnumeratePhysicalDevices( vk_instance, &physical_device_count, nullptr ) );
 	auto vk_physical_devices = List<VkPhysicalDevice>( physical_device_count );
 	BAssertVkResult( vkEnumeratePhysicalDevices( vk_instance, &physical_device_count, vk_physical_devices.Data() ) );

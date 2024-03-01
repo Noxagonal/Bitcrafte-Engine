@@ -316,7 +316,7 @@ void bc::thread::ThreadPool::WaitIdle()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-uint64_t bc::thread::ThreadPool::DoAddTask(
+bc::u64 bc::thread::ThreadPool::DoAddTask(
 	UniquePtr<Task>	&&	new_task
 )
 {

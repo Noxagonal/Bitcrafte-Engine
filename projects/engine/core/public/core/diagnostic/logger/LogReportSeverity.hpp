@@ -17,7 +17,7 @@ namespace diagnostic {
 /// 
 /// @see
 /// vk2d::PFN_VK2D_ReportFunction()
-enum class LogReportSeverity : uint32_t
+enum class LogReportSeverity : u32
 {
 	NONE					= 0,		///< Not valid severity value, used to detect invalid severity values.
 	VERBOSE,							///< Reports everything, usually too much information.

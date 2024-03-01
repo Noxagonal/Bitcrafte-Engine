@@ -137,27 +137,27 @@ void bc::rhi::RHIVulkanImpl::Start(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int64_t bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice()
+bc::i64 bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice()
 {
 	auto & physical_device_list = vulkan_instance->GetPhysicalDeviceList();
 
-	auto device_scores = [ &physical_device_list ]() -> List<uint64_t>
+	auto device_scores = [ &physical_device_list ]() -> List<u64>
 		{
-			List<uint64_t> result( physical_device_list.Size() );
+			List<u64> result( physical_device_list.Size() );
 			for( size_t i=0; i < physical_device_list.Size(); ++i )
 			{
 				auto & pd = physical_device_list[ i ];
 				auto & s = result[ i ];
 				auto & p = pd.GetProperties();
 				s += 1000; // some intial score
-				s += uint64_t( p.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ) * 16000;
-				s += uint64_t( p.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ) * 5000;
-				s += uint64_t( p.properties.limits.maxImageDimension2D );
-				s += uint64_t( p.properties.limits.maxPerStageDescriptorUniformBuffers ) * 20;
-				s += uint64_t( p.properties.limits.maxPerStageDescriptorSampledImages ) * 40;
-				s += uint64_t( p.properties.limits.maxVertexInputBindings ) * 10;
-				s += uint64_t( p.properties.limits.maxComputeWorkGroupInvocations );
-				s += uint64_t( p.properties.limits.maxSamplerAnisotropy ) * 200;
+				s += u64( p.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ) * 16000;
+				s += u64( p.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ) * 5000;
+				s += u64( p.properties.limits.maxImageDimension2D );
+				s += u64( p.properties.limits.maxPerStageDescriptorUniformBuffers ) * 20;
+				s += u64( p.properties.limits.maxPerStageDescriptorSampledImages ) * 40;
+				s += u64( p.properties.limits.maxVertexInputBindings ) * 10;
+				s += u64( p.properties.limits.maxComputeWorkGroupInvocations );
+				s += u64( p.properties.limits.maxSamplerAnisotropy ) * 200;
 
 				// Check if physical device can present
 				auto can_present						= false;
@@ -180,8 +180,8 @@ int64_t bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice()
 			return result;
 		}();
 
-	auto best_physical_device_index		= int64_t { -1 };
-	auto best_score_so_far				= uint64_t {};
+	auto best_physical_device_index		= i64{ -1 };
+	auto best_score_so_far				= u64 {};
 	for( size_t i = 0; i < physical_device_list.Size(); ++i )
 	{
 		if( device_scores[ i ] > best_score_so_far )

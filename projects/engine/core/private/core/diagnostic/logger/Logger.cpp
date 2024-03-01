@@ -99,7 +99,7 @@ void bc::diagnostic::Logger::Log(
 
 	// TODO: Do formatting on both Log functions.
 
-	uint64_t exception_counter = 0;
+	u64 exception_counter = 0;
 	while( current_exception_in_chain )
 	{
 		auto exception_message = MakePrintRecord_Argument( U"Exception", exception_counter );

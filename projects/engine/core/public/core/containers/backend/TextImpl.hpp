@@ -547,10 +547,10 @@ public:
 		auto other_size = text_to_find.Size();
 		start_position = std::min( start_position, my_size );
 		search_length = std::min( search_length, my_size );
-		auto max_search_position = int64_t( search_length ) - int64_t( other_size );
-		for( int64_t outer = start_position; outer <= max_search_position; ++outer )
+		auto max_search_position = i64( search_length ) - i64( other_size );
+		for( i64 outer = start_position; outer <= max_search_position; ++outer )
 		{
-			int64_t inner;
+			i64 inner;
 			for( inner = 0; inner < text_to_find.Size(); ++inner )
 			{
 				if( this->data_ptr[ outer + inner ] != text_to_find.Data()[ inner ] ) break;
@@ -1856,7 +1856,7 @@ public:
 				return;
 			}
 			size_t it_index = it.GetIndex();
-			int64_t size_diff = int64_t( replace_with.Size() ) - int64_t( text_to_replace.Size() );
+			i64 size_diff = i64( replace_with.Size() ) - i64( text_to_replace.Size() );
 			if( size_diff < 0 ) {
 				this->Erase( it, it + -size_diff );
 				ReplaceRange( it_index, 0, replace_with.Size() );

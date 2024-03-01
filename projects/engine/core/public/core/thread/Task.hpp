@@ -21,7 +21,7 @@ class ThreadPool;
 class ThreadSharedData;
 class Thread;
 
-using TaskIdentifier = uint64_t;
+using TaskIdentifier = u64;
 
 
 
@@ -123,7 +123,7 @@ public:
 	/// 
 	/// @return
 	/// An array of unique identifiers to tasks that must complete before this task.
-	inline const List<uint64_t>					&	GetDependencies() const
+	inline const List<u64>						&	GetDependencies() const
 	{
 		return dependencies;
 	}

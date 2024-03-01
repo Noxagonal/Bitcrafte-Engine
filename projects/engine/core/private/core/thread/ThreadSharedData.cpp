@@ -44,7 +44,7 @@ bc::thread::Task * bc::thread::ThreadSharedData::FindWork(
 		if( std::any_of( task_list.begin(), task_list.end(), [ &dependencies ](
 			UniquePtr<Task> & t )
 		{
-			return std::any_of( dependencies.begin(), dependencies.end(), [ &t ]( uint64_t task_dependency )
+			return std::any_of( dependencies.begin(), dependencies.end(), [ &t ]( u64 task_dependency )
 			{
 				return t->GetTaskId() == task_dependency;
 			} );

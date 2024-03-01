@@ -123,7 +123,7 @@ public:
 	///
 	/// @return
 	/// Number of lines taken by this print record.
-	constexpr const uint32_t								CalculateLineCount() const;
+	constexpr const u32								CalculateLineCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -174,7 +174,7 @@ public:
 	/// @return
 	/// Reference to this.
 	constexpr PrintRecord								&	AddIndent(
-		int32_t												add_indentation_level			= 1
+		i32													add_indentation_level			= 1
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@ public:
 	/// @return
 	/// Reference to this.
 	constexpr PrintRecord									GetFinalized(
-		uint32_t											indentation_size				= 4
+		u32											indentation_size				= 4
 	) const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ private:
 	/// @return
 	/// New section list with applied indents.
 	constexpr void											Finalize_ApplyIndents(
-		uint32_t											indentation_size				= 4
+		u32											indentation_size				= 4
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -56,14 +56,14 @@ public:
 	///				Keyboard input event returning individual key presses. Returns
 	///				Keyboard button, scancode of the key, action of what happened
 	///				with the key and modifier keys pressed down at the same time.
-	Event<KeyboardButton, int32_t, KeyboardButtonAction, ModifierKeyFlags>		KeyboardKey;
+	Event<KeyboardButton, i32, KeyboardButtonAction, ModifierKeyFlags>			KeyboardKey;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief		Use this for keyboard text input.
 	/// 
 	///				Keyboard input event returning unicode characters. Returns
 	///				unicode character.
-	Event<int32_t>																KeyboardCharacter;
+	Event<i32>																	KeyboardCharacter;
 };
 
 

@@ -16,7 +16,7 @@ namespace window_manager {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class WindowManagerPlatformHandlesStructureType : uint32_t
+enum class WindowManagerPlatformHandlesStructureType : u32
 {
 	WINDOW_MANAGER_NONE				= 0,
 	WINDOW_MANAGER_WIN32,

@@ -16,7 +16,7 @@ void bc::memory::internal::FreeRawMemory_Runtime(
 	BHardAssert( allocation_info, "Couldn't free runtime memory, memory pointer was not allocated from bc::memory utilities" );
 
 	// TODO: Free from memory pool once it's implemented.
-	delete[] reinterpret_cast<uint8_t*>( allocation_info->system_allocated_location );
+	delete[] reinterpret_cast<u8*>( allocation_info->system_allocated_location );
 }
 
 
@@ -33,7 +33,7 @@ void * bc::memory::internal::AllocateRawMemory_Runtime(
 	);
 
 	// TODO: Allocate from memory pool once it's implemented.
-	auto system_ptr = new uint8_t[ minimum_required_allocation_size ];
+	auto system_ptr = new u8[ minimum_required_allocation_size ];
 	if( system_ptr == nullptr ) std::abort();
 	BHardAssert( ( reinterpret_cast<uintptr_t>( system_ptr ) & 0xFFFF000000000000ULL ) == 0ULL, "Allocated memory from system needs to have high 16 bits unused" );
 
@@ -80,7 +80,7 @@ void * bc::memory::internal::ReallocateRawMemory_Runtime(
 	auto common_size = ( old_size < new_size ) ? old_size : new_size;
 	for( size_t i = 0; i < common_size; ++i )
 	{
-		reinterpret_cast<uint8_t*>( new_ptr )[ i ] = reinterpret_cast<uint8_t*>( old_location )[ i ];
+		reinterpret_cast<u8*>( new_ptr )[ i ] = reinterpret_cast<u8*>( old_location )[ i ];
 	}
 
 	FreeRawMemory_Runtime( old_location );

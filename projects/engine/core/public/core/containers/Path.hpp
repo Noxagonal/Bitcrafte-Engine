@@ -227,7 +227,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr int64_t												GetIndex() const
+	constexpr i64													GetIndex() const
 	{
 		BAssert( this->container, "Tried using iterator that points to nothing" );
 		BAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
@@ -242,9 +242,9 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr int64_t												GetIndex_NoCheck() const
+	constexpr i64												GetIndex_NoCheck() const
 	{
-		return ( int64_t( this->data ) - int64_t( this->container->Data() ) ) / sizeof( ValueType );
+		return ( i64( this->data ) - i64( this->container->Data() ) ) / sizeof( ValueType );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1049,8 +1049,8 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void													ResolveBacksteps()
 	{
-		int64_t current = 0;
-		while( current < int64_t( sections.Size() ) )
+		i64 current = 0;
+		while( current < i64( sections.Size() ) )
 		{
 			if( IsBackstepSection( current ) )
 			{

@@ -31,10 +31,10 @@ public:
 	/// 
 	/// @return
 	/// Amount of time passed in seconds.
-	inline double							Tick()
+	inline f64								Tick()
 	{
 		auto now		= std::chrono::steady_clock::now();
-		auto delta_time	= std::chrono::duration<double>( now - last_time_point ).count();
+		auto delta_time	= std::chrono::duration<f64>( now - last_time_point ).count();
 		last_time_point	= now;
 		return delta_time;
 	}

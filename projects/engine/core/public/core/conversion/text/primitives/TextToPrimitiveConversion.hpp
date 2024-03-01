@@ -22,14 +22,14 @@ concept TextToBoolConvertible = std::is_same_v<ValueType, bool>;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename ValueType>
 concept TextToIntegerConvertible =
-std::is_same_v<ValueType, int8_t> ||
-std::is_same_v<ValueType, uint8_t> ||
-std::is_same_v<ValueType, int16_t> ||
-std::is_same_v<ValueType, uint16_t> ||
-std::is_same_v<ValueType, int32_t> ||
-std::is_same_v<ValueType, uint32_t> ||
-std::is_same_v<ValueType, int64_t> ||
-std::is_same_v<ValueType, uint64_t>;
+std::is_same_v<ValueType, i8> ||
+std::is_same_v<ValueType, u8> ||
+std::is_same_v<ValueType, i16> ||
+std::is_same_v<ValueType, u16> ||
+std::is_same_v<ValueType, i32> ||
+std::is_same_v<ValueType, u32> ||
+std::is_same_v<ValueType, i64> ||
+std::is_same_v<ValueType, u64>;
 
 
 
@@ -130,7 +130,7 @@ constexpr size_t								TextToPrimitive(
 /// AUTOMATIC option automatically parses values starting with "0o" as octal, "0b" as binary and "0x" as hexadecimal. Other
 /// options do not automatically parse the text and expects the text to be the value portion without any prefix. Eg. You might
 /// want to read text that is "5FA0", which does not contain "0x" but you know is hexadecimal.
-enum class TextToIntegerConversionFormat : uint32_t
+enum class TextToIntegerConversionFormat : u32
 {
 	AUTOMATIC	= 0,		///< Detect "0b", "0o" and "0x" beginning texts as binary, octal and hex respectively.
 	BINARY		= 2,		///< Base-2
@@ -281,7 +281,7 @@ constexpr size_t								TextToPrimitive(
 ///
 ///	Unlike FloatToTextConversionFormat, these are not flags and may not be used together. Scientific notation or fixed type is
 /// always resolved automatically, hex is resolved only if type is left at AUTOMATIC and value starts with "0x".
-enum class TextToFloatConversionFormat : uint32_t
+enum class TextToFloatConversionFormat : u32
 {
 	AUTOMATIC	= 0,	///< Automatically resolves if the value is decimal or hex. (Default)
 	DECIMAL,			///< Allows scientific notations as well as fixed representation, but not hex.

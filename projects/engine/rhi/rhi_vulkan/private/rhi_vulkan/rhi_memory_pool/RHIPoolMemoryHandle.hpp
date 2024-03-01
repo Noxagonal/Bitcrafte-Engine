@@ -25,9 +25,9 @@ class RHIPoolMemoryHandle
 		VkDeviceSize										offset,
 		VkDeviceSize										size,
 		VkDeviceSize										alignment,
-		uint64_t											chunk_id,
-		uint64_t											block_id,
-		uint32_t											memory_type_index,
+		u64													chunk_id,
+		u64													block_id,
+		u32													memory_type_index,
 		VkMemoryPropertyFlagBits							property_flags,
 		bool												is_linear
 	);
@@ -131,9 +131,9 @@ private:
 	VkDeviceSize											size								= 0;
 	VkDeviceSize											alignment							= 0;
 
-	uint64_t												chunk_id							= UINT64_MAX;
-	uint64_t												block_id							= UINT64_MAX;
-	uint32_t												memory_type_index					= UINT32_MAX;
+	u64														chunk_id							= std::numeric_limits<u64>::max();
+	u64														block_id							= std::numeric_limits<u64>::max();
+	u32														memory_type_index					= std::numeric_limits<u32>::max();
 	VkMemoryPropertyFlags									property_flags						= {};
 
 	bool													is_allocated					:1	= false;

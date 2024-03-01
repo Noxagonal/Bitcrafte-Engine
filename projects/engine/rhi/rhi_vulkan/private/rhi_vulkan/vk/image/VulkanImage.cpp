@@ -31,7 +31,7 @@ bc::rhi::VulkanImage::VulkanImage(
 		{
 			auto result = create_info.image_size;
 			auto max_image_extent = rhi_vulkan_impl.GetVulkanDevice().GetVulkanPhysicalDevice().GetProperties().properties.limits.maxImageDimension2D;
-			result = { std::min( result.x, uint64_t( max_image_extent ) ), std::min( result.y, uint64_t( max_image_extent ) ) };
+			result = { std::min( result.x, u64( max_image_extent ) ), std::min( result.y, u64( max_image_extent ) ) };
 			return result;
 		};
 
@@ -54,7 +54,7 @@ bc::rhi::VulkanImage::VulkanImage(
 
 	auto CreateImage = [ &create_info, &rhi_vulkan_impl ](
 		math::Vector2u	size,
-		uint32_t		mip_level_count,
+		u32		mip_level_count,
 		VkImageTiling	image_tiling_info
 		)
 		{
@@ -74,7 +74,7 @@ bc::rhi::VulkanImage::VulkanImage(
 			image_create_info.flags					= create_info.image_flags;
 			image_create_info.imageType				= VK_IMAGE_TYPE_2D;
 			image_create_info.format				= create_info.image_format;
-			image_create_info.extent				= { uint32_t( size.x ), uint32_t( size.y ), 1 };
+			image_create_info.extent				= { u32( size.x ), u32( size.y ), 1 };
 			image_create_info.mipLevels				= mip_level_count;
 			image_create_info.arrayLayers			= create_info.image_array_layers;
 			image_create_info.samples				= create_info.image_samples;
@@ -154,7 +154,7 @@ bc::rhi::VulkanImage::VulkanImage(
 			image_view_create_info.subresourceRange.aspectMask			= image_aspect_mask;
 			image_view_create_info.subresourceRange.layerCount			= create_info.image_array_layers;
 			image_view_create_info.subresourceRange.baseArrayLayer		= 0;
-			image_view_create_info.subresourceRange.levelCount			= uint32_t( mip_levels.Size() );
+			image_view_create_info.subresourceRange.levelCount			= u32( mip_levels.Size() );
 			image_view_create_info.subresourceRange.baseMipLevel		= 0;
 			auto result = VkImageView {};
 			BAssertVkResult( vkCreateImageView(
@@ -177,7 +177,7 @@ bc::rhi::VulkanImage::VulkanImage(
 
 	vk_image = CreateImage(
 		image_size,
-		uint32_t( mip_levels.Size() ),
+		u32( mip_levels.Size() ),
 		image_tiling_info
 	);
 

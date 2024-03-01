@@ -11,7 +11,7 @@
 bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	RHIVulkanImpl								&	rhi_vulkan_impl,
 	const VulkanPhysicalDevice					&	physical_device,
-	bc::List<bc::Pair<VkQueueFlags, float>>			queue_types
+	bc::List<bc::Pair<VkQueueFlags, f32>>			queue_types
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl ),
 	physical_device( physical_device ),
@@ -22,9 +22,9 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	BHardAssert( queue_types.Size() > 0, "No queue types requested" );
 
 	// available queues for the family, we can substract from this to test if queues are available or not
-	auto available_queues		= List<uint32_t>( queue_family_properties.queue_family_properties.Size() );
+	auto available_queues		= List<u32>( queue_family_properties.queue_family_properties.Size() );
 	// family allocations, outside List represents the queue family, inside List represents indices to the queue_types
-	auto family_allocations		= List<List<uint32_t>>( queue_family_properties.queue_family_properties.Size() );
+	auto family_allocations		= List<List<u32>>( queue_family_properties.queue_family_properties.Size() );
 	for( size_t i = 0; i < queue_family_properties.queue_family_properties.Size(); ++i )
 	{
 		available_queues[ i ]	= queue_family_properties.queue_family_properties[ i ].queueFamilyProperties.queueCount;
@@ -39,10 +39,10 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	}
 
 	// find queue families for queue types and also check for available queue count in that family
-	for( uint32_t q = 0; q < this->queue_types.Size(); ++q )
+	for( u32 q = 0; q < this->queue_types.Size(); ++q )
 	{
-		uint32_t family_candidate = UINT32_MAX;
-		for( uint32_t f = 0; f < queue_family_properties.queue_family_properties.Size(); ++f )
+		u32 family_candidate = UINT32_MAX;
+		for( u32 f = 0; f < queue_family_properties.queue_family_properties.Size(); ++f )
 		{
 			if( queue_family_properties.queue_family_properties[ f ].queueFamilyProperties.queueFlags & this->queue_types[ q ].first )
 			{
@@ -70,7 +70,7 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 		{
 			--available_queues[ family_candidate ];
 			queue_get_info[ q ].queue_family_index	= family_candidate;
-			queue_get_info[ q ].queue_index			= uint32_t( family_allocations[ family_candidate ].Size() );
+			queue_get_info[ q ].queue_index			= u32( family_allocations[ family_candidate ].Size() );
 			family_allocations[ family_candidate ].PushBack( q );
 		}
 	}
@@ -86,14 +86,14 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	}
 
 	// Those that didn't get an allocation will share the allocation with someone else with similar properties and fewer existing dependants
-	List<uint32_t> queue_dependants( this->queue_types.Size() );
-	for( uint32_t a = 0; a < queue_allocated_test.Size(); ++a )
+	List<u32> queue_dependants( this->queue_types.Size() );
+	for( u32 a = 0; a < queue_allocated_test.Size(); ++a )
 	{
 		if( !queue_allocated_test[ a ] )
 		{
-			uint32_t	candidate			= UINT32_MAX;
-			float		candidate_priority	= 0.0f;
-			for( uint32_t t = 0; t < this->queue_types.Size(); ++t )
+			u32 candidate			= UINT32_MAX;
+			f32 candidate_priority	= 0.0f;
+			for( u32 t = 0; t < this->queue_types.Size(); ++t )
 			{
 				if( !( a == t ) && queue_allocated_test[ t ] )
 				{
@@ -140,8 +140,8 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 			ci.sType				= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 			ci.pNext				= nullptr;
 			ci.flags				= 0;
-			ci.queueFamilyIndex		= uint32_t( i );
-			ci.queueCount			= uint32_t( family_allocations[ i ].Size() );
+			ci.queueFamilyIndex		= u32( i );
+			ci.queueCount			= u32( family_allocations[ i ].Size() );
 			ci.pQueuePriorities		= queue_priorities[ i ].Data();
 			queue_create_infos.PushBack( ci );
 		}
@@ -164,7 +164,7 @@ bc::List<bc::rhi::VulkanQueue> bc::rhi::DeviceQueueResolver::GetVulkanQueues(
 )
 {
 	List<VulkanQueue> ret( queue_get_info.Size() );
-	for( uint32_t i=0; i < ret.Size(); ++i )
+	for( u32 i=0; i < ret.Size(); ++i )
 	{
 		ret[ i ].queue_mutex				= nullptr;
 		ret[ i ].queue						= VK_NULL_HANDLE;

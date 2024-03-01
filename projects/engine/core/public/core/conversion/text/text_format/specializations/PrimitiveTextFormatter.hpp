@@ -208,14 +208,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename T>
 concept FormatterIntegerType =
-std::is_same_v<T, int8_t> ||
-std::is_same_v<T, uint8_t> ||
-std::is_same_v<T, int16_t> ||
-std::is_same_v<T, uint16_t> ||
-std::is_same_v<T, int32_t> ||
-std::is_same_v<T, uint32_t> ||
-std::is_same_v<T, int64_t> ||
-std::is_same_v<T, uint64_t> ||
+std::is_same_v<T, i8> ||
+std::is_same_v<T, u8> ||
+std::is_same_v<T, i16> ||
+std::is_same_v<T, u16> ||
+std::is_same_v<T, i32> ||
+std::is_same_v<T, u32> ||
+std::is_same_v<T, i64> ||
+std::is_same_v<T, u64> ||
 std::is_same_v<T, size_t>;
 
 
@@ -231,7 +231,7 @@ class TextFormatter<OutTextContainerType, IntegerType>
 	using OutTextContainerConstViewType = typename OutTextContainerType::template ThisViewType<true>;
 
 	conversion::IntegerToTextConversionFormat base = conversion::IntegerToTextConversionFormat::DECIMAL;
-	int64_t zero_fill = 0;
+	i64 zero_fill = 0;
 
 public:
 
@@ -316,8 +316,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename T>
 concept FormatterFloatingType =
-std::is_same_v<T, float> ||
-std::is_same_v<T, double>;
+std::is_same_v<T, f32> ||
+std::is_same_v<T, f64>;
 
 
 
@@ -332,7 +332,7 @@ class TextFormatter<OutTextContainerType, FloatType>
 	using OutTextContainerConstViewType = typename OutTextContainerType::template ThisViewType<true>;
 
 	conversion::FloatToTextConversionFormat float_to_text_conversion_format = conversion::FloatToTextConversionFormat::GENERAL;
-	int64_t requested_decimal_count = INT64_MAX;
+	i64 requested_decimal_count = INT64_MAX;
 	bool decimals_set = false;
 
 public:

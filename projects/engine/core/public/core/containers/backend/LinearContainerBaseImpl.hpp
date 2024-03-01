@@ -279,7 +279,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr int64_t																					GetIndex() const BC_CONTAINER_NOEXCEPT
+	constexpr i64																						GetIndex() const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
@@ -312,9 +312,9 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr int64_t																					GetIndex_NoCheck() const noexcept
+	constexpr i64																					GetIndex_NoCheck() const noexcept
 	{
-		return ( int64_t( this->data ) - int64_t( this->container->Data() ) ) / sizeof( ContainedValueType );
+		return ( i64( this->data ) - i64( this->container->Data() ) ) / sizeof( ContainedValueType );
 	}
 };
 
@@ -1351,26 +1351,26 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if linear container base fulfills size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, true> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, true> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, false> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, false> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, true> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, true> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, false> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, false> ) == 16 );
 
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false> ) == 16 );
 
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerBase )<uint32_t> ) == 24 );
+static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerBase )<u32> ) == 24 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if linear container iterator base passes container iterator concept.
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, true>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, true>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, true>, false>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<uint32_t, false>, false>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, true>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<uint32_t>, false>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, true>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, true>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, false>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, false>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<u32>, true>> );
+static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<u32>, false>> );
 
 
 

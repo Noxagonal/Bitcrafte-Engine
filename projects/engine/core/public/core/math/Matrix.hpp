@@ -602,44 +602,44 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using Matrix2f = MatrixBase<2, float>;
-using Matrix2d = MatrixBase<2, double>;
-using Matrix2i = MatrixBase<2, int64_t>;
+using Matrix2f = MatrixBase<2, f32>;
+using Matrix2d = MatrixBase<2, f64>;
+using Matrix2i = MatrixBase<2, i64>;
 
-using Matrix3f = MatrixBase<3, float>;
-using Matrix3d = MatrixBase<3, double>;
-using Matrix3i = MatrixBase<3, int64_t>;
+using Matrix3f = MatrixBase<3, f32>;
+using Matrix3d = MatrixBase<3, f64>;
+using Matrix3i = MatrixBase<3, i64>;
 
-using Matrix4f = MatrixBase<4, float>;
-using Matrix4d = MatrixBase<4, double>;
-using Matrix4i = MatrixBase<4, int64_t>;
+using Matrix4f = MatrixBase<4, f32>;
+using Matrix4d = MatrixBase<4, f64>;
+using Matrix4i = MatrixBase<4, i64>;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static_assert( sizeof( Matrix2f ) == sizeof( float ) * 2 * 2 );
-static_assert( sizeof( Matrix2d ) == sizeof( double ) * 2 * 2 );
-static_assert( sizeof( Matrix2i ) == sizeof( int64_t ) * 2 * 2 );
+static_assert( sizeof( Matrix2f ) == sizeof( f32 ) * 2 * 2 );
+static_assert( sizeof( Matrix2d ) == sizeof( f64 ) * 2 * 2 );
+static_assert( sizeof( Matrix2i ) == sizeof( i64 ) * 2 * 2 );
 
-static_assert( sizeof( Matrix3f ) == sizeof( float ) * 3 * 3 );
-static_assert( sizeof( Matrix3d ) == sizeof( double ) * 3 * 3 );
-static_assert( sizeof( Matrix3i ) == sizeof( int64_t ) * 3 * 3 );
+static_assert( sizeof( Matrix3f ) == sizeof( f32 ) * 3 * 3 );
+static_assert( sizeof( Matrix3d ) == sizeof( f64 ) * 3 * 3 );
+static_assert( sizeof( Matrix3i ) == sizeof( i64 ) * 3 * 3 );
 
-static_assert( sizeof( Matrix4f ) == sizeof( float ) * 4 * 4 );
-static_assert( sizeof( Matrix4d ) == sizeof( double ) * 4 * 4 );
-static_assert( sizeof( Matrix4i ) == sizeof( int64_t ) * 4 * 4 );
+static_assert( sizeof( Matrix4f ) == sizeof( f32 ) * 4 * 4 );
+static_assert( sizeof( Matrix4d ) == sizeof( f64 ) * 4 * 4 );
+static_assert( sizeof( Matrix4i ) == sizeof( i64 ) * 4 * 4 );
 
-static_assert( alignof( Matrix2f ) == alignof( float ) * 4 );
-static_assert( alignof( Matrix2d ) == alignof( double ) * 4 );
-static_assert( alignof( Matrix2i ) == alignof( int64_t ) * 4 );
+static_assert( alignof( Matrix2f ) == alignof( f32 ) * 4 );
+static_assert( alignof( Matrix2d ) == alignof( f64 ) * 4 );
+static_assert( alignof( Matrix2i ) == alignof( i64 ) * 4 );
 
-static_assert( alignof( Matrix3f ) == alignof( float ) );
-static_assert( alignof( Matrix3d ) == alignof( double ) );
-static_assert( alignof( Matrix3i ) == alignof( int64_t ) );
+static_assert( alignof( Matrix3f ) == alignof( f32 ) );
+static_assert( alignof( Matrix3d ) == alignof( f64 ) );
+static_assert( alignof( Matrix3i ) == alignof( i64 ) );
 
-static_assert( alignof( Matrix4f ) == alignof( float ) * 16 );
-static_assert( alignof( Matrix4d ) == alignof( double ) * 16 );
-static_assert( alignof( Matrix4i ) == alignof( int64_t ) * 16 );
+static_assert( alignof( Matrix4f ) == alignof( f32 ) * 16 );
+static_assert( alignof( Matrix4d ) == alignof( f64 ) * 16 );
+static_assert( alignof( Matrix4i ) == alignof( i64 ) * 16 );
 
 
 

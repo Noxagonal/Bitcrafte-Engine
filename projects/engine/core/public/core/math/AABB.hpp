@@ -250,53 +250,53 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using AABB2f = AABBBase<2, float>;
-using AABB2d = AABBBase<2, double>;
-using AABB2i = AABBBase<2, int64_t>;
-using AABB2u = AABBBase<2, uint64_t>;
+using AABB2f = AABBBase<2, f32>;
+using AABB2d = AABBBase<2, f64>;
+using AABB2i = AABBBase<2, i64>;
+using AABB2u = AABBBase<2, u64>;
 
-using AABB3f = AABBBase<3, float>;
-using AABB3d = AABBBase<3, double>;
-using AABB3i = AABBBase<3, int64_t>;
-using AABB3u = AABBBase<3, uint64_t>;
+using AABB3f = AABBBase<3, f32>;
+using AABB3d = AABBBase<3, f64>;
+using AABB3i = AABBBase<3, i64>;
+using AABB3u = AABBBase<3, u64>;
 
-using AABB4f = AABBBase<4, float>;
-using AABB4d = AABBBase<4, double>;
-using AABB4i = AABBBase<4, int64_t>;
-using AABB4u = AABBBase<4, uint64_t>;
+using AABB4f = AABBBase<4, f32>;
+using AABB4d = AABBBase<4, f64>;
+using AABB4i = AABBBase<4, i64>;
+using AABB4u = AABBBase<4, u64>;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static_assert( sizeof( AABB2f ) == sizeof( float ) * 4 );
-static_assert( sizeof( AABB2d ) == sizeof( double ) * 4 );
-static_assert( sizeof( AABB2i ) == sizeof( int64_t ) * 4 );
-static_assert( sizeof( AABB2u ) == sizeof( uint64_t ) * 4 );
+static_assert( sizeof( AABB2f ) == sizeof( f32 ) * 4 );
+static_assert( sizeof( AABB2d ) == sizeof( f64 ) * 4 );
+static_assert( sizeof( AABB2i ) == sizeof( i64 ) * 4 );
+static_assert( sizeof( AABB2u ) == sizeof( u64 ) * 4 );
 
-static_assert( sizeof( AABB3f ) == sizeof( float ) * 6 );
-static_assert( sizeof( AABB3d ) == sizeof( double ) * 6 );
-static_assert( sizeof( AABB3i ) == sizeof( int64_t ) * 6 );
-static_assert( sizeof( AABB3u ) == sizeof( uint64_t ) * 6 );
+static_assert( sizeof( AABB3f ) == sizeof( f32 ) * 6 );
+static_assert( sizeof( AABB3d ) == sizeof( f64 ) * 6 );
+static_assert( sizeof( AABB3i ) == sizeof( i64 ) * 6 );
+static_assert( sizeof( AABB3u ) == sizeof( u64 ) * 6 );
 
-static_assert( sizeof( AABB4f ) == sizeof( float ) * 8 );
-static_assert( sizeof( AABB4d ) == sizeof( double ) * 8 );
-static_assert( sizeof( AABB4i ) == sizeof( int64_t ) * 8 );
-static_assert( sizeof( AABB4u ) == sizeof( uint64_t ) * 8 );
+static_assert( sizeof( AABB4f ) == sizeof( f32 ) * 8 );
+static_assert( sizeof( AABB4d ) == sizeof( f64 ) * 8 );
+static_assert( sizeof( AABB4i ) == sizeof( i64 ) * 8 );
+static_assert( sizeof( AABB4u ) == sizeof( u64 ) * 8 );
 
-static_assert( alignof( AABB2f ) == alignof( float ) * 2 );
-static_assert( alignof( AABB2d ) == alignof( double ) * 2 );
-static_assert( alignof( AABB2i ) == alignof( int64_t ) * 2 );
-static_assert( alignof( AABB2u ) == alignof( uint64_t ) * 2 );
+static_assert( alignof( AABB2f ) == alignof( f32 ) * 2 );
+static_assert( alignof( AABB2d ) == alignof( f64 ) * 2 );
+static_assert( alignof( AABB2i ) == alignof( i64 ) * 2 );
+static_assert( alignof( AABB2u ) == alignof( u64 ) * 2 );
 
-static_assert( alignof( AABB3f ) == alignof( float ) * 2 );
-static_assert( alignof( AABB3d ) == alignof( double ) * 2 );
-static_assert( alignof( AABB3i ) == alignof( int64_t ) * 2 );
-static_assert( alignof( AABB3u ) == alignof( uint64_t ) * 2 );
+static_assert( alignof( AABB3f ) == alignof( f32 ) * 2 );
+static_assert( alignof( AABB3d ) == alignof( f64 ) * 2 );
+static_assert( alignof( AABB3i ) == alignof( i64 ) * 2 );
+static_assert( alignof( AABB3u ) == alignof( u64 ) * 2 );
 
-static_assert( alignof( AABB4f ) == alignof( float ) * 4 );
-static_assert( alignof( AABB4d ) == alignof( double ) * 4 );
-static_assert( alignof( AABB4i ) == alignof( int64_t ) * 4 );
-static_assert( alignof( AABB4u ) == alignof( uint64_t ) * 4 );
+static_assert( alignof( AABB4f ) == alignof( f32 ) * 4 );
+static_assert( alignof( AABB4d ) == alignof( f64 ) * 4 );
+static_assert( alignof( AABB4i ) == alignof( i64 ) * 4 );
+static_assert( alignof( AABB4u ) == alignof( u64 ) * 4 );
 
 
 

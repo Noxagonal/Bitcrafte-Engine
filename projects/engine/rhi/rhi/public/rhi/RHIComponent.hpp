@@ -36,7 +36,7 @@ public:
 	virtual List<Text>													GetGraphicsCardList() = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual int64_t														GetPrimaryGraphicsCardIndex() = 0;
+	virtual i64															GetPrimaryGraphicsCardIndex() = 0;
 };
 
 

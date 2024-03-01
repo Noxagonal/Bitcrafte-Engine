@@ -840,20 +840,20 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( Array )<uint32_t, 5> ) == sizeof( uint32_t ) * 5 );
-static_assert( sizeof( BC_CONTAINER_NAME( Array )<uint32_t, 1> ) == sizeof( uint32_t ) * 1 );
+static_assert( sizeof( BC_CONTAINER_NAME( Array )<u32, 5> ) == sizeof( u32 ) * 5 );
+static_assert( sizeof( BC_CONTAINER_NAME( Array )<u32, 1> ) == sizeof( u32 ) * 1 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill concept requirements.
-static_assert( utility::ContainerView<BC_CONTAINER_NAME( Array )<uint32_t, 4>> );
-static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( Array )<uint32_t, 4>> );
-static_assert( utility::Container<BC_CONTAINER_NAME( Array )<uint32_t, 4>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( Array )<u32, 4>> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( Array )<u32, 4>> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Array )<u32, 4>> );
 
-static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( Array )<uint32_t, 4>> );
-static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( Array )<uint32_t, 4>> );
-static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Array )<uint32_t, 4>> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( Array )<u32, 4>> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( Array )<u32, 4>> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Array )<u32, 4>> );
 
 static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( Array )<char32_t, 4>> );
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( Array )<char32_t, 4>> );

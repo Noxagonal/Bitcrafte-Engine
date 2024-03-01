@@ -61,11 +61,11 @@ bc::rhi::VulkanDevice::VulkanDevice(
 	device_create_info.sType					= VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	device_create_info.pNext					= &enabled_11_features;
 	device_create_info.flags					= 0;
-	device_create_info.queueCreateInfoCount		= uint32_t( device_queue_create_info_list.Size() );
+	device_create_info.queueCreateInfoCount		= u32( device_queue_create_info_list.Size() );
 	device_create_info.pQueueCreateInfos		= device_queue_create_info_list.Data();
 	device_create_info.enabledLayerCount		= 0;
 	device_create_info.ppEnabledLayerNames		= nullptr;
-	device_create_info.enabledExtensionCount	= uint32_t( enabled_extension_names_c_str.Size() );
+	device_create_info.enabledExtensionCount	= u32( enabled_extension_names_c_str.Size() );
 	device_create_info.ppEnabledExtensionNames	= enabled_extension_names_c_str.Data();
 	device_create_info.pEnabledFeatures			= &features;
 

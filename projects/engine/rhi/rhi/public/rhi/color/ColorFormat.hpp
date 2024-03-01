@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/data_types/FundamentalTypes.hpp>
+
 #include <cstdint>
 
 
@@ -11,7 +13,7 @@ namespace rhi {
 
 
 
-enum class ColorFormat : uint32_t
+enum class ColorFormat : u32
 {
 	NONE			= 0,
 

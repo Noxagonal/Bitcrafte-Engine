@@ -38,7 +38,7 @@ struct BC_CONTAINER_NAME( MapNode )
 	BC_CONTAINER_NAME( MapNode )																	*	parent;
 	BC_CONTAINER_NAME( MapNode )																	*	left;
 	BC_CONTAINER_NAME( MapNode )																	*	right;
-	int64_t																								height;
+	i64																									height;
 	BC_CONTAINER_NAME( Pair )<KeyType, ValueType>														data;
 };
 
@@ -1378,7 +1378,7 @@ private:
 		while( node ) {
 			bool was_root = node == this->root_node;
 			this->RecalculateHeight( node );
-			int64_t balance = this->GetNodeBalance( node );
+			i64 balance = this->GetNodeBalance( node );
 
 			if( balance > +1 ) {
 				if( this->GetNodeBalance( node->left ) < 0 ) {
@@ -1405,18 +1405,18 @@ private:
 		Node																						*	node
 	) noexcept
 	{
-		int64_t left_height = node->left ? ( node->left->height ) : int64_t( 0 );
-		int64_t right_height = node->right ? ( node->right->height ) : int64_t( 0 );
+		i64 left_height = node->left ? ( node->left->height ) : i64( 0 );
+		i64 right_height = node->right ? ( node->right->height ) : i64( 0 );
 		node->height = std::max( left_height, right_height ) + 1;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr int64_t																					GetNodeBalance(
+	constexpr i64																						GetNodeBalance(
 		Node																						*	node
 	) const noexcept
 	{
-		int64_t left_height = node->left ? ( node->left->height ) : int64_t( 0 );
-		int64_t right_height = node->right ? ( node->right->height ) : int64_t( 0 );
+		i64 left_height = node->left ? ( node->left->height ) : i64( 0 );
+		i64 right_height = node->right ? ( node->right->height ) : i64( 0 );
 		return left_height - right_height;
 	}
 
@@ -1521,11 +1521,11 @@ public:
 			assert( 0 && "Node pointer invalid" );
 		}
 	}
-	int64_t CheckMaxImbalance( Node * node = nullptr ) const
+	i64 CheckMaxImbalance( Node * node = nullptr ) const
 	{
-		int64_t result = 0;
-		int64_t left_height = 0;
-		int64_t right_height = 0;
+		i64 result = 0;
+		i64 left_height = 0;
+		i64 right_height = 0;
 		if( node == nullptr ) node = this->root_node;
 		if( node->left ) {
 			result = std::max( result, CheckMaxImbalance( node->left ) );
@@ -1569,21 +1569,21 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if map container fulfills size requirements.
-static_assert( sizeof( container_bases::BC_CONTAINER_NAME( MapIteratorBase )<uint32_t, uint32_t, true> ) == 16 );
-static_assert( sizeof( container_bases::BC_CONTAINER_NAME( MapIteratorBase )<uint32_t, uint32_t, false> ) == 16 );
+static_assert( sizeof( container_bases::BC_CONTAINER_NAME( MapIteratorBase )<u32, u32, true> ) == 16 );
+static_assert( sizeof( container_bases::BC_CONTAINER_NAME( MapIteratorBase )<u32, u32, false> ) == 16 );
 
-static_assert( sizeof( BC_CONTAINER_NAME( Map )<uint32_t, uint32_t> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( Map )<u32, u32> ) == 16 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if map container fulfills concept requirements.
-static_assert( utility::ContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( utility::Container<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
-static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( Map )<uint32_t, uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( Map )<u32, u32>> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( Map )<u32, u32>> );
+static_assert( utility::Container<BC_CONTAINER_NAME( Map )<u32, u32>> );
+static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( Map )<u32, u32>> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( Map )<u32, u32>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( Map )<u32, u32>> );
 
 
 

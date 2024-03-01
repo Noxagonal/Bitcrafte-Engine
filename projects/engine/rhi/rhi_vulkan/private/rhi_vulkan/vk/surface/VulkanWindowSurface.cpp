@@ -110,7 +110,7 @@ bc::rhi::VulkanWindowSurface::VulkanWindowSurface(
 	auto GetSurfaceFormats = [ &rhi_vulkan_impl ]( VkSurfaceKHR surface ) -> List<VkSurfaceFormatKHR>
 		{
 			List<VkSurfaceFormatKHR> result;
-			uint32_t surface_format_count = 0;
+			u32 surface_format_count = 0;
 			BAssertVkResult( vkGetPhysicalDeviceSurfaceFormatsKHR(
 				rhi_vulkan_impl.GetVulkanDevice().GetVulkanPhysicalDevice(),
 				surface,

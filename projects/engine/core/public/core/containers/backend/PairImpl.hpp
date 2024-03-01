@@ -124,7 +124,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if pair container fulfills size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( Pair )<uint32_t, uint32_t> ) == ( sizeof( uint32_t ) + sizeof( uint32_t ) ) );
+static_assert( sizeof( BC_CONTAINER_NAME( Pair )<u32, u32> ) == ( sizeof( u32 ) + sizeof( u32 ) ) );
 
 
 

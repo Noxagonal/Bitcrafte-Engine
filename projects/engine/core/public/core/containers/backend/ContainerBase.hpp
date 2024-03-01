@@ -1,6 +1,7 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
+#include <core/data_types/FundamentalTypes.hpp>
 #include <core/diagnostic/assertion/HardAssert.hpp>
 #include <core/memory/raw/RawMemory.hpp>
 #include <core/utility/concepts/ContainerConcepts.hpp>
@@ -397,7 +398,7 @@ protected:
 		// Fill destructed object memory range with byte 0xCB. This is used to catch errors in development builds.
 		if( !std::is_constant_evaluated() )
 		{
-			auto uninitialize_memory_ptr = reinterpret_cast<uint8_t*>( location );
+			auto uninitialize_memory_ptr = reinterpret_cast<u8*>( location );
 			for( size_t i = 0; i < element_count * sizeof( ValueType ); ++i )
 			{
 				uninitialize_memory_ptr[ i ] = 0xCB;

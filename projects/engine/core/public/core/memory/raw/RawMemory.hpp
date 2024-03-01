@@ -57,7 +57,7 @@ inline size_t											CalculateSystemMemoryAllocationInfoInfoChecksum(
 	#if BITCRAFTE_DEVELOPMENT_BUILD
 	// Checksum calculation is disabled for shipping builds, errors should have been caught in development builds.
 
-	auto bytes = reinterpret_cast<const uint8_t*>( &allocation_info );
+	auto bytes = reinterpret_cast<const u8*>( &allocation_info );
 	auto size = sizeof( SystemMemoryAllocationInfo ) - sizeof( size_t );
 	size_t checksum = 0xDEADBEEFDEADBEEF;
 	for( size_t i = 0; i < size; ++i )
@@ -185,7 +185,7 @@ inline SystemMemoryAllocationInfo						CalculateSystemMemoryAllocationInfoFromSy
 	auto allocation_info							= SystemMemoryAllocationInfo {};
 	allocation_info.system_allocated_location		= system_allocated_location;
 	allocation_info.payload_location				= AlignMemoryToRequirement(
-		reinterpret_cast<uint8_t*>( system_allocated_location ) + sizeof( SystemMemoryAllocationInfo ),
+		reinterpret_cast<u8*>( system_allocated_location ) + sizeof( SystemMemoryAllocationInfo ),
 		std::max( payload_alignment_requirement, alignof( SystemMemoryAllocationInfo ) )
 	);
 	allocation_info.system_allocation_size			= system_allocated_size;
@@ -245,7 +245,7 @@ inline const SystemMemoryAllocationInfo				*	GetSystemMemoryAllocationInfoFromRa
 	auto raw_ptr_position = reinterpret_cast<uintptr_t>( raw_location );
 	if( raw_ptr_position % alignof( SystemMemoryAllocationInfo ) ) return nullptr; // raw_location isn't aligned to SystemMemoryAllocationInfo, which is the minimum, return.
 
-	auto raw_location_bytes = reinterpret_cast<const uint8_t*>( raw_location );
+	auto raw_location_bytes = reinterpret_cast<const u8*>( raw_location );
 
 	auto allocation_info = reinterpret_cast<const SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
 
@@ -282,7 +282,7 @@ inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPoin
 		return nullptr;
 	}
 
-	auto raw_location_bytes = reinterpret_cast<uint8_t*>( raw_location );
+	auto raw_location_bytes = reinterpret_cast<u8*>( raw_location );
 
 	auto allocation_info = reinterpret_cast<SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
 

@@ -60,7 +60,7 @@ bc::rhi::VulkanPhysicalDevice::VulkanPhysicalDevice(
 			return result;
 		};
 
-	auto family_count = uint32_t {};
+	auto family_count = u32 {};
 	vkGetPhysicalDeviceQueueFamilyProperties2( vk_physical_device, &family_count, nullptr );
 	queue_family_properties.queue_family_properties.Resize( family_count );
 	for( auto & p : queue_family_properties.queue_family_properties )

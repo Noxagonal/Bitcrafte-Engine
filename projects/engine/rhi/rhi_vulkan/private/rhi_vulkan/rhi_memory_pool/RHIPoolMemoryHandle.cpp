@@ -15,9 +15,9 @@ bc::rhi::RHIPoolMemoryHandle::RHIPoolMemoryHandle(
 	VkDeviceSize					offset,
 	VkDeviceSize					size,
 	VkDeviceSize					alignment,
-	uint64_t						chunk_id,
-	uint64_t						block_id,
-	uint32_t						memory_type_index,
+	u64								chunk_id,
+	u64								block_id,
+	u32								memory_type_index,
 	VkMemoryPropertyFlagBits		property_flags,
 	bool							is_linear
 ) :

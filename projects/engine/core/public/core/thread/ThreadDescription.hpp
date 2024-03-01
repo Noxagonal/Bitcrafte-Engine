@@ -16,12 +16,12 @@ namespace thread {
 
 
 
-using ThreadIdentifier = uint64_t;
+using ThreadIdentifier = u64;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class WorkerThreadState : uint32_t
+enum class WorkerThreadState : u32
 {
 	UNINITIALIZED		= 0,
 	RUNNING,

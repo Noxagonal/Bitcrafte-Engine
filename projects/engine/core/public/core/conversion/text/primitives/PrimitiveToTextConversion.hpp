@@ -28,14 +28,14 @@ concept BoolToTextConvertible = std::is_same_v<ValueType, bool>;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename ValueType>
 concept IntegerToTextConvertible =
-std::is_same_v<ValueType, int8_t> ||
-std::is_same_v<ValueType, uint8_t> ||
-std::is_same_v<ValueType, int16_t> ||
-std::is_same_v<ValueType, uint16_t> ||
-std::is_same_v<ValueType, int32_t> ||
-std::is_same_v<ValueType, uint32_t> ||
-std::is_same_v<ValueType, int64_t> ||
-std::is_same_v<ValueType, uint64_t>;
+std::is_same_v<ValueType, i8> ||
+std::is_same_v<ValueType, u8> ||
+std::is_same_v<ValueType, i16> ||
+std::is_same_v<ValueType, u16> ||
+std::is_same_v<ValueType, i32> ||
+std::is_same_v<ValueType, u32> ||
+std::is_same_v<ValueType, i64> ||
+std::is_same_v<ValueType, u64>;
 
 
 
@@ -189,12 +189,12 @@ constexpr size_t								PrimitiveToText(
 /// Tells how floating point numbers should be represented as text.
 /// 
 ///	These can be used together. Eg SCIENTIFIC | HEX;
-enum class FloatToTextConversionFormat : uint32_t
+enum class FloatToTextConversionFormat : u32
 {
-	GENERAL			= static_cast<uint32_t>( std::chars_format::general ),		///< Uses fixed format for smaller values and scientific format for larger values. (Default)
-	SCIENTIFIC		= static_cast<uint32_t>( std::chars_format::scientific ),	///< Output scientific notation, use mantissa/exponent.
-	FIXED			= static_cast<uint32_t>( std::chars_format::fixed ),		///< Always use fixed format, regardless how big the value is.
-	HEX				= static_cast<uint32_t>( std::chars_format::hex ),			///< Output as hexadecimal floating point. (lowercase hexadecimal letters, does not append "0x")
+	GENERAL			= static_cast<u32>( std::chars_format::general ),		///< Uses fixed format for smaller values and scientific format for larger values. (Default)
+	SCIENTIFIC		= static_cast<u32>( std::chars_format::scientific ),	///< Output scientific notation, use mantissa/exponent.
+	FIXED			= static_cast<u32>( std::chars_format::fixed ),		///< Always use fixed format, regardless how big the value is.
+	HEX				= static_cast<u32>( std::chars_format::hex ),			///< Output as hexadecimal floating point. (lowercase hexadecimal letters, does not append "0x")
 };
 inline FloatToTextConversionFormat operator|( FloatToTextConversionFormat a, FloatToTextConversionFormat b )
 {
