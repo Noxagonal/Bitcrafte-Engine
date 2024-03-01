@@ -11,7 +11,13 @@ namespace scene {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Provides runtime storage for meshes.
+/// Provides runtime storage for meshes in RAM.
+///
+/// This class is used to store, copy and access mesh data. This is useful when mesh data is shared between objects, no more
+/// than 1 copy is kept in RAM. eg. Static meshes.
+///
+/// Mesh data may also be duplicated in cases where mesh data must be unique per object that needs it. eg. Dynamic meshes that
+/// are modified by the CPU.
 class MeshStorage
 {
 public:

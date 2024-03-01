@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <core/math/linear_algebra/Vector.hpp>
+#include <core/math/Vector.hpp>
 
 
 
@@ -14,11 +14,19 @@ namespace scene {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct Vertex
 {
-	math::Vector4f		position;
-	math::Vector4f		normal;
-	math::Vector4f		color;
-	math::Vector2f		UV;
+	math::Vec4f32											position;
+	math::Vec4f32											normal;
+	math::Vec4f32											color;
+	math::Vec2f32											uv;
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Vertex														MakeVertex(
+	math::Vec4f32											position,
+	math::Vec4f32											normal,
+	math::Vec4f32											color,
+	math::Vec2f32											uv
+) noexcept;
 
 
 
