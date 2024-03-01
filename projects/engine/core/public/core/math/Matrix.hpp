@@ -2,8 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/utility/concepts/ValueConcepts.hpp>
-#include <core/utility/math/SmallValues.hpp>
-#include <core/math/linear_algebra/Vector.hpp>
+#include <core/math/SmallValues.hpp>
+#include <core/math/Vector.hpp>
 
 #include <cstdint>
 #include <type_traits>

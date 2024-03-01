@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/utility/concepts/ValueConcepts.hpp>
-#include <core/utility/math/SmallValues.hpp>
+#include <core/math/SmallValues.hpp>
 
 #include <cstdint>
 #include <cfloat>
@@ -11,7 +11,7 @@
 
 
 namespace bc {
-namespace utility {
+namespace math {
 
 
 
@@ -47,7 +47,7 @@ constexpr bool							AreValuesWithinRange(
 /// Used to get around floating point precision errors.
 ///
 /// @note
-/// Uses bc::utility::GetSmallValue() function to get the small value to test for range.
+/// Uses bc::math::GetSmallValue() function to get the small value to test for range.
 ///
 /// @tparam ValueType
 /// Floating point type.
@@ -68,5 +68,5 @@ constexpr bool							IsFloatEqual(
 
 
 
-} // utility
+} // math
 } // bc

@@ -8,7 +8,7 @@
 
 
 namespace bc {
-namespace utility {
+namespace math {
 
 
 

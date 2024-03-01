@@ -2,8 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/utility/concepts/ValueConcepts.hpp>
-#include <core/utility/math/SmallValues.hpp>
-#include <core/utility/math/FundamentalComparison.hpp>
+#include <core/math/SmallValues.hpp>
+#include <core/math/FundamentalComparison.hpp>
 #include <core/diagnostic/exception/Exception.hpp>
 
 #include <cstdint>
