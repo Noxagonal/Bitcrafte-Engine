@@ -65,7 +65,7 @@ template<
 	utility::TextContainerView					TextContainerType,
 	internal::TextToBoolConvertible				ValueType
 >
-constexpr size_t								TextToPrimitive(
+constexpr u64								TextToPrimitive(
 	ValueType								&	out_value,
 	const TextContainerType					&	in_text
 )
@@ -163,7 +163,7 @@ template<
 	utility::TextContainerView					TextContainerType,
 	internal::TextToIntegerConvertible			ValueType
 >
-constexpr size_t								TextToPrimitive(
+constexpr u64								TextToPrimitive(
 	ValueType								&	out_value,
 	const TextContainerType					&	in_text,
 	TextToIntegerConversionFormat				text_format		= TextToIntegerConversionFormat::AUTOMATIC
@@ -173,7 +173,7 @@ constexpr size_t								TextToPrimitive(
 	using ASCIIType				= typename TextContainerType::template ThisContainerFullType<char>;
 	using ASCIIViewType			= typename ASCIIType::template ThisViewType<true>;
 
-	auto FixEndPosition = []( ASCIIViewType in_text_view, size_t end_position ) -> size_t
+	auto FixEndPosition = []( ASCIIViewType in_text_view, u64 end_position ) -> u64
 	{
 		// On success, std::from_chars either returns pointer to the first non-number, or a pointer to
 		// the last number, depending on if the text contained only numbers. Here we fix it so that
@@ -195,7 +195,7 @@ constexpr size_t								TextToPrimitive(
 
 		} else {
 			in_buffer.Resize( in_text.Size() );
-			for( size_t i = 0; i < in_text.Size(); i++ ) {
+			for( u64 i = 0; i < in_text.Size(); i++ ) {
 				in_buffer[ i ] = char( std::tolower( in_text[ i ] ) );
 			}
 			in_buffer_view = in_buffer;
@@ -239,7 +239,7 @@ constexpr size_t								TextToPrimitive(
 	if constexpr( std::is_same_v<char, CharacterType> || std::is_same_v<char8_t, CharacterType> ) {
 		if( std::underlying_type_t<TextToIntegerConversionFormat>( text_format ) >
 			std::underlying_type_t<TextToIntegerConversionFormat>( TextToIntegerConversionFormat::DECIMAL ) ) {
-			for( size_t i = 0; i < in_buffer.Size(); i++ ) {
+			for( u64 i = 0; i < in_buffer.Size(); i++ ) {
 				in_buffer[ i ] = tolower( in_buffer[ i ] );
 			}
 		}
@@ -252,7 +252,7 @@ constexpr size_t								TextToPrimitive(
 		int( text_format )
 	);
 	if( result.ec == std::errc() ) {
-		size_t end_position = result.ptr - in_buffer_view.Data();
+		u64 end_position = result.ptr - in_buffer_view.Data();
 		return FixEndPosition( in_buffer_view, end_position );
 	}
 	if( result.ec == std::errc::result_out_of_range ) {
@@ -264,7 +264,7 @@ constexpr size_t								TextToPrimitive(
 		// Value was larger than this primitive type can hold, set the value to maximum.
 		out_value = std::numeric_limits<CharacterType>::max();
 
-		size_t end_position = result.ptr - in_buffer_view.Data();
+		u64 end_position = result.ptr - in_buffer_view.Data();
 		return end_position;
 	}
 
@@ -312,7 +312,7 @@ template<
 	utility::TextContainerView					TextContainerType,
 	internal::TextToFloatingConvertible			ValueType
 >
-constexpr size_t								TextToPrimitive(
+constexpr u64									TextToPrimitive(
 	ValueType								&	out_value,
 	const TextContainerType					&	in_text,
 	TextToFloatConversionFormat					text_format				= TextToFloatConversionFormat::AUTOMATIC
@@ -322,7 +322,7 @@ constexpr size_t								TextToPrimitive(
 	using ASCIIType				= typename TextContainerType::template NonViewBaseType<char>;
 	using ASCIIViewType			= typename ASCIIType::ViewType;
 
-	auto FixEndPosition = []( ASCIIViewType in_text_view, size_t end_position ) -> size_t
+	auto FixEndPosition = []( ASCIIViewType in_text_view, u64 end_position ) -> u64
 	{
 		// On success, std::from_chars either returns pointer to the first non-number, or a pointer to
 		// the last number, depending on if the text contained only numbers. Here we fix it so that
@@ -344,7 +344,7 @@ constexpr size_t								TextToPrimitive(
 
 		} else {
 			in_buffer.Resize( in_text.Size() );
-			for( size_t i = 0; i < in_text.Size(); i++ ) {
+			for( u64 i = 0; i < in_text.Size(); i++ ) {
 				in_buffer[ i ] = char( std::tolower( in_text[ i ] ) );
 			}
 			in_buffer_view = in_buffer;
@@ -375,7 +375,7 @@ constexpr size_t								TextToPrimitive(
 	if constexpr( std::is_same_v<char, CharacterType> || std::is_same_v<char8_t, CharacterType> ) {
 		if( std::underlying_type_t<TextToFloatConversionFormat>( text_format ) &
 			std::underlying_type_t<TextToFloatConversionFormat>( TextToFloatConversionFormat::HEX ) ) {
-			for( size_t i = 0; i < in_buffer.Size(); i++ ) {
+			for( u64 i = 0; i < in_buffer.Size(); i++ ) {
 				in_buffer[ i ] = tolower( in_buffer[ i ] );
 			}
 		}
@@ -395,7 +395,7 @@ constexpr size_t								TextToPrimitive(
 		);
 
 		if( result.ec == std::errc() ) {
-			size_t end_position = result.ptr - in_buffer_view.Data();
+			u64 end_position = result.ptr - in_buffer_view.Data();
 			return FixEndPosition( in_buffer_view, end_position );
 		}
 	}

@@ -16,8 +16,8 @@ namespace internal {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainerView TextContainerType>
 constexpr void															TextFormat_Collector(
-	size_t																current_argument,
-	size_t																requested_argument,
+	u64																	current_argument,
+	u64																	requested_argument,
 	typename TextContainerType::ThisFullType						&	out,
 	TextContainerType													parse_text
 )
@@ -30,8 +30,8 @@ template<
 	typename															...RestTypePack
 >
 constexpr void															TextFormat_Collector(
-	size_t																current_argument,
-	size_t																requested_argument,
+	u64																	current_argument,
+	u64																	requested_argument,
 	typename TextContainerType::ThisFullType						&	out,
 	TextContainerType													parse_text,
 	const FirstType													&	first,
@@ -131,11 +131,11 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 	using TextContainerConstViewType = typename TextContainerType::template ThisViewType<true>;
 	using TextContainerCharacterType = typename TextContainerType::ContainedCharacterType;
 
-	constexpr size_t args_count = sizeof...( ArgumentsTypePack );
+	constexpr u64 args_count = sizeof...( ArgumentsTypePack );
 	TextContainerFullType out_buffer;
 	out_buffer.Reserve( 256 );
 
-	size_t current_argument = 0;
+	u64 current_argument = 0;
 	TextContainerConstViewType argument_parse_text;
 
 	// TODO: Get rid of std::from_chars and std::isdigit inside TextFormat function

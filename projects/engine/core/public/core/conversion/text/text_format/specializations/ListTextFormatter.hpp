@@ -35,7 +35,7 @@ public:
 	{
 		out.PushBack( '[' );
 		if( in.Size() ) {
-			for( size_t i = 0; i < in.Size() - 1; ++i ) {
+			for( u64 i = 0; i < in.Size() - 1; ++i ) {
 				sub_formatter.Format( out, in[ i ] );
 				out.Append( ", " );
 			}
@@ -72,7 +72,7 @@ public:
 	{
 		out.PushBack( '[' );
 		if( in.Size() ) {
-			for( size_t i = 0; i < in.Size() - 1; ++i ) {
+			for( u64 i = 0; i < in.Size() - 1; ++i ) {
 				sub_formatter.Format( out, in[ i ] );
 				out.Append( ", " );
 			}

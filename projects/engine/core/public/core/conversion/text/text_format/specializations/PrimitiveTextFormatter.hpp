@@ -140,7 +140,7 @@ public:
 template<
 	utility::TextContainerView				OutTextContainerType,
 	FormatterCStringType					ValueTextType,
-	size_t									StringArraySize
+	u64										StringArraySize
 >
 class TextFormatter<OutTextContainerType, ValueTextType[ StringArraySize ]>
 {
@@ -215,8 +215,7 @@ std::is_same_v<T, u16> ||
 std::is_same_v<T, i32> ||
 std::is_same_v<T, u32> ||
 std::is_same_v<T, i64> ||
-std::is_same_v<T, u64> ||
-std::is_same_v<T, size_t>;
+std::is_same_v<T, u64>;
 
 
 
@@ -296,8 +295,8 @@ public:
 			conversion::PrimitiveToText( buffer, in, base );
 			if( buffer.Size() < zero_fill )
 			{
-				size_t add_count = zero_fill - buffer.Size();
-				for( size_t i = 0; i < add_count; ++i )
+				u64 add_count = zero_fill - buffer.Size();
+				for( u64 i = 0; i < add_count; ++i )
 				{
 					out.PushBack( '0' );
 				}
@@ -415,7 +414,7 @@ public:
 			REMAINDER,
 		};
 		ParseState parse_state = ParseState::WHOLE;
-		for( size_t i = 0; i < buffer.Size(); ++i )
+		for( u64 i = 0; i < buffer.Size(); ++i )
 		{
 			auto c = buffer[ i ];
 
@@ -438,7 +437,7 @@ public:
 					parse_state = ParseState::REMAINDER;
 					if( decimals_set )
 					{
-						for( size_t d = 0; d < remaining_decimals; ++d )
+						for( u64 d = 0; d < remaining_decimals; ++d )
 						{
 							out.PushBack( '0' );
 						}

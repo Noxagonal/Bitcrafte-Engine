@@ -12,7 +12,7 @@ namespace text {
 
 template<
 	utility::TextContainerCharacterType									CharacterType,
-	size_t 																CharacterArraySize,
+	u64																	CharacterArraySize,
 	typename															...ArgumentsTypePack
 >
 constexpr bc::internal::SimpleTextBase<CharacterType>					TextFormat(

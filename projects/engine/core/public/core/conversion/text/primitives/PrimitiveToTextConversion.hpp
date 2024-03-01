@@ -14,8 +14,8 @@ namespace internal {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr size_t primitive_to_text_conversion_integer_reserve_space = 64;
-constexpr size_t primitive_to_text_conversion_floating_reserve_space = 32;
+constexpr u64 primitive_to_text_conversion_integer_reserve_space = 64;
+constexpr u64 primitive_to_text_conversion_floating_reserve_space = 32;
 
 
 
@@ -79,7 +79,7 @@ template<
 	utility::TextContainer						TextContainerType,
 	internal::BoolToTextConvertible				ValueType
 >
-constexpr size_t								PrimitiveToText(
+constexpr u64									PrimitiveToText(
 	TextContainerType						&	append_to,
 	const ValueType								value
 )
@@ -129,7 +129,7 @@ template<
 	utility::TextContainer						TextContainerType,
 	internal::IntegerToTextConvertible			ValueType
 >
-constexpr size_t								PrimitiveToText(
+constexpr u64									PrimitiveToText(
 	TextContainerType						&	append_to,
 	const ValueType								value,
 	IntegerToTextConversionFormat				text_format		= IntegerToTextConversionFormat::DECIMAL
@@ -138,7 +138,7 @@ constexpr size_t								PrimitiveToText(
 	using ContainerBaseCharType = typename TextContainerType::template ThisContainerFullType<char>;
 	using TextContainerCharacterType = typename TextContainerType::ContainedCharacterType;
 
-	size_t write_length;
+	u64 write_length;
 
 	if constexpr( std::is_same_v<TextContainerCharacterType, char> ) {
 		auto original_size	= append_to.Size();
@@ -235,7 +235,7 @@ template<
 	utility::TextContainer						TextContainerType,
 	internal::FloatingToTextConvertible			ValueType
 >
-constexpr size_t								PrimitiveToText(
+constexpr u64									PrimitiveToText(
 	TextContainerType						&	append_to,
 	const ValueType								value,
 	FloatToTextConversionFormat					text_format		= FloatToTextConversionFormat::GENERAL
@@ -244,10 +244,10 @@ constexpr size_t								PrimitiveToText(
 	using ContainerBaseCharType = typename TextContainerType::template ThisContainerFullType<char>;
 	using TextContainerCharacterType = typename TextContainerType::ContainedCharacterType;
 
-	size_t write_length = 0;
+	u64 write_length = 0;
 	auto original_size	= append_to.Size();
 
-	auto Convert = [original_size, value, text_format]( ContainerBaseCharType & append_to, size_t reserve_space ) -> std::to_chars_result
+	auto Convert = [original_size, value, text_format]( ContainerBaseCharType & append_to, u64 reserve_space ) -> std::to_chars_result
 	{
 		append_to.Resize( original_size + reserve_space );
 		auto begin					= append_to.Data() + original_size;
