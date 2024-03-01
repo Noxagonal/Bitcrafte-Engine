@@ -2,6 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/math/SmallValues.hpp>
 #include <core/math/Vector.hpp>
 
 
@@ -57,6 +58,35 @@ constexpr bool														AreValuesWithinRange(
 			AreValuesWithinRange( v1.z, v2.z, range ) &&
 			AreValuesWithinRange( v1.w, v2.w, range );
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Checks if a floating point vectors are close enough to be considered equal.
+///
+/// Used to get around floating point precision errors.
+///
+/// @note
+/// Uses bc::math::GetSmallValue() function to get the small value to test for range.
+///
+/// @tparam ValueType
+/// Floating point type.
+///
+/// @param v1
+/// First value.
+///
+/// @param v2
+/// Value to test against v1 if it is close enough to it.
+template<
+	size_t															VectorLength,
+	utility::FundamentalType										VectorValueType
+>
+constexpr bool														IsFloatEqual(
+	const math::VectorBase<VectorLength, VectorValueType>		&	v1,
+	const math::VectorBase<VectorLength, VectorValueType>		&	v2
+) noexcept
+{
+	return AreValuesWithinRange( v1, v2, GetSmallValue<VectorValueType>() );
 }
 
 
