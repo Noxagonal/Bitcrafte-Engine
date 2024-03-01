@@ -228,7 +228,7 @@ bc::List<bc::rhi::VulkanPhysicalDevice> bc::rhi::VulkanInstance::FetchPhysicalDe
 
 	auto result = List<VulkanPhysicalDevice> {};
 	result.Reserve( vk_physical_devices.Size() );
-	for( size_t i = 0; i < vk_physical_devices.Size(); i++ )
+	for( u64 i = 0; i < vk_physical_devices.Size(); i++ )
 	{
 		result.EmplaceBack( rhi_vulkan_impl, vk_physical_devices[ i ] );
 	}

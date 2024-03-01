@@ -15,8 +15,8 @@
 
 void* VKAPI_PTR VulkanMemoryAllocationFunction(
 	void*										pUserData,
-	size_t										size,
-	size_t										alignment,
+	u64											size,
+	u64											alignment,
 	VkSystemAllocationScope						allocationScope
 )
 {
@@ -26,8 +26,8 @@ void* VKAPI_PTR VulkanMemoryAllocationFunction(
 void* VKAPI_PTR VulkanMemoryReallocationFunction(
 	void*										pUserData,
 	void*										pOriginal,
-	size_t										size,
-	size_t										alignment,
+	u64											size,
+	u64											alignment,
 	VkSystemAllocationScope						allocationScope
 )
 {
@@ -44,7 +44,7 @@ void VKAPI_PTR VulkanMemoryFreeFunction(
 
 void VKAPI_PTR VulkanMemoryInternalAllocationNotification(
 	void*										pUserData,
-	size_t										size,
+	u64											size,
 	VkInternalAllocationType					allocationType,
 	VkSystemAllocationScope						allocationScope
 )
@@ -52,7 +52,7 @@ void VKAPI_PTR VulkanMemoryInternalAllocationNotification(
 
 void VKAPI_PTR VulkanMemoryInternalFreeNotification(
 	void*										pUserData,
-	size_t										size,
+	u64											size,
 	VkInternalAllocationType					allocationType,
 	VkSystemAllocationScope						allocationScope
 )
@@ -144,7 +144,7 @@ bc::i64 bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice()
 	auto device_scores = [ &physical_device_list ]() -> List<u64>
 		{
 			List<u64> result( physical_device_list.Size() );
-			for( size_t i=0; i < physical_device_list.Size(); ++i )
+			for( u64 i=0; i < physical_device_list.Size(); ++i )
 			{
 				auto & pd = physical_device_list[ i ];
 				auto & s = result[ i ];
@@ -182,7 +182,7 @@ bc::i64 bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice()
 
 	auto best_physical_device_index		= i64{ -1 };
 	auto best_score_so_far				= u64 {};
-	for( size_t i = 0; i < physical_device_list.Size(); ++i )
+	for( u64 i = 0; i < physical_device_list.Size(); ++i )
 	{
 		if( device_scores[ i ] > best_score_so_far )
 		{

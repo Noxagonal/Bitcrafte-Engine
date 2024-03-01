@@ -42,7 +42,7 @@ bc::rhi::VulkanPhysicalDevice::VulkanPhysicalDevice(
 
 			#if BITCRAFTE_WINDOW_MANAGER_WIN32
 
-			for( size_t i = 0; i < queue_family_properties.Size(); ++i )
+			for( u64 i = 0; i < queue_family_properties.Size(); ++i )
 			{
 				result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR( vk_physical_device, i );
 			}

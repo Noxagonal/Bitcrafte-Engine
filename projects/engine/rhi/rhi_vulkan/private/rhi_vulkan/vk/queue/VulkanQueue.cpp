@@ -14,7 +14,7 @@ void bc::rhi::VulkanQueue::Submit(
 {
 	List<VkSemaphore>			wait_sem( wait_semaphores.Size() );
 	List<VkPipelineStageFlags>	wait_flags( wait_semaphores.Size() );
-	for( size_t i = 0; i < wait_semaphores.Size(); ++i )
+	for( u64 i = 0; i < wait_semaphores.Size(); ++i )
 	{
 		wait_sem[ i ]	= wait_semaphores[ i ].first;
 		wait_flags[ i ]	= wait_semaphores[ i ].second;
@@ -47,11 +47,11 @@ void bc::rhi::VulkanQueue::Submit(
 {
 	List<List<VkSemaphore>>				wait_sem( submit_infos.Size() );
 	List<List<VkPipelineStageFlags>>	wait_flags( submit_infos.Size() );
-	for( size_t s = 0; s < submit_infos.Size(); ++s )
+	for( u64 s = 0; s < submit_infos.Size(); ++s )
 	{
 		wait_sem[ s ].Resize( submit_infos[ s ].wait_semaphores.Size() );
 		wait_flags[ s ].Resize( submit_infos[ s ].wait_semaphores.Size() );
-		for( size_t i = 0; i < wait_sem[ i ].Size(); ++i )
+		for( u64 i = 0; i < wait_sem[ i ].Size(); ++i )
 		{
 			wait_sem[ s ][ i ]		= submit_infos[ s ].wait_semaphores[ i ].first;
 			wait_flags[ s ][ i ]	= submit_infos[ s ].wait_semaphores[ i ].second;
@@ -59,7 +59,7 @@ void bc::rhi::VulkanQueue::Submit(
 	}
 
 	List<VkSubmitInfo> vk_submit_infos( submit_infos.Size() );
-	for( size_t i = 0; i < submit_infos.Size(); ++i )
+	for( u64 i = 0; i < submit_infos.Size(); ++i )
 	{
 		vk_submit_infos[ i ].sType					= VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		vk_submit_infos[ i ].pNext					= nullptr;
@@ -91,7 +91,7 @@ void bc::rhi::VulkanQueue::Present(
 	List<u32> vk_swapchain_indices( swapchains.Size() );
 	List<VkResult> vk_swapchain_results( swapchains.Size() );
 
-	for( size_t i = 0; i < swapchains.Size(); ++i )
+	for( u64 i = 0; i < swapchains.Size(); ++i )
 	{
 		vk_swapchains[ i ]			= swapchains[ i ].swapchain;
 		vk_swapchain_indices[ i ]	= swapchains[ i ].image_index;

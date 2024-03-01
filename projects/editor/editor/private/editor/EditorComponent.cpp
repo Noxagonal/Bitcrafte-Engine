@@ -69,7 +69,7 @@ bc::editor::EditorComponent::EditorComponent()
 			auto gpus = engine->GetRHIComponent()->GetGraphicsCardList();
 			auto report = diagnostic::MakePrintRecord( U"GPUs found on system" );
 			report += diagnostic::MakePrintRecord( U"\n" );
-			for( size_t i = 0; i < gpus.Size(); i++ )
+			for( u64 i = 0; i < gpus.Size(); i++ )
 			{
 				report += diagnostic::MakePrintRecord_Argument( i, gpus[ i ] ).AddIndent();
 			}

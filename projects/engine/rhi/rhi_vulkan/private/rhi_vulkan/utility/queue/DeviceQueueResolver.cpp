@@ -25,7 +25,7 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	auto available_queues		= List<u32>( queue_family_properties.queue_family_properties.Size() );
 	// family allocations, outside List represents the queue family, inside List represents indices to the queue_types
 	auto family_allocations		= List<List<u32>>( queue_family_properties.queue_family_properties.Size() );
-	for( size_t i = 0; i < queue_family_properties.queue_family_properties.Size(); ++i )
+	for( u64 i = 0; i < queue_family_properties.queue_family_properties.Size(); ++i )
 	{
 		available_queues[ i ]	= queue_family_properties.queue_family_properties[ i ].queueFamilyProperties.queueCount;
 	}
@@ -77,9 +77,9 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 
 	// Check that everyone got a queue family
 	List<bool> queue_allocated_test( this->queue_types.Size() );
-	for( size_t a = 0; a < family_allocations.Size(); ++a )
+	for( u64 a = 0; a < family_allocations.Size(); ++a )
 	{
-		for( size_t b = 0; b < family_allocations[ a ].Size(); ++b )
+		for( u64 b = 0; b < family_allocations[ a ].Size(); ++b )
 		{
 			queue_allocated_test[ family_allocations[ a ][ b ] ] = true;
 		}
@@ -127,10 +127,10 @@ bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
 	// build queue create infos
 	queue_priorities.Resize( queue_family_properties.queue_family_properties.Size() );
 	queue_create_infos.Reserve( queue_family_properties.queue_family_properties.Size() );
-	for( size_t i = 0; i < queue_family_properties.queue_family_properties.Size(); ++i )
+	for( u64 i = 0; i < queue_family_properties.queue_family_properties.Size(); ++i )
 	{
 		queue_priorities[ i ].Resize( family_allocations[ i ].Size() );
-		for( size_t p = 0; p < family_allocations[ i ].Size(); ++p )
+		for( u64 p = 0; p < family_allocations[ i ].Size(); ++p )
 		{
 			queue_priorities[ i ][ p ] = this->queue_types[ family_allocations[ i ][ p ] ].second;
 		}
@@ -175,7 +175,7 @@ bc::List<bc::rhi::VulkanQueue> bc::rhi::DeviceQueueResolver::GetVulkanQueues(
 	}
 
 	// get the original queues first
-	for( size_t i=0; i < queue_get_info.Size(); ++i )
+	for( u64 i=0; i < queue_get_info.Size(); ++i )
 	{
 		if( queue_get_info[ i ].based_on == UINT32_MAX )
 		{
@@ -191,7 +191,7 @@ bc::List<bc::rhi::VulkanQueue> bc::rhi::DeviceQueueResolver::GetVulkanQueues(
 	}
 
 	// get the information for the shared queue after we know the originals
-	for( size_t i=0; i < queue_get_info.Size(); ++i )
+	for( u64 i=0; i < queue_get_info.Size(); ++i )
 	{
 		if( queue_get_info[ i ].based_on != UINT32_MAX )
 		{
