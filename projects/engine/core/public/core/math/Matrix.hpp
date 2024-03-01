@@ -17,7 +17,7 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t MatrixDimensions, utility::FundamentalType ValueType>
+template<u64 MatrixDimensions, utility::FundamentalType ValueType>
 class MatrixBase;
 
 
@@ -28,7 +28,7 @@ class alignas( sizeof( ValueType ) * 2 * 2 ) MatrixBase<2, ValueType>
 {
 public:
 
-	static constexpr size_t MatrixDimensions = 2;
+	static constexpr u64 MatrixDimensions = 2;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VectorBase<MatrixDimensions, ValueType>									column_1;
@@ -143,7 +143,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const VectorBase<MatrixDimensions, ValueType>				&	operator[](
-		size_t																index
+		u64																	index
 	) const
 	{
 		if( index == 0 ) return column_1;
@@ -157,7 +157,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase<MatrixDimensions, ValueType>					&	operator[](
-		size_t																index
+		u64																	index
 	)
 	{
 		if( index == 0 ) return column_1;
@@ -206,7 +206,7 @@ class MatrixBase<3, ValueType>
 {
 public:
 
-	static constexpr size_t MatrixDimensions = 3;
+	static constexpr u64 MatrixDimensions = 3;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VectorBase<MatrixDimensions, ValueType>									column_1;
@@ -332,7 +332,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const VectorBase<MatrixDimensions, ValueType>				&	operator[](
-		size_t																index
+		u64																	index
 	) const
 	{
 		if( index == 0 ) return column_1;
@@ -347,7 +347,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase<MatrixDimensions, ValueType>					&	operator[](
-		size_t																index
+		u64																	index
 	)
 	{
 		if( index == 0 ) return column_1;
@@ -399,7 +399,7 @@ class alignas( sizeof( ValueType ) * 4 * 4 ) MatrixBase<4, ValueType>
 {
 public:
 
-	static constexpr size_t MatrixDimensions = 4;
+	static constexpr u64 MatrixDimensions = 4;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VectorBase<MatrixDimensions, ValueType>									column_1;
@@ -536,7 +536,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const VectorBase<MatrixDimensions, ValueType>				&	operator[](
-		size_t																index
+		u64																	index
 	) const
 	{
 		if( index == 0 ) return column_1;
@@ -552,7 +552,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase<MatrixDimensions, ValueType>					&	operator[](
-		size_t																index
+		u64																	index
 	)
 	{
 		if( index == 0 ) return column_1;

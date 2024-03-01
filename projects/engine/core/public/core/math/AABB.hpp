@@ -30,14 +30,14 @@ namespace math {
 ///
 /// @tparam ValueType
 /// Value type of this bounding box.
-template<size_t AABBDimensionCount, utility::FundamentalType ValueType>
+template<u64 AABBDimensionCount, utility::FundamentalType ValueType>
 class alignas( sizeof( ValueType ) * 2 ) AABBBase
 {
 	static_assert( AABBDimensionCount >= 2 && AABBDimensionCount <= 4, "Invalid number of dimensions" );
 
 public:
 
-	static constexpr size_t DimensionCount = AABBDimensionCount;
+	static constexpr u64 DimensionCount = AABBDimensionCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -153,7 +153,7 @@ public:
 	/// @return
 	/// Reference to the vector which contains the coordinates to AABB corner.
 	constexpr const VectorBase<DimensionCount, ValueType>				&	operator[](
-		size_t																index
+		u64																	index
 	) const
 	{
 		if( std::is_constant_evaluated() )
@@ -183,7 +183,7 @@ public:
 	/// @return
 	/// Reference to the vector which contains the coordinates to AABB corner.
 	constexpr VectorBase<DimensionCount, ValueType>						&	operator[](
-		size_t																index
+		u64																	index
 	)
 	{
 		if( std::is_constant_evaluated() )

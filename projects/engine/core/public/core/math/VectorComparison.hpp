@@ -28,7 +28,7 @@ namespace utility {
 /// @param range
 /// Maximum distance between values for them to still be considered within range.
 template<
-	size_t															VectorLength,
+	u64																VectorLength,
 	utility::FundamentalType										VectorValueType
 >
 constexpr bool														AreValuesWithinRange(
@@ -78,7 +78,7 @@ constexpr bool														AreValuesWithinRange(
 /// @param v2
 /// Value to test against v1 if it is close enough to it.
 template<
-	size_t															VectorLength,
+	u64																VectorLength,
 	utility::FundamentalType										VectorValueType
 >
 constexpr bool														IsFloatEqual(

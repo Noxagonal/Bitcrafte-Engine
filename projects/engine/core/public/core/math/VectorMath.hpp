@@ -11,7 +11,7 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t DimensionCount, typename VectorValueType>
+template<u64 DimensionCount, typename VectorValueType>
 VectorValueType												Distance(
 	const VectorBase<DimensionCount, VectorValueType>	&	v1,
 	const VectorBase<DimensionCount, VectorValueType>	&	v2
@@ -23,7 +23,7 @@ VectorValueType												Distance(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t DimensionCount, typename VectorValueType>
+template<u64 DimensionCount, typename VectorValueType>
 VectorValueType												Dot(
 	const VectorBase<DimensionCount, VectorValueType>	&	v1,
 	const VectorBase<DimensionCount, VectorValueType>	&	v2
@@ -46,7 +46,7 @@ VectorValueType												Dot(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t DimensionCount, typename VectorValueType>
+template<u64 DimensionCount, typename VectorValueType>
 VectorValueType												Cross(
 	const VectorBase<DimensionCount, VectorValueType>	&	v1,
 	const VectorBase<DimensionCount, VectorValueType>	&	v2
@@ -56,7 +56,7 @@ VectorValueType												Cross(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t DimensionCount, typename VectorValueType>
+template<u64 DimensionCount, typename VectorValueType>
 VectorBase<DimensionCount, VectorValueType>					Cross(
 	const VectorBase<DimensionCount, VectorValueType>	&	v1,
 	const VectorBase<DimensionCount, VectorValueType>	&	v2

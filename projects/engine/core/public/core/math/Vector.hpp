@@ -18,7 +18,7 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t DimensionCount, utility::FundamentalType ValueType>
+template<u64 DimensionCount, utility::FundamentalType ValueType>
 class VectorBase;
 
 
@@ -29,7 +29,7 @@ class alignas( sizeof( ValueType ) * 2 ) VectorBase<2, ValueType>
 {
 public:
 
-	static constexpr size_t DimensionCount = 2;
+	static constexpr u64 DimensionCount = 2;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																x				= {};
@@ -56,7 +56,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr VectorBase(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
@@ -65,7 +65,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr VectorBase												&	operator=(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
@@ -225,7 +225,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const ValueType											&	operator[](
-		size_t																index
+		u64																	index
 	) const
 	{
 		if( index == 0 ) return x;
@@ -235,7 +235,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType													&	operator[](
-		size_t																index
+		u64																	index
 	)
 	{
 		if( index == 0 ) return x;
@@ -275,7 +275,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr void															CopyOther(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
@@ -296,7 +296,7 @@ class VectorBase<3, ValueType>
 {
 public:
 
-	static constexpr size_t DimensionCount = 3;
+	static constexpr u64 DimensionCount = 3;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																x				= {};
@@ -327,7 +327,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr VectorBase(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
@@ -336,7 +336,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr VectorBase												&	operator=(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
@@ -502,7 +502,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const ValueType											&	operator[](
-		size_t																index
+		u64																	index
 	) const
 	{
 		if( index == 0 ) return x;
@@ -513,7 +513,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType													&	operator[](
-		size_t																index
+		u64																	index
 	)
 	{
 		if( index == 0 ) return x;
@@ -555,7 +555,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr void															CopyOther(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) requires( OtherDimensionCount <= DimensionCount )
@@ -583,7 +583,7 @@ class alignas( sizeof( ValueType ) * 4 ) VectorBase<4, ValueType>
 {
 public:
 
-	static constexpr size_t DimensionCount = 4;
+	static constexpr u64 DimensionCount = 4;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																x					= {};
@@ -618,7 +618,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr VectorBase(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
@@ -627,7 +627,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr VectorBase												&	operator=(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
@@ -799,7 +799,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const ValueType											&	operator[](
-		size_t																index
+		u64																	index
 	) const
 	{
 		if( index == 0 ) return x;
@@ -811,7 +811,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType													&	operator[](
-		size_t																index
+		u64																	index
 	)
 	{
 		if( index == 0 ) return x;
@@ -855,7 +855,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<size_t OtherDimensionCount>
+	template<u64 OtherDimensionCount>
 	constexpr void															CopyOther(
 		const VectorBase<OtherDimensionCount, ValueType>				&	other
 	) noexcept requires( OtherDimensionCount <= DimensionCount )
