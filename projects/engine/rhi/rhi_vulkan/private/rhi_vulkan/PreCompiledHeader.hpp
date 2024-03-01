@@ -16,3 +16,6 @@
 #include <core/containers/Text.hpp>
 #include <core/containers/Pair.hpp>
 #include <core/containers/Map.hpp>
+
+// STL
+#include <bitset>
