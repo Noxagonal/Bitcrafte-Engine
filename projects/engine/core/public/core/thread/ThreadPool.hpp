@@ -370,7 +370,7 @@ public:
 	///
 	/// @return
 	/// Number of tasks queued.
-	size_t													GetTaskQueueCount() const;
+	u64														GetTaskQueueCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -378,7 +378,7 @@ public:
 	///
 	/// @return
 	/// Number of tasks being executed.
-	size_t													GetTaskRunningCount() const;
+	u64														GetTaskRunningCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -479,7 +479,7 @@ private:
 	List<ThreadIdentifier>									GetTaskThreadLockIDs()
 	{
 		List<ThreadIdentifier> ret;
-		for( size_t i = 0; i < thread_description_list.Size(); i++ )
+		for( u64 i = 0; i < thread_description_list.Size(); i++ )
 		{
 			if( dynamic_cast<ThreadType*>( thread_description_list[ i ]->pool_thread.Get() ) != nullptr )
 			{

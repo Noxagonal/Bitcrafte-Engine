@@ -255,7 +255,7 @@ void bc::thread::ThreadPool::RemoveThread(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-size_t bc::thread::ThreadPool::GetTaskQueueCount() const
+bc::u64 bc::thread::ThreadPool::GetTaskQueueCount() const
 {
 	auto lock_guard = std::lock_guard( thread_shared_data->task_list_mutex );
 
@@ -263,11 +263,11 @@ size_t bc::thread::ThreadPool::GetTaskQueueCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-size_t bc::thread::ThreadPool::GetTaskRunningCount() const
+bc::u64 bc::thread::ThreadPool::GetTaskRunningCount() const
 {
 	auto lock_guard = std::lock_guard( thread_shared_data->task_list_mutex );
 
-	auto result = size_t {};
+	auto result = u64 {};
 	for( auto & t : thread_shared_data->task_list )
 	{
 		if( t->state == TaskState::RUNNING ) ++result;
