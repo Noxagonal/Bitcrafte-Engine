@@ -3,6 +3,8 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/diagnostic/assertion/HardAssert.hpp>
 
+#include <core/data_types/FundamentalTypes.hpp>
+
 #include <type_traits>
 #include <memory>
 #include <stdint.h>
