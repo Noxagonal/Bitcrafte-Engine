@@ -10,6 +10,8 @@
 #error "Container implementation type not given"
 #endif
 
+#include <core/utility/concepts/LambdaConcepts.hpp>
+
 #include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 
@@ -678,6 +680,64 @@ public:
 			this,
 			this->DoErase( from.GetAddress(), to.GetAddress() )
 		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase value if callback return true.
+	///
+	///	Run for every element of the list and if callable returns true, that element is removed.
+	///
+	/// @note
+	/// This function goes through every element, it will not stop at the first occurrence.
+	/// 
+	/// @param callable
+	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
+	template<utility::CallableWithReturn<bool, const ValueType&> CallableType>
+	constexpr void																						EraseIf(
+		CallableType																					callable
+	) BC_CONTAINER_NOEXCEPT
+	{
+		auto it = begin();
+		while( it != end() )
+		{
+			if( callable( *it ) )
+			{
+				it = Erase( it );
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase first value if callback return true.
+	///
+	///	Run for every element of the list and if callable returns true, that element is removed.
+	///
+	/// @note
+	/// This function only erases the first found element and returns as soon as it is erased.
+	/// 
+	/// @param callable
+	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
+	template<utility::CallableWithReturn<bool, const ValueType&> CallableType>
+	constexpr void																						EraseFirstIf(
+		CallableType																					callable
+	) BC_CONTAINER_NOEXCEPT
+	{
+		auto it = begin();
+		while( it != end() )
+		{
+			if( callable( *it ) )
+			{
+				Erase( it );
+				return;
+			}
+			++it;
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
