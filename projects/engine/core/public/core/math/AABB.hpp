@@ -303,12 +303,12 @@ static_assert( alignof( AABB2u32 ) == alignof( u32 ) * 2 );
 static_assert( alignof( AABB2i64 ) == alignof( i64 ) * 2 );
 static_assert( alignof( AABB2u64 ) == alignof( u64 ) * 2 );
 
-static_assert( alignof( AABB3f32 ) == alignof( f32 ) * 2 );
-static_assert( alignof( AABB3f64 ) == alignof( f64 ) * 2 );
-static_assert( alignof( AABB3i32 ) == alignof( i32 ) * 2 );
-static_assert( alignof( AABB3u32 ) == alignof( u32 ) * 2 );
-static_assert( alignof( AABB3i64 ) == alignof( i64 ) * 2 );
-static_assert( alignof( AABB3u64 ) == alignof( u64 ) * 2 );
+static_assert( alignof( AABB3f32 ) == alignof( f32 ) * 1 );
+static_assert( alignof( AABB3f64 ) == alignof( f64 ) * 1 );
+static_assert( alignof( AABB3i32 ) == alignof( i32 ) * 1 );
+static_assert( alignof( AABB3u32 ) == alignof( u32 ) * 1 );
+static_assert( alignof( AABB3i64 ) == alignof( i64 ) * 1 );
+static_assert( alignof( AABB3u64 ) == alignof( u64 ) * 1 );
 
 static_assert( alignof( AABB4f32 ) == alignof( f32 ) * 4 );
 static_assert( alignof( AABB4f64 ) == alignof( f64 ) * 4 );
