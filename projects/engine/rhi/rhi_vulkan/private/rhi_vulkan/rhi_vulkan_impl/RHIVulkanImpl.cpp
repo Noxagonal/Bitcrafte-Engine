@@ -15,8 +15,8 @@
 
 void* VKAPI_PTR VulkanMemoryAllocationFunction(
 	void*										pUserData,
-	u64											size,
-	u64											alignment,
+	bc::u64										size,
+	bc::u64										alignment,
 	VkSystemAllocationScope						allocationScope
 )
 {
@@ -26,8 +26,8 @@ void* VKAPI_PTR VulkanMemoryAllocationFunction(
 void* VKAPI_PTR VulkanMemoryReallocationFunction(
 	void*										pUserData,
 	void*										pOriginal,
-	u64											size,
-	u64											alignment,
+	bc::u64										size,
+	bc::u64										alignment,
 	VkSystemAllocationScope						allocationScope
 )
 {
@@ -44,7 +44,7 @@ void VKAPI_PTR VulkanMemoryFreeFunction(
 
 void VKAPI_PTR VulkanMemoryInternalAllocationNotification(
 	void*										pUserData,
-	u64											size,
+	bc::u64										size,
 	VkInternalAllocationType					allocationType,
 	VkSystemAllocationScope						allocationScope
 )
@@ -52,7 +52,7 @@ void VKAPI_PTR VulkanMemoryInternalAllocationNotification(
 
 void VKAPI_PTR VulkanMemoryInternalFreeNotification(
 	void*										pUserData,
-	u64											size,
+	bc::u64										size,
 	VkInternalAllocationType					allocationType,
 	VkSystemAllocationScope						allocationScope
 )
