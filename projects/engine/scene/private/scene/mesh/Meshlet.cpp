@@ -14,8 +14,8 @@ bc::scene::Meshlet bc::scene::MakeMeshlet(
 	BAssert( !vertex_index_list.IsEmpty(), U"Cannot create meshlet, vertex index list was empty" );
 	BAssert( vertex_index_list.Size() <= internal::MESHLET_MAX_INDICES, U"Cannot create meshlet, vertex index list was too large" );
 
-	auto mean_normal	= math::Vector4f();
-	auto center_point	= math::Vector4f();
+	auto mean_normal	= math::Vec4f32();
+	auto center_point	= math::Vec4f32();
 
 	for( auto & i : vertex_index_list )
 	{

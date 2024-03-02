@@ -6,10 +6,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::scene::Vertex bc::scene::MakeVertex(
-	math::Vector4f			position,
-	math::Vector4f			normal,
-	math::Vector4f			color,
-	math::Vector2f			uv
+	math::Vec4f32			position,
+	math::Vec4f32			normal,
+	math::Vec4f32			color,
+	math::Vec2f32			uv
 ) noexcept
 {
 	auto result = Vertex();
