@@ -11,11 +11,11 @@
 
 namespace bc {
 namespace scene {
-namespace internal {
+namespace internal_ {
 
 constexpr u32 MESHLET_MAX_INDICES = 64;
 
-} // internal
+} // internal_
 
 
 
@@ -27,7 +27,7 @@ struct Meshlet
 	f32																mean_normal_cone_dot			= {};
 	f32																radius							= {};
 	u32																vertex_count					= {};
-	Array<u32, internal::MESHLET_MAX_INDICES>						vertex_index_list;
+	Array<u32, internal_::MESHLET_MAX_INDICES>						vertex_index_list;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

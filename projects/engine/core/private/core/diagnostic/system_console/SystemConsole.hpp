@@ -8,7 +8,7 @@
 
 namespace bc {
 namespace diagnostic {
-namespace internal {
+namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -48,7 +48,7 @@ void								SetupSystemConsole(
 
 
 
-} // internal
+} // internal_
 
 
 
@@ -98,7 +98,7 @@ void								SystemConsolePrint(
 {
 	if constexpr( std::is_same_v<char8_t, typename ContainerType::ContainedCharacterType> || std::is_same_v<char, typename ContainerType::ContainedCharacterType> ) {
 		// char8_t and char can be printed directly without conversion.
-		internal::SystemConsolePrintRawUTF8(
+		internal_::SystemConsolePrintRawUTF8(
 			text.Data(),
 			text.Size(),
 			foreground_color,
@@ -108,7 +108,7 @@ void								SystemConsolePrint(
 	} else {
 		// char16_t and char32_t must be converted into UTF8 first.
 		auto buffer = conversion::ToUTF8( text );
-		internal::SystemConsolePrintRawUTF8(
+		internal_::SystemConsolePrintRawUTF8(
 			buffer.Data(),
 			buffer.Size(),
 			foreground_color,
@@ -179,7 +179,7 @@ void								SystemConsolePrint(
 )
 {
 	static_assert( CharacterArraySize > 0 );
-	SystemConsolePrint( bc::internal::SimpleTextViewBase<CharacterType, true>( text, CharacterArraySize ), foreground_color, background_color );
+	SystemConsolePrint( bc::internal_::SimpleTextViewBase<CharacterType, true>( text, CharacterArraySize ), foreground_color, background_color );
 }
 
 
@@ -211,7 +211,7 @@ void								SystemConsolePrint(
 )
 {
 	static_assert( CharacterArraySize > 0 );
-	SystemConsolePrint( bc::internal::SimpleTextViewBase<CharacterType, true> { text, CharacterArraySize }, theme );
+	SystemConsolePrint( bc::internal_::SimpleTextViewBase<CharacterType, true> { text, CharacterArraySize }, theme );
 }
 
 

@@ -90,7 +90,7 @@ public:
 	{
 		assert( std::addressof( next_exception ) != this && "next_exception was this exception" );
 		if( std::addressof( next_exception ) == this ) return;
-		this->next = bc::internal::MakeSimpleUniquePtr<Exception>( next_exception );
+		this->next = bc::internal_::MakeSimpleUniquePtr<Exception>( next_exception );
 	}
 
 	constexpr inline bool									IsEmpty() const noexcept
@@ -125,7 +125,7 @@ private:
 	///
 	/// This is used when an exception is caught by something which will then throw its own exception with additional information.
 	/// The original exception may be stored here.
-	bc::internal::SimpleUniquePtr<Exception>				next;
+	bc::internal_::SimpleUniquePtr<Exception>				next;
 };
 
 
@@ -288,7 +288,7 @@ inline void												Throw [[noreturn]] (
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
 inline void												Throw [[noreturn]] (
-	const bc::internal::SimpleTextView32				message,
+	const bc::internal_::SimpleTextView32				message,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
 	)
 {

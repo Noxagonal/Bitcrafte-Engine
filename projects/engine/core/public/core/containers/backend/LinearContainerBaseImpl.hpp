@@ -1021,7 +1021,7 @@ protected:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
-		auto iterator = container_bases::internal::DoLinearSearch<ValueType, false>( this->data_ptr, this->data_size, value );
+		auto iterator = container_bases::internal_::DoLinearSearch<ValueType, false>( this->data_ptr, this->data_size, value );
 		if( iterator >= this->data_ptr + this->data_size ) return iterator;
 		return this->DoErase( iterator );
 	}

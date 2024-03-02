@@ -20,7 +20,7 @@ void* VKAPI_PTR VulkanMemoryAllocationFunction(
 	VkSystemAllocationScope						allocationScope
 )
 {
-	return bc::memory::internal::AllocateRawMemory_Runtime( size, alignment );
+	return bc::memory::internal_::AllocateRawMemory_Runtime( size, alignment );
 }
 
 void* VKAPI_PTR VulkanMemoryReallocationFunction(
@@ -31,7 +31,7 @@ void* VKAPI_PTR VulkanMemoryReallocationFunction(
 	VkSystemAllocationScope						allocationScope
 )
 {
-	return bc::memory::internal::ReallocateRawMemory_Runtime( pOriginal, size );
+	return bc::memory::internal_::ReallocateRawMemory_Runtime( pOriginal, size );
 }
 
 void VKAPI_PTR VulkanMemoryFreeFunction(
@@ -39,7 +39,7 @@ void VKAPI_PTR VulkanMemoryFreeFunction(
 	void*										pMemory
 )
 {
-	bc::memory::internal::FreeRawMemory_Runtime( pMemory );
+	bc::memory::internal_::FreeRawMemory_Runtime( pMemory );
 }
 
 void VKAPI_PTR VulkanMemoryInternalAllocationNotification(

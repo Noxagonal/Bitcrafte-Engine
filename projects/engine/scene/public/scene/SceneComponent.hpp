@@ -37,7 +37,7 @@ namespace scene {
 // as the number of render target textures needed to draw all 3D views on all open windows.
 //
 // Render target texture size will determine the render size and changing that will either require a recreation of the
-// RenderPipeline because of the internal G-buffers. A RenderPipeline would have an internal maximum size, and target output
+// RenderPipeline because of the internal_ G-buffers. A RenderPipeline would have an internal_ maximum size, and target output
 // size.
 //
 // I think I covered most of this by now, and I'll probably figure out more details as I go but I think this is the direction I

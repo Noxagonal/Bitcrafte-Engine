@@ -9,7 +9,7 @@
 
 namespace bc {
 namespace conversion {
-namespace internal {
+namespace internal_ {
 
 
 
@@ -45,16 +45,16 @@ concept FloatingToTextConvertible = std::is_floating_point_v<ValueType>;
 
 
 
-} // internal
+} // internal_
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename ValueType>
 concept PrimitiveToTextConvertibleValue =
-internal::BoolToTextConvertible<ValueType> ||
-internal::IntegerToTextConvertible<ValueType> ||
-internal::FloatingToTextConvertible<ValueType>;
+internal_::BoolToTextConvertible<ValueType> ||
+internal_::IntegerToTextConvertible<ValueType> ||
+internal_::FloatingToTextConvertible<ValueType>;
 
 
 
@@ -77,7 +77,7 @@ internal::FloatingToTextConvertible<ValueType>;
 ///	Value to convert into text.
 template<
 	utility::TextContainer						TextContainerType,
-	internal::BoolToTextConvertible				ValueType
+	internal_::BoolToTextConvertible			ValueType
 >
 constexpr u64									PrimitiveToText(
 	TextContainerType						&	append_to,
@@ -127,7 +127,7 @@ enum class IntegerToTextConversionFormat
 /// example if you want Base-5 you can just give this parameter static_cast<IntegerToTextConversionFormat>( 5 ).
 template<
 	utility::TextContainer						TextContainerType,
-	internal::IntegerToTextConvertible			ValueType
+	internal_::IntegerToTextConvertible			ValueType
 >
 constexpr u64									PrimitiveToText(
 	TextContainerType						&	append_to,
@@ -142,9 +142,9 @@ constexpr u64									PrimitiveToText(
 
 	if constexpr( std::is_same_v<TextContainerCharacterType, char> ) {
 		auto original_size	= append_to.Size();
-		append_to.Resize( original_size + internal::primitive_to_text_conversion_integer_reserve_space );
+		append_to.Resize( original_size + internal_::primitive_to_text_conversion_integer_reserve_space );
 		auto begin			= append_to.Data() + original_size;
-		auto end			= append_to.Data() + ( original_size + internal::primitive_to_text_conversion_integer_reserve_space );
+		auto end			= append_to.Data() + ( original_size + internal_::primitive_to_text_conversion_integer_reserve_space );
 		auto result			= std::to_chars( begin, end, value, int( text_format ) );
 
 		if( result.ec == std::errc() ) {
@@ -161,9 +161,9 @@ constexpr u64									PrimitiveToText(
 	} else {
 		ContainerBaseCharType buffer;
 		// Text8 buffer;
-		buffer.Resize( internal::primitive_to_text_conversion_integer_reserve_space );
+		buffer.Resize( internal_::primitive_to_text_conversion_integer_reserve_space );
 		auto begin			= buffer.Data();
-		auto end			= buffer.Data() + internal::primitive_to_text_conversion_integer_reserve_space;
+		auto end			= buffer.Data() + internal_::primitive_to_text_conversion_integer_reserve_space;
 		auto result			= std::to_chars( begin, end, value, int( text_format ) );
 
 		if( result.ec == std::errc() ) {
@@ -233,7 +233,7 @@ inline FloatToTextConversionFormat operator&( FloatToTextConversionFormat a, Flo
 ///	Value text representation. See FloatToTextConversionFormat.
 template<
 	utility::TextContainer						TextContainerType,
-	internal::FloatingToTextConvertible			ValueType
+	internal_::FloatingToTextConvertible		ValueType
 >
 constexpr u64									PrimitiveToText(
 	TextContainerType						&	append_to,
@@ -270,7 +270,7 @@ constexpr u64									PrimitiveToText(
 
 	if constexpr( std::is_same_v<TextContainerCharacterType, char> ) {
 
-		auto result = Convert( append_to, internal::primitive_to_text_conversion_floating_reserve_space );
+		auto result = Convert( append_to, internal_::primitive_to_text_conversion_floating_reserve_space );
 
 		if( result.ec != std::errc() ) {
 			// Failure, try again with much larger buffer. This will be enough to store
@@ -289,7 +289,7 @@ constexpr u64									PrimitiveToText(
 	} else {
 		ContainerBaseCharType buffer;
 		// Text8 buffer;
-		auto result = Convert( buffer, internal::primitive_to_text_conversion_floating_reserve_space );
+		auto result = Convert( buffer, internal_::primitive_to_text_conversion_floating_reserve_space );
 
 		if( result.ec != std::errc() ) {
 			// Failure, try again with much larger buffer. This will be enough to store

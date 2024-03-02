@@ -16,8 +16,8 @@
 
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
 
-#define BC_CONTAINER_NAMESPACE_START namespace internal {
-#define BC_CONTAINER_NAMESPACE_END } // internal
+#define BC_CONTAINER_NAMESPACE_START namespace internal_ {
+#define BC_CONTAINER_NAMESPACE_END } // internal_
 #define BC_CONTAINER_NOEXCEPT noexcept
 #define BC_CONTAINER_NAME( container_name ) Simple##container_name
 #define BC_CONTAINER_VALUE_TYPENAME ::bc::utility::SimpleContainerAllowedValueType

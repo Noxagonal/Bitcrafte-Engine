@@ -15,7 +15,7 @@ namespace diagnostic {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-bc::internal::SimpleTextView32			LogReportSeverityToText(
+bc::internal_::SimpleTextView32			LogReportSeverityToText(
 	LogReportSeverity					e
 );
 

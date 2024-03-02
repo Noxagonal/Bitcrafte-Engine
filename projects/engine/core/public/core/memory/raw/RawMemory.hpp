@@ -14,7 +14,7 @@
 
 namespace bc {
 namespace memory {
-namespace internal {
+namespace internal_ {
 
 
 
@@ -116,7 +116,7 @@ inline void											*	AlignMemoryToRequirement(
 /// Calculate total required space for allocating from memory pool or OS.
 ///
 /// @warning
-/// This is an internal function used when allocating a new memory block from system, please do not use.
+/// This is an internal_ function used when allocating a new memory block from system, please do not use.
 ///
 /// @param payload_size
 /// Size requirement for the payload.
@@ -147,7 +147,7 @@ inline u64												CalculateMinimumRequiredSystemMemoryAllocationSize(
 /// This calculates the SystemMemoryAllocationInfo from an already allocated system allocation.
 ///
 /// @warning
-/// This is an internal function used when allocating a new memory block from system, please do not use.
+/// This is an internal_ function used when allocating a new memory block from system, please do not use.
 ///
 /// @param system_allocated_location
 /// Pointer to memory location that was originally received from underlaying allocation scheme, either OS or memory pool.
@@ -567,7 +567,7 @@ void						*	ReallocateRawMemory_Runtime(
 
 
 
-} // internal
+} // internal_
 
 
 
@@ -580,7 +580,7 @@ constexpr void					FreeMemory(
 {
 	if( std::is_constant_evaluated() )
 	{
-		internal::FreeMemory_Consteval<ValueType>( location, count );
+		internal_::FreeMemory_Consteval<ValueType>( location, count );
 	}
 	else
 	{
@@ -592,7 +592,7 @@ constexpr void					FreeMemory(
 
 		BHardAssert( count < 0x0000FFFFFFFFFFFF, "Freeing memory, element count too high, something is not right" );
 
-		internal::FreeRawMemory_Runtime( location );
+		internal_::FreeRawMemory_Runtime( location );
 	}
 }
 
@@ -607,14 +607,14 @@ constexpr ValueType			*	AllocateMemory(
 {
 	if( std::is_constant_evaluated() )
 	{
-		return internal::AllocateMemory_Consteval<ValueType>( count, alignment_requirement );
+		return internal_::AllocateMemory_Consteval<ValueType>( count, alignment_requirement );
 	}
 	else
 	{
 		BHardAssert( count > 0, "Allocating memory, new element count must be larger than 0" );
 		BHardAssert( count < 0x0000FFFFFFFFFFFF, "Allocating memory, new element count too high, something is not right" );
 
-		return reinterpret_cast<ValueType*>( internal::AllocateRawMemory_Runtime( count * sizeof( ValueType ), alignment_requirement ) );
+		return reinterpret_cast<ValueType*>( internal_::AllocateRawMemory_Runtime( count * sizeof( ValueType ), alignment_requirement ) );
 	}
 }
 
@@ -632,7 +632,7 @@ constexpr ValueType			*	ReallocateMemory(
 
 	if( std::is_constant_evaluated() )
 	{
-		return internal::ReallocateMemory_Consteval<ValueType>( old_location, old_count, new_count );
+		return internal_::ReallocateMemory_Consteval<ValueType>( old_location, old_count, new_count );
 	}
 	else
 	{
@@ -648,7 +648,7 @@ constexpr ValueType			*	ReallocateMemory(
 
 		BHardAssert( old_count != new_count, "Reallocating memory, new reserved element count is the same as the old element count, this check should be done earlier" );
 
-		return reinterpret_cast<ValueType*>( internal::ReallocateRawMemory_Runtime( old_location, new_count * sizeof( ValueType ) ) );
+		return reinterpret_cast<ValueType*>( internal_::ReallocateRawMemory_Runtime( old_location, new_count * sizeof( ValueType ) ) );
 	}
 }
 
@@ -667,8 +667,8 @@ constexpr bool					IsInPlaceReallocateable(
 	}
 	else
 	{
-		auto allocation_info = internal::GetSystemMemoryAllocationInfoFromRawPointer( location );
-		return internal::IsInPlaceReallocateable_Runtime( *allocation_info, new_count * sizeof( ValueType ) );
+		auto allocation_info = internal_::GetSystemMemoryAllocationInfoFromRawPointer( location );
+		return internal_::IsInPlaceReallocateable_Runtime( *allocation_info, new_count * sizeof( ValueType ) );
 	}
 }
 
@@ -684,11 +684,11 @@ constexpr ValueType				*	InPlaceReallocateMemory(
 {
 	if( std::is_constant_evaluated() )
 	{
-		return internal::ReallocateMemory_Consteval<ValueType>( old_location, old_count, new_count );
+		return internal_::ReallocateMemory_Consteval<ValueType>( old_location, old_count, new_count );
 	}
 	else
 	{
-		auto allocation_info = internal::GetSystemMemoryAllocationInfoFromRawPointer( old_location );
+		auto allocation_info = internal_::GetSystemMemoryAllocationInfoFromRawPointer( old_location );
 
 		BHardAssert( allocation_info, "In place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier" );
 		BHardAssert(
@@ -696,7 +696,7 @@ constexpr ValueType				*	InPlaceReallocateMemory(
 			"In place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier"
 		);
 
-		return reinterpret_cast<ValueType*>( internal::InPlaceReallocateMemory_Runtime( *allocation_info, new_count * sizeof( ValueType ) ) );
+		return reinterpret_cast<ValueType*>( internal_::InPlaceReallocateMemory_Runtime( *allocation_info, new_count * sizeof( ValueType ) ) );
 	}
 }
 

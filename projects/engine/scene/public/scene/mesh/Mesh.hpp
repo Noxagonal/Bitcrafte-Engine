@@ -45,10 +45,10 @@ public:
 	/// perform better than the traditional pipeline, however, it is not as straight forward.
 	///
 	/// @param vertex_list
-	/// List of vertices that are copied over to internal vertex list.
+	/// List of vertices that are copied over to internal_ vertex list.
 	///
 	/// @param meshlet_list
-	/// List of meshlets that are copied over to internal meshlet list.
+	/// List of meshlets that are copied over to internal_ meshlet list.
 	Mesh(
 		const List<Vertex>									&	vertex_list,
 		const List<Meshlet>									&	meshlet_list
@@ -62,10 +62,10 @@ public:
 	/// meshlets but may not perform as good.
 	///
 	/// @param vertex_list
-	/// List of vertices that are copied over to internal vertex list.
+	/// List of vertices that are copied over to internal_ vertex list.
 	///
 	/// @param index_list
-	/// List of vertex indices that are copied over to internal index list.
+	/// List of vertex indices that are copied over to internal_ index list.
 	Mesh(
 		const List<Vertex>									&	vertex_list,
 		const List<u32>										&	index_list

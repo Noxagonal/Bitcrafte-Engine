@@ -7,7 +7,7 @@
 
 namespace bc {
 namespace diagnostic {
-namespace internal {
+namespace internal_ {
 
 
 
@@ -22,7 +22,7 @@ void								PanicInternal(
 
 
 
-} // internal
+} // internal_
 
 
 
@@ -34,7 +34,7 @@ void								Panic(
 	SourceLocation					source_location					= SourceLocation::Current()
 )
 {
-	internal::PanicInternal( message, MessageLength ? ( message[ MessageLength - 1 ] == '\0' ? MessageLength - 1 : MessageLength ) : MessageLength, source_location );
+	internal_::PanicInternal( message, MessageLength ? ( message[ MessageLength - 1 ] == '\0' ? MessageLength - 1 : MessageLength ) : MessageLength, source_location );
 }
 
 

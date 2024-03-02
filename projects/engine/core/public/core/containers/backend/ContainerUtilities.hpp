@@ -22,7 +22,7 @@
 
 namespace bc {
 namespace container_bases {
-namespace internal {
+namespace internal_ {
 
 
 
@@ -238,7 +238,7 @@ constexpr std::conditional_t<IsConst, const ValueType, ValueType>								*	DoLin
 
 
 
-} // internal
+} // internal_
 } // container_bases
 } // bc
 

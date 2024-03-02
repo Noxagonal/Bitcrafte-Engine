@@ -9,7 +9,7 @@
 
 namespace bc {
 namespace conversion {
-namespace internal {
+namespace internal_ {
 
 
 
@@ -39,7 +39,7 @@ concept TextToFloatingConvertible = std::is_floating_point_v<ValueType>;
 
 
 
-} // internal
+} // internal_
 
 
 
@@ -63,7 +63,7 @@ concept TextToFloatingConvertible = std::is_floating_point_v<ValueType>;
 ///	Text which contains the value we want to convert.
 template<
 	utility::TextContainerView					TextContainerType,
-	internal::TextToBoolConvertible				ValueType
+	internal_::TextToBoolConvertible			ValueType
 >
 constexpr u64								TextToPrimitive(
 	ValueType								&	out_value,
@@ -161,7 +161,7 @@ enum class TextToIntegerConversionFormat : u32
 /// static_cast<TextToIntegerConversionFormat>( 5 ).
 template<
 	utility::TextContainerView					TextContainerType,
-	internal::TextToIntegerConvertible			ValueType
+	internal_::TextToIntegerConvertible			ValueType
 >
 constexpr u64								TextToPrimitive(
 	ValueType								&	out_value,
@@ -310,7 +310,7 @@ enum class TextToFloatConversionFormat : u32
 ///	Value text representation. See TextToFloatConversionFormat.
 template<
 	utility::TextContainerView					TextContainerType,
-	internal::TextToFloatingConvertible			ValueType
+	internal_::TextToFloatingConvertible		ValueType
 >
 constexpr u64									TextToPrimitive(
 	ValueType								&	out_value,

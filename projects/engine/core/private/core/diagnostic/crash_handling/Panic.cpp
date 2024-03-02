@@ -6,7 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 [[noreturn]]
-void bc::diagnostic::internal::PanicInternal(
+void bc::diagnostic::internal_::PanicInternal(
 	const char						*	message_ptr,
 	u64									message_length,
 	bc::diagnostic::SourceLocation		source_location

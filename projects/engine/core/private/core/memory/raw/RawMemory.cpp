@@ -6,7 +6,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::memory::internal::FreeRawMemory_Runtime(
+void bc::memory::internal_::FreeRawMemory_Runtime(
 	void			*	location
 ) noexcept
 {
@@ -22,7 +22,7 @@ void bc::memory::internal::FreeRawMemory_Runtime(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void * bc::memory::internal::AllocateRawMemory_Runtime(
+void * bc::memory::internal_::AllocateRawMemory_Runtime(
 	u64				size,
 	u64				alignment_requirement
 ) noexcept
@@ -51,7 +51,7 @@ void * bc::memory::internal::AllocateRawMemory_Runtime(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void * bc::memory::internal::ReallocateRawMemory_Runtime(
+void * bc::memory::internal_::ReallocateRawMemory_Runtime(
 	void			*	old_location,
 	u64					new_size
 ) noexcept

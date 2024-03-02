@@ -140,7 +140,7 @@ const wchar_t * PrintRecordColorToWCharANSIBackgroundColorCode(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::basic_ostream<char8_t> & operator<<(
 	std::basic_ostream<char8_t>					&	out,
-	const bc::internal::SimpleTextView8			&	in
+	const bc::internal_::SimpleTextView8			&	in
 )
 {
 	std::basic_ostringstream<char8_t> ss;
@@ -160,14 +160,14 @@ std::basic_ostream<char8_t> & operator<<(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
+void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 	const char8_t						*	raw_text,
 	u64										raw_text_length,
 	bc::diagnostic::PrintRecordColor		foreground_color,
 	bc::diagnostic::PrintRecordColor		background_color
 )
 {
-	auto text = bc::internal::SimpleTextView8( raw_text, raw_text_length );
+	auto text = bc::internal_::SimpleTextView8( raw_text, raw_text_length );
 	auto text_as_utf16 = conversion::ToUTF16( text );
 
 	auto lock_guard = std::lock_guard( print_mutex );
@@ -222,7 +222,7 @@ void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal::SetupSystemConsole(
+void bc::diagnostic::internal_::SetupSystemConsole(
 	u64 characters_per_line_num
 )
 {
@@ -308,7 +308,7 @@ void bc::diagnostic::SetupSystemConsole(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
+void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 	const char8_t						*	raw_text,
 	u64										raw_text_length,
 	bc::diagnostic::PrintRecordColor		foreground_color,

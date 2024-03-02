@@ -176,7 +176,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return true;
 
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,7 +231,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return false;
 
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +248,7 @@ public:
 		const ValueType																				&	value
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return ConstIterator { this, container_bases::internal::DoLinearSearch<ValueType, true>( this->data, ValueCount, value ) };
+		return ConstIterator { this, container_bases::internal_::DoLinearSearch<ValueType, true>( this->data, ValueCount, value ) };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +265,7 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		return Iterator { this, container_bases::internal::DoLinearSearch<ValueType, false>( this->data, ValueCount, value ) };
+		return Iterator { this, container_bases::internal_::DoLinearSearch<ValueType, false>( this->data, ValueCount, value ) };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +286,7 @@ public:
 		LambdaType																					&&	lambda
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return ConstIterator { this, container_bases::internal::DoLinearSearchIf<ValueType, true>( this->data, ValueCount, lambda ) };
+		return ConstIterator { this, container_bases::internal_::DoLinearSearchIf<ValueType, true>( this->data, ValueCount, lambda ) };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -307,7 +307,7 @@ public:
 		LambdaType																					&&	lambda
 	) BC_CONTAINER_NOEXCEPT
 	{
-		return Iterator { this, container_bases::internal::DoLinearSearchIf<ValueType, false>( this->data, ValueCount, lambda ) };
+		return Iterator { this, container_bases::internal_::DoLinearSearchIf<ValueType, false>( this->data, ValueCount, lambda ) };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -587,7 +587,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -606,7 +606,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -624,7 +624,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return true;
 
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -642,7 +642,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return false;
 
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -526,7 +526,7 @@ public:
 	{
 		if( other.root_node == this->root_node && other.Size() == this->Size() ) return true;
 
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -544,7 +544,7 @@ public:
 	{
 		if( other.root_node == this->root_node && other.Size() == this->Size() ) return true;
 
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

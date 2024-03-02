@@ -222,7 +222,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
 	) const noexcept
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +239,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
 	) const noexcept
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +256,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
 	) const noexcept requires( !std::is_same_v<CharacterType, char> )
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
 	) const noexcept requires( !std::is_same_v<CharacterType, char> )
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -293,7 +293,7 @@ public:
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -313,7 +313,7 @@ public:
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -333,7 +333,7 @@ public:
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -353,7 +353,7 @@ public:
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1158,7 +1158,7 @@ public:
 	{
 		if( &other == this ) return true;
 
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1176,7 +1176,7 @@ public:
 	{
 		if( &other == this ) return false;
 
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1192,7 +1192,7 @@ public:
 		const BC_CONTAINER_NAME( TextBase )<char>													&	other
 	) const noexcept requires( !std::is_same_v<CharacterType, char> )
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1208,7 +1208,7 @@ public:
 		const BC_CONTAINER_NAME( TextBase )<char>													&	other
 	) const noexcept requires( !std::is_same_v<CharacterType, char> )
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1227,7 +1227,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1245,7 +1245,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1262,7 +1262,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
 	) const noexcept requires( !std::is_same_v<CharacterType, char> )
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1279,7 +1279,7 @@ public:
 		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
 	) const noexcept requires( !std::is_same_v<CharacterType, char> )
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1299,7 +1299,7 @@ public:
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1319,7 +1319,7 @@ public:
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1339,7 +1339,7 @@ public:
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
 	{
-		return container_bases::internal::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1359,7 +1359,7 @@ public:
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
 	{
-		return container_bases::internal::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

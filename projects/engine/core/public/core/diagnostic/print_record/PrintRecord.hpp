@@ -40,7 +40,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr PrintRecord(
-		const bc::internal::SimpleTextView32				simple_text_view
+		const bc::internal_::SimpleTextView32				simple_text_view
 	)
 	{
 		auto new_section = PrintRecordSection {};

@@ -9,7 +9,7 @@
 
 namespace bc {
 namespace text {
-namespace internal {
+namespace internal_ {
 
 
 
@@ -55,7 +55,7 @@ constexpr void															TextFormat_Collector(
 
 
 
-} // internal
+} // internal_
 
 
 
@@ -228,7 +228,7 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 					"\".\nNumber of arguments: \"" + argument_count_as_text + "\""
 				);
 			}
-			internal::TextFormat_Collector( 0, current_argument, out_buffer, argument_parse_text, std::forward<ArgumentsTypePack>( args )... );
+			internal_::TextFormat_Collector( 0, current_argument, out_buffer, argument_parse_text, std::forward<ArgumentsTypePack>( args )... );
 			argument_parse_text = {};
 
 			++current_argument;
