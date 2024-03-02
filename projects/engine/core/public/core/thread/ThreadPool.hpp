@@ -6,7 +6,7 @@
 #include <core/thread/ThreadDescription.hpp>
 #include <core/thread/Task.hpp>
 
-#include <core/utility/concepts/LambdaConcepts.hpp>
+#include <core/utility/concepts/CallableConcepts.hpp>
 
 #include <core/containers/UniquePtr.hpp>
 #include <core/containers/List.hpp>
@@ -228,12 +228,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::Callable<LambdaType, Task&> || utility::Callable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturn<LambdaType, void, Task&> || utility::CallableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturn<LambdaType, void> || utility::CallableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -270,12 +270,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::Callable<LambdaType, Task&> || utility::Callable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturn<LambdaType, void, Task&> || utility::CallableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturn<LambdaType, void> || utility::CallableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -311,12 +311,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::Callable<LambdaType, Task&> || utility::Callable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturn<LambdaType, void, Task&> || utility::CallableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturn<LambdaType, void> || utility::CallableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -348,12 +348,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::Callable<LambdaType, Task&> || utility::Callable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturn<LambdaType, void, Task&> || utility::CallableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturn<LambdaType, void> || utility::CallableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -420,26 +420,26 @@ private:
 			Thread										&	thread
 		) override
 		{
-			constexpr bool non_void1 = utility::IsLambdaSignature<LambdaType, void>;
-			constexpr bool non_void2 = utility::IsLambdaSignature<LambdaType, void, Task&>;
-			constexpr bool non_void3 = utility::IsLambdaSignature<LambdaType, TaskExecutionResult>;
-			constexpr bool non_void4 = utility::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&>;
+			constexpr bool non_void1 = utility::Callable<LambdaType, void>;
+			constexpr bool non_void2 = utility::Callable<LambdaType, void, Task&>;
+			constexpr bool non_void3 = utility::Callable<LambdaType, TaskExecutionResult>;
+			constexpr bool non_void4 = utility::Callable<LambdaType, TaskExecutionResult, Task&>;
 
-			if constexpr( utility::IsLambdaSignature<LambdaType, void> )
+			if constexpr( utility::Callable<LambdaType, void> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( utility::IsLambdaSignature<LambdaType, void, Task&> )
+			else if constexpr( utility::Callable<LambdaType, void, Task&> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( utility::IsLambdaSignature<LambdaType, TaskExecutionResult> )
+			else if constexpr( utility::Callable<LambdaType, TaskExecutionResult> )
 			{
 				return lambda_function();
 			}
-			else if constexpr( utility::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&> )
+			else if constexpr( utility::Callable<LambdaType, TaskExecutionResult, Task&> )
 			{
 				return lambda_function();
 			}
