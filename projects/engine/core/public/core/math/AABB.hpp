@@ -31,7 +31,7 @@ namespace math {
 /// @tparam ValueType
 /// Value type of this bounding box.
 template<u64 AABBDimensionCount, utility::FundamentalType ValueType>
-class alignas( sizeof( ValueType ) * 2 ) AABBBase
+class AABBBase
 {
 	static_assert( AABBDimensionCount >= 2 && AABBDimensionCount <= 4, "Invalid number of dimensions" );
 
