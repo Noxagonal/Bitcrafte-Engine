@@ -1,0 +1,40 @@
+#pragma once
+
+#include <build_configuration/BuildConfigurationComponent.hpp>
+
+#include <core/containers/UniquePtr.hpp>
+
+
+
+namespace bc {
+namespace scene {
+
+class MeshManager;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Handles scene data requests and allocations.
+///
+/// This class provides functions to load entities, meshes and others. This class is also handles communication with RHI to load
+/// data to the VRAM when required.
+class SceneDataManager
+{
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	SceneDataManager();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual ~SceneDataManager();
+
+private:
+
+	UniquePtr<MeshManager>								mesh_manager;
+};
+
+
+
+} // scene
+} // bc
