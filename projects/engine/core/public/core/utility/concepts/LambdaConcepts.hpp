@@ -23,7 +23,7 @@ concept IsLambdaReturningVoid = requires(
 	LambdaParamsT		...params
 )
 {
-	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::same_as<void>;
+	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::convertible_to<void>;
 };
 
 
@@ -41,7 +41,7 @@ concept IsLambdaReturningType = requires(
 	LambdaParamsT		...params
 )
 {
-	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::same_as<LambdaReturnT>;
+	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::convertible_to<LambdaReturnT>;
 };
 
 
@@ -77,7 +77,7 @@ concept IsLambdaSignature = requires(
 )
 {
 	lambda( std::forward<LambdaParamsT>( params )... );
-	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::same_as<LambdaReturnT>;
+	{ lambda( std::forward<LambdaParamsT>( params )... ) } -> std::convertible_to<LambdaReturnT>;
 };
 
 
