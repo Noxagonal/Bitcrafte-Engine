@@ -11,3 +11,4 @@
 #undef BC_CONTAINER_IS_MOVE_ASSIGNABLE
 
 #undef BC_ContainerAssert
+#undef BC_ContainerThrowOrCrash

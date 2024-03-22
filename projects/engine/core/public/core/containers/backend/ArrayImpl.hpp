@@ -727,7 +727,7 @@ public:
 		u64
 	) const
 	{
-		BC_ContainerAssert( 0, U"Index out of range, Array is empty" );
+		BC_ContainerThrowOrCrash( U"Index out of range, Array is empty" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -736,7 +736,7 @@ public:
 		u64
 	)
 	{
-		BC_ContainerAssert( 0, U"Index out of range, Array is empty" );
+		BC_ContainerThrowOrCrash( U"Index out of range, Array is empty" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

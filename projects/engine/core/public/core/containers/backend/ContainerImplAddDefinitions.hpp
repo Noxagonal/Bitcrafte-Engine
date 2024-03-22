@@ -13,6 +13,7 @@
 #define BC_CONTAINER_IS_MOVE_ASSIGNABLE ::std::is_move_assignable_v
 
 #define BC_ContainerAssert( condition, fail_message, ... ) BAssert( ( condition ), bc::diagnostic::MakePrintRecord_AssertText( fail_message, __VA_ARGS__ ) )
+#define BC_ContainerThrowOrCrash( fail_message, ... ) ::bc::diagnostic::Throw( bc::diagnostic::MakePrintRecord_AssertText( fail_message, __VA_ARGS__ ) )
 
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
 
@@ -28,6 +29,7 @@
 #define BC_CONTAINER_IS_MOVE_ASSIGNABLE ::std::is_nothrow_move_assignable_v
 
 #define BC_ContainerAssert( condition, fail_message, ... ) assert( ( condition ) && fail_message )
+#define BC_ContainerThrowOrCrash( fail_message, ... ) std::abort() // TODO: Call custom crash handler
 
 #else
 #error "container implementation not defined"
