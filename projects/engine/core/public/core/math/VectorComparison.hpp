@@ -3,12 +3,13 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/utility/concepts/ValueConcepts.hpp>
 #include <core/math/SmallValues.hpp>
+#include <core/math/FundamentalComparison.hpp>
 #include <core/math/Vector.hpp>
 
 
 
 namespace bc {
-namespace utility {
+namespace math {
 
 
 
@@ -91,5 +92,5 @@ constexpr bool														IsFloatEqual(
 
 
 
-} // utility
+} // math
 } // bc

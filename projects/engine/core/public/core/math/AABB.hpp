@@ -109,7 +109,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return math::IsFloatEqual( begin, other.begin ) && utility::IsFloatEqual( end, other.end );
+			return IsFloatEqual( begin, other.begin ) && IsFloatEqual( end, other.end );
 		}
 		else
 		{
@@ -136,7 +136,7 @@ public:
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
-			return !math::IsFloatEqual( begin, other.begin ) || !utility::IsFloatEqual( end, other.end );
+			return !IsFloatEqual( begin, other.begin ) || !IsFloatEqual( end, other.end );
 		}
 		else
 		{

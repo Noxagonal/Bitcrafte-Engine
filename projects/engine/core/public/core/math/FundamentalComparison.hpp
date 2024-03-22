@@ -4,10 +4,6 @@
 #include <core/utility/concepts/ValueConcepts.hpp>
 #include <core/math/SmallValues.hpp>
 
-#include <cstdint>
-#include <cfloat>
-#include <cmath>
-
 
 
 namespace bc {

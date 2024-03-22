@@ -1,8 +1,8 @@
 
 #include <gtest/gtest.h>
 
-#include <core/math/linear_algebra/Vector.hpp>
-#include <core/utility/math/VectorComparison.hpp>
+#include <core/math/Vector.hpp>
+#include <core/math/VectorComparison.hpp>
 
 
 
@@ -14,9 +14,9 @@ namespace math {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, BasicInitialize )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a;
@@ -60,9 +60,9 @@ TEST( Vector, BasicInitialize )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, Comparisons )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a {};
@@ -157,44 +157,44 @@ TEST( Vector, Comparisons )
 		A2 ap3 { 1.5 };
 		A2 ap4 { 2 };
 
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am4, 1.5 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am3, 1.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am2, 1.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am1, 1.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, a0,  1.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap1, 1.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap2, 1.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap3, 1.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap4, 1.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am4, 1.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am3, 1.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am2, 1.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am1, 1.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, a0,  1.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap1, 1.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap2, 1.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap3, 1.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap4, 1.5 ), false );
 
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am4, 1.0 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am3, 1.0 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am2, 1.0 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am1, 1.0 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, a0,  1.0 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap1, 1.0 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap2, 1.0 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap3, 1.0 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap4, 1.0 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am4, 1.0 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am3, 1.0 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am2, 1.0 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am1, 1.0 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, a0,  1.0 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap1, 1.0 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap2, 1.0 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap3, 1.0 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap4, 1.0 ), false );
 
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am4, 0.5 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am3, 0.5 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am2, 0.5 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, am1, 0.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, a0,  0.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap1, 0.5 ), true );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap2, 0.5 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap3, 0.5 ), false );
-		EXPECT_EQ( bc::utility::AreValuesWithinRange( a0, ap4, 0.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am4, 0.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am3, 0.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am2, 0.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, am1, 0.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, a0,  0.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap1, 0.5 ), true );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap2, 0.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap3, 0.5 ), false );
+		EXPECT_EQ( bc::math::AreValuesWithinRange( a0, ap4, 0.5 ), false );
 	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, Addition )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a { 1.0, 2.0 };
@@ -240,9 +240,9 @@ TEST( Vector, Addition )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, Subdivision )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a { 1.0, 2.0 };
@@ -288,9 +288,9 @@ TEST( Vector, Subdivision )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, Multiplication )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a { 1.0, 2.0 };
@@ -375,9 +375,9 @@ TEST( Vector, Multiplication )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, Division )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a { 1.0, 4.0 };
@@ -462,9 +462,9 @@ TEST( Vector, Division )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, Magnitude )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a { 0.0, 0.0 };
@@ -516,9 +516,9 @@ TEST( Vector, Magnitude )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Vector, Normalized )
 {
-	using A2 = bc::math::Vector2d;
-	using A3 = bc::math::Vector3d;
-	using A4 = bc::math::Vector4d;
+	using A2 = bc::math::Vec2f64;
+	using A3 = bc::math::Vec3f64;
+	using A4 = bc::math::Vec4f64;
 
 	{
 		A2 a { 0.0, 0.0 };
