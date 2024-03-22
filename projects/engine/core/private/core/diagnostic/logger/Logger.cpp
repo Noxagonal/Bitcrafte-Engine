@@ -130,7 +130,7 @@ void bc::diagnostic::Logger::PushLogEntry(
 	const LogEntry		&	log_entry
 )
 {
-#if !BITCRAFTE_DEVELOPMENT_BUILD
+#if !BITCRAFTE_GAME_DEVELOPMENT_BUILD
 	if( log_entry.severity == LogReportSeverity::DEBUG ) return;
 #endif
 

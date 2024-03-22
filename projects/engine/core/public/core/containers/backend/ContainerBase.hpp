@@ -393,7 +393,7 @@ protected:
 			}
 		}
 
-		#if BITCRAFTE_DEVELOPMENT_BUILD
+		#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 		// Fill destructed object memory range with byte 0xCB. This is used to catch errors in development builds.
 		if( !std::is_constant_evaluated() )

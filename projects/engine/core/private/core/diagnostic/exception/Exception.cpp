@@ -21,7 +21,7 @@ bc::diagnostic::Exception bc::diagnostic::MakeException(
 
 
 
-#if BITCRAFTE_DEVELOPMENT_BUILD
+#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 
 
@@ -35,4 +35,4 @@ void bc::diagnostic::Throw [[noreturn]] (
 
 
 
-#endif // BITCRAFTE_DEVELOPMENT_BUILD
+#endif // BITCRAFTE_GAME_DEVELOPMENT_BUILD

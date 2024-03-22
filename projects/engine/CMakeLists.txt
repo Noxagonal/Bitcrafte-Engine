@@ -75,14 +75,32 @@ function(add_engine_component
 	if(${BITCRAFTE_BUILD_SHARED_ENGINE})
 		target_compile_definitions(${ENGINE_COMPONENT_NAME}
 			PRIVATE
-				BITCRAFTE_ENGINE_SHARED=1
+				BITCRAFTE_IS_ENGINE_SHARED=1
 		)
 	endif()
 
 	target_compile_definitions(${ENGINE_COMPONENT_NAME}
 		PRIVATE
-			BITCRAFTE_ENGINE_COMPONENT=1
+			# Can be used to detect if a header is being used in an engine component or if it is included in a game component.
+			BITCRAFTE_IS_ENGINE_COMPONENT=1
 	)
+
+	if(${BITCRAFTE_INSTALL_GAME_SHIPPING} OR ${BITCRAFTE_INSTALL_GAME_DEVELOPMENT} OR ${BITCRAFTE_INSTALL_ENGINE_DEVELOPMENT})
+		install(
+			DIRECTORY				"${CMAKE_CURRENT_SOURCE_DIR}/resource/"
+			DESTINATION				"."
+			PATTERN					".gitkeep" EXCLUDE
+		)
+		install(
+			TARGETS					${ENGINE_COMPONENT_NAME}
+			RUNTIME
+				DESTINATION			"."
+			LIBRARY
+				DESTINATION			"."
+			ARCHIVE
+				DESTINATION			"."
+		)
+	endif()
 
 endfunction()
 

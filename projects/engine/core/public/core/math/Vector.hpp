@@ -473,7 +473,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr bool															operator==(
 		VectorBase															other
-		) const
+	) const
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{
@@ -488,7 +488,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr bool															operator!=(
 		VectorBase															other
-		) const
+	) const
 	{
 		if constexpr( utility::FloatingPointType<ValueType> )
 		{

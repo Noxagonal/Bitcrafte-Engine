@@ -10,6 +10,34 @@ project(Bitcrafte CXX)
 
 
 ################################################################
+# Set configurations
+################################################################
+set(CMAKE_CONFIGURATION_TYPES "GameShipping;GameDevelopment;EngineDevelopment" CACHE STRING "" FORCE)
+
+set(CMAKE_CXX_FLAGS_GAMESHIPPING "${CMAKE_CXX_FLAGS_RELEASE}")
+set(CMAKE_EXE_LINKER_FLAGS_SHIPPING "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+set(CMAKE_SHARED_LINKER_FLAGS_SHIPPING "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
+
+set(CMAKE_CXX_FLAGS_GAMEDEVELOPMENT "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+set(CMAKE_EXE_LINKER_FLAGS_GAMEDEVELOPMENT "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
+set(CMAKE_SHARED_LINKER_FLAGS_GAMEDEVELOPMENT "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}")
+
+set(CMAKE_CXX_FLAGS_ENGINEDEVELOPMENT "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_EXE_LINKER_FLAGS_ENGINEDEVELOPMENT "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+set(CMAKE_SHARED_LINKER_FLAGS_ENGINEDEVELOPMENT "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+
+# Set 'EngineDevelopment' as the default build type if none is specified
+if(NOT CMAKE_BUILD_TYPE)
+	message(STATUS "Setting default build type to 'EngineDevelopment' as none was specified.")
+	set(CMAKE_BUILD_TYPE "EngineDevelopment" CACHE STRING "Choose the type of build." FORCE)
+	# Set the possible values of build type for cmake-gui, ccmake
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${CMAKE_CONFIGURATION_TYPES}")
+endif()
+
+
+
+
+################################################################
 # Common paths to different folders
 ################################################################
 set(BITCRAFTE_EXTERNAL_SUBMODULES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/submodules")
@@ -35,8 +63,7 @@ set(CMAKE_C_EXTENSIONS				OFF)
 # Disable in source build.
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-# This is not a library and not a final product so forcing installing locally for now.
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR})
+set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/build/install/${CMAKE_BUILD_TYPE}/")
 
 # Enable folder separators for targets, (DO NOT CHANGE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -70,6 +97,18 @@ option(BITCRAFTE_BUILD_TESTS
 	"Build tests"
 	OFF
 )
+option(BITCRAFTE_INSTALL_GAME_SHIPPING
+	"Enable installation for Game Shipping"
+	OFF
+)
+option(BITCRAFTE_INSTALL_GAME_DEVELOPMENT
+	"Enable installation for Game Development"
+	OFF
+)
+option(BITCRAFTE_INSTALL_ENGINE_DEVELOPMENT
+	"Enable installation for Engine Development"
+	OFF
+)
 
 # Check and enforce interprocedural optimization (IPO/LTO)
 check_ipo_supported(RESULT IPO_SUPPORT_RESULT OUTPUT IPO_SUPPORT_OUTPUT)
@@ -98,4 +137,34 @@ add_subdirectory("projects")
 
 if(${BITCRAFTE_BUILD_TESTS})
 	add_subdirectory("tests")
+endif()
+
+
+
+################################################################
+# Installation targets
+################################################################
+# These targets can be used to package the project automatically. It works by recursively calling CMake on this project.
+# This allows for automatic build settings per configuration in all build system without using external tools.
+# Generated files are put in 'build/install_targets/<configuration>' folder and installed into 'build/install/<configuration>'.
+# This leaves the current build directory clean of installation related generated files, but does take up more disk space
+# and requires recompilation of the entire project.
+
+# If installation is already enabled, these targets will not be created, to prevent accidental infinite recursion.
+if(NOT ${BITCRAFTE_INSTALL_GAME_SHIPPING} AND NOT ${BITCRAFTE_INSTALL_GAME_DEVELOPMENT} AND NOT ${BITCRAFTE_INSTALL_ENGINE_DEVELOPMENT})
+	add_custom_target(InstallGameShipping
+		COMMAND ${CMAKE_COMMAND} "-S${CMAKE_SOURCE_DIR}" "-B${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameShipping" -DBITCRAFTE_INSTALL_GAME_SHIPPING=ON -DCMAKE_BUILD_TYPE=GameShipping
+		COMMAND ${CMAKE_COMMAND} --build "${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameShipping" --target install --config GameShipping
+		COMMENT "Reconfiguring in '${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameShipping' and installing to '${CMAKE_SOURCE_DIR}/build/install/InstallGameShipping'"
+	)
+	add_custom_target(InstallGameDevelopment
+		COMMAND ${CMAKE_COMMAND} "-S${CMAKE_SOURCE_DIR}" "-B${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameDevelopment" -DBITCRAFTE_INSTALL_GAME_DEVELOPMENT=ON -DCMAKE_BUILD_TYPE=GameDevelopment
+		COMMAND ${CMAKE_COMMAND} --build "${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameDevelopment" --target install --config GameDevelopment
+		COMMENT "Reconfiguring in '${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameDevelopment' and installing to '${CMAKE_SOURCE_DIR}/build/install/InstallGameDevelopment'"
+	)
+	add_custom_target(InstallEngineDevelopment
+		COMMAND ${CMAKE_COMMAND} "-S${CMAKE_SOURCE_DIR}" "-B${CMAKE_SOURCE_DIR}/build/install_targets/InstallEngineDevelopment" -DBITCRAFTE_INSTALL_ENGINE_DEVELOPMENT=ON -DCMAKE_BUILD_TYPE=EngineDevelopment
+		COMMAND ${CMAKE_COMMAND} --build "${CMAKE_SOURCE_DIR}/build/install_targets/InstallEngineDevelopment" --target install --config EngineDevelopment
+		COMMENT "Reconfiguring in '${CMAKE_SOURCE_DIR}/build/install_targets/InstallEngineDevelopment' and installing to '${CMAKE_SOURCE_DIR}/build/install/InstallEngineDevelopment'"
+	)
 endif()

@@ -12,7 +12,7 @@ namespace diagnostic {
 
 
 
-#if BITCRAFTE_DEBUG
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 

@@ -156,9 +156,7 @@ Exception												MakeException(
 
 
 
-#if BITCRAFTE_DEVELOPMENT_BUILD
-
-
+#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -180,11 +178,7 @@ void													Throw [[noreturn]] (
 	const Exception									&	exception
 );
 
-
-
-#else // BITCRAFTE_DEVELOPMENT_BUILD
-
-
+#else // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline void												Throw [[noreturn]] (
@@ -198,10 +192,7 @@ inline void												Throw [[noreturn]] (
 	std::abort();
 }
 
-
-
-
-#endif // BITCRAFTE_DEVELOPMENT_BUILD
+#endif // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 
 

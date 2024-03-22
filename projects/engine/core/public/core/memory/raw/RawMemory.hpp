@@ -56,7 +56,7 @@ inline u64												CalculateSystemMemoryAllocationInfoInfoChecksum(
 	const SystemMemoryAllocationInfo				&	allocation_info
 )
 {
-	#if BITCRAFTE_DEVELOPMENT_BUILD
+	#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 	// Checksum calculation is disabled for shipping builds, errors should have been caught in development builds.
 
 	auto bytes = reinterpret_cast<const u8*>( &allocation_info );
@@ -251,7 +251,7 @@ inline const SystemMemoryAllocationInfo				*	GetSystemMemoryAllocationInfoFromRa
 
 	auto allocation_info = reinterpret_cast<const SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
 
-	#if BITCRAFTE_DEVELOPMENT_BUILD
+	#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 	auto allocation_info_checksum = CalculateSystemMemoryAllocationInfoInfoChecksum( *allocation_info );
 	if( allocation_info->checksum != allocation_info_checksum ) return nullptr; // Checksum mismatch, this is not a runtime allocated memory block.
 	#endif
@@ -288,7 +288,7 @@ inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPoin
 
 	auto allocation_info = reinterpret_cast<SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
 
-	#if BITCRAFTE_DEVELOPMENT_BUILD
+	#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 	auto allocation_info_checksum = CalculateSystemMemoryAllocationInfoInfoChecksum( *allocation_info );
 	if( allocation_info->checksum != allocation_info_checksum )
 	{
