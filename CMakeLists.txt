@@ -93,6 +93,10 @@ option(BITCRAFTE_BUILD_SHARED_ENGINE
 	"Build engine as a shared library instead of a static library"
 	ON
 )
+option(BITCRAFTE_BUILD_DOCUMENTATION
+	"Build documentation"
+	OFF
+)
 option(BITCRAFTE_BUILD_TESTS
 	"Build tests"
 	OFF
@@ -134,6 +138,10 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 add_subdirectory("projects")
+
+if(${BITCRAFTE_BUILD_DOCUMENTATION})
+	add_subdirectory("documentation")
+endif()
 
 if(${BITCRAFTE_BUILD_TESTS})
 	add_subdirectory("tests")
