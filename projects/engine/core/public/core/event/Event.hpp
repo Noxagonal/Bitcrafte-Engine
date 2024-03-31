@@ -138,10 +138,9 @@ public:
 	/// cb::Event::UnRegisterCallback()
 	/// 
 	/// @warning
-	/// Do not register a callback function or a lambda that has lifetime shorter than the event it was registered to. There is no
-	/// way to automatically unregister callbacks. To navigate around this, make an event with lifetime as long as the callback and
-	/// register the newly created event as a listener to the event you want to listen to, and the callback to the newly created
-	/// event.
+	/// If callback lifetime is shorter than the event, this will cause a crash. To get around this, make an event with lifetime as
+	/// long as the callback and register the newly created event as a listener to the event you want to listen to, and register the
+	/// callback to the newly created event.
 	///
 	/// @param callback
 	///	Function to call when this event is signalled.
@@ -221,7 +220,7 @@ public:
 	///
 	/// @return
 	/// Number of listeners
-	u64															GetObserverCount()
+	u64																GetObserverCount()
 	{
 		return listeners.Size();
 	}
@@ -232,7 +231,7 @@ public:
 	///
 	/// @return
 	/// Number of listening_to events.
-	u64															GetObservingCount()
+	u64																GetObservingCount()
 	{
 		return listening_to.Size();
 	}
