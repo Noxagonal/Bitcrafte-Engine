@@ -101,6 +101,7 @@ public:
 	{
 		static_assert( sizeof...( ValueArgumentTypePack ) <= ValueCount, "Too many values given to constructor" );
 		FillFromTemplateParameterPack<0>( std::forward<ValueArgumentTypePack>( values )... );
+		// Fill in the remaining values with default constructed values.
 		for( u64 i = sizeof...( ValueArgumentTypePack ); i < ValueCount; i++ )
 		{
 			data[ i ] = ValueType {};
@@ -427,6 +428,23 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Fills this container with template parameter pack.
+	///
+	/// @tparam Index
+	/// Index of the current element in the parameter pack.
+	///
+	/// @tparam FirstType
+	/// Type of the first element in the parameter pack.
+	///
+	/// @tparam RestTypePack
+	/// Parameter pack for types sent to the constructor of the element.
+	///
+	/// @param first
+	/// First element in the parameter pack.
+	///
+	/// @param ...rest
+	/// Remaining elements in the parameter pack.
 	template<
 		u64																								Index,
 		std::constructible_from<ValueType>																FirstType,
@@ -441,6 +459,8 @@ private:
 		data[ Index ] = std::forward<FirstType>( first );
 		if constexpr( sizeof...( RestTypePack ) ) FillFromTemplateParameterPack<Index + 1>( std::forward<RestTypePack>( rest )... );
 	}
+
+private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																							data[ ValueCount ];
