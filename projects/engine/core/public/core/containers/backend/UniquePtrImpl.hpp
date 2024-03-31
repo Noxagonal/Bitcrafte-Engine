@@ -212,6 +212,55 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Casts and releases the contained pointer to the new unique pointer.
+	///
+	/// Transfers ownership of the contained pointer to a new unique pointer. This is a helper function primarily for downcasting,
+	/// this function is provided mostly because releasing ownership of the contained pointer is not supported. This is because raw
+	/// pointer memory management is not as straightforward as std::unique_ptr.
+	///
+	/// @note
+	/// Up-cast, down-cast and same type cast are supported. It not necessary to use this function to up-cast as it is implicit.
+	///
+	/// @note
+	/// The contained pointer must be derived from ValueType.
+	///
+	/// @note
+	/// If cast fails, exception will be thrown in debug builds. In release builds, an empty UniquePtr will be returned and current
+	/// UniquePtr will retain ownership.
+	/// 
+	/// @tparam DerivedValueType
+	/// Type to downcast to.
+	/// 
+	/// @return
+	/// Downcasted unique pointer.
+	template<typename CastToValueType>
+	constexpr BC_CONTAINER_NAME( UniquePtr )<CastToValueType>											CastTo()
+	{
+		static_assert(
+			std::is_base_of_v<ValueType, CastToValueType> || std::is_base_of_v<CastToValueType, ValueType>,
+			"Cannot cast, Types have no correlation"
+		);
+
+		if constexpr( std::is_base_of_v<CastToValueType, ValueType> )
+		{
+			// No cast or upcast
+			return BC_CONTAINER_NAME( UniquePtr )( std::move( *this ) );
+		}
+		else if constexpr( std::is_base_of_v<ValueType, CastToValueType> )
+		{
+			// Downcast
+			auto casted_ptr = dynamic_cast<CastToValueType*>( this->data_ptr );
+			BC_ContainerAssert( casted_ptr, U"Failed to downcast" );
+			if( casted_ptr == nullptr ) return {};
+			auto downcasted_unique_ptr = BC_CONTAINER_NAME( UniquePtr )<CastToValueType>();
+			downcasted_unique_ptr.data_ptr = casted_ptr;
+			this->data_ptr = nullptr;
+			return downcasted_unique_ptr;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void																						Clear() BC_CONTAINER_NOEXCEPT
 	{
 		if( this->data_ptr == nullptr ) return;
