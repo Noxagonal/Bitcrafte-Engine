@@ -271,6 +271,8 @@ TAB_SIZE               = 4
 
 ALIASES                += "rst=\verbatim embed:rst:leading-asterisk"
 ALIASES                += "endrst=\endverbatim"
+
+# Aliases for event parameters.
 ALIASES                += "eventparam=\xrefitem eventparam \"Event Parameter\" \"Event Parameters\""
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
