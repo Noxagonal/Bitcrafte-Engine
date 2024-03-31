@@ -134,6 +134,7 @@ public:
 		BC_CONTAINER_NAME( UniquePtr )																&&	other
 	) noexcept
 	{
+		if( this == std::addressof( other ) ) return *this;
 		this->SwapOther( std::move( other ) );
 		return *this;
 	}
