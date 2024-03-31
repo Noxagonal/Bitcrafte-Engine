@@ -22,7 +22,11 @@ BC_CONTAINER_NAMESPACE_START;
 ///
 /// @note
 /// This container can handle objects which constructor may throw. If there's a chance that the object constructor may throw,
-/// it should be wrapped into a UniquePtr or Optional.
+/// it can still be wrapped into a UniquePtr or Optional.
+///
+/// @note
+/// Aquiring raw pointers is not supported. Likewise releasing raw pointers is not supported. This is because internal memory
+/// management is not as straightforward as std::unique_ptr.
 ///
 /// @tparam ValueType
 /// Type of the contained object/element.
@@ -92,14 +96,6 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr explicit BC_CONTAINER_NAME( UniquePtr )(
-		ValueType																					*	claim_pointer
-	) noexcept
-	{
-		this->data_ptr = claim_pointer;
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ~BC_CONTAINER_NAME( UniquePtr )() BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();
@@ -120,17 +116,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		ValueType																					*	claim_pointer
-	) BC_CONTAINER_NOEXCEPT
-	{
-		this->Clear();
-		this->data_ptr = claim_pointer;
-		return *this;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
+	constexpr BC_CONTAINER_NAME( UniquePtr )												&	operator=(
 		BC_CONTAINER_NAME( UniquePtr )																&&	other
 	) noexcept
 	{
