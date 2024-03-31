@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/diagnostic/assertion/Assert.hpp>
+#include <core/utility/template/TypeList.hpp>
 #include <core/containers/List.hpp>
 #include <core/containers/Map.hpp>
 
@@ -47,6 +48,8 @@ template<typename ...EventSignalTypePack>
 class Event
 {
 public:
+
+	using EventSignalTypeList = utility::TypeList<EventSignalTypePack...>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Event() = default;
