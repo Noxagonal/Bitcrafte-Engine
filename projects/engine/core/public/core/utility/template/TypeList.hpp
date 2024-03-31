@@ -377,8 +377,8 @@ static_assert( TypeList<int, float, double>::template Matches<TypeList<int>>() =
 static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float>>() == false );
 static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float, double>>() == true );
 
-auto type_list_sample = TypeList<int, float, double>();
-auto other_type_list_sample = TypeList<int, float, double>();
+static auto type_list_sample = TypeList<int, float, double>();
+static auto other_type_list_sample = TypeList<int, float, double>();
 static_assert( type_list_sample == other_type_list_sample );
 
 // Tests for TypeListType concept.
