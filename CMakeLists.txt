@@ -165,14 +165,28 @@ if(NOT ${BITCRAFTE_INSTALL_GAME_SHIPPING} AND NOT ${BITCRAFTE_INSTALL_GAME_DEVEL
 		COMMAND ${CMAKE_COMMAND} --build "${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameShipping" --target install --config GameShipping
 		COMMENT "Reconfiguring in '${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameShipping' and installing to '${CMAKE_SOURCE_DIR}/build/install/InstallGameShipping'"
 	)
+	set_target_properties(InstallGameShipping
+		PROPERTIES
+			FOLDER							"install"
+	)
+
 	add_custom_target(InstallGameDevelopment
 		COMMAND ${CMAKE_COMMAND} "-S${CMAKE_SOURCE_DIR}" "-B${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameDevelopment" -DBITCRAFTE_INSTALL_GAME_DEVELOPMENT=ON -DCMAKE_BUILD_TYPE=GameDevelopment
 		COMMAND ${CMAKE_COMMAND} --build "${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameDevelopment" --target install --config GameDevelopment
 		COMMENT "Reconfiguring in '${CMAKE_SOURCE_DIR}/build/install_targets/InstallGameDevelopment' and installing to '${CMAKE_SOURCE_DIR}/build/install/InstallGameDevelopment'"
 	)
+	set_target_properties(InstallGameDevelopment
+		PROPERTIES
+			FOLDER							"install"
+	)
+
 	add_custom_target(InstallEngineDevelopment
 		COMMAND ${CMAKE_COMMAND} "-S${CMAKE_SOURCE_DIR}" "-B${CMAKE_SOURCE_DIR}/build/install_targets/InstallEngineDevelopment" -DBITCRAFTE_INSTALL_ENGINE_DEVELOPMENT=ON -DCMAKE_BUILD_TYPE=EngineDevelopment
 		COMMAND ${CMAKE_COMMAND} --build "${CMAKE_SOURCE_DIR}/build/install_targets/InstallEngineDevelopment" --target install --config EngineDevelopment
 		COMMENT "Reconfiguring in '${CMAKE_SOURCE_DIR}/build/install_targets/InstallEngineDevelopment' and installing to '${CMAKE_SOURCE_DIR}/build/install/InstallEngineDevelopment'"
+	)
+	set_target_properties(InstallEngineDevelopment
+		PROPERTIES
+			FOLDER							"install"
 	)
 endif()
