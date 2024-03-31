@@ -135,8 +135,10 @@ public:
 	/// cb::Event::UnRegisterCallback()
 	/// 
 	/// @warning
-	/// There are no way to automatically unregister callbacks. Be mindful of registering member functions and lambdas that capture
-	/// anything as those callbacks will still be called even if the object is destroyed.
+	/// Do not register a callback function or a lambda that has lifetime shorter than the event it was registered to. There is no
+	/// way to automatically unregister callbacks. To navigate around this, make an event with lifetime as long as the callback and
+	/// register the newly created event as a listener to the event you want to listen to, and the callback to the newly created
+	/// event.
 	///
 	/// @param callback
 	///	Function to call when this event is signalled.
