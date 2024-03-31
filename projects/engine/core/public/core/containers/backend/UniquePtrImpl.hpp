@@ -85,7 +85,7 @@ public:
 	template<typename OtherValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )(
 		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
-	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> )
+	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
 	{
 		this->data_ptr = other.data_ptr;
 		other.data_ptr = nullptr;
@@ -143,7 +143,7 @@ public:
 	template<typename OtherValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
 		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
-	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> )
+	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
 	{
 		this->Clear();
 		this->data_ptr = other.data_ptr;
