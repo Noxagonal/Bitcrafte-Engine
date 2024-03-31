@@ -17,51 +17,53 @@ static constexpr double		Basic_MCValue = 1010.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Sample message types
+struct MessageA : public bc::MessageBusMessage
+{
+	MessageA( float value ) : value( value ) {}
+	float value = 0.0f;
+};
+struct MessageB : public bc::MessageBusMessage
+{
+	MessageB( int value ) : value( value ) {}
+	int value = 0;
+};
+struct MessageC : public bc::MessageBusMessage
+{
+	MessageC( double value ) : value( value ) {}
+	double value = 0.0;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Sample message handlers
+struct MessageHandlerA : public bc::MessageBusMessageHandler<MessageA>
+{
+	virtual void operator()( const MessageType* message ) override
+	{
+		EXPECT_FLOAT_EQ( message->value, Basic_MAValue );
+	}
+};
+struct MessageHandlerB : public bc::MessageBusMessageHandler<MessageB>
+{
+	virtual void operator()( const MessageType* message ) override
+	{
+		EXPECT_EQ( message->value, Basic_MBValue );
+	}
+};
+struct MessageHandlerC : public bc::MessageBusMessageHandler<MessageC>
+{
+	virtual void operator()( const MessageType* message ) override
+	{
+		EXPECT_DOUBLE_EQ( message->value, Basic_MCValue );
+	}
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( MessageBus, Basic )
 {
 	using namespace bc;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Sample message types
-	struct MessageA : public MessageBusMessage
-	{
-		MessageA( float value ) : value( value ) {}
-		float value = 0.0f;
-	};
-	struct MessageB : public MessageBusMessage
-	{
-		MessageB( int value ) : value( value ) {}
-		int value = 0;
-	};
-	struct MessageC : public MessageBusMessage
-	{
-		MessageC( double value ) : value( value ) {}
-		double value = 0.0;
-	};
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Sample message handlers
-	struct MessageHandlerA : public MessageBusMessageHandler<MessageA>
-	{
-		virtual void operator()( const MessageType* message ) override
-		{
-			EXPECT_FLOAT_EQ( message->value, Basic_MAValue );
-		}
-	};
-	struct MessageHandlerB : public MessageBusMessageHandler<MessageB>
-	{
-		virtual void operator()( const MessageType* message ) override
-		{
-			EXPECT_EQ( message->value, Basic_MBValue );
-		}
-	};
-	struct MessageHandlerC : public MessageBusMessageHandler<MessageC>
-	{
-		virtual void operator()( const MessageType* message ) override
-		{
-			EXPECT_DOUBLE_EQ( message->value, Basic_MCValue );
-		}
-	};
 
 	{
 		using Packet_1 = MessageBusPacket<MessageA, MessageB, MessageC>;
@@ -110,48 +112,6 @@ TEST( MessageBus, Event )
 {
 	using namespace bc;
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Sample message types
-	struct MessageA : public MessageBusMessage
-	{
-		MessageA( float value ) : value( value ) {}
-		float value = 0.0f;
-	};
-	struct MessageB : public MessageBusMessage
-	{
-		MessageB( int value ) : value( value ) {}
-		int value = 0;
-	};
-	struct MessageC : public MessageBusMessage
-	{
-		MessageC( double value ) : value( value ) {}
-		double value = 0.0;
-	};
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Sample message handlers
-	struct MessageHandlerA : public MessageBusMessageHandler<MessageA>
-	{
-		virtual void operator()( const MessageType* message ) override
-		{
-			EXPECT_FLOAT_EQ( message->value, Basic_MAValue );
-		}
-	};
-	struct MessageHandlerB : public MessageBusMessageHandler<MessageB>
-	{
-		virtual void operator()( const MessageType* message ) override
-		{
-			EXPECT_EQ( message->value, Basic_MBValue );
-		}
-	};
-	struct MessageHandlerC : public MessageBusMessageHandler<MessageC>
-	{
-		virtual void operator()( const MessageType* message ) override
-		{
-			EXPECT_DOUBLE_EQ( message->value, Basic_MCValue );
-		}
-	};
-
 	{
 		using Packet_1 = MessageBusPacket<MessageA, MessageB, MessageC>;
 		using Receiver_1 = MessageBusReceiver<MessageHandlerA, MessageHandlerB, MessageHandlerC>;
@@ -184,6 +144,45 @@ TEST( MessageBus, Event )
 		message_bus.SendPacket( std::move( packet_1 ) );
 
 		EXPECT_TRUE( messages_handled );
+	}
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( MessageBus, UnreceivablePacket )
+{
+	using namespace bc;
+
+	{
+		using Packet_1 = MessageBusPacket<MessageA, MessageB, MessageC>;
+		using Packet_2 = MessageBusPacket<MessageB, MessageC>;
+		using Receiver_1 = MessageBusReceiver<MessageHandlerA, MessageHandlerB, MessageHandlerC>;
+		using Receiver_2 = MessageBusReceiver<MessageHandlerB, MessageHandlerC>;
+
+		MessageBus<Packet_1, Packet_2> message_bus;
+
+		// Make packets.
+		UniquePtr<Packet_1> packet_1 = MakeUniquePtr<Packet_1>();
+		packet_1->AddMessage( bc::MakeUniquePtr<MessageA>( Basic_MAValue ) );
+		packet_1->AddMessage( bc::MakeUniquePtr<MessageB>( Basic_MBValue ) );
+		packet_1->AddMessage( bc::MakeUniquePtr<MessageC>( Basic_MCValue ) );
+		UniquePtr<Packet_2> packet_2 = MakeUniquePtr<Packet_2>();
+		packet_2->AddMessage( bc::MakeUniquePtr<MessageB>( Basic_MBValue ) );
+		packet_2->AddMessage( bc::MakeUniquePtr<MessageC>( Basic_MCValue ) );
+
+		// Send packet.
+		message_bus.SendPacket( std::move( packet_1 ) );
+		message_bus.SendPacket( std::move( packet_2 ) );
+
+		// Receive packet.
+		Receiver_1 receiver_1;
+		Receiver_2 receiver_2;
+		auto received_packet_1 = message_bus.ClaimPacket<Packet_1>( 1 );
+		auto received_packet_2 = message_bus.ClaimPacket<Packet_2>( 1 );
+
+		EXPECT_FALSE( received_packet_1.IsEmpty() );
+		EXPECT_TRUE( received_packet_2.IsEmpty() );
 	}
 };
 
