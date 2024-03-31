@@ -5,6 +5,12 @@
 #include <iostream>
 #include <sstream>
 
+#if defined( BITCRAFTE_PLATFORM_WINDOWS )
+#include <core/platform/windows/Windows.hpp>
+#else
+#error "Please add platform support here."
+#endif
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,8 +160,6 @@ std::basic_ostream<char8_t> & operator<<(
 
 
 #if defined( BITCRAFTE_PLATFORM_WINDOWS )
-
-#include <Windows.h>
 
 
 

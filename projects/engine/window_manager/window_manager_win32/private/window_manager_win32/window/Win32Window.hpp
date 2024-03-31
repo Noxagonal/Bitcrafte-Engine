@@ -2,13 +2,9 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <window_manager/window/Window.hpp>
-
-#include <Windows.h>
-// Prevent polluting CreateWindow all over the place
-#undef CreateWindow
-
 #include <window_manager/platform/handles/WindowPlatformHandles.hpp>
 
+#include <core/platform/windows/Windows.hpp>
 
 
 

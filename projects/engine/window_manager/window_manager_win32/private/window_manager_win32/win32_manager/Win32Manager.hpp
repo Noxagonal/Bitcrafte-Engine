@@ -7,8 +7,7 @@
 #include <core/containers/List.hpp>
 #include <core/containers/UniquePtr.hpp>
 
-#include <Windows.h>
-#undef CreateWindow
+#include <core/platform/windows/Windows.hpp>
 
 
 

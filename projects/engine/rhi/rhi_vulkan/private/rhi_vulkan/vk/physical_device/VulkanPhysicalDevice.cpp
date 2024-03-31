@@ -7,7 +7,7 @@
 #include <rhi_vulkan/platform/PlatformSpecificExtensionNames.hpp>
 
 #if BITCRAFTE_WINDOW_MANAGER_WIN32
-#include <Windows.h>
+#include <core/platform/windows/Windows.hpp>
 #elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 todo;
 #else

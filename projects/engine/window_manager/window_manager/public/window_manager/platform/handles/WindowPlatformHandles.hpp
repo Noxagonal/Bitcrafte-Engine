@@ -5,9 +5,8 @@
 #include <cstdint>
 
 #if BITCRAFTE_WINDOW_MANAGER_WIN32
-#include <Windows.h>
+#include <core/platform/windows/Windows.hpp>
 #endif
-
 
 
 namespace bc {
