@@ -397,7 +397,7 @@ LRESULT CALLBACK WndProc(
 	// Text input.
 	case WM_CHAR:
 	{
-		win32_window->events.KeyboardCharacter.Signal( static_cast<i32>( w_param ) );
+		win32_window->events.KeyboardCharacter.Signal( static_cast<c32>( w_param ) );
 		break;
 	}
 	case WM_UNICHAR:
@@ -408,7 +408,7 @@ LRESULT CALLBACK WndProc(
 			return TRUE;
 		}
 
-		win32_window->events.KeyboardCharacter.Signal( static_cast<i32>( w_param ) );
+		win32_window->events.KeyboardCharacter.Signal( static_cast<c32>( w_param ) );
 		break;
 	}
 

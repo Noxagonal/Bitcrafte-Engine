@@ -63,7 +63,7 @@ public:
 	/// 
 	///				Keyboard input event returning unicode characters. Returns
 	///				unicode character.
-	Event<i32>																	KeyboardCharacter;
+	Event<c32>																	KeyboardCharacter;
 };
 
 
