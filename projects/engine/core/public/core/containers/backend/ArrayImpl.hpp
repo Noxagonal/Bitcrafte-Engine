@@ -859,7 +859,7 @@ public:
 
 
 #if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-// Tests.
+namespace tests {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill size requirements.
@@ -882,6 +882,7 @@ static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( Array )<char32_t, 
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( Array )<char32_t, 4>> );
 static_assert( !utility::TextContainer<BC_CONTAINER_NAME( Array )<char32_t, 4>> );
 
+} // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 

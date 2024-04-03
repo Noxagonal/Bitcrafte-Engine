@@ -1001,7 +1001,7 @@ using BC_CONTAINER_NAME( EditableListView ) = BC_CONTAINER_NAME( ListViewBase )<
 
 
 #if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-// Tests.
+namespace tests {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill size requirements.
@@ -1049,6 +1049,7 @@ static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( ListView )<char32_
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( ListView )<char32_t>> );
 static_assert( !utility::TextContainer<BC_CONTAINER_NAME( ListView )<char32_t>> );
 
+} // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
