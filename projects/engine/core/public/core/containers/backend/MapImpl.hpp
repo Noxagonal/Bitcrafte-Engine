@@ -1567,6 +1567,9 @@ private:
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+// Tests.
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if map container fulfills size requirements.
 static_assert( sizeof( container_bases::BC_CONTAINER_NAME( MapIteratorBase )<u32, u32, true> ) == 16 );
@@ -1584,6 +1587,8 @@ static_assert( utility::Container<BC_CONTAINER_NAME( Map )<u32, u32>> );
 static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( Map )<u32, u32>> );
 static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( Map )<u32, u32>> );
 static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( Map )<u32, u32>> );
+
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 

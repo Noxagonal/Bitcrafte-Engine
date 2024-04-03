@@ -2056,6 +2056,9 @@ using BC_CONTAINER_NAME( EditableTextView32	) = BC_CONTAINER_NAME( TextViewBase	
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+// Tests.
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill size requirements.
 static_assert( sizeof( BC_CONTAINER_NAME( Text ) ) == 24 );
@@ -2153,6 +2156,8 @@ static_assert( !utility::TextContainer<BC_CONTAINER_NAME( EditableTextView )> );
 static_assert( utility::TextContainerView<BC_CONTAINER_NAME( TextView )> );
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( TextView )> );
 static_assert( !utility::TextContainer<BC_CONTAINER_NAME( TextView )> );
+
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 

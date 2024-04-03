@@ -122,9 +122,14 @@ public:
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+// Tests.
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if pair container fulfills size requirements.
 static_assert( sizeof( BC_CONTAINER_NAME( Pair )<u32, u32> ) == ( sizeof( u32 ) + sizeof( u32 ) ) );
+
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 

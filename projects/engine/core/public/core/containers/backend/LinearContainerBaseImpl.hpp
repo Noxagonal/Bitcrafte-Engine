@@ -1349,6 +1349,9 @@ protected:
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+// Tests.
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if linear container base fulfills size requirements.
 static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, true> ) == 16 );
@@ -1371,6 +1374,8 @@ static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIter
 static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, false>> );
 static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<u32>, true>> );
 static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<u32>, false>> );
+
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 

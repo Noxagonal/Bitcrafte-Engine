@@ -858,6 +858,9 @@ public:
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+// Tests.
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill size requirements.
 static_assert( sizeof( BC_CONTAINER_NAME( Array )<u32, 5> ) == sizeof( u32 ) * 5 );
@@ -878,6 +881,8 @@ static_assert( utility::LinearContainer<BC_CONTAINER_NAME( Array )<u32, 4>> );
 static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( Array )<char32_t, 4>> );
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( Array )<char32_t, 4>> );
 static_assert( !utility::TextContainer<BC_CONTAINER_NAME( Array )<char32_t, 4>> );
+
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 
