@@ -721,10 +721,10 @@ constexpr ValueType				*	InPlaceReallocateMemory(
 	{
 		auto allocation_info = internal_::GetSystemMemoryAllocationInfoFromRawPointer( old_location );
 
-		BHardAssert( allocation_info, "In place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier" );
+		BHardAssert( allocation_info, "Could not in-place reallocate memory, allocation header not found. This was not allocated using engine utilities or pointer did not point to the beginning of the allocated block." );
 		BHardAssert(
 			allocation_info->payload_size != new_count * sizeof( ValueType ),
-			"In place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier"
+			"Could not in-place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier"
 		);
 
 		return reinterpret_cast<ValueType*>( internal_::InPlaceReallocateMemory_Runtime( *allocation_info, new_count * sizeof( ValueType ) ) );
