@@ -96,15 +96,15 @@ inline void											*	AlignMemoryToRequirement(
 {
 	auto is_alignment_requirement_power_of_2 = ( alignment_requirement & ( alignment_requirement - 1 ) ) == 0;
 
-	BHardAssert( alignment_requirement > 0, "Align memory to requirement, alignment must be larger than 0" );
-	BHardAssert( alignment_requirement <= 0x8000, "Align memory to requirement, alignment must be smaller or equal to 32kb" );
-	BHardAssert( is_alignment_requirement_power_of_2, "Align memory to requirement, alignment must be power of 2" );
+	BHardAssert( alignment_requirement > 0, "Cannot align memory to requirement, alignment must be larger than 0" );
+	BHardAssert( alignment_requirement <= 0x8000, "Cannot align memory to requirement, alignment must be smaller or equal to 32kb" );
+	BHardAssert( is_alignment_requirement_power_of_2, "Cannot align memory to requirement, alignment must be power of 2" );
 
 	auto ptr_position = reinterpret_cast<uintptr_t>( location );
 	auto aligned_ptr_position = ( ptr_position - 1 ) / alignment_requirement * alignment_requirement + alignment_requirement;
 
 	// Test for overflow, however this shouldn't ever happen in practice, it may detect some errors.
-	BHardAssert( aligned_ptr_position >= ptr_position, "Align memory to requirement, pointer overflow" );
+	BHardAssert( aligned_ptr_position >= ptr_position, "Cannot align memory to requirement, pointer overflow" );
 
 	return reinterpret_cast<void*>( aligned_ptr_position );
 }
@@ -172,17 +172,17 @@ inline SystemMemoryAllocationInfo						CalculateSystemMemoryAllocationInfoFromSy
 {
 	auto is_payload_alignment_requirement_power_of_2 = ( payload_alignment_requirement & ( payload_alignment_requirement - 1 ) ) == 0;
 
-	BHardAssert( system_allocated_location != nullptr, "Calculate system memory allocation info from system allocation, no system memory pointer given" );
+	BHardAssert( system_allocated_location != nullptr, "Cannot calculate system memory allocation info from system allocation, no system memory pointer given" );
 
-	BHardAssert( system_allocated_size > 0, "Calculate system memory allocation info from system allocation, system allocated size must be larger than 0" );
-	BHardAssert( system_allocated_size < 0x0000FFFFFFFFFFFF, "Calculate system memory allocation info from system allocation, system allocated size too large" );
+	BHardAssert( system_allocated_size > 0, "Cannot calculate system memory allocation info from system allocation, system allocated size must be larger than 0" );
+	BHardAssert( system_allocated_size < 0x0000FFFFFFFFFFFF, "Cannot calculate system memory allocation info from system allocation, system allocated size too large" );
 
-	BHardAssert( payload_size > 0, "Calculate system memory allocation info from system allocation, payload size must be larger than 0" );
-	BHardAssert( payload_size < 0x0000FFFFFFFFFFFF, "Calculate system memory allocation info from system allocation, payload size too large" );
+	BHardAssert( payload_size > 0, "Cannot calculate system memory allocation info from system allocation, payload size must be larger than 0" );
+	BHardAssert( payload_size < 0x0000FFFFFFFFFFFF, "Cannot calculate system memory allocation info from system allocation, payload size too large" );
 
-	BHardAssert( payload_alignment_requirement > 0, "Calculate system memory allocation info from system allocation, payload alignment must be larger than 0" );
+	BHardAssert( payload_alignment_requirement > 0, "Cannot calculate system memory allocation info from system allocation, payload alignment must be larger than 0" );
 	BHardAssert( payload_alignment_requirement <= 0x8000, "Calculate system memory allocation info from system allocation, payload alignment must be smaller or equal to 32kb" );
-	BHardAssert( is_payload_alignment_requirement_power_of_2, "Calculate system memory allocation info from system allocation, alignment must be power of 2" );
+	BHardAssert( is_payload_alignment_requirement_power_of_2, "Cannot calculate system memory allocation info from system allocation, alignment must be power of 2" );
 
 	auto allocation_info							= SystemMemoryAllocationInfo {};
 	allocation_info.system_allocated_location		= system_allocated_location;
@@ -317,13 +317,13 @@ inline u64												CalculateUnusedPayloadSpaceInAllocation(
 {
 	BHardAssert(
 		allocation_info.payload_location > allocation_info.system_allocated_location,
-		"Unable to calculate unused space in allocation, payload location was before system allocation location"
+		"Cannot calculate unused space in allocation, payload location was before system allocation location"
 	);
 
 	auto payload_offset_to_system_ptr = reinterpret_cast<u64>( allocation_info.payload_location ) - reinterpret_cast<u64>( allocation_info.system_allocated_location );
 	BHardAssert(
 		allocation_info.system_allocation_size >= payload_offset_to_system_ptr + allocation_info.payload_size,
-		"Unable to calculate unused space in allocation, apparent system allocation size was smaller than actual space required by the payload"
+		"Cannot calculate unused space in allocation, apparent system allocation size was smaller than actual space required by the payload"
 	);
 	return allocation_info.system_allocation_size - payload_offset_to_system_ptr - allocation_info.payload_size;
 }
@@ -585,10 +585,10 @@ constexpr void					FreeMemory(
 	else
 	{
 		// Assert some common Visual studio fault addresses.
-		BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Freeing memory outside of process" );
-		BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Freeing already freed memory" );
-		BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Freeing uninitialized global memory" );
-		BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Freeing uninitialized stack memory" );
+		BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Cannot free memory, memory outside of process" );
+		BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Cannot free memory, memory is already freed" );
+		BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Cannot free memory, memory is uninitialized global memory" );
+		BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Cannot free memory, memory is uninitialized stack memory" );
 
 		BHardAssert( count < 0x0000FFFFFFFFFFFF, "Freeing memory, element count too high, something is not right" );
 
@@ -611,8 +611,8 @@ constexpr ValueType			*	AllocateMemory(
 	}
 	else
 	{
-		BHardAssert( count > 0, "Allocating memory, new element count must be larger than 0" );
-		BHardAssert( count < 0x0000FFFFFFFFFFFF, "Allocating memory, new element count too high, something is not right" );
+		BHardAssert( count > 0, "Cannot allocate memory, new element count must be larger than 0" );
+		BHardAssert( count < 0x0000FFFFFFFFFFFF, "Cannot allocate memory, new element count too high, something is not right" );
 
 		return reinterpret_cast<ValueType*>( internal_::AllocateRawMemory_Runtime( count * sizeof( ValueType ), alignment_requirement ) );
 	}
@@ -637,16 +637,16 @@ constexpr ValueType			*	ReallocateMemory(
 	else
 	{
 		// Assert some common Visual studio fault addresses.
-		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Reallocating memory, with old pointer pointing to memory outside of process" );
-		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Reallocating memory, with old pointer pointing to freed memory" );
-		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Reallocating memory, with old pointer pointing to uninitialized global memory" );
-		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Reallocating memory, with old pointer pointing to uninitialized stack memory" );
+		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Cannot reallocate memory, old pointer pointing to memory outside of process" );
+		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Cannot reallocate memory, old pointer pointing to freed memory" );
+		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Cannot reallocate memory, old pointer pointing to uninitialized global memory" );
+		BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Cannot reallocate memory, old pointer pointing to uninitialized stack memory" );
 
-		BHardAssert( old_location != nullptr, "Reallocating memory, old location is nullptr" );
-		BHardAssert( old_count > 0, "Reallocating memory, old element count must be larger than 0" );
-		BHardAssert( old_count < 0x0000FFFFFFFFFFFF, "Reallocating memory, old element count too high, something is not right" );
+		BHardAssert( old_location != nullptr, "Cannot reallocate memory, old location is nullptr" );
+		BHardAssert( old_count > 0, "Cannot reallocate memory, old element count must be larger than 0" );
+		BHardAssert( old_count < 0x0000FFFFFFFFFFFF, "Cannot reallocate memory, old element count too high, something is not right" );
 
-		BHardAssert( old_count != new_count, "Reallocating memory, new reserved element count is the same as the old element count, this check should be done earlier" );
+		BHardAssert( old_count != new_count, "Cannot reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier" );
 
 		return reinterpret_cast<ValueType*>( internal_::ReallocateRawMemory_Runtime( old_location, new_count * sizeof( ValueType ) ) );
 	}
