@@ -18,6 +18,14 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Mathematical vector storing 2, 3, or 4 components
+/// 
+/// @tparam DimensionCount
+/// Number of dimensions this vector should have, must be 2, 3, or 4.
+/// 
+/// @tparam ValueType
+/// Type of the contained value, eg. f32, i32, f64.
 template<u64 DimensionCount, utility::FundamentalType ValueType>
 class VectorBase;
 
