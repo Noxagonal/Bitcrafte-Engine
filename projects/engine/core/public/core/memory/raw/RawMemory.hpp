@@ -655,6 +655,19 @@ constexpr ValueType			*	ReallocateMemory(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Test if pointer has enough headroom to extend the allocation.
+///
+/// @see InPlaceReallocateMemory().
+///
+/// @tparam ValueType
+/// Type of memory to be tested.
+///
+/// @param location
+/// Pointer to beginning of the original allocation that should be in-place expanded.
+///
+/// @param new_count
+/// Number of elements that should fit into the new allocation.
 template<typename ValueType>
 constexpr bool					IsInPlaceReallocateable(
 	const ValueType			*	location,
@@ -675,6 +688,24 @@ constexpr bool					IsInPlaceReallocateable(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Reallocates memory in place.
+///
+/// The purpose of this function is to reconfigure the memory allocation header so that the allocation becomes larger.
+/// This assumes that there is enough space at the end of the current allocation.
+/// The memory pool is involved for in-place allocation if the current allocation does not have enough headroom.
+/// 
+/// @tparam ValueType
+/// Type of memory to be allocated.
+///
+/// @param old_location
+/// Pointer to beginning of the original allocation that should be in-place expanded.
+///
+/// @param old_count
+/// Number of elements allocated at the old pointer.
+///
+/// @param new_count
+/// Number of elements that should fit into the new allocation.
 template<typename ValueType>
 constexpr ValueType				*	InPlaceReallocateMemory(
 	ValueType					*	old_location,
