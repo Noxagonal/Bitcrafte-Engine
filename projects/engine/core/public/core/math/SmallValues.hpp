@@ -26,6 +26,41 @@ static constexpr f64							SMALL_F64_VALUE				= 0.00001;
 
 
 
+namespace internal_ {
+
+template<utility::FundamentalType FundamentalType>
+struct SmallValueGetter
+{
+    constexpr FundamentalType value = {};
+};
+
+template<>
+struct SmallValueGetter<f32>
+{
+    constexpr f32 value = SMALL_F32_VALUE;
+};
+
+template<>
+struct SmallValueGetter<f64>
+{
+    constexpr f64 value = SMALL_F64_VALUE;
+};
+
+} // internal_
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Get small value for a given data type.
+/// 
+/// @tparam FundamentalType
+/// Type to get small value for.
+template<utility::FundamentalType FundamentalType>
+constexpr FundamentalType SmallValue = internal_::SmallValueGetter<FundamentalType>::value;
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::FundamentalType FundamentalType>
 consteval inline FundamentalType				GetSmallValue()
