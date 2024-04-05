@@ -26,7 +26,7 @@ namespace math {
 ///
 /// @param range
 /// Maximum distance between values for them to still be considered within range.
-template<utility::FundamentalType		ValueType>
+template<utility::FundamentalValue		ValueType>
 constexpr bool							AreValuesWithinRange(
 	ValueType							v1,
 	ValueType							v2,
@@ -53,7 +53,7 @@ constexpr bool							AreValuesWithinRange(
 ///
 /// @param v2
 /// Value to test against v1 if it is close enough to it.
-template<utility::FloatingPointType		ValueType>
+template<utility::FloatingPointValue	ValueType>
 constexpr bool							IsFloatEqual(
 	ValueType							v1,
 	ValueType							v2

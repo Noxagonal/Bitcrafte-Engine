@@ -30,7 +30,7 @@ namespace math {
 /// Maximum distance between values for them to still be considered within range.
 template<
 	u64																VectorLength,
-	utility::FundamentalType										VectorValueType
+	utility::FundamentalValue										VectorValueType
 >
 constexpr bool														AreValuesWithinRange(
 	const math::VectorBase<VectorLength, VectorValueType>		&	v1,
@@ -80,7 +80,7 @@ constexpr bool														AreValuesWithinRange(
 /// Value to test against v1 if it is close enough to it.
 template<
 	u64																VectorLength,
-	utility::FundamentalType										VectorValueType
+	utility::FundamentalValue										VectorValueType
 >
 constexpr bool														IsFloatEqual(
 	const math::VectorBase<VectorLength, VectorValueType>		&	v1,

@@ -26,13 +26,13 @@ namespace math {
 /// 
 /// @tparam ValueType
 /// Type of the contained value, eg. f32, i32, f64.
-template<u64 DimensionCount, utility::FundamentalType ValueType>
+template<u64 DimensionCount, utility::FundamentalValue ValueType>
 class VectorBase;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalType ValueType>
+template<utility::FundamentalValue ValueType>
 class alignas( sizeof( ValueType ) * 2 ) VectorBase<2, ValueType>
 {
 public:
@@ -206,7 +206,7 @@ public:
 		VectorBase															other
 	) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y );
 		}
@@ -221,7 +221,7 @@ public:
 		VectorBase															other
 	) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y );
 		}
@@ -299,7 +299,7 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalType ValueType>
+template<utility::FundamentalValue ValueType>
 class VectorBase<3, ValueType>
 {
 public:
@@ -483,7 +483,7 @@ public:
 		VectorBase															other
 	) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y ) && IsFloatEqual( z, other.z );
 		}
@@ -498,7 +498,7 @@ public:
 		VectorBase															other
 	) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y ) || !IsFloatEqual( z, other.z );
 		}
@@ -586,7 +586,7 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalType ValueType>
+template<utility::FundamentalValue ValueType>
 class alignas( sizeof( ValueType ) * 4 ) VectorBase<4, ValueType>
 {
 public:
@@ -780,7 +780,7 @@ public:
 		VectorBase															other
 		) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y ) && IsFloatEqual( z, other.z ) && IsFloatEqual( w, other.w );
 		}
@@ -795,7 +795,7 @@ public:
 		VectorBase															other
 		) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y ) || !IsFloatEqual( z, other.z ) || !IsFloatEqual( w, other.w );
 		}

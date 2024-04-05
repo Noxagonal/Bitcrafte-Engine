@@ -21,7 +21,7 @@ namespace math {
 ///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointType ValueType>
+template<utility::FloatingPointValue ValueType>
 constexpr ValueType					RoundToCeiling(
 	ValueType						value
 )
@@ -38,7 +38,7 @@ constexpr ValueType					RoundToCeiling(
 ///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointType ValueType>
+template<utility::FloatingPointValue ValueType>
 constexpr ValueType					RoundToFloor(
 	ValueType						value
 )
@@ -55,7 +55,7 @@ constexpr ValueType					RoundToFloor(
 ///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointType ValueType>
+template<utility::FloatingPointValue ValueType>
 constexpr ValueType					RoundToClosest(
 	ValueType						value
 )
@@ -72,7 +72,7 @@ constexpr ValueType					RoundToClosest(
 ///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointType ValueType>
+template<utility::FloatingPointValue ValueType>
 constexpr ValueType					Truncate(
 	ValueType						value
 )

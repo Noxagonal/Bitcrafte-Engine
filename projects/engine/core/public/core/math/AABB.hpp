@@ -30,7 +30,7 @@ namespace math {
 ///
 /// @tparam ValueType
 /// Value type of this bounding box.
-template<u64 AABBDimensionCount, utility::FundamentalType ValueType>
+template<u64 AABBDimensionCount, utility::FundamentalValue ValueType>
 class AABBBase
 {
 	static_assert( AABBDimensionCount >= 2 && AABBDimensionCount <= 4, "Invalid number of dimensions" );
@@ -107,7 +107,7 @@ public:
 		const AABBBase													&	other
 	) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return IsFloatEqual( begin, other.begin ) && IsFloatEqual( end, other.end );
 		}
@@ -134,7 +134,7 @@ public:
 		const AABBBase													&	other
 	) const
 	{
-		if constexpr( utility::FloatingPointType<ValueType> )
+		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
 			return !IsFloatEqual( begin, other.begin ) || !IsFloatEqual( end, other.end );
 		}

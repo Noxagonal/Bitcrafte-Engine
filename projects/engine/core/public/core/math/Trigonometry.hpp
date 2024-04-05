@@ -14,7 +14,7 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalType ValueType>
+template<utility::FundamentalValue ValueType>
 constexpr ValueType				Sin(
 	ValueType					value
 )
@@ -23,7 +23,7 @@ constexpr ValueType				Sin(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalType ValueType>
+template<utility::FundamentalValue ValueType>
 constexpr ValueType				Cos(
 	ValueType					value
 )
@@ -32,7 +32,7 @@ constexpr ValueType				Cos(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalType ValueType>
+template<utility::FundamentalValue ValueType>
 constexpr ValueType				Tan(
 	ValueType					value
 )
