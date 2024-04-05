@@ -12,6 +12,7 @@ namespace bc {
 namespace utility {
 namespace internal_ {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
 	bool IsPlainFunctionCallable,
 	bool IsMemberCallable,
@@ -42,14 +43,27 @@ public:
 
 
 
-template<typename Callable>
-class CallableObjectResolver {};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Helper class to resolve the traits of a callable object.
+///
+/// Specializations below are used to resolve the traits of each callable object operator().
+///
+/// @tparam Type
+/// Unused.
+template<typename Type>
+class CallableObjectResolver
+{
+	static_assert( 0, "Cannot get a callable traits from a non callable type." );
+};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... )>
 	: public CallableTraitsBase<false, false, false, false, false, false, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const>
 	: public CallableTraitsBase<false, false, true, false, false, false, false, CallableReturnType, CallableParameterTypePack...>
@@ -60,106 +74,127 @@ class CallableObjectResolver<CallableReturnType( CallableClassType::* )( Callabl
 	: public CallableTraitsBase<false, false, false, true, false, false, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const volatile>
 	: public CallableTraitsBase<false, false, true, true, false, false, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) &>
 	: public CallableTraitsBase<false, false, false, false, true, false, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const &>
 	: public CallableTraitsBase<false, false, true, false, true, false, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) volatile &>
 	: public CallableTraitsBase<false, false, false, true, true, false, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const volatile &>
 	: public CallableTraitsBase<false, false, true, true, true, false, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) &&>
 	: public CallableTraitsBase<false, false, false, false, false, true, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const &&>
 	: public CallableTraitsBase<false, false, true, false, false, true, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) volatile &&>
 	: public CallableTraitsBase<false, false, false, true, false, true, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const volatile &&>
 	: public CallableTraitsBase<false, false, true, true, false, true, false, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) noexcept>
 	: public CallableTraitsBase<false, false, false, false, false, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const noexcept>
 	: public CallableTraitsBase<false, false, true, false, false, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) volatile noexcept>
 	: public CallableTraitsBase<false, false, false, true, false, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const volatile noexcept>
 	: public CallableTraitsBase<false, false, true, true, false, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) & noexcept>
 	: public CallableTraitsBase<false, false, false, false, true, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const & noexcept>
 	: public CallableTraitsBase<false, false, true, false, true, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) volatile & noexcept>
 	: public CallableTraitsBase<false, false, false, true, true, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const volatile & noexcept>
 	: public CallableTraitsBase<false, false, true, true, true, false, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) && noexcept>
 	: public CallableTraitsBase<false, false, false, false, false, true, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const && noexcept>
 	: public CallableTraitsBase<false, false, true, false, false, true, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) volatile && noexcept>
 	: public CallableTraitsBase<false, false, false, true, false, true, true, CallableReturnType, CallableParameterTypePack...>
 {};
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
 class CallableObjectResolver<CallableReturnType( CallableClassType::* )( CallableParameterTypePack... ) const volatile && noexcept>
 	: public CallableTraitsBase<false, false, true, true, false, true, true, CallableReturnType, CallableParameterTypePack...>
@@ -179,12 +214,13 @@ class CallableObjectResolver<CallableReturnType( CallableClassType::* )( Callabl
 /// Callable object type.
 template<typename CallableType>
 class CallableTraits :
+	// Assume this is a callable object. Delegate resolving to the CallableObjectResolver by default.
 	public internal_::CallableObjectResolver<decltype( &CallableType::operator() )>
-{
-	//static_assert( 0, "Cannot get a callable traits from a non callable type." );
-};
+{};
 
 
+
+// Plain functions.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename CallableReturnType, typename ...CallableParameterTypePack>
@@ -331,6 +367,8 @@ class CallableTraits<CallableReturnType(CallableParameterTypePack...) const vola
 {};
 
 
+
+// Member functions.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename ClassType, typename CallableReturnType, typename ...CallableParameterTypePack>
