@@ -1520,19 +1520,19 @@ struct CallableTestReturningIntWithParameter_ConstVolatileRValueReference
 	int operator()( int, float, double ) const volatile && { return 0; }
 };
 
-struct CallableTestReturningVoidNoexcept
+struct CallableTestReturningVoid_Noexcept
 {
 	void operator()() noexcept {}
 };
-struct CallableTestReturningIntNoexcept
+struct CallableTestReturningInt_Noexcept
 {
 	int operator()() noexcept { return 0; }
 };
-struct CallableTestReturningVoidWithParameterNoexcept
+struct CallableTestReturningVoidWithParameter_Noexcept
 {
 	void operator()( int, float, double ) noexcept {}
 };
-struct CallableTestReturningIntWithParameterNoexcept
+struct CallableTestReturningIntWithParameter_Noexcept
 {
 	int operator()( int, float, double ) noexcept { return 0; }
 };
@@ -1935,13 +1935,13 @@ static_assert( CallableTraits<CallableTestReturningVoid_ConstVolatileRValueRefer
 static_assert( CallableTraits<CallableTestReturningVoid_ConstVolatileRValueReference>::IsRValueOnly() == true );
 static_assert( CallableTraits<CallableTestReturningVoid_ConstVolatileRValueReference>::IsNoexcept() == false );
 
-static_assert( CallableTraits<CallableTestReturningVoidNoexcept>::IsPlainFunction() == false );
-static_assert( CallableTraits<CallableTestReturningVoidNoexcept>::IsMemberFunction() == false );
-static_assert( CallableTraits<CallableTestReturningVoidNoexcept>::IsConst() == false );
-static_assert( CallableTraits<CallableTestReturningVoidNoexcept>::IsVolatile() == false );
-static_assert( CallableTraits<CallableTestReturningVoidNoexcept>::IsLValueOnly() == false );
-static_assert( CallableTraits<CallableTestReturningVoidNoexcept>::IsRValueOnly() == false );
-static_assert( CallableTraits<CallableTestReturningVoidNoexcept>::IsNoexcept() == true );
+static_assert( CallableTraits<CallableTestReturningVoid_Noexcept>::IsPlainFunction() == false );
+static_assert( CallableTraits<CallableTestReturningVoid_Noexcept>::IsMemberFunction() == false );
+static_assert( CallableTraits<CallableTestReturningVoid_Noexcept>::IsConst() == false );
+static_assert( CallableTraits<CallableTestReturningVoid_Noexcept>::IsVolatile() == false );
+static_assert( CallableTraits<CallableTestReturningVoid_Noexcept>::IsLValueOnly() == false );
+static_assert( CallableTraits<CallableTestReturningVoid_Noexcept>::IsRValueOnly() == false );
+static_assert( CallableTraits<CallableTestReturningVoid_Noexcept>::IsNoexcept() == true );
 
 static_assert( CallableTraits<CallableTestReturningVoid_ConstNoexcept>::IsPlainFunction() == false );
 static_assert( CallableTraits<CallableTestReturningVoid_ConstNoexcept>::IsMemberFunction() == false );
