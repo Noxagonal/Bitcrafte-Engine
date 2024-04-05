@@ -31,19 +31,19 @@ namespace internal_ {
 template<utility::FundamentalType FundamentalType>
 struct SmallValueGetter
 {
-    constexpr FundamentalType value = {};
+    static constexpr FundamentalType value = {};
 };
 
 template<>
 struct SmallValueGetter<f32>
 {
-    constexpr f32 value = SMALL_F32_VALUE;
+	static constexpr f32 value = SMALL_F32_VALUE;
 };
 
 template<>
 struct SmallValueGetter<f64>
 {
-    constexpr f64 value = SMALL_F64_VALUE;
+	static constexpr f64 value = SMALL_F64_VALUE;
 };
 
 } // internal_
