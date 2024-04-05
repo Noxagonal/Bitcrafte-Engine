@@ -61,16 +61,5 @@ constexpr FundamentalType SmallValue = internal_::SmallValueGetter<FundamentalTy
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalType FundamentalType>
-consteval inline FundamentalType				GetSmallValue()
-{
-	if constexpr( std::is_same_v<FundamentalType, f32> ) return SMALL_F32_VALUE;
-	if constexpr( std::is_same_v<FundamentalType, f64> ) return SMALL_F64_VALUE;
-	else return {};
-}
-
-
-
 } // math
 } // bc

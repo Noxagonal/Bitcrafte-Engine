@@ -59,7 +59,7 @@ constexpr bool							IsFloatEqual(
 	ValueType							v2
 ) noexcept
 {
-	return AreValuesWithinRange( v1, v2, GetSmallValue<ValueType>() );
+	return AreValuesWithinRange( v1, v2, SmallValue<ValueType> );
 }
 
 

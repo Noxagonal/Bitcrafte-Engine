@@ -270,7 +270,7 @@ public:
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
-		if( magnitude <= GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
+		if( magnitude <= SmallValue<ValueType> ) return VectorBase::UnitVector();
 		return *this / magnitude;
 	}
 
@@ -550,7 +550,7 @@ public:
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
-		if( magnitude <= GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
+		if( magnitude <= SmallValue<ValueType> ) return VectorBase::UnitVector();
 		return *this / magnitude;
 	}
 
@@ -850,7 +850,7 @@ public:
 	constexpr VectorBase													Normalized() const noexcept
 	{
 		auto magnitude = Magnitude();
-		if( magnitude <= GetSmallValue<ValueType>() ) return VectorBase::UnitVector();
+		if( magnitude <= SmallValue<ValueType> ) return VectorBase::UnitVector();
 		return *this / magnitude;
 	}
 
