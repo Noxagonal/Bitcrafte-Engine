@@ -1266,21 +1266,13 @@ static_assert( CallableTraits<decltype( []() {} )>::IsLValueOnly() == false );
 static_assert( CallableTraits<decltype( []() {} )>::IsRValueOnly() == false );
 static_assert( CallableTraits<decltype( []() {} )>::IsNoexcept() == false );
 
-static_assert( CallableTraits<decltype( []() & {} )>::IsPlainFunction() == false );
-static_assert( CallableTraits<decltype( []() & {} )>::IsMemberFunction() == false );
-static_assert( CallableTraits<decltype( []() & {} )>::IsConst() == true );
-static_assert( CallableTraits<decltype( []() & {} )>::IsVolatile() == false );
-static_assert( CallableTraits<decltype( []() & {} )>::IsLValueOnly() == true );
-static_assert( CallableTraits<decltype( []() & {} )>::IsRValueOnly() == false );
-static_assert( CallableTraits<decltype( []() & {} )>::IsNoexcept() == false );
-
-static_assert( CallableTraits<decltype( []() && {} )>::IsPlainFunction() == false );
-static_assert( CallableTraits<decltype( []() && {} )>::IsMemberFunction() == false );
-static_assert( CallableTraits<decltype( []() && {} )>::IsConst() == true );
-static_assert( CallableTraits<decltype( []() && {} )>::IsVolatile() == false );
-static_assert( CallableTraits<decltype( []() && {} )>::IsLValueOnly() == false );
-static_assert( CallableTraits<decltype( []() && {} )>::IsRValueOnly() == true );
-static_assert( CallableTraits<decltype( []() && {} )>::IsNoexcept() == false );
+static_assert( CallableTraits<decltype( []() mutable {} )>::IsPlainFunction() == false );
+static_assert( CallableTraits<decltype( []() mutable {} )>::IsMemberFunction() == false );
+static_assert( CallableTraits<decltype( []() mutable {} )>::IsConst() == false );		// Note that mutable lambda is not const.
+static_assert( CallableTraits<decltype( []() mutable {} )>::IsVolatile() == false );
+static_assert( CallableTraits<decltype( []() mutable {} )>::IsLValueOnly() == false );
+static_assert( CallableTraits<decltype( []() mutable {} )>::IsRValueOnly() == false );
+static_assert( CallableTraits<decltype( []() mutable {} )>::IsNoexcept() == false );
 
 static_assert( CallableTraits<decltype( []() noexcept {} )>::IsPlainFunction() == false );
 static_assert( CallableTraits<decltype( []() noexcept {} )>::IsMemberFunction() == false );
@@ -1290,29 +1282,13 @@ static_assert( CallableTraits<decltype( []() noexcept {} )>::IsLValueOnly() == f
 static_assert( CallableTraits<decltype( []() noexcept {} )>::IsRValueOnly() == false );
 static_assert( CallableTraits<decltype( []() noexcept {} )>::IsNoexcept() == true );
 
-static_assert( CallableTraits<decltype( []() & noexcept {} )>::IsPlainFunction() == false );
-static_assert( CallableTraits<decltype( []() & noexcept {} )>::IsMemberFunction() == false );
-static_assert( CallableTraits<decltype( []() & noexcept {} )>::IsConst() == true );
-static_assert( CallableTraits<decltype( []() & noexcept {} )>::IsVolatile() == false );
-static_assert( CallableTraits<decltype( []() & noexcept {} )>::IsLValueOnly() == true );
-static_assert( CallableTraits<decltype( []() & noexcept {} )>::IsRValueOnly() == false );
-static_assert( CallableTraits<decltype( []() & noexcept {} )>::IsNoexcept() == true );
-
-static_assert( CallableTraits<decltype( []() && noexcept {} )>::IsPlainFunction() == false );
-static_assert( CallableTraits<decltype( []() && noexcept {} )>::IsMemberFunction() == false );
-static_assert( CallableTraits<decltype( []() && noexcept {} )>::IsConst() == true );
-static_assert( CallableTraits<decltype( []() && noexcept {} )>::IsVolatile() == false );
-static_assert( CallableTraits<decltype( []() && noexcept {} )>::IsLValueOnly() == false );
-static_assert( CallableTraits<decltype( []() && noexcept {} )>::IsRValueOnly() == true );
-static_assert( CallableTraits<decltype( []() && noexcept {} )>::IsNoexcept() == true );
-
-static_assert( CallableTraits<decltype( []() mutable && noexcept {} )>::IsPlainFunction() == false );
-static_assert( CallableTraits<decltype( []() mutable && noexcept {} )>::IsMemberFunction() == false );
-static_assert( CallableTraits<decltype( []() mutable && noexcept {} )>::IsConst() == false );			// Note that mutable lambda is not const.
-static_assert( CallableTraits<decltype( []() mutable && noexcept {} )>::IsVolatile() == false );
-static_assert( CallableTraits<decltype( []() mutable && noexcept {} )>::IsLValueOnly() == false );
-static_assert( CallableTraits<decltype( []() mutable && noexcept {} )>::IsRValueOnly() == true );
-static_assert( CallableTraits<decltype( []() mutable && noexcept {} )>::IsNoexcept() == true );
+static_assert( CallableTraits<decltype( []() mutable noexcept {} )>::IsPlainFunction() == false );
+static_assert( CallableTraits<decltype( []() mutable noexcept {} )>::IsMemberFunction() == false );
+static_assert( CallableTraits<decltype( []() mutable noexcept {} )>::IsConst() == false );		// Note that mutable lambda is not const.
+static_assert( CallableTraits<decltype( []() mutable noexcept {} )>::IsVolatile() == false );
+static_assert( CallableTraits<decltype( []() mutable noexcept {} )>::IsLValueOnly() == false );
+static_assert( CallableTraits<decltype( []() mutable noexcept {} )>::IsRValueOnly() == false );
+static_assert( CallableTraits<decltype( []() mutable noexcept {} )>::IsNoexcept() == true );
 
 
 // Callable objects.
