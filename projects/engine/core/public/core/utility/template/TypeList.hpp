@@ -28,6 +28,25 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
+	/// Apply the TypeList parameter pack to an existing class template with a type pack.
+	///
+	/// Usage example:
+	/// @code
+	/// template<typename... ArgumentsPack>
+	/// class ClassTemplateSample {};
+	/// 
+	/// using TypeListSample = TypeList<int, float, double>;
+	/// using PopulatedClassTemplateSample = TypeListSample::ApplyTo<ClassTemplateSample>;
+	/// // PopulatedClassTemplateSample will be equivalent to ClassTemplateSample<int, float, double>
+	/// @endcode
+	///
+	/// @tparam Template
+	/// Class template to apply the TypeList parameter pack to.
+	template<template<typename...> class Template>
+	using ApplyTo = Template<TypePack...>;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
 	/// Get template type at index in TypeList.
 	///
 	/// @note
@@ -323,9 +342,14 @@ struct TypeListTestDerived_1 : TypeListTestBase_1 {};
 struct TypeListTestDerived_2 : TypeListTestBase_2 {};
 struct TypeListTestDerived_3 : TypeListTestBase_2 {};
 
+template<typename ...TypePack>
+struct TypeListTestTemplateClass {};
+
 // Tests for TypeList.
 static_assert( sizeof( TypeList<> ) == 1 );
 static_assert( sizeof( TypeList<int, float, double> ) == 1 );
+
+static_assert( std::is_same_v<TypeList<int, float, double>::ApplyTo<TypeListTestTemplateClass>, TypeListTestTemplateClass<int, float, double>> );
 
 static_assert( std::is_same_v<TypeList<int, float, double>::template IndexToType<0>, int> );
 static_assert( std::is_same_v<TypeList<int, float, double>::template IndexToType<1>, float> );
