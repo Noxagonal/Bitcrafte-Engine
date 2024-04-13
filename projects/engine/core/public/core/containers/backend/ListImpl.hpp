@@ -693,7 +693,7 @@ public:
 	/// 
 	/// @param callable
 	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
-	template<utility::CallableWithReturn<bool, const ValueType&> CallableType>
+	template<utility::CallableWithReturnAndParameters<bool, const ValueType&> CallableType>
 	constexpr void																						EraseIf(
 		CallableType																					callable
 	) BC_CONTAINER_NOEXCEPT
@@ -723,7 +723,7 @@ public:
 	/// 
 	/// @param callable
 	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
-	template<utility::CallableWithReturn<bool, const ValueType&> CallableType>
+	template<utility::CallableWithReturnAndParameters<bool, const ValueType&> CallableType>
 	constexpr void																						EraseFirstIf(
 		CallableType																					callable
 	) BC_CONTAINER_NOEXCEPT

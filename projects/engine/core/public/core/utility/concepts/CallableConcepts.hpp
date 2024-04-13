@@ -18,7 +18,7 @@ template<
 	typename CallableType,
 	typename ...CallableParameterTypePack
 >
-concept Callable = requires(
+concept CallableWithParameters = requires(
 	CallableType				callable,
 	CallableParameterTypePack	...parameter_pack
 )
@@ -34,7 +34,7 @@ template<
 	typename CallableReturnType,
 	typename ...CallableParameterTypePack
 >
-concept CallableWithReturn = requires(
+concept CallableWithReturnAndParameters = requires(
 	CallableType				callable,
 	CallableParameterTypePack	...parameter_pack
 )

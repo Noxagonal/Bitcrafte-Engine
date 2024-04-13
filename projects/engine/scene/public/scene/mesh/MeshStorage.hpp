@@ -37,7 +37,7 @@ public:
 	~MeshStorage();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<utility::Callable<u32, LODMesh&>		CallbackType>
+	template<utility::CallableWithParameters<u32, LODMesh&>		CallbackType>
 	void											CreateLODMesh(
 		u32											lod_level_count,
 		CallbackType							&&	lod_callback
