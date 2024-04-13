@@ -28,7 +28,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Apply the TypeList parameter pack to an existing class template with a type pack.
+	/// Apply the TypeList types to an existing class template.
 	///
 	/// Usage example:
 	/// @code
@@ -40,10 +40,10 @@ public:
 	/// // PopulatedClassTemplateSample will be equivalent to ClassTemplateSample<int, float, double>
 	/// @endcode
 	///
-	/// @tparam Template
+	/// @tparam ClassTemplate
 	/// Class template to apply the TypeList parameter pack to.
-	template<template<typename...> class Template>
-	using ApplyTo = Template<TypePack...>;
+	template<template<typename...> class ClassTemplate>
+	using ApplyTo = ClassTemplate<TypePack...>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
