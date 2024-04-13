@@ -44,5 +44,23 @@ concept CallableWithReturnAndParameters = requires(
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
+
+static_assert( CallableWithParameters<void( void )> == true );
+static_assert( CallableWithParameters<void( int ), int> == true );
+static_assert( CallableWithParameters<int( void )> == true );
+static_assert( CallableWithParameters<int( int ), int> == true );
+
+static_assert( CallableWithReturnAndParameters<void( void ), void> == true );
+static_assert( CallableWithReturnAndParameters<void( int ), void, int> == true );
+static_assert( CallableWithReturnAndParameters<int( void ), int> == true );
+static_assert( CallableWithReturnAndParameters<int( int ), int, int> == true );
+
+} // tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+
+
+
 } // utility
 } // bc
