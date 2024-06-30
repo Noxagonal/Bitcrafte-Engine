@@ -39,13 +39,13 @@ public:
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr PrintRecord(
+	PrintRecord(
 		const bc::internal_::SimpleTextView32				simple_text_view
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename CharacterType, u64 StringArraySize>
-	constexpr PrintRecord(
+	PrintRecord(
 		const CharacterType( &c_string )[ StringArraySize ]
 	)
 	{
@@ -55,12 +55,12 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr PrintRecord								&	operator=(
+	PrintRecord											&	operator=(
 		const PrintRecord								&	other
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr PrintRecord								&	operator=(
+	PrintRecord											&	operator=(
 		PrintRecord										&&	other
 	) = default;
 
@@ -76,7 +76,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	constexpr PrintRecord								&	operator+=(
+	PrintRecord											&	operator+=(
 		const PrintRecord								&	other
 	);
 
@@ -92,7 +92,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	constexpr PrintRecord								&	operator+=(
+	PrintRecord											&	operator+=(
 		const PrintRecordSection						&	section
 	);
 
@@ -105,12 +105,12 @@ public:
 	///
 	/// @return
 	/// A new PrintRecord with combined texts.
-	constexpr PrintRecord									operator+(
+	PrintRecord												operator+(
 		const PrintRecord								&	other
 	) const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const PrintRecordSectionList				&	GetSections() const;
+	const PrintRecordSectionList						&	GetSections() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -118,7 +118,7 @@ public:
 	///
 	/// @return
 	/// Number of lines taken by this print record.
-	constexpr const u32										CalculateLineCount() const;
+	const u32												CalculateLineCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -132,7 +132,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	constexpr PrintRecord								&	Append(
+	PrintRecord											&	Append(
 		const PrintRecord								&	other
 	);
 
@@ -148,7 +148,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	constexpr PrintRecord								&	AddSection(
+	PrintRecord											&	AddSection(
 		const PrintRecordSection						&	section
 	);
 
@@ -168,7 +168,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	constexpr PrintRecord								&	AddIndent(
+	PrintRecord											&	AddIndent(
 		i32													add_indentation_level			= 1
 	);
 
@@ -189,12 +189,12 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	constexpr PrintRecord									GetFinalized(
+	PrintRecord												GetFinalized(
 		u32													indentation_size				= 4
 	) const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool											IsEmpty() const noexcept;
+	bool													IsEmpty() const noexcept;
 
 private:
 
@@ -207,7 +207,7 @@ private:
 	///
 	/// @return
 	/// New section list with applied indents.
-	constexpr void											Finalize_ApplyIndents(
+	void													Finalize_ApplyIndents(
 		u32													indentation_size				= 4
 	);
 
