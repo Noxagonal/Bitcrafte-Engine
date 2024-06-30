@@ -45,7 +45,13 @@ struct GetTemplateParameterPackIndexFromType<MatchType>
 		std::numeric_limits<size_t>::max()
 	>
 {
-	static_assert( 0, "Type not found" );
+	template<bool Check = false>
+	struct TypeNotFoundStaticAssertChecker
+	{
+		static_assert( Check, "Type not found" );
+	};
+	TypeNotFoundStaticAssertChecker<> type_not_found_static_assert_checker;
+	//static_assert( 0, "Type not found" );
 };
 
 // Specialization for when the first type matches the one we're looking for.
@@ -108,7 +114,14 @@ struct GetTemplateParameterPackTypeAtIndex;
 template <size_t Index>
 struct GetTemplateParameterPackTypeAtIndex<Index>
 {
-	static_assert( 0, "Out of bounds" );
+	template<bool Check = false>
+	struct OutOfBoundsStaticAssertChecker
+	{
+		static_assert( Check, "Type not found" );
+	};
+	OutOfBoundsStaticAssertChecker<> type_not_found_static_assert_checker;
+
+	//static_assert( 0, "Out of bounds" );
 	using Type = void; // This is here just to prevent polluting the error log with missing type.
 };
 

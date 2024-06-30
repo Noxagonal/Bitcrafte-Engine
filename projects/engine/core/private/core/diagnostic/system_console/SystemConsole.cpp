@@ -10,6 +10,7 @@
 #else
 #error "Please add platform support here."
 #endif
+#include <core/conversion/text/text_format/TextFormat.hpp>
 
 
 
@@ -301,12 +302,12 @@ void bc::diagnostic::internal_::SetupSystemConsole(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::SetupSystemConsole(
-	u64 characters_per_line_num
+void bc::diagnostic::internal_::SetupSystemConsole(
+	bc::u64 characters_per_line_num
 )
 {
-	auto set_characters_per_line_syscall_string = TextFormat( "stty cols {}", characters_per_line_num );
-	std::system( set_characters_per_line_syscall_string );
+	auto set_characters_per_line_syscall_string = bc::text::TextFormat( "stty cols {}", characters_per_line_num );
+	std::system( set_characters_per_line_syscall_string.ToCStr() );
 }
 
 
@@ -314,14 +315,15 @@ void bc::diagnostic::SetupSystemConsole(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 	const char8_t						*	raw_text,
-	u64										raw_text_length,
+	bc::u64									raw_text_length,
 	bc::diagnostic::PrintRecordColor		foreground_color,
 	bc::diagnostic::PrintRecordColor		background_color
 )
 {
 	// TODO: Test ConsolePrint on Linux machine.
+	using namespace bc;
 
-	auto text = SimpleText8( SimpleTextView8( raw_text, raw_text_length ) );
+	auto text = bc::internal_::SimpleText8( bc::internal_::SimpleTextView8( raw_text, raw_text_length ) );
 
 	std::lock_guard<std::mutex> lock_guard( print_mutex );
 
@@ -335,7 +337,7 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 		<< ";"
 		<< PrintRecordColorToCharANSIBackgroundColorCode( background_color )
 		<< "m"
-		<< reinterpret_cast<char*>( text.ToCStr() )
+		<< reinterpret_cast<const char*>( text.ToCStr() )
 		<< RES;
 
 	//std::cout << "\033[" << foreground_color_map[ foreground_color ] << ";" << background_color_map[ background_color ] << "m"

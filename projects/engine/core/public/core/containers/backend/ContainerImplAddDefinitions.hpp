@@ -12,8 +12,8 @@
 #define BC_CONTAINER_IS_COPY_ASSIGNABLE ::std::is_copy_assignable_v
 #define BC_CONTAINER_IS_MOVE_ASSIGNABLE ::std::is_move_assignable_v
 
-#define BC_ContainerAssert( condition, fail_message, ... ) BAssert( ( condition ), bc::diagnostic::MakePrintRecord_AssertText( fail_message, __VA_ARGS__ ) )
-#define BC_ContainerThrowOrCrash( fail_message, ... ) ::bc::diagnostic::Throw( bc::diagnostic::MakePrintRecord_AssertText( fail_message, __VA_ARGS__ ) )
+#define BC_ContainerAssert( condition, fail_message, ... ) BAssert( ( condition ), bc::diagnostic::MakePrintRecord_AssertText( fail_message, ##__VA_ARGS__ ) )
+#define BC_ContainerThrowOrCrash( fail_message, ... ) ::bc::diagnostic::Throw( bc::diagnostic::MakePrintRecord_AssertText( fail_message, ##__VA_ARGS__ ) )
 
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
 
@@ -28,8 +28,8 @@
 #define BC_CONTAINER_IS_COPY_ASSIGNABLE ::std::is_nothrow_copy_assignable_v
 #define BC_CONTAINER_IS_MOVE_ASSIGNABLE ::std::is_nothrow_move_assignable_v
 
-#define BC_ContainerAssert( condition, fail_message, ... ) assert( ( condition ) && fail_message )
-#define BC_ContainerThrowOrCrash( fail_message, ... ) std::abort() // TODO: Call custom crash handler
+#define BC_ContainerAssert( condition, fail_message, ... ) BHardAssert( ( condition ), fail_message )
+#define BC_ContainerThrowOrCrash( fail_message, ... ) ::bc::diagnostic::Panic( m_failure_explanation )
 
 #else
 #error "container implementation not defined"

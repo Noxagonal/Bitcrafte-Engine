@@ -61,7 +61,7 @@ public:
 	/// @tparam Index
 	/// Index of Type to get.
 	template<u64 Index>
-	using IndexToType = GetTemplateParameterPackTypeAtIndex<Index, TypePack...>::Type;
+	using IndexToType = typename GetTemplateParameterPackTypeAtIndex<Index, TypePack...>::Type;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief

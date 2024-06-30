@@ -89,10 +89,10 @@ private:
 		else
 		{
 			// Assert some common Visual studio fault addresses.
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Constructing object, destination is in memory outside of process" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Constructing object, destination is in freed memory" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Constructing object, destination is in uninitialized global memory" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Constructing object, destination is in uninitialized stack memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Constructing object, destination is in memory outside of process" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Constructing object, destination is in freed memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Constructing object, destination is in uninitialized global memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Constructing object, destination is in uninitialized stack memory" );
 
 			// Construct in place with the temporary pointer, which contains the original address, if contained value
 			// throws in its constructor, then original location will remain modified.
@@ -129,10 +129,10 @@ private:
 		else
 		{
 			// Assert some common Visual studio fault addresses.
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Destructing range, location is in memory outside of process" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Destructing range, location is in freed memory" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Destructing range, location is in uninitialized global memory" );
-			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Destructing range, location is in uninitialized stack memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Destructing range, location is in memory outside of process" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Destructing range, location is in freed memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Destructing range, location is in uninitialized global memory" );
+			BHardAssert( location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Destructing range, location is in uninitialized stack memory" );
 
 			if( IsObjectPointerUndead( location ) )
 			{
@@ -277,16 +277,16 @@ protected:
 		if( !std::is_constant_evaluated() )
 		{
 			// Assert some common Visual studio fault addresses.
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Constructing range, destination is in memory outside of process" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Constructing range, destination is in freed memory" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Constructing range, destination is in uninitialized global memory" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Constructing range, destination is in uninitialized stack memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Constructing range, destination is in memory outside of process" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Constructing range, destination is in freed memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Constructing range, destination is in uninitialized global memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Constructing range, destination is in uninitialized stack memory" );
 		}
 
-		BHardAssert( destination != nullptr, "Constructing range, destination is nullptr" );
+		BHardAssert( destination != nullptr, U"Constructing range, destination is nullptr" );
 
-		BHardAssert( element_count > 0, "Constructing range, element count must be larger than 0" );
-		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Constructing range, element count too high, something is not right" );
+		BHardAssert( element_count > 0, U"Constructing range, element count must be larger than 0" );
+		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, U"Constructing range, element count too high, something is not right" );
 
 		auto end = destination + element_count;
 		for( u64 i = 0; i < element_count; ++i )
@@ -308,23 +308,23 @@ protected:
 		if( !std::is_constant_evaluated() )
 		{
 			// Assert some common Visual studio fault addresses.
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Copy constructing range, destination is in memory outside of process" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Copy constructing range, destination is in freed memory" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Copy constructing range, destination is in uninitialized global memory" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Copy constructing range, destination is in uninitialized stack memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Copy constructing range, destination is in memory outside of process" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Copy constructing range, destination is in freed memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Copy constructing range, destination is in uninitialized global memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Copy constructing range, destination is in uninitialized stack memory" );
 
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Copy constructing range, source is in memory outside of process" );
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Copy constructing range, source is in freed memory" );
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Copy constructing range, source is in uninitialized global memory" );
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Copy constructing range, source is in uninitialized stack memory" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Copy constructing range, source is in memory outside of process" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Copy constructing range, source is in freed memory" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Copy constructing range, source is in uninitialized global memory" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Copy constructing range, source is in uninitialized stack memory" );
 		}
 
-		BHardAssert( destination != nullptr, "Copy constructing range, destination is nullptr" );
-		BHardAssert( source != nullptr, "Copy constructing range, source is nullptr" );
-		BHardAssert( destination != source, "Copy constructing range, destination is source, this should be checked earlier than this" );
+		BHardAssert( destination != nullptr, U"Copy constructing range, destination is nullptr" );
+		BHardAssert( source != nullptr, U"Copy constructing range, source is nullptr" );
+		BHardAssert( destination != source, U"Copy constructing range, destination is source, this should be checked earlier than this" );
 
-		BHardAssert( element_count > 0, "Copy constructing range, element count must be larger than 0" );
-		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Copy constructing range, element count too high, something is not right" );
+		BHardAssert( element_count > 0, U"Copy constructing range, element count must be larger than 0" );
+		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, U"Copy constructing range, element count too high, something is not right" );
 
 		auto end = destination + element_count;
 		for( u64 i = 0; i < element_count; ++i )
@@ -346,23 +346,23 @@ protected:
 		if( !std::is_constant_evaluated() )
 		{
 			// Assert some common Visual studio fault addresses.
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Move constructing range, destination is in memory outside of process" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Move constructing range, destination is in freed memory" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Move constructing range, destination is in uninitialized global memory" );
-			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Move constructing range, destination is in uninitialized stack memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Move constructing range, destination is in memory outside of process" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Move constructing range, destination is in freed memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Move constructing range, destination is in uninitialized global memory" );
+			BHardAssert( destination != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Move constructing range, destination is in uninitialized stack memory" );
 
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Move constructing range, source is in memory outside of process" );
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Move constructing range, source is in freed memory" );
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Move constructing range, source is in uninitialized global memory" );
-			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Move constructing range, source is in uninitialized stack memory" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Move constructing range, source is in memory outside of process" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Move constructing range, source is in freed memory" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Move constructing range, source is in uninitialized global memory" );
+			BHardAssert( source != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Move constructing range, source is in uninitialized stack memory" );
 		}
 
-		BHardAssert( destination != nullptr, "Move constructing range, destination is nullptr" );
-		BHardAssert( source != nullptr, "Move constructing range, source is nullptr" );
-		BHardAssert( destination != source, "Move constructing range, destination is source, this should be checked earlier than this" );
+		BHardAssert( destination != nullptr, U"Move constructing range, destination is nullptr" );
+		BHardAssert( source != nullptr, U"Move constructing range, source is nullptr" );
+		BHardAssert( destination != source, U"Move constructing range, destination is source, this should be checked earlier than this" );
 
-		BHardAssert( element_count > 0, "Move constructing range, element count must be larger than 0" );
-		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Move constructing range, element count too high, something is not right" );
+		BHardAssert( element_count > 0, U"Move constructing range, element count must be larger than 0" );
+		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, U"Move constructing range, element count too high, something is not right" );
 
 		for( u64 i = 0; i < element_count; ++i )
 		{
@@ -382,7 +382,7 @@ protected:
 		if( location == nullptr ) return;
 		if( element_count == 0 ) return;
 
-		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, "Destructing range, element count too high, something is not right" );
+		BHardAssert( element_count < 0x0000FFFFFFFFFFFF, U"Destructing range, element count too high, something is not right" );
 
 		auto end = location + element_count;
 		if constexpr( !std::is_trivially_destructible_v<ValueType> )
@@ -421,21 +421,21 @@ protected:
 		if( !std::is_constant_evaluated() )
 		{
 			// Assert some common Visual studio fault addresses.
-			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), "Resizing range, old location is in memory outside of process" );
-			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), "Resizing range, old location is in freed memory" );
-			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), "Resizing range, old location is in uninitialized global memory" );
-			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), "Resizing range, old location is in uninitialized stack memory" );
+			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xFDFDFDFDFDFDFDFD ), U"Resizing range, old location is in memory outside of process" );
+			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xDDDDDDDDDDDDDDDD ), U"Resizing range, old location is in freed memory" );
+			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCDCDCDCDCDCDCDCD ), U"Resizing range, old location is in uninitialized global memory" );
+			BHardAssert( old_location != reinterpret_cast<ValueType*>( 0xCCCCCCCCCCCCCCCC ), U"Resizing range, old location is in uninitialized stack memory" );
 		}
 
-		BHardAssert( old_location != nullptr, "Resizing range, old location is nullptr" );
-		BHardAssert( old_element_count < 0x0000FFFFFFFFFFFF, "Resizing range, old element count too high, something is not right" );
+		BHardAssert( old_location != nullptr, U"Resizing range, old location is nullptr" );
+		BHardAssert( old_element_count < 0x0000FFFFFFFFFFFF, U"Resizing range, old element count too high, something is not right" );
 
-		BHardAssert( new_reserved_element_count > 0, "Resizing range, new reserved element count must be larger than 0" );
-		BHardAssert( new_reserved_element_count < 0x0000FFFFFFFFFFFF, "Resizing range, new reserved element count too high, something is not right" );
+		BHardAssert( new_reserved_element_count > 0, U"Resizing range, new reserved element count must be larger than 0" );
+		BHardAssert( new_reserved_element_count < 0x0000FFFFFFFFFFFF, U"Resizing range, new reserved element count too high, something is not right" );
 
-		BHardAssert( old_reserved_element_count > 0, "Resizing range, old reserved element count must be larger than 0" );
-		BHardAssert( old_reserved_element_count < 0x0000FFFFFFFFFFFF, "Resizing range, old reserved element count too high, something is not right" );
-		BHardAssert( old_reserved_element_count != new_reserved_element_count, "Resizing range, new reserved element count is the same as the old reserved element count, this check should be done earlier" );
+		BHardAssert( old_reserved_element_count > 0, U"Resizing range, old reserved element count must be larger than 0" );
+		BHardAssert( old_reserved_element_count < 0x0000FFFFFFFFFFFF, U"Resizing range, old reserved element count too high, something is not right" );
+		BHardAssert( old_reserved_element_count != new_reserved_element_count, U"Resizing range, new reserved element count is the same as the old reserved element count, this check should be done earlier" );
 
 		if constexpr( std::is_trivial_v<ValueType> )
 		{

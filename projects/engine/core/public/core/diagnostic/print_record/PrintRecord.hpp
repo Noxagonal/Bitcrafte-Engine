@@ -41,12 +41,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr PrintRecord(
 		const bc::internal_::SimpleTextView32				simple_text_view
-	)
-	{
-		auto new_section = PrintRecordSection {};
-		new_section.text = simple_text_view;
-		AddSection( new_section );
-	}
+	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename CharacterType, u64 StringArraySize>
@@ -123,7 +118,7 @@ public:
 	///
 	/// @return
 	/// Number of lines taken by this print record.
-	constexpr const u32								CalculateLineCount() const;
+	constexpr const u32										CalculateLineCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -195,11 +190,11 @@ public:
 	/// @return
 	/// Reference to this.
 	constexpr PrintRecord									GetFinalized(
-		u32											indentation_size				= 4
+		u32													indentation_size				= 4
 	) const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool											IsEmpty() const;
+	constexpr bool											IsEmpty() const noexcept;
 
 private:
 
@@ -213,7 +208,7 @@ private:
 	/// @return
 	/// New section list with applied indents.
 	constexpr void											Finalize_ApplyIndents(
-		u32											indentation_size				= 4
+		u32													indentation_size				= 4
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

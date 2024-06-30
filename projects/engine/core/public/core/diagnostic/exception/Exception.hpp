@@ -25,55 +25,36 @@ public:
 	Exception() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception(
+	constexpr Exception(
 		const Exception									&	other
-	)
-	{
-		this->CopyOther( other );
-	}
+	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception(
+	constexpr Exception(
 		Exception										&&	other
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception							&	operator=(
+	constexpr Exception									&	operator=(
 		const Exception									&	other
-	)
-	{
-		this->CopyOther( other );
-		return *this;
-	}
+	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception							&	operator=(
+	constexpr Exception									&	operator=(
 		Exception										&&	other
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const PrintRecord					&	GetMessage() const noexcept
-	{
-		return this->message;
-	}
+	constexpr const PrintRecord							&	GetMessage() const noexcept;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const SourceLocation				&	GetSourceLocation() const noexcept
-	{
-		return this->source_location;
-	}
+	constexpr const SourceLocation						&	GetSourceLocation() const noexcept;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const StackTrace					&	GetStackTrace() const noexcept
-	{
-		return this->stack_trace;
-	}
+	constexpr const StackTrace							&	GetStackTrace() const noexcept;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const Exception					*	GetNextException() const noexcept
-	{
-		return this->next.Get();
-	}
+	constexpr inline const Exception					*	GetNextException() const noexcept;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -84,31 +65,17 @@ public:
 	///
 	/// @param next_exception
 	/// Exception we wish to store inside this exception.
-	constexpr inline void									SetNextException(
+	constexpr void											SetNextException(
 		const Exception									&	next_exception
-	)
-	{
-		assert( std::addressof( next_exception ) != this && "next_exception was this exception" );
-		if( std::addressof( next_exception ) == this ) return;
-		this->next = bc::internal_::MakeSimpleUniquePtr<Exception>( next_exception );
-	}
+	);
 
-	constexpr inline bool									IsEmpty() const noexcept
-	{
-		return this->message.IsEmpty();
-	}
+	constexpr bool											IsEmpty() const noexcept;
 
 private:
 
-	constexpr inline void									CopyOther(
+	constexpr void											CopyOther(
 		const Exception									&	other
-	)
-	{
-		this->message			= other.message;
-		this->source_location	= other.source_location;
-		this->stack_trace		= other.stack_trace;
-		if( !other.next.IsEmpty() ) SetNextException( *other.next );
-	}
+	);
 
 public:
 
@@ -156,8 +123,6 @@ Exception												MakeException(
 
 
 
-#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Throw already created exception.
@@ -175,25 +140,10 @@ Exception												MakeException(
 ///	Exception to throw.
 BITCRAFTE_ENGINE_API
 void													Throw [[noreturn]] (
-	const Exception									&	exception
+	const Exception									&	exception,
+	SourceLocation										source_location					= SourceLocation::Current()
 );
 
-#else // BITCRAFTE_GAME_DEVELOPMENT_BUILD
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline void												Throw [[noreturn]] (
-	const Exception									&	exception
-)
-{
-	// TODO: Should call our own abort/terminate function which makes sure all potentially problematic
-	// system resources like files are closed. Our own abort/terminate function can also launch crash
-	// report application.
-
-	std::abort();
-}
-
-#endif // BITCRAFTE_GAME_DEVELOPMENT_BUILD
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,19 +180,10 @@ inline void												Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
-inline void												Throw [[noreturn]] (
+void													Throw [[noreturn]] (
 	const PrintRecord								&	print_record,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
-)
-{
-	Throw(
-		MakeException(
-			print_record,
-			source_location,
-			StackTrace::Current( 1 )
-		)
-	);
-}
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -278,19 +219,10 @@ inline void												Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
-inline void												Throw [[noreturn]] (
+void													Throw [[noreturn]] (
 	const bc::internal_::SimpleTextView32				message,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
-	)
-{
-	Throw(
-		MakeException(
-			PrintRecord( message ),
-			source_location,
-			StackTrace::Current( 1 )
-		)
-	);
-}
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief

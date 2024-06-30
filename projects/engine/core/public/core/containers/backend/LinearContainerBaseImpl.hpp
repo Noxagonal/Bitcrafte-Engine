@@ -2,7 +2,11 @@
 #include <core/containers/backend/ContainerBase.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
+#include <core/diagnostic/assertion/Assert.hpp>
+
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
+#include <core/diagnostic/assertion/HardAssert.hpp>
+
 #else
 #error "Container implementation type not given"
 #endif

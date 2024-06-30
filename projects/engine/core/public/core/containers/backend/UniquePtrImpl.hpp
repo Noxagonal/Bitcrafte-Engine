@@ -2,7 +2,11 @@
 #include <core/containers/backend/ContainerBase.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
+#include <core/diagnostic/assertion/Assert.hpp>
+
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
+#include <core/diagnostic/assertion/HardAssert.hpp>
+
 #else
 #error "Container implementation type not given"
 #endif
@@ -68,7 +72,7 @@ public:
 	constexpr BC_CONTAINER_NAME( UniquePtr )( ) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )( nullptr_t ) noexcept :
+	constexpr BC_CONTAINER_NAME( UniquePtr )( std::nullptr_t ) noexcept :
 		data_ptr( nullptr )
 	{}
 
@@ -108,7 +112,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		nullptr_t
+		std::nullptr_t
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();

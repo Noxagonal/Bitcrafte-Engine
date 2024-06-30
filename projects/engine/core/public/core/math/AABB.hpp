@@ -160,7 +160,7 @@ public:
 		if( std::is_constant_evaluated() )
 		{
 			// TODO: Test this works.
-			[]<bool flag = false>()
+			[index]<bool flag = false>()
 				{
 					static_assert( index < 2 && flag, "Index out of range" );
 				}();
@@ -170,8 +170,8 @@ public:
 			if( index > 2 ) diagnostic::Throw( U"Index out of range" );
 		}
 
-		if constexpr( index == 0 ) return begin;
-		if constexpr( index == 1 ) return end;
+		if( index == 0 ) return begin;
+		if( index == 1 ) return end;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ public:
 		if( std::is_constant_evaluated() )
 		{
 			// TODO: Test this works.
-			[] <bool flag = false>( )
+			[index] <bool flag = false>( )
 			{
 				static_assert( index < 2 && flag, "Index out of range" );
 			}( );
@@ -200,8 +200,8 @@ public:
 			if( index > 2 ) diagnostic::Throw( U"Index out of range" );
 		}
 
-		if constexpr( index == 0 ) return begin;
-		if constexpr( index == 1 ) return end;
+		if( index == 0 ) return begin;
+		if( index == 1 ) return end;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

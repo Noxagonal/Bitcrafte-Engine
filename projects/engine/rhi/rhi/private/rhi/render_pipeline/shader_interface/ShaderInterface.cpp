@@ -1,6 +1,5 @@
-#pragma once
 
-#include <build_configuration/BuildConfigurationComponent.hpp>
+#include <rhi/PreCompiledHeader.hpp>
 
 #include <rhi/render_pipeline/shader_interface/ShaderInterfaceCreateInfo.hpp>
 

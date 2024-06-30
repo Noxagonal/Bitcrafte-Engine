@@ -7,6 +7,7 @@
 #include <core/containers/UniquePtr.hpp>
 
 #include <scene/mesh/Mesh.hpp>
+#include <scene/mesh/LODMesh.hpp>
 
 
 
@@ -43,10 +44,10 @@ public:
 		CallbackType							&&	lod_callback
 	)
 	{
-		auto lod_mesh = CreateNewLODMesh();
+		auto lod_mesh = CreateNewLODMesh( lod_level_count );
 		for( u32 i = 0; i < lod_level_count; ++i )
 		{
-			auto & lod_level = lod_mesh.GetLODLevel();
+			auto & lod_level = lod_mesh.GetLODLevel( i );
 			lod_callback( i, lod_level.mesh );
 		}
 		FinalizeLODMesh( lod_mesh );

@@ -275,7 +275,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static consteval VectorBase												UnitVector() noexcept
+	static constexpr VectorBase												UnitVector() noexcept
 	{
 		return VectorBase { 1.0, 0.0 };
 	}
@@ -555,7 +555,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static consteval VectorBase												UnitVector() noexcept
+	static constexpr VectorBase												UnitVector() noexcept
 	{
 		return VectorBase { 1.0, 0.0, 0.0 };
 	}
@@ -855,7 +855,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static consteval VectorBase												UnitVector() noexcept
+	static constexpr VectorBase												UnitVector() noexcept
 	{
 		return VectorBase { 1.0, 0.0, 0.0, 0.0 };
 	}

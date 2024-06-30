@@ -39,9 +39,9 @@ concept ContainerIterator = requires(
 template<typename CharacterType>
 concept TextContainerCharacterType =
 std::is_same_v<CharacterType, char> ||
-std::is_same_v<CharacterType, char8_t> ||
-std::is_same_v<CharacterType, char16_t> ||
-std::is_same_v<CharacterType, char32_t>;
+std::is_same_v<CharacterType, c8> ||
+std::is_same_v<CharacterType, c16> ||
+std::is_same_v<CharacterType, c32>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief

@@ -7,15 +7,17 @@
 
 namespace bc {
 namespace diagnostic {
+
+class PrintRecord;
+
 namespace internal_ {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-[[noreturn]]
 BITCRAFTE_ENGINE_API
-void								PanicInternal(
-	const char					*	message_ptr,
+void								PanicInternal [[noreturn]] (
+	const char32_t				*	message_ptr,
 	u64								message_length,
 	SourceLocation					source_location
 );
@@ -28,14 +30,19 @@ void								PanicInternal(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<u64 MessageLength>
-[[noreturn]]
-void								Panic(
-	const char						( &message )[ MessageLength ],
+void								Panic [[noreturn]] (
+	const char32_t					( &message )[ MessageLength ],
 	SourceLocation					source_location					= SourceLocation::Current()
 )
 {
-	internal_::PanicInternal( message, MessageLength ? ( message[ MessageLength - 1 ] == '\0' ? MessageLength - 1 : MessageLength ) : MessageLength, source_location );
+	internal_::PanicInternal( message, MessageLength ? ( message[ MessageLength - 1 ] == U'\0' ? MessageLength - 1 : MessageLength ) : MessageLength, source_location );
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void								Panic [[noreturn]] (
+	const PrintRecord			&	message,
+	SourceLocation					source_location					= SourceLocation::Current()
+);
 
 
 

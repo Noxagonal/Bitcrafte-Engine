@@ -12,8 +12,7 @@
 #include <core/conversion/text/utf/UTFConversion.hpp>
 
 #include <cuchar>
-#include <climits>
-#include <xstring>
+#include <limits>
 
 #include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 

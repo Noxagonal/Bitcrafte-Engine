@@ -42,7 +42,7 @@ public:
 		{
 			diagnostic::Throw(
 				OutTextContainerFullType( "Unsupported text format options while formatting text, unrecognized parse text: \"" ) +
-				conversion::ToUTF32( parse_text ) + "\""
+				conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\""
 			);
 		}
 	}
@@ -75,7 +75,7 @@ public:
 			else
 			{
 				diagnostic::Throw(
-					"Cannot format text, tried converting from an UTF text to char, Bitcrafte considers char to be ASCII and thus cannot handle UTF text"
+					U"Cannot format text, tried converting from an UTF text to char, Bitcrafte considers char to be ASCII and thus cannot handle UTF text"
 				);
 			}
 		}
@@ -159,7 +159,7 @@ public:
 		{
 			diagnostic::Throw(
 				OutTextContainerFullType( "Unsupported text format options while formatting c-style string, unrecognized parse text: \"" ) +
-				conversion::ToUTF32( parse_text ) + "\""
+				conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\""
 			);
 		}
 	}
@@ -190,7 +190,7 @@ public:
 			{
 				diagnostic::Throw(
 					OutTextContainerFullType( "Cannot format text, tried converting from an UTF text to char, Bitcrafte considers char to be ASCII and thus cannot handle UTF text, input text: \"" ) +
-					conversion::ToUTF32( InTextAsContainerConstViewType { in, StringArraySize } ) + "\""
+					conversion::ToUTF<OutTextCharacterType>( InTextAsContainerConstViewType { in, StringArraySize } ) + "\""
 				);
 			}
 		}
@@ -226,6 +226,7 @@ template<
 >
 class TextFormatter<OutTextContainerType, IntegerType>
 {
+	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
 	using OutTextContainerFullType = typename OutTextContainerType::ThisFullType;
 	using OutTextContainerConstViewType = typename OutTextContainerType::template ThisViewType<true>;
 
@@ -263,12 +264,12 @@ public:
 					it.IsValid(),
 					OutTextContainerFullType( "Unsupported text format options while formatting integer primitive type, "
 						"invalid number format while parsing integer zero fill parse text, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + "\n"
+					conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\n"
 				);
 				BAssert( zero_fill <= 1024,
 					OutTextContainerFullType( "Unsupported text format options while formatting integer primitive type, "
 						"too many zeroes requested from zero fill, current limit is 1024, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + "\n"
+					conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\n"
 				);
 				it += conversion::TextToPrimitive(
 					zero_fill,
@@ -280,7 +281,7 @@ public:
 			{
 				diagnostic::Throw(
 					OutTextContainerFullType( "Unsupported text format options while formatting integer primitive type, unrecognized parse text: " ) +
-					conversion::ToUTF32( parse_text ) + "\n"
+					conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\n"
 				);
 			}
 		}
@@ -329,6 +330,7 @@ class TextFormatter<OutTextContainerType, FloatType>
 {
 	using OutTextContainerFullType = typename OutTextContainerType::ThisFullType;
 	using OutTextContainerConstViewType = typename OutTextContainerType::template ThisViewType<true>;
+	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
 
 	conversion::FloatToTextConversionFormat float_to_text_conversion_format = conversion::FloatToTextConversionFormat::GENERAL;
 	i64 requested_decimal_count = INT64_MAX;
@@ -387,12 +389,12 @@ public:
 					it.IsValid(),
 					OutTextContainerFullType( "Unsupported text format options while formatting floating primitive type, "
 						"invalid number format while parsing floating point decimal count, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + "\n"
+					conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\n"
 				);
 				BAssert( requested_decimal_count <= 1024,
 					OutTextContainerFullType( "Unsupported text format options while formatting integer primitive type, "
 						"too many decimal numbers requested from floating point text parser, current limit is 1024, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + "\n"
+					conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\n"
 				);
 			}
 		}
@@ -492,6 +494,7 @@ class TextFormatter<OutTextContainerType, bool>
 {
 	using OutTextContainerFullType = typename OutTextContainerType::ThisFullType;
 	using OutTextContainerConstViewType = typename OutTextContainerType::template ThisViewType<true>;
+	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
 
 	bool binary = false;
 
@@ -509,7 +512,7 @@ public:
 			diagnostic::Throw(
 				OutTextContainerFullType( "Unsupported text format options while formatting boolean primitive type, "
 					"unrecognized parse text: \"" ) +
-				conversion::ToUTF32( parse_text ) + "\n"
+				conversion::ToUTF<OutTextCharacterType>( parse_text ) + "\n"
 			);
 		}
 	}
