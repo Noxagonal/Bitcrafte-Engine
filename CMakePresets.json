@@ -1,0 +1,58 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 22,
+        "patch": 0
+    },
+    "configurePresets": [
+		{
+			"name": "default",
+			"hidden": true,
+			"generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/build/install/${presetName}",
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			}
+		},
+        {
+            "name": "GameShipping",
+			"inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "GameShipping"
+            }
+        },
+        {
+            "name": "GameDevelopment",
+			"inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "GameDevelopment"
+            }
+        },
+        {
+            "name": "EngineDevelopment",
+			"inherits": "default",
+            "warnings": {
+                "dev": true
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "EngineDevelopment"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "GameShipping",
+            "configurePreset": "GameShipping"
+        },
+        {
+            "name": "GameDevelopment",
+            "configurePreset": "GameDevelopment"
+        },
+        {
+            "name": "EngineDevelopment",
+            "configurePreset": "EngineDevelopment"
+        }
+    ]
+}
