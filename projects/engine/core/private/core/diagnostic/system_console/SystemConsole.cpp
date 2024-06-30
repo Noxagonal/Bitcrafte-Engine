@@ -7,6 +7,8 @@
 
 #if defined( BITCRAFTE_PLATFORM_WINDOWS )
 #include <core/platform/windows/Windows.hpp>
+#elif defined( BITCRAFTE_PLATFORM_LINUX )
+#include <core/platform/linux/Linux.hpp>
 #else
 #error "Please add platform support here."
 #endif

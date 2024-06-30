@@ -111,13 +111,29 @@ if(WIN32)
 	if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_MANAGER_WIN32)
 	    set(BITCRAFTE_BUILD_WINDOW_MANAGER_WIN32 ON CACHE BOOL "Build Windows window manager component" FORCE)
 	endif()
-endif()
-if(LINUX)
-	if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND)
-	    set(BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND ON CACHE BOOL "Build Wayland window manager component" FORCE)
+elseif(UNIX AND NOT APPLE)
+	if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+		if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND)
+			set(BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND ON CACHE BOOL "Build Wayland window manager component" FORCE)
+		endif()
+
+	elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+		if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND)
+			set(BITCRAFTE_BUILD_WINDOW_MANAGER_WAYLAND ON CACHE BOOL "Build Wayland window manager component" FORCE)
+		endif()
+
+	elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
+		if(NOT DEFINED BITCRAFTE_BUILD_WINDOW_MANAGER_ANDROID)
+			set(BITCRAFTE_BUILD_WINDOW_MANAGER_ANDROID ON CACHE BOOL "Build Android window manager component" FORCE)
+		endif()
+
+	else()
+		message(FATAL_ERROR "Please add unix window manager component here")
+
 	endif()
 elseif(APPLE)
-	message(FATAL_ERROR "Please add window manager component here")
+	message(FATAL_ERROR "Please add apple window manager component here")
+
 endif()
 
 

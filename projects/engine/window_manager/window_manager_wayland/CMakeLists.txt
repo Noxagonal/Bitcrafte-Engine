@@ -11,3 +11,5 @@ add_engine_window_manager_component(${THIS_TARGET_NAME}
 		core
 		window_manager
 )
+
+set_window_manager_component_defines(${THIS_TARGET_NAME})

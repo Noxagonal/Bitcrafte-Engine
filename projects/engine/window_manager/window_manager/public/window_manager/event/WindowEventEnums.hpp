@@ -2,7 +2,9 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <stdint.h>
+#include <core/data_types/FundamentalTypes.hpp>
+
+#include <utility>
 
 
 
