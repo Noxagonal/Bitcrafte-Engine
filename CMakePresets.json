@@ -13,7 +13,8 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "installDir": "${sourceDir}/build/install/${presetName}",
 			"cacheVariables": {
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_CXX_COMPILER": "clang++"
 			}
 		},
         {
@@ -39,20 +40,6 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "EngineDevelopment"
             }
-        }
-    ],
-    "buildPresets": [
-        {
-            "name": "GameShipping",
-            "configurePreset": "GameShipping"
-        },
-        {
-            "name": "GameDevelopment",
-            "configurePreset": "GameDevelopment"
-        },
-        {
-            "name": "EngineDevelopment",
-            "configurePreset": "EngineDevelopment"
         }
     ]
 }
