@@ -1,6 +1,7 @@
 
 #include <editor/PreCompiledHeader.hpp>
 #include <core/diagnostic/logger/Logger.hpp>
+#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 #include <core/thread/ThreadPool.hpp>
 
 #include <engine/EngineComponent.hpp>

@@ -139,7 +139,7 @@ endif()
 
 
 # Determine which RHI components should be included in the built.
-if(WIN32 OR LINUX)
+if(WIN32 OR UNIX AND NOT APPLE)
 	if(NOT DEFINED BITCRAFTE_BUILD_RHI_VULKAN)
 	    set(BITCRAFTE_BUILD_RHI_VULKAN ON CACHE BOOL "Include Vulkan RHI" FORCE)
 	endif()

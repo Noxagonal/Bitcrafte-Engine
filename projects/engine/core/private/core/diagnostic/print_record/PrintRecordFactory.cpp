@@ -5,7 +5,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord MakePrintRecord(
+BITCRAFTE_ENGINE_API
+bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord(
 	bc::internal_::SimpleTextView32		text,
 	bc::diagnostic::PrintRecordTheme	theme
 )
@@ -21,6 +22,7 @@ bc::diagnostic::PrintRecord MakePrintRecord(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BITCRAFTE_ENGINE_API
 bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord(
 	bc::internal_::SimpleTextView32 text
 )
@@ -30,6 +32,7 @@ bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BITCRAFTE_ENGINE_API
 bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord_SourceLocation(
 	const SourceLocation 	&	source_location
 )
