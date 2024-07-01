@@ -35,10 +35,19 @@ class BC_CONTAINER_NAME( LinearContainerIteratorBase )
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	using ThisType				= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>;
 	using ContainedValueType	= typename ContainerType::ContainedValueType;
 	using IteratorContainerType	= ContainerType;
+	using DifferenceType		= std::ptrdiff_t;
+	using Pointer				= std::conditional_t<IsConst, const ContainedValueType*, ContainedValueType*>;
+	using Reference				= std::conditional_t<IsConst, const ContainedValueType&, ContainedValueType&>;
 
-	using value_type			= ContainedValueType;	// For stl compatibility.
+	// For stl compatibility.
+	using iterator_category		= std::random_access_iterator_tag;
+	using difference_type		= DifferenceType;
+	using value_type			= ContainedValueType;
+	using pointer				= Pointer;
+	using reference				= Reference;
 
 private:
 
@@ -51,7 +60,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	const ContainerType																				*	container		= nullptr;
-	ContainedValueType																				*	data			= nullptr;
+	Pointer																								data			= nullptr;
 
 public:
 
@@ -70,16 +79,16 @@ public:
 		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
 	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
 		container( other.container ),
-		data( const_cast<ContainedValueType*>( other.data ) )
+		data( other.data )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )(
 		const ContainerType																			*	container,
-		const ContainedValueType																	*	data
+		Pointer																							data
 	) noexcept :
 		container( container ),
-		data( const_cast<ContainedValueType*>( data ) )
+		data( data )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,25 +108,25 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ContainedValueType																	&	operator*() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
+	constexpr Reference																					operator*() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
 	{
 		return *this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ContainedValueType																&	operator*() const BC_CONTAINER_NOEXCEPT
+	constexpr const Reference																			operator*() const BC_CONTAINER_NOEXCEPT
 	{
 		return *this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ContainedValueType																	*	operator->() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
+	constexpr Pointer																					operator->() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
 	{
 		return this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ContainedValueType																*	operator->() const BC_CONTAINER_NOEXCEPT
+	constexpr const Pointer																				operator->() const BC_CONTAINER_NOEXCEPT
 	{
 		return this->Get();
 	}
@@ -143,129 +152,144 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator++() BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data + 1 <= this->container->Data() + this->container->Size(),
-			U"Tried to increment iterator past end",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck() + 1
-		);
+		CheckContainer();
+		CheckBounds( 1 );
 		++this->data;
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator++(int) BC_CONTAINER_NOEXCEPT
+	{
+		BC_CONTAINER_NAME( LinearContainerIteratorBase ) tmp = *this;
+		++( *this );
+		return tmp;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator--() BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data - 1 >= this->container->Data(),
-			U"Tried to decrement iterator past first value",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck() - 1
-		);
+		CheckContainer();
+		CheckBounds( -1 );
 		--this->data;
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator--(int) BC_CONTAINER_NOEXCEPT
+	{
+		BC_CONTAINER_NAME( LinearContainerIteratorBase ) tmp = *this;
+		--( *this );
+		return tmp;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>					operator+(
-		u64																								value
+		DifferenceType																					value
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data + value <= this->container->Data() + this->container->Size(),
-			U"Tried to increment iterator past end",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck() + value
-		);
 		BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst> ret = *this;
-		ret.data += value;
+		ret += value;
 		return ret;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>					operator-(
-		u64																								value
+		DifferenceType																					value
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data - value >= this->container->Data(),
-			U"Tried to decrement iterator past first value",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck() - value
-		);
 		BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst> ret = *this;
-		ret.data -= value;
+		ret -= value;
 		return ret;
 	}
-	
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<bool IsOtherConst>
+	constexpr DifferenceType																			operator-(
+		BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>					iterator
+	) const noexcept
+	{
+		return this->data - iterator.data;
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator+=(
-		u64																								value
+		DifferenceType																					value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data + value <= this->container->Data() + this->container->Size(),
-			U"Tried to increment iterator past end",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck() + value
-		);
+		CheckContainer();
+		CheckBounds( value );
 		this->data += value;
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator-=(
-		u64																								value
+		DifferenceType																					value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		BC_ContainerAssert( this->data - value >= this->container->Data(),
-			U"Tried to decrement iterator past first value",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck() - value
-		);
+		CheckContainer();
+		CheckBounds( -value );
 		this->data -= value;
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ContainedValueType																*	Get() const BC_CONTAINER_NOEXCEPT
+	constexpr Reference																					operator[](
+		DifferenceType																					value
+	) const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
-			U"Iterator is out of range",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck()
-		);
+		CheckContainer();
+		CheckBounds( value );
+		return *(this->data + value);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<bool IsOtherConst>
+	constexpr bool																						operator<(
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
+	) const noexcept
+	{
+		return data < other.data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<bool IsOtherConst>
+	constexpr bool																						operator>(
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
+	) const noexcept
+	{
+		return data > other.data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<bool IsOtherConst>
+	constexpr bool																						operator<=(
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
+	) const noexcept
+	{
+		return data <= other.data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<bool IsOtherConst>
+	constexpr bool																						operator>=(
+		const BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>			&	other
+	) const noexcept
+	{
+		return data >= other.data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr const Pointer																				Get() const BC_CONTAINER_NOEXCEPT
+	{
+		CheckContainer();
+		CheckBounds( 0 );
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ContainedValueType																	*	Get() BC_CONTAINER_NOEXCEPT requires( IsConst == false )
-	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
-			U"Iterator is out of range",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck()
-		);
-		return this->data;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ContainedValueType																*	GetAddress() noexcept
-	{
-		return this->data;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ContainedValueType																	*	GetAddress() noexcept requires( IsConst == false )
+	constexpr Pointer																					GetAddress() noexcept
 	{
 		return this->data;
 	}
@@ -283,14 +307,10 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr i64																						GetIndex() const BC_CONTAINER_NOEXCEPT
+	constexpr DifferenceType																			GetIndex() const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
-		BC_ContainerAssert( this->data >= this->container->Data() && this->data < ( this->container->Data() + this->container->Size() ),
-			U"Iterator is out of range",
-			U"Container size", this->container->Size(),
-			U"Iterator index", this->GetIndex_NoCheck()
-		);
+		CheckContainer();
+		CheckBounds( 0 );
 		return GetIndex_NoCheck();
 	}
 
@@ -316,9 +336,36 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr i64																					GetIndex_NoCheck() const noexcept
+	constexpr DifferenceType																			GetIndex_NoCheck() const noexcept
 	{
-		return ( i64( this->data ) - i64( this->container->Data() ) ) / sizeof( ContainedValueType );
+		return ( DifferenceType( this->data ) - DifferenceType( this->container->Data() ) ) / sizeof( ContainedValueType );
+	}
+
+	constexpr void																						CheckContainer() const
+	{
+		BC_ContainerAssert( this->container, U"Invalid use of iterator, container is nullptr" );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr void																						CheckBounds(
+		DifferenceType																					offset
+	) const
+	{
+		BC_ContainerAssert( !this->container->IsEmpty(),
+			U"Iterator is out of range, container is empty",
+			U"Container size", this->container->Size(),
+			U"Accessed container index", this->GetIndex_NoCheck() + offset
+		);
+		BC_ContainerAssert( this->data + offset >= this->container->Data(),
+			U"Iterator out of range, lower than first value",
+			U"Container size", this->container->Size(),
+			U"Accessed container index", this->GetIndex_NoCheck() + offset
+		);
+		BC_ContainerAssert( this->data + offset < this->container->Data() + this->container->Size(),
+			U"Iterator out of range, greater than last value",
+			U"Container size", this->container->Size(),
+			U"Accessed container index", this->GetIndex_NoCheck() + offset
+		);
 	}
 };
 
