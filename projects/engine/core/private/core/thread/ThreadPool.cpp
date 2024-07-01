@@ -278,10 +278,10 @@ bc::u64 bc::thread::ThreadPool::GetTaskRunningCount() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::thread::id bc::thread::ThreadPool::GetThreadSystemID(
-	ThreadIdentifier thread_index
+	ThreadIdentifier thread_id
 ) const
 {
-	auto thread_description = std::find_if( thread_description_list.begin(), thread_description_list.end(), []( auto & t ) { return t->thread_id; } );
+	auto thread_description = std::find_if( thread_description_list.begin(), thread_description_list.end(), [ thread_id ]( auto & t ) { return t->thread_id == thread_index; } );
 	if( thread_description == thread_description_list.end() ) return {};
 	return ( *thread_description )->stl_thread.get_id();
 }
