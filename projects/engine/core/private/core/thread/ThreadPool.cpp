@@ -63,7 +63,7 @@ static void ThreadPoolWorker(
 			auto report = bc::diagnostic::MakePrintRecord( U"stl exception thrown in thread" );
 			report += bc::diagnostic::MakePrintRecord( U"\n" );
 			report += bc::diagnostic::MakePrintRecord_Argument( U"stl exception message", exception.what() ).AddIndent();
-			return bc::diagnostic::MakeException( report );
+			return bc::diagnostic::Exception{ report };
 		};
 
 	auto thread_start_result = [ ReportException, MakeExceptionFromStlException, thread_description ]() -> bool
@@ -84,7 +84,7 @@ static void ThreadPoolWorker(
 			}
 			catch( ... )
 			{
-				ReportException( bc::diagnostic::MakeException( "Unknown exception thrown in thread" ) );
+				ReportException( bc::diagnostic::Exception{ "Unknown exception thrown in thread" } );
 				return false;
 			}
 			return true;
@@ -131,7 +131,7 @@ static void ThreadPoolWorker(
 			}
 			catch( ... )
 			{
-				ReportException( bc::diagnostic::MakeException( "Unknown exception thrown in thread" ) );
+				ReportException( bc::diagnostic::Exception{ "Unknown exception thrown in thread" } );
 				break;
 			}
 
@@ -362,7 +362,7 @@ bc::thread::ThreadIdentifier bc::thread::ThreadPool::DoAddThread(
 	}
 	if( thread_description_ptr->state == WorkerThreadState::INITIALIZATION_ERROR )
 	{
-		auto exception = diagnostic::MakeException( "Failed to start thread pool thread" );
+		auto exception = diagnostic::Exception{ "Failed to start thread pool thread" };
 		exception.SetNextException( thread_shared_data->thread_exception );
 
 		EvacuateThreads();
@@ -418,7 +418,7 @@ void bc::thread::ThreadPool::CheckAndHandleThreadThrow()
 		EvacuateThreads();
 		auto record = diagnostic::MakePrintRecord_Argument( U"Exception thrown in thread", thread_shared_data->thread_exception_id.load() );
 		record += diagnostic::MakePrintRecord( U"\n" );
-		auto exception = diagnostic::MakeException( record );
+		auto exception = diagnostic::Exception{ record };
 		exception.SetNextException( thread_shared_data->thread_exception );
 		diagnostic::Throw( exception );
 	}

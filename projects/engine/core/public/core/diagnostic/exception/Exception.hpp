@@ -22,12 +22,38 @@ class BITCRAFTE_ENGINE_API Exception
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Exception() = default;
+	/// @brief
+	/// Construct an Exception object.
+	///
+	/// @param print_record
+	///	General info of what caused the exception. Eg, "Index out of scope" when iterating over an array. See
+	/// bc::diagnostic::PrintRecord for more info on how to construct a print record.
+	///
+	/// @param source_location
+	/// This reports the source location where this function was called. If left as default, source location will point to the line
+	/// where this function was called.
+	///
+	/// @param stack_trace
+	/// This reports the source location where this function was called. If left as default, stack trace will point to the function
+	/// where this function was called.
+	constexpr inline Exception(
+		const PrintRecord		&	print_record			= PrintRecord{},
+		const SourceLocation	&	source_location			= SourceLocation::Current(),
+		const StackTrace		&	stack_trace 			= StackTrace::Current()
+	) noexcept :
+		message{ print_record },
+		source_location{ source_location },
+		stack_trace{ stack_trace },
+		next{ nullptr }
+	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr Exception(
+	constexpr inline Exception(
 		const Exception									&	other
-	);
+	)
+	{
+		this->CopyOther( other );
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr Exception(
@@ -35,9 +61,13 @@ public:
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr Exception									&	operator=(
+	constexpr inline Exception							&	operator=(
 		const Exception									&	other
-	);
+	)
+	{
+		this->CopyOther( other );
+		return *this;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr Exception									&	operator=(
@@ -45,16 +75,28 @@ public:
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const PrintRecord							&	GetMessage() const noexcept;
+	constexpr inline const PrintRecord					&	GetMessage() const noexcept
+	{
+		return this->message;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const SourceLocation						&	GetSourceLocation() const noexcept;
+	constexpr inline const SourceLocation				&	GetSourceLocation() const noexcept
+	{
+		return this->source_location;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const StackTrace							&	GetStackTrace() const noexcept;
+	constexpr inline const StackTrace					&	GetStackTrace() const noexcept
+	{
+		return this->stack_trace;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const Exception					*	GetNextException() const noexcept;
+	constexpr inline const Exception					*	GetNextException() const noexcept
+	{
+		return this->next.Get();
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -65,17 +107,33 @@ public:
 	///
 	/// @param next_exception
 	/// Exception we wish to store inside this exception.
-	constexpr void											SetNextException(
+	constexpr inline void									SetNextException(
 		const Exception									&	next_exception
-	);
+	)
+	{
+		assert( std::addressof( next_exception ) != this && "next_exception was this exception" );
+		if( std::addressof( next_exception ) == this ) return;
+		this->next = bc::internal_::MakeSimpleUniquePtr<Exception>( next_exception );
+	}
 
-	constexpr bool											IsEmpty() const noexcept;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr inline bool									IsEmpty() const noexcept
+	{
+		return this->message.IsEmpty();
+	}
 
 private:
 
-	constexpr void											CopyOther(
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr inline void									CopyOther(
 		const Exception									&	other
-	);
+	)
+	{
+		this->message			= other.message;
+		this->source_location	= other.source_location;
+		this->stack_trace		= other.stack_trace;
+		if( !other.next.IsEmpty() ) SetNextException( *other.next );
+	}
 
 public:
 
@@ -94,32 +152,6 @@ private:
 	/// The original exception may be stored here.
 	bc::internal_::SimpleUniquePtr<Exception>				next;
 };
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Build an Exception structure.
-///
-/// @param print_record
-///	General info of what caused the exception. Eg, "Index out of scope" when iterating over an array. See
-/// bc::diagnostic::PrintRecord for more info on how to construct a print record.
-///
-/// @param source_location
-/// This reports the source location where this function was called. If left as default, source location will point to the line
-/// where this function was called.
-///
-/// @param stack_trace
-/// This reports the source location where this function was called. If left as default, stack trace will point to the function
-/// where this function was called.
-///
-/// @return New Exception object.
-BITCRAFTE_ENGINE_API
-Exception												MakeException(
-	const PrintRecord								&	print_record,
-	const SourceLocation							&	source_location				= SourceLocation::Current(),
-	const StackTrace								&	stack_trace					= StackTrace::Current()
-);
 
 
 
@@ -265,11 +297,11 @@ void													Throw [[noreturn]] (
 )
 {
 	Throw(
-		MakeException(
+		Exception{
 			PrintRecord( message ),
 			source_location,
 			StackTrace::Current( 1 )
-		)
+		}
 	);
 }
 
