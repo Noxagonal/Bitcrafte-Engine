@@ -153,7 +153,7 @@ public:
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator++() BC_CONTAINER_NOEXCEPT
 	{
 		CheckContainer();
-		CheckBounds( 1 );
+		CheckBounds( 1, true );
 		++this->data;
 		return *this;
 	}
@@ -170,7 +170,7 @@ public:
 	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>				&	operator--() BC_CONTAINER_NOEXCEPT
 	{
 		CheckContainer();
-		CheckBounds( -1 );
+		CheckBounds( -1, true );
 		--this->data;
 		return *this;
 	}
@@ -218,7 +218,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		CheckContainer();
-		CheckBounds( value );
+		CheckBounds( value, true );
 		this->data += value;
 		return *this;
 	}
@@ -284,7 +284,7 @@ public:
 	constexpr const Pointer																				Get() const BC_CONTAINER_NOEXCEPT
 	{
 		CheckContainer();
-		CheckBounds( 0 );
+		CheckBounds( 0, false );
 		return this->data;
 	}
 
@@ -310,7 +310,7 @@ public:
 	constexpr DifferenceType																			GetIndex() const BC_CONTAINER_NOEXCEPT
 	{
 		CheckContainer();
-		CheckBounds( 0 );
+		CheckBounds( 0, true );
 		return GetIndex_NoCheck();
 	}
 
@@ -348,7 +348,8 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void																						CheckBounds(
-		DifferenceType																					offset
+		DifferenceType																					offset,
+		bool	 																						allow_one_past_last
 	) const
 	{
 		BC_ContainerAssert( !this->container->IsEmpty(),
@@ -361,7 +362,7 @@ private:
 			U"Container size", this->container->Size(),
 			U"Accessed container index", this->GetIndex_NoCheck() + offset
 		);
-		BC_ContainerAssert( this->data + offset < this->container->Data() + this->container->Size(),
+		BC_ContainerAssert( this->data + offset < this->container->Data() + this->container->Size() + ( !!allow_one_past_last ),
 			U"Iterator out of range, greater than last value",
 			U"Container size", this->container->Size(),
 			U"Accessed container index", this->GetIndex_NoCheck() + offset
