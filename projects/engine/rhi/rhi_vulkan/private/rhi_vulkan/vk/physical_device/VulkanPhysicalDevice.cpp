@@ -9,7 +9,7 @@
 #if BITCRAFTE_WINDOW_MANAGER_WIN32
 #include <core/platform/windows/Windows.hpp>
 #elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
-todo;
+#include <wayland-client-core.h>
 #else
 #error "Please add window manager required headers here"
 #endif
@@ -21,7 +21,7 @@ bc::rhi::VulkanPhysicalDevice::VulkanPhysicalDevice(
 	RHIVulkanImpl		&	rhi_vulkan_impl,
 	VkPhysicalDevice		vk_physical_device
 ) :
-	rhi_vulkan_impl( rhi_vulkan_impl ),
+	rhi_vulkan_impl( &rhi_vulkan_impl ),
 	vk_physical_device( vk_physical_device )
 {
 	vk_memory_properties.sType		= VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
@@ -49,7 +49,16 @@ bc::rhi::VulkanPhysicalDevice::VulkanPhysicalDevice(
 
 			#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 
-			vkGetPhysicalDeviceWaylandPresentationSupportKHR( todo );
+			// TODO: Wayland display should be provided by the window manager instead,
+			// figure out what would be best way to do this.
+			if( auto wayland_display = wl_display_connect( nullptr ) )
+			{
+				for( u64 i = 0; i < queue_family_properties.Size(); ++i )
+				{
+					result[ i ] = !!vkGetPhysicalDeviceWaylandPresentationSupportKHR( vk_physical_device, i, wayland_display );
+				}
+				wl_display_disconnect( wayland_display );
+			}
 
 			#else
 

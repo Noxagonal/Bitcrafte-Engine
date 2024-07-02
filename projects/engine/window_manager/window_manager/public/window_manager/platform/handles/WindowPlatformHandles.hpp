@@ -6,6 +6,9 @@
 
 #if BITCRAFTE_WINDOW_MANAGER_WIN32
 #include <core/platform/windows/Windows.hpp>
+#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
+struct wl_display;
+struct wl_surface;
 #endif
 
 
@@ -54,7 +57,8 @@ struct WindowManagerWin32PlatformHandles : public WindowManagerPlatformHandlesBa
 struct WindowManagerWaylandPlatformHandles : public WindowManagerPlatformHandlesBase
 {
 	inline WindowManagerWaylandPlatformHandles() : WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND ) {}
-	// TODO;
+	wl_display									*	display					= nullptr;
+	wl_surface									*	surface					= nullptr;
 };
 #endif
 

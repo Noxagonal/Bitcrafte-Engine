@@ -46,7 +46,23 @@ bc::rhi::VulkanWindowSurface::VulkanWindowSurface(
 
 			#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 
-			TODO;
+			auto wayland_handles = reinterpret_cast<window_manager::WindowManagerWaylandPlatformHandles*>( window->GetPlatformSpecificHandles() );
+			assert( wayland_handles );
+			assert( wayland_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WIN32 );
+
+			auto surface_create_info = VkWaylandSurfaceCreateInfoKHR {};
+			surface_create_info.sType		= VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+			surface_create_info.pNext		= nullptr;
+			surface_create_info.flags		= 0;
+			surface_create_info.display		= wayland_handles->display;
+			surface_create_info.surface		= wayland_handles->surface;
+			BAssertVkResult( vkCreateWaylandSurfaceKHR(
+				rhi_vulkan_impl.GetVulkanInstance(),
+				&surface_create_info,
+				rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
+				&result
+			) );
+
 
 			#else
 			#error "Please add window manager specific vulkan window surface creation code here"
