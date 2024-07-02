@@ -229,7 +229,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT
 	{
 		CheckContainer();
-		CheckBounds( -value );
+		CheckBounds( -value, true );
 		this->data -= value;
 		return *this;
 	}
