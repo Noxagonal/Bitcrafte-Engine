@@ -83,7 +83,7 @@ private:
 	VkPhysicalDeviceFeatures2								vk_features;
 	QueueFamilyInfo											queue_family_properties;
 
-	RHIVulkanImpl										&	rhi_vulkan_impl;
+	RHIVulkanImpl										*	rhi_vulkan_impl;
 };
 
 
