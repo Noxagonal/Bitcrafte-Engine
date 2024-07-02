@@ -857,7 +857,7 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto result = ThisViewType<true>( *this ).Find( value );
+		auto result = ThisViewType<false>( *this ).Find( value );
 		return Iterator { this, result.GetAddress() };
 	}
 
@@ -901,7 +901,7 @@ public:
 		LambdaType																					&&	lambda
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto result = ThisViewType<true>( *this ).FindIf( lambda );
+		auto result = ThisViewType<false>( *this ).FindIf( lambda );
 		return Iterator { this, result.GetAddress() };
 	}
 
