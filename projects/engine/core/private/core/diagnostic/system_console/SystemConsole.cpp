@@ -340,7 +340,8 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 		<< PrintRecordColorToCharANSIBackgroundColorCode( background_color )
 		<< "m"
 		<< reinterpret_cast<const char*>( text.ToCStr() )
-		<< RES;
+		<< RES
+		<< std::flush;
 
 	//std::cout << "\033[" << foreground_color_map[ foreground_color ] << ";" << background_color_map[ background_color ] << "m"
 	//	<< Text8( text ).ToCStr()

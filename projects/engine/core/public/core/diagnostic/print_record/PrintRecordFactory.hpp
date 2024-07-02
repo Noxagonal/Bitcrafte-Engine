@@ -80,6 +80,7 @@ void														MakePrintRecord_ArgumentList_Collector(
 	const RestTypePack									&	...argument_pack
 )
 {
+	out_buffer += MakePrintRecord( U"\n" );
 	out_buffer += MakePrintRecord_Argument( argument_description, argument_value );
 	if constexpr( sizeof...( argument_pack ) > 0 ) MakePrintRecord_ArgumentList_Collector( out_buffer, argument_pack... );
 }
@@ -116,7 +117,6 @@ PrintRecord													MakePrintRecord_AssertText(
 	auto record = MakePrintRecord( title );
 	if constexpr( sizeof...( argument_pack ) )
 	{
-		record += MakePrintRecord( U"\n" );
 		record += MakePrintRecord_ArgumentList( argument_pack... ).AddIndent();
 	}
 	return record;
