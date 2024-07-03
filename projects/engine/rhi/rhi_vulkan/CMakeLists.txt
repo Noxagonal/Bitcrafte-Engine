@@ -17,4 +17,6 @@ add_engine_rhi_component(${THIS_TARGET_NAME}
 		Vulkan::Vulkan
 )
 
+# Set window manager component defines like BITCRAFTE_WINDOW_MANAGER_WIN32 or
+# BITCRAFTE_WINDOW_MANAGER_WAYLAND. These are needed by vulkan window system integration.
 set_window_manager_component_defines(${THIS_TARGET_NAME})
