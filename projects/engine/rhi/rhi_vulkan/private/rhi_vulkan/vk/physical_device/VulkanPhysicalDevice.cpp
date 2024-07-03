@@ -36,39 +36,6 @@ bc::rhi::VulkanPhysicalDevice::VulkanPhysicalDevice(
 	vk_features.pNext				= nullptr;
 	vkGetPhysicalDeviceFeatures2( vk_physical_device, &vk_features );
 
-	auto DetermineWhichQueuesCanPresent = [ this, vk_physical_device ]( const List<VkQueueFamilyProperties2> & queue_family_properties ) -> List<bool>
-		{
-			auto result = List<bool>( queue_family_properties.Size() );
-
-			#if BITCRAFTE_WINDOW_MANAGER_WIN32
-
-			for( u64 i = 0; i < queue_family_properties.Size(); ++i )
-			{
-				result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR( vk_physical_device, i );
-			}
-
-			#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
-
-			// TODO: Wayland display should be provided by the window manager instead,
-			// figure out what would be best way to do this.
-			if( auto wayland_display = wl_display_connect( nullptr ) )
-			{
-				for( u64 i = 0; i < queue_family_properties.Size(); ++i )
-				{
-					result[ i ] = !!vkGetPhysicalDeviceWaylandPresentationSupportKHR( vk_physical_device, i, wayland_display );
-				}
-				wl_display_disconnect( wayland_display );
-			}
-
-			#else
-
-			#error "Please add window manager specific queue presentation support query here"
-
-			#endif
-
-			return result;
-		};
-
 	auto family_count = u32 {};
 	vkGetPhysicalDeviceQueueFamilyProperties2( vk_physical_device, &family_count, nullptr );
 	queue_family_properties.queue_family_properties.Resize( family_count );
@@ -77,9 +44,45 @@ bc::rhi::VulkanPhysicalDevice::VulkanPhysicalDevice(
 		p.sType = VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2;
 	}
 	vkGetPhysicalDeviceQueueFamilyProperties2( vk_physical_device, &family_count, queue_family_properties.queue_family_properties.Data() );
-	queue_family_properties.can_present = DetermineWhichQueuesCanPresent( queue_family_properties.queue_family_properties );
+	queue_family_properties.can_present = GetPhysicalDeviceQueuePresentationSupport( queue_family_properties.queue_family_properties );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanPhysicalDevice::~VulkanPhysicalDevice()
 {}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bc::List<bool> bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentationSupport(
+	ListView<VkQueueFamilyProperties2>		family_properties
+)
+{
+	auto result = List<bool>( family_properties.Size() );
+
+	#if BITCRAFTE_WINDOW_MANAGER_WIN32
+
+	for( u64 i = 0; i < family_properties.Size(); ++i )
+	{
+		result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR( vk_physical_device, i );
+	}
+
+	#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
+
+	// TODO: Wayland display should be provided by the window manager instead,
+	// figure out what would be best way to do this.
+	if( auto wayland_display = wl_display_connect( nullptr ) )
+	{
+		for( u64 i = 0; i < family_properties.Size(); ++i )
+		{
+			result[ i ] = !!vkGetPhysicalDeviceWaylandPresentationSupportKHR( vk_physical_device, i, wayland_display );
+		}
+		wl_display_disconnect( wayland_display );
+	}
+
+	#else
+
+	#error "Please add window manager specific queue presentation support query here"
+
+	#endif
+
+	return result;
+}
