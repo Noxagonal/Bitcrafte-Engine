@@ -1,6 +1,9 @@
 
 cmake_minimum_required(VERSION 3.22)
 
+include("${CMAKE_SOURCE_DIR}/cmake/BitCrafteEngineComponent.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/RHI.cmake")
+
 
 
 # Add RHI component.
@@ -75,10 +78,10 @@ endfunction()
 
 
 
+# add rhi components.
 add_subdirectory("rhi")
-if(BITCRAFTE_BUILD_RHI_VULKAN)
-	add_subdirectory("rhi_vulkan")
-endif()
-if(BITCRAFTE_BUILD_RHI_METAL)
-	add_subdirectory("rhi_metal")
-endif()
+set(RHI_LIST)
+get_supported_rhi_list(RHI_LIST)
+foreach(RHI IN LISTS RHI_LIST)
+	add_subdirectory("rhi_${RHI}")
+endforeach()

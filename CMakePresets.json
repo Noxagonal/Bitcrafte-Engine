@@ -14,7 +14,8 @@
 			"installDir": "${sourceDir}/build/install/${presetName}",
 			"cacheVariables": {
 				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-				"CMAKE_CXX_COMPILER": "clang++"
+				"CMAKE_CXX_COMPILER": "clang++",
+				"CMAKE_C_COMPILER": "clang"
 			}
 		},
 		{

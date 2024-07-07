@@ -3,36 +3,16 @@
 
 cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 
-include(CheckIPOSupported)
+project(Bitcrafte LANGUAGES CXX)
 
-project(Bitcrafte CXX)
+include("${CMAKE_SOURCE_DIR}/cmake/BitCrafteBuildConfigurations.cmake")
 
 
 
 ################################################################
 # Set configurations
 ################################################################
-set(CMAKE_CONFIGURATION_TYPES "GameShipping;GameDevelopment;EngineDevelopment" CACHE STRING "" FORCE)
-
-set(CMAKE_CXX_FLAGS_GAMESHIPPING "${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_EXE_LINKER_FLAGS_SHIPPING "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-set(CMAKE_SHARED_LINKER_FLAGS_SHIPPING "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
-
-set(CMAKE_CXX_FLAGS_GAMEDEVELOPMENT "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-set(CMAKE_EXE_LINKER_FLAGS_GAMEDEVELOPMENT "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
-set(CMAKE_SHARED_LINKER_FLAGS_GAMEDEVELOPMENT "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}")
-
-set(CMAKE_CXX_FLAGS_ENGINEDEVELOPMENT "${CMAKE_CXX_FLAGS_DEBUG}")
-set(CMAKE_EXE_LINKER_FLAGS_ENGINEDEVELOPMENT "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-set(CMAKE_SHARED_LINKER_FLAGS_ENGINEDEVELOPMENT "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
-
-# Set 'EngineDevelopment' as the default build type if none is specified
-if(NOT CMAKE_BUILD_TYPE)
-	message(STATUS "Setting default build type to 'EngineDevelopment' as none was specified.")
-	set(CMAKE_BUILD_TYPE "EngineDevelopment" CACHE STRING "Choose the type of build." FORCE)
-	# Set the possible values of build type for cmake-gui, ccmake
-	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${CMAKE_CONFIGURATION_TYPES}")
-endif()
+set_bitcrafte_build_configurations()
 
 
 
@@ -112,19 +92,23 @@ option(BITCRAFTE_INSTALL_ENGINE_DEVELOPMENT
 	"Enable installation for Engine Development"
 	OFF
 )
+option(BITCRAFTE_ENABLE_IPO
+	"Enable Interprocedural Optimization"
+	OFF # TODO: Enable IPO by default when CMake and all compilers support it.
+)
 
-# Check and enforce interprocedural optimization (IPO/LTO)
-check_ipo_supported(RESULT IPO_SUPPORT_RESULT OUTPUT IPO_SUPPORT_OUTPUT)
-if(NOT IPO_SUPPORT_RESULT)
-  message(FATAL_ERROR "Interprocedural optimization is required but not supported: ${IPO_SUPPORT_OUTPUT}")
-endif()
-
-
+# Check and conditionally enable IPO support for C and C++ compilers
+set_interprocedural_optimization(${BITCRAFTE_ENABLE_IPO})
 
 ################################################################
 # Project prerequisites
 ################################################################
 add_subdirectory("submodules" EXCLUDE_FROM_ALL)
+
+# Copy vscode_template folder into .vscode folder if it doesn't already exist.
+if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.vscode")
+	file(COPY "${CMAKE_SOURCE_DIR}/utilities/vscode_template" DESTINATION "${CMAKE_SOURCE_DIR}/.vscode")
+endif()
 
 
 
