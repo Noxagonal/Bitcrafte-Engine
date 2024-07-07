@@ -15,14 +15,9 @@ namespace bc {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Make sure condition is true or throw an exception.
+/// Make sure condition is true in development builds. Test is disabled in shipping builds.
 ///
-///	Similar to assert but without crashing the editor. If in-editor game is running, and condition is false, this will cause the
-/// in-editor game to close and popup to display what went wrong. If the in-editor game is not running, then whatever object
-/// caused this assertion to fail will be disabled and only a popup will be displayed.
-///
-///	If regular C/C++ assert() is used, this will cause the engine to shut down immediately. This is only useful for engine
-/// development and should not be used in any addon or game code.
+///	If condition is false, in development builds, an exception will be thrown.
 ///
 /// @see
 /// bc::diagnostic::Throw()
@@ -48,7 +43,7 @@ do {																				\
 
 
 
-#else
+#else // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 
 
@@ -56,7 +51,7 @@ do {																				\
 
 
 
-#endif
+#endif // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 
 
