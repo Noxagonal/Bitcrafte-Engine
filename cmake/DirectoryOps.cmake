@@ -45,28 +45,30 @@ if(NOT DEFINED DIRECTORY_OPS_INCLUDED)
 
 
 	# Function to copy contents of one directory to another
-	function(copy_folder_contents source_dir destination_dir)
-
+	function(copy_folder_contents
+		SOURCE_DIR
+		DESTINATION_DIR
+	)
 		# Ensure the destination directory exists
-		file(MAKE_DIRECTORY "${destination_dir}")
+		file(MAKE_DIRECTORY "${DESTINATION_DIR}")
 
 		# Get all files and directories in the source directory
-		file(GLOB_RECURSE files "${source_dir}/*")
+		file(GLOB_RECURSE FILES "${SOURCE_DIR}/*")
 
 		# Copy each file to the destination directory, preserving the directory structure
-		foreach(file ${files})
+		foreach(FILE ${FILES})
 			# Get the relative path of the file
-			file(RELATIVE_PATH rel_path "${source_dir}" "${file}")
+			file(RELATIVE_PATH rel_path "${SOURCE_DIR}" "${FILE}")
 			
 			# Construct the full destination path
-			set(dest_path "${destination_dir}/${rel_path}")
+			set(DESTINATION_PATH "${DESTINATION_DIR}/${rel_path}")
 			
 			# Make sure the destination directory exists
-			get_filename_component(dest_dir "${dest_path}" DIRECTORY)
-			file(MAKE_DIRECTORY "${dest_dir}")
+			get_filename_component(DESTINATION_DIR "${DESTINATION_PATH}" DIRECTORY)
+			file(MAKE_DIRECTORY "${DESTINATION_DIR}")
 
 			# Copy the file
-			file(COPY "${file}" DESTINATION "${dest_dir}" FOLLOW_SYMLINK_CHAIN)
+			file(COPY "${FILE}" DESTINATION "${DESTINATION_DIR}" FOLLOW_SYMLINK_CHAIN)
 		endforeach()
 	endfunction()
 
