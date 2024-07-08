@@ -33,3 +33,9 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerWayla
 {
 	return wayland_manager->CreateWindow( window_create_info );
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const void * bc::window_manager::WindowManagerWaylandComponent::GetPlatformSpecificHandles() const
+{
+	return wayland_manager->GetPlatformSpecificHandles();
+}

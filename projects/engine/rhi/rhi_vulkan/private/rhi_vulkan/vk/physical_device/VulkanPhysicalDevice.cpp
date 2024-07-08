@@ -1,6 +1,10 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
 #include <rhi_vulkan/vk/physical_device/VulkanPhysicalDevice.hpp>
+#include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
+
+#include <window_manager/WindowManagerComponent.hpp>
+#include <window_manager/platform/handles/WindowPlatformHandles.hpp>
 
 #include <rhi_vulkan/platform/PlatformHeadersInclude.hpp>
 #undef ERROR
@@ -54,32 +58,29 @@ bc::rhi::VulkanPhysicalDevice::~VulkanPhysicalDevice()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::List<bool> bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentationSupport(
 	ListView<VkQueueFamilyProperties2>		family_properties
-)
+) const
 {
 	auto result = List<bool>( family_properties.Size() );
 
 	#if BITCRAFTE_WINDOW_MANAGER_WIN32
-
 	for( u64 i = 0; i < family_properties.Size(); ++i )
 	{
 		result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR( vk_physical_device, i );
 	}
 
 	#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
+	auto platform_specific_handles = reinterpret_cast<const window_manager::WindowManagerWaylandPlatformHandles*>( rhi_vulkan_impl->GetWindowManagerComponent().GetPlatformSpecificHandles() );
+	assert( platform_specific_handles );
+	assert( platform_specific_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND );
+	BAssert( platform_specific_handles->display, "Failed to get Wayland display, make sure desktop environment is running on Wayland" );
 
-	// TODO: Wayland display should be provided by the window manager instead,
-	// figure out what would be best way to do this.
-	if( auto wayland_display = wl_display_connect( nullptr ) )
+	auto wayland_display = platform_specific_handles->display;
+	for( u64 i = 0; i < family_properties.Size(); ++i )
 	{
-		for( u64 i = 0; i < family_properties.Size(); ++i )
-		{
-			result[ i ] = !!vkGetPhysicalDeviceWaylandPresentationSupportKHR( vk_physical_device, i, wayland_display );
-		}
-		wl_display_disconnect( wayland_display );
+		result[ i ] = !!vkGetPhysicalDeviceWaylandPresentationSupportKHR( vk_physical_device, i, wayland_display );
 	}
 
 	#else
-
 	#error "Please add window manager specific queue presentation support query here"
 
 	#endif

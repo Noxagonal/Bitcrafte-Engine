@@ -183,7 +183,7 @@ void													Throw [[noreturn]] (
 /// Throw exception with message and optional information.
 ///
 /// Example:
-/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 6.
+/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 8.
 ///		diagnostic::Throw(
 ///			diagnostic::MakePrintRecord_AssertText( "Index out of scope",
 ///				"List size", size,
@@ -193,7 +193,7 @@ void													Throw [[noreturn]] (
 /// Will output:
 ///		Index out of scope
 ///		- List size: 5
-///		- Accessed index: 6
+///		- Accessed index: 8
 ///
 /// @note
 ///	Depending on where the exception is thrown, this will either disable parts of the engine or cause general crash of the
@@ -222,7 +222,7 @@ void													Throw [[noreturn]] (
 /// Throw exception with message and optional information.
 ///
 /// Example:
-/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 6.
+/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 8.
 ///		diagnostic::Throw(
 ///			diagnostic::MakePrintRecord_AssertText( "Index out of scope",
 ///				"List size", size,
@@ -232,7 +232,7 @@ void													Throw [[noreturn]] (
 /// Will output:
 ///		Index out of scope
 ///		- List size: 5
-///		- Accessed index: 6
+///		- Accessed index: 8
 ///
 /// @note
 ///	Depending on where the exception is thrown, this will either disable parts of the engine or cause general crash of the
@@ -261,7 +261,7 @@ void													Throw [[noreturn]] (
 /// Throw exception with message and optional information.
 ///
 /// Example:
-/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 6.
+/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 8.
 ///		diagnostic::Throw(
 ///			diagnostic::MakePrintRecord_AssertText( "Index out of scope",
 ///				"List size", size,
@@ -271,7 +271,7 @@ void													Throw [[noreturn]] (
 /// Will output:
 ///		Index out of scope
 ///		- List size: 5
-///		- Accessed index: 6
+///		- Accessed index: 8
 ///
 /// @note
 ///	Depending on where the exception is thrown, this will either disable parts of the engine or cause general crash of the

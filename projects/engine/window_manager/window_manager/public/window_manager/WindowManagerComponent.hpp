@@ -36,6 +36,9 @@ public:
 		const WindowCreateInfo								&	window_create_info
 	) = 0;
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual const void 										*	GetPlatformSpecificHandles() const = 0;
+
 	WindowManagerComponentEvents								events;
 
 private:

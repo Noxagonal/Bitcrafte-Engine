@@ -124,7 +124,7 @@ void bc::window_manager::Win32Window::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void * bc::window_manager::Win32Window::GetPlatformSpecificHandles()
+const void * bc::window_manager::Win32Window::GetPlatformSpecificHandles() const
 {
 	return &platform_handles;
 }

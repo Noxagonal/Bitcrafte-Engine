@@ -8,7 +8,11 @@
 #include <core/platform/windows/Windows.hpp>
 #elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 struct wl_display;
+struct wl_compositor;
+struct xdg_wm_base;
 struct wl_surface;
+struct xdg_surface;
+struct xdg_toplevel;
 #endif
 
 
@@ -58,7 +62,11 @@ struct WindowManagerWaylandPlatformHandles : public WindowManagerPlatformHandles
 {
 	inline WindowManagerWaylandPlatformHandles() : WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND ) {}
 	wl_display									*	display					= nullptr;
+	wl_compositor								*	compositor				= nullptr;
+	xdg_wm_base									*	wm_base_xdg				= nullptr;
 	wl_surface									*	surface					= nullptr;
+	xdg_surface									*	surface_xdg				= nullptr;
+	xdg_toplevel								*	toplevel_xdg			= nullptr;
 };
 #endif
 
