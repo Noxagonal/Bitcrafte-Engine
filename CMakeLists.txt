@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.22 FATAL_ERROR)
 project(Bitcrafte LANGUAGES CXX)
 
 include("${CMAKE_SOURCE_DIR}/cmake/BitCrafteBuildConfigurations.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/DirectoryOps.cmake")
 
 
 
@@ -107,7 +108,7 @@ add_subdirectory("submodules" EXCLUDE_FROM_ALL)
 
 # Copy vscode_template folder into .vscode folder if it doesn't already exist.
 if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.vscode")
-	file(COPY "${CMAKE_SOURCE_DIR}/utilities/vscode_template" DESTINATION "${CMAKE_SOURCE_DIR}/.vscode")
+	copy_folder_contents("${CMAKE_SOURCE_DIR}/utilities/vscode_template" "${CMAKE_SOURCE_DIR}/.vscode")
 endif()
 
 
