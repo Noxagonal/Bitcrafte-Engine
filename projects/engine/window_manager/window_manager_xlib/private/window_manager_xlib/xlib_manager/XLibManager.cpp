@@ -1,11 +1,11 @@
 
-#include <window_manager_xcb/PreCompiledHeader.hpp>
-#include <window_manager_xcb/xcb_manager/XCBManager.hpp>
+#include <window_manager_xlib/PreCompiledHeader.hpp>
+#include <window_manager_xlib/xlib_manager/XLibManager.hpp>
 
 #include <window_manager/window/Window.hpp>
-#include <window_manager_xcb/window/XCBWindow.hpp>
-#include <window_manager_xcb/WindowManagerXCBComponent.hpp>
-#include <window_manager_xcb/xcb_manager/XCBEvents.hpp>
+#include <window_manager_xlib/window/XLibWindow.hpp>
+#include <window_manager_xlib/WindowManagerXLibComponent.hpp>
+#include <window_manager_xlib/xlib_manager/XLibEvents.hpp>
 
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
@@ -17,11 +17,11 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::XCBManager::XCBManager(
-	WindowManagerXCBComponent				&	window_manager_xcb_component,
+bc::window_manager::XLibManager::XLibManager(
+	WindowManagerXLibComponent				&	window_manager_xlib_component,
 	const WindowManagerComponentCreateInfo	&	window_manager_component_create_info
 ) :
-	window_manager_xcb_component( window_manager_xcb_component )
+	window_manager_xlib_component( window_manager_xlib_component )
 {
 	// Open xlib display
 	platform_handles.display = XOpenDisplay( nullptr );
@@ -32,18 +32,34 @@ bc::window_manager::XCBManager::XCBManager(
 	}
 
 	// Get the default screen
-	platform_handles.screen = DefaultScreen( platform_handles.display );
-	if( platform_handles.screen < 0 )
+	platform_handles.default_screen = DefaultScreen( platform_handles.display );
+	if( platform_handles.default_screen < 0 )
 	{
 		CleanupHandles();
 		diagnostic::Throw( "Failed to get default screen" );
 	}
 
-	// Populate XCB atoms
+	// Get the default visual
+	platform_handles.default_visual = DefaultVisual( platform_handles.display, platform_handles.default_screen );
+	if( platform_handles.default_visual == nullptr )
+	{
+		CleanupHandles();
+		diagnostic::Throw( "Failed to get default screen visual" );
+	}
+
+	// Get the default visual ID
+	platform_handles.default_visual_id = XVisualIDFromVisual( platform_handles.default_visual );
+	if( platform_handles.default_visual_id == 0 )
+	{
+		CleanupHandles();
+		diagnostic::Throw( "Failed to get default screen visual ID" );
+	}
+
+	// Populate XLib atoms
 	if( auto result = PopulateX11Atoms() )
 	{
 		CleanupHandles();
-		diagnostic::Throw( "Failed to populate XCB atoms" );
+		diagnostic::Throw( "Failed to populate XLib atoms" );
 	}
 
 	// Create an X input method (global)
@@ -64,7 +80,7 @@ bc::window_manager::XCBManager::XCBManager(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::XCBManager::~XCBManager()
+bc::window_manager::XLibManager::~XLibManager()
 {
 	BHardAssert( active_window_list.IsEmpty(), "Error while shutting down OS window system, there are still active windows" );
 
@@ -72,7 +88,7 @@ bc::window_manager::XCBManager::~XCBManager()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBManager::CleanupHandles()
+void bc::window_manager::XLibManager::CleanupHandles()
 {
 	XFlush( platform_handles.display );
 
@@ -87,7 +103,7 @@ void bc::window_manager::XCBManager::CleanupHandles()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBManager::Run()
+void bc::window_manager::XLibManager::Run()
 {
 	ProcessMessages();
 
@@ -98,31 +114,33 @@ void bc::window_manager::XCBManager::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::Window> bc::window_manager::XCBManager::CreateWindow(
+bc::UniquePtr<bc::window_manager::Window> bc::window_manager::XLibManager::CreateWindow(
 	const WindowCreateInfo  & window_create_info
 )
 {
-	auto new_window = MakeUniquePtr<XCBWindow>( *this, window_create_info );
+	auto new_window = MakeUniquePtr<XLibWindow>( *this, window_create_info );
 	active_window_list.PushBack( new_window.Get() );
-	auto platform_handles = static_cast<const bc::window_manager::WindowManagerXCBPlatformHandles*>( new_window->GetPlatformSpecificHandles() );
-	window_manager_xcb_component.events.OnWindowCreated.Signal( new_window.Get() );
+	auto platform_handles = static_cast<const bc::window_manager::WindowManagerXLibPlatformHandles*>( new_window->GetPlatformSpecificHandles() );
+	window_manager_xlib_component.events.OnWindowCreated.Signal( new_window.Get() );
 	return new_window;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBManager::NotifyWindowBeingDestroyed(
-	bc::window_manager::XCBWindow * window_ptr
+void bc::window_manager::XLibManager::NotifyWindowBeingDestroyed(
+	bc::window_manager::XLibWindow * window_ptr
 )
 {
-	window_manager_xcb_component.events.OnWindowBeingDestroyed.Signal( window_ptr );
+	XFlush( platform_handles.display );
+
+	window_manager_xlib_component.events.OnWindowBeingDestroyed.Signal( window_ptr );
 	active_window_list.Erase( window_ptr );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBManager::ProcessMessages()
+void bc::window_manager::XLibManager::ProcessMessages()
 {
 	auto event = XEvent {};
-	while( true )
+	while( XPending( platform_handles.display ) > 0 )
 	{
 		XNextEvent( platform_handles.display, &event );
 		ProcessEvent( event );
@@ -130,20 +148,20 @@ void bc::window_manager::XCBManager::ProcessMessages()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBManager::ProcessEvent(
+void bc::window_manager::XLibManager::ProcessEvent(
 	XEvent & event
 )
 {
 	std::cout << "Event type: " << event.type << std::endl;
 
-	auto GetWindowPointer = [ this ]( auto window ) -> bc::window_manager::XCBWindow*
+	auto GetWindowPointer = [ this ]( auto window ) -> bc::window_manager::XLibWindow*
 	{
-		return xlib::GetProperty<bc::window_manager::XCBWindow*>(
+		return xlib::GetProperty<bc::window_manager::XLibWindow*>(
 			platform_handles.display,
 			window,
 			platform_handles.window_user_pointer_atom,
 			XA_CARDINAL,
-			xlib::PropertyFormat::F32
+			xlib::PropertyFormat::F8
 		);
 	};
 
@@ -156,11 +174,11 @@ void bc::window_manager::XCBManager::ProcessEvent(
 
 			auto key = bc::window_manager::KeyboardButton::KEY_UNKNOWN;
 
-			auto modifier_key_flags = xcb::GetModifierKeyFlags( e.state );
+			auto modifier_key_flags = xlib::GetModifierKeyFlags( e.state );
 
 			// Get key code
 			auto key_code_symbol = XLookupKeysym( &e, 0 );
-			auto key_code = bc::window_manager::xcb::GetKeyboardButton( key_code_symbol );
+			auto key_code = bc::window_manager::xlib::GetKeyboardButton( key_code_symbol );
 
 			// TODO: Get scancode.
 			auto scancode = i32 {};
@@ -183,7 +201,7 @@ void bc::window_manager::XCBManager::ProcessEvent(
 			auto keysym_output = KeySym {};
 			auto status = Status {};
 			int xmb_lookup_length = XwcLookupString(
-				platform_handles.xlib_xic,
+				platform_handles.xic,
 				&e,
 				buffer.Data(),
 				buffer.Size() - 1,
@@ -227,9 +245,9 @@ void bc::window_manager::XCBManager::ProcessEvent(
 			auto & e = event.xbutton;
 			auto window = GetWindowPointer( e.window );
 			window->events.MouseButton.Signal(
-				xcb::GetMouseButton( e.button ),
+				xlib::GetMouseButton( e.button ),
 				bc::window_manager::MouseButtonAction::PRESSED,
-				xcb::GetModifierKeyFlags( e.state )
+				xlib::GetModifierKeyFlags( e.state )
 			);
 		}
 		return;
@@ -239,9 +257,9 @@ void bc::window_manager::XCBManager::ProcessEvent(
 			auto & e = event.xbutton;
 			auto window = GetWindowPointer( e.window );
 			window->events.MouseButton.Signal(
-				xcb::GetMouseButton( e.button ),
+				xlib::GetMouseButton( e.button ),
 				bc::window_manager::MouseButtonAction::RELEASED,
-				xcb::GetModifierKeyFlags( e.state )
+				xlib::GetModifierKeyFlags( e.state )
 			);
 		}
 		return;
@@ -428,13 +446,13 @@ void bc::window_manager::XCBManager::ProcessEvent(
 			}
 			if( e.data.l[ 0 ] == platform_handles.window_protocol_take_focus_atom )
 			{
-				xcb::SetInputFocus( *window );
+				xlib::SetInputFocus( *window );
 				return;
 			}
 			if( e.data.l[ 0 ] == platform_handles.window_protocol_ping_atom )
 			{
 				// Does not work, might not need.
-				//xcb::ReplyToPing( e, *window );
+				//xlib::ReplyToPing( e, *window );
 				return;
 			}
 		}
@@ -461,23 +479,23 @@ void bc::window_manager::XCBManager::ProcessEvent(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::Optional<bc::Text32> bc::window_manager::XCBManager::PopulateX11Atoms()
+bc::Optional<bc::Text32> bc::window_manager::XLibManager::PopulateX11Atoms()
 {
-	platform_handles.window_user_pointer_atom = xcb::GetAtom( platform_handles.xcb_connection, "_BITCRAFTE_XCB_WINDOW_POINTER", true );
-	if( platform_handles.window_user_pointer_atom == XCB_ATOM_NONE ) return { "Failed to get _BITCRAFTE_XCB_WINDOW_POINTER atom" };
+	platform_handles.window_user_pointer_atom = xlib::GetAtom( platform_handles.display, "_BITCRAFTE_XLIB_WINDOW_POINTER", true );
+	if( platform_handles.window_user_pointer_atom == None ) return { "Failed to get _BITCRAFTE_XLIB_WINDOW_POINTER atom" };
 
 	// Protocol atoms
-	platform_handles.window_protocol_atom = xcb::GetAtom( platform_handles.xcb_connection, "WM_PROTOCOLS", false );
-	if( platform_handles.window_protocol_atom == XCB_ATOM_NONE ) return { "Failed to get WM_PROTOCOLS atom" };
+	platform_handles.window_protocol_atom = xlib::GetAtom( platform_handles.display, "WM_PROTOCOLS", false );
+	if( platform_handles.window_protocol_atom == None ) return { "Failed to get WM_PROTOCOLS atom" };
 
-	platform_handles.window_protocol_close_atom = xcb::GetAtom( platform_handles.xcb_connection, "WM_DELETE_WINDOW", false );
-	if( platform_handles.window_protocol_close_atom == XCB_ATOM_NONE ) return { "Failed to get WM_DELETE_WINDOW atom" };
+	platform_handles.window_protocol_close_atom = xlib::GetAtom( platform_handles.display, "WM_DELETE_WINDOW", false );
+	if( platform_handles.window_protocol_close_atom == None ) return { "Failed to get WM_DELETE_WINDOW atom" };
 
-	platform_handles.window_protocol_take_focus_atom = xcb::GetAtom( platform_handles.xcb_connection, "WM_TAKE_FOCUS", false );
-	if( platform_handles.window_protocol_take_focus_atom == XCB_ATOM_NONE ) return { "Failed to get WM_TAKE_FOCUS atom" };
+	platform_handles.window_protocol_take_focus_atom = xlib::GetAtom( platform_handles.display, "WM_TAKE_FOCUS", false );
+	if( platform_handles.window_protocol_take_focus_atom == None ) return { "Failed to get WM_TAKE_FOCUS atom" };
 
-	platform_handles.window_protocol_ping_atom = xcb::GetAtom( platform_handles.xcb_connection, "_NET_WM_PING", false );
-	if( platform_handles.window_protocol_ping_atom == XCB_ATOM_NONE ) return { "Failed to get _NET_WM_PING atom" };
+	platform_handles.window_protocol_ping_atom = xlib::GetAtom( platform_handles.display, "_NET_WM_PING", false );
+	if( platform_handles.window_protocol_ping_atom == None ) return { "Failed to get _NET_WM_PING atom" };
 
 	return {};
 }

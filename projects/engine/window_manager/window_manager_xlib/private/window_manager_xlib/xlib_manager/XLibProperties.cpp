@@ -1,12 +1,11 @@
 
-#include <window_manager_xcb/PreCompiledHeader.hpp>
+#include <window_manager_xlib/PreCompiledHeader.hpp>
 
-#include <window_manager_xcb/xcb_manager/XCBProperties.hpp>
+#include <window_manager_xlib/xlib_manager/XLibProperties.hpp>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
-#include "XCBProperties.hpp"
 
 
 
@@ -63,12 +62,13 @@ void bc::window_manager::xlib::GetPropertyRaw(
 	unsigned long nitems = {};
 	unsigned long bytes_after = {};
 	unsigned char * prop = nullptr;
+	auto aligned_data_length = ( data_length - 1 ) / 4 + 1;
 
 	auto status = XGetWindowProperty(
 		display,
 		window,
 		atom_property,
-		0, data_length / format_bytes,
+		0, aligned_data_length,
 		false,
 		type,
 		&actual_type,

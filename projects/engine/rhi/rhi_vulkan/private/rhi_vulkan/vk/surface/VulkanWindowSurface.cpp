@@ -53,6 +53,31 @@ bc::rhi::VulkanWindowSurface::VulkanWindowSurface(
 		}
 		#endif
 
+		#if BITCRAFTE_WINDOW_MANAGER_XLIB
+		case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XLIB:
+		{
+			auto xlib_handles = static_cast<const window_manager::WindowManagerXLibPlatformHandles*>( window->GetPlatformSpecificHandles() );
+			assert( xlib_handles );
+			assert( xlib_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XLIB );
+			assert( xlib_handles->display );
+			assert( xlib_handles->window );
+
+			auto surface_create_info = VkXlibSurfaceCreateInfoKHR {};
+			surface_create_info.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+			surface_create_info.pNext = nullptr;
+			surface_create_info.flags = 0;
+			surface_create_info.dpy = xlib_handles->display;
+			surface_create_info.window = xlib_handles->window;
+			BAssertVkResult( vkCreateXlibSurfaceKHR(
+				rhi_vulkan_impl.GetVulkanInstance(),
+				&surface_create_info,
+				rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
+				&result
+			) );
+			break;
+		}
+		#endif
+
 		#if BITCRAFTE_WINDOW_MANAGER_XCB
 		case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XCB:
 		{

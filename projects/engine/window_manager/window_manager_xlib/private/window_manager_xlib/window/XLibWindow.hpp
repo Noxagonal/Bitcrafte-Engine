@@ -3,7 +3,7 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <window_manager/window/Window.hpp>
 #include <window_manager/platform/handles/WindowPlatformHandles.hpp>
-#include <window_manager_xcb/xcb_manager/XCBProperties.hpp>
+#include <window_manager_xlib/xlib_manager/XLibProperties.hpp>
 
 
 
@@ -12,19 +12,19 @@ namespace window_manager {
 
 
 
-class XCBManager;
+class XLibManager;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class XCBWindow : public Window
+class XLibWindow : public Window
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct X11PropertyHandles
 	{
-		xlib::PropertyHandle<XCBWindow*>					window_user_pointer;
+		xlib::PropertyHandle<XLibWindow*>					window_user_pointer;
 		xlib::PropertyHandle<List<::Atom>>					window_protocols;
 		xlib::PropertyHandle<Text>							window_title;
 		xlib::PropertyHandle<Text>							window_icon_name;
@@ -32,13 +32,13 @@ public:
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	XCBWindow(
-		XCBManager										&	xcb_manager,
+	XLibWindow(
+		XLibManager										&	xlib_manager,
 		const WindowCreateInfo							&	window_create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual ~XCBWindow() override;
+	virtual ~XLibWindow() override;
 
 private:
 
@@ -68,7 +68,7 @@ public:
 	virtual const WindowManagerPlatformHandlesBase		*	GetPlatformSpecificHandles() const override;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const WindowManagerXCBPlatformHandles				*	GetXLibPlatformHandles() const;
+	const WindowManagerXLibPlatformHandles				*	GetXLibPlatformHandles() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline X11PropertyHandles							*	GetX11PropertyHandles() { return &x11_property_handles; }
@@ -79,9 +79,9 @@ private:
 	void													SetupPropertyHandles();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	XCBManager											&	xcb_manager;
+	XLibManager											&	xlib_manager;
 
-	WindowManagerXCBPlatformHandles							platform_handles			= {};
+	WindowManagerXLibPlatformHandles						platform_handles			= {};
 	X11PropertyHandles										x11_property_handles		= {};
 };
 

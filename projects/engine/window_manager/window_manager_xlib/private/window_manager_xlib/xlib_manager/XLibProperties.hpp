@@ -91,7 +91,7 @@ void										ChangeProperty(
 {
 	auto format_bytes = std::to_underlying( format ) / 8;
 	uint32_t data_length = sizeof( PropertyType );
-	assert( sizeof( PropertyType ) % format_bytes == 0 && "PropertyType must be a multiple of format bytes" );
+	assert( data_length % format_bytes == 0 && "Data length must be a multiple of format bytes" );
 	ChangePropertyRaw(
 		display,
 		window,
@@ -113,8 +113,9 @@ PropertyType								GetProperty(
 	PropertyFormat							format
 )
 {
-	auto data_length = sizeof( PropertyType );
-	static_assert( sizeof( PropertyType ) % 4 == 0 );
+	auto format_bytes = std::to_underlying( format ) / 8;
+	uint32_t data_length = sizeof( PropertyType );
+	assert( data_length % format_bytes == 0 && "Data length must be a multiple of format bytes" );
 
 	PropertyType data = {};
 	GetPropertyRaw(
@@ -176,7 +177,7 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Handle for XCB properties
+/// Handle for XLib properties
 ///
 /// @tparam PropertyType
 ///	Property type
@@ -326,6 +327,6 @@ public:
 
 
 
-} // xcb
+} // xlib
 } // window_manager
 } // bc

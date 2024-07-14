@@ -65,7 +65,7 @@ bc::List<bool> bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentation
 	auto * platform_specific_handles_base = rhi_vulkan_impl->GetWindowManagerComponent().GetPlatformSpecificHandles();
 	assert( platform_specific_handles_base );
 
-	switch (platform_specific_handles_base->structure_type)
+	switch( platform_specific_handles_base->structure_type )
 	{
 
 	#if BITCRAFTE_WINDOW_MANAGER_WIN32
@@ -73,7 +73,27 @@ bc::List<bool> bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentation
 	{
 		for( u64 i = 0; i < family_properties.Size(); ++i )
 		{
-			result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR( vk_physical_device, i );
+			result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR(
+				vk_physical_device,
+				i
+			);
+		}
+		break;
+	}
+	#endif
+
+	#if BITCRAFTE_WINDOW_MANAGER_XLIB
+	case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XLIB:
+	{
+		auto platform_specific_handles = static_cast<const window_manager::WindowManagerXLibPlatformHandles*>( platform_specific_handles_base );
+		for( u64 i = 0; i < family_properties.Size(); ++i )
+		{
+			result[ i ] = !!vkGetPhysicalDeviceXlibPresentationSupportKHR(
+				vk_physical_device,
+				i,
+				platform_specific_handles->display,
+				platform_specific_handles->default_visual_id
+			);
 		}
 		break;
 	}
@@ -85,10 +105,14 @@ bc::List<bool> bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentation
 		auto platform_specific_handles = static_cast<const window_manager::WindowManagerXCBPlatformHandles*>( platform_specific_handles_base );
 		BAssert( platform_specific_handles->xcb_connection, "Failed to aquire X11 connection, make sure desktop environment is running X11" );
 
-		auto xcb_connection = platform_specific_handles->xcb_connection;
 		for( u64 i = 0; i < family_properties.Size(); ++i )
 		{
-			result[ i ] = !!vkGetPhysicalDeviceXcbPresentationSupportKHR( vk_physical_device, i, xcb_connection, platform_specific_handles->xcb_screen->root_visual );
+			result[ i ] = !!vkGetPhysicalDeviceXcbPresentationSupportKHR(
+				vk_physical_device,
+				i,
+				platform_specific_handles->xcb_connection,
+				platform_specific_handles->xcb_screen->root_visual
+			);
 		}
 		break;
 	}

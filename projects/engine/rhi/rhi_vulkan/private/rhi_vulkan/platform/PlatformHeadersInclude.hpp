@@ -15,6 +15,7 @@
 #endif
 
 #if BITCRAFTE_WINDOW_MANAGER_XLIB
+#include <X11/Xlib.h>
 #include <vulkan/vulkan_xlib.h>
 #endif
 

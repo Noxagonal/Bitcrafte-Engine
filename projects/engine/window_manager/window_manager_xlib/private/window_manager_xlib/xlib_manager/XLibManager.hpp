@@ -2,8 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <window_manager_xcb/window/XCBWindow.hpp>
-#include <window_manager_xcb/xcb_manager/XCBProperties.hpp>
+#include <window_manager_xlib/window/XLibWindow.hpp>
+#include <window_manager_xlib/xlib_manager/XLibProperties.hpp>
 
 #include <core/containers/Optional.hpp>
 #include <core/containers/List.hpp>
@@ -17,9 +17,9 @@ namespace window_manager {
 
 
 struct WindowManagerComponentCreateInfo;
-class WindowManagerXCBComponent;
-class XCBManager;
-class XCBWindow;
+class WindowManagerXLibComponent;
+class XLibManager;
+class XLibWindow;
 
 struct WindowCreateInfo;
 class Window;
@@ -27,18 +27,18 @@ class Window;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class XCBManager
+class XLibManager
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	XCBManager(
-		WindowManagerXCBComponent						&	window_manager_xcb_component,
+	XLibManager(
+		WindowManagerXLibComponent						&	window_manager_xlib_component,
 		const WindowManagerComponentCreateInfo			&	window_manager_component_create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~XCBManager();
+	~XLibManager();
 
 private:
 
@@ -57,11 +57,11 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void													NotifyWindowBeingDestroyed(
-		XCBWindow										*	window_ptr
+		XLibWindow										*	window_ptr
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const WindowManagerXCBPlatformHandles		*	GetPlatformSpecificHandles() const { return &platform_handles; }
+	inline const WindowManagerXLibPlatformHandles		*	GetPlatformSpecificHandles() const { return &platform_handles; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void													ProcessMessages();
@@ -79,11 +79,11 @@ private:
 	Optional<Text32>										PopulateX11Atoms();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	WindowManagerXCBComponent							&	window_manager_xcb_component;
+	WindowManagerXLibComponent							&	window_manager_xlib_component;
 
-	List<XCBWindow*>										active_window_list;
+	List<XLibWindow*>										active_window_list;
 
-	WindowManagerXCBPlatformHandles							platform_handles = {};
+	WindowManagerXLibPlatformHandles						platform_handles = {};
 };
 
 

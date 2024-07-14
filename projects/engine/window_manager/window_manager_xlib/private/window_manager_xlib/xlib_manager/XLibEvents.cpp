@@ -1,8 +1,8 @@
 
-#include <window_manager_xcb/PreCompiledHeader.hpp>
-#include <window_manager_xcb/xcb_manager/XCBEvents.hpp>
+#include <window_manager_xlib/PreCompiledHeader.hpp>
+#include <window_manager_xlib/xlib_manager/XLibEvents.hpp>
 
-#include <window_manager_xcb/window/XCBWindow.hpp>
+#include <window_manager_xlib/window/XLibWindow.hpp>
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -10,8 +10,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::xcb::SetInputFocus(
-	const XCBWindow	&	window
+void bc::window_manager::xlib::SetInputFocus(
+	const XLibWindow	&	window
 )
 {
 	auto handles = window.GetXLibPlatformHandles();
@@ -24,56 +24,58 @@ void bc::window_manager::xcb::SetInputFocus(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::xcb::ReplyToPing(
-	const xcb_client_message_event_t	*	event,
-	const XCBWindow						&	window
+void bc::window_manager::xlib::ReplyToPing(
+	const XEvent		&	event,
+	const XLibWindow	&	window
 )
 {
-	// WARNING: Does not work, might not need.
-	//auto handles = window.GetXCBPlatformHandles();
-	//xcb_client_message_event_t reply = *event;
-	//reply.window = handles->xcb_screen->root;
-	//xcb_send_event(
-	//	handles->xcb_connection,
-	//	0,
-	//	handles->xcb_screen->root,
-	//	XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY,
-	//	reinterpret_cast<const char*>( &reply )
-	//);
-	//xcb_flush( handles->xcb_connection );
+	auto handles = window.GetXLibPlatformHandles();
+	auto e = event;
+	e.xclient.window = RootWindow( handles->display, handles->default_screen );
+	XSendEvent(
+		window.GetXLibPlatformHandles()->display,
+		e.xclient.window,
+		False,
+		SubstructureRedirectMask | SubstructureNotifyMask,
+		&e
+	);
+	XFlush( handles->display );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::ModifierKeyFlags bc::window_manager::xcb::GetModifierKeyFlags(
-	uint16_t	state
+bc::window_manager::ModifierKeyFlags bc::window_manager::xlib::GetModifierKeyFlags(
+	uint32_t	state
 )
 {
 	auto modifier_key_flags = bc::window_manager::ModifierKeyFlags {};
-	if( state & XCB_MOD_MASK_SHIFT ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::SHIFT;
-	if( state & XCB_MOD_MASK_CONTROL ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::CONTROL;
-	if( state & XCB_MOD_MASK_LOCK ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::CAPS_LOCK;
-	if( state & XCB_MOD_MASK_1 ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::ALT;
-	if( state & XCB_MOD_MASK_2 ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::NUM_LOCK;
-	if( state & XCB_MOD_MASK_4 ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::SUPER;
-	if( state & XCB_MOD_MASK_5 ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::ALT_GR;
+	if( state & ShiftMask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::SHIFT;
+	if( state & ControlMask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::CONTROL;
+	if( state & LockMask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::CAPS_LOCK;
+	if( state & Mod1Mask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::ALT;
+	if( state & Mod2Mask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::NUM_LOCK;
+	if( state & Mod4Mask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::SUPER;
+	if( state & Mod5Mask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::ALT_GR;
 	return modifier_key_flags;
 }
 
-bc::window_manager::MouseButton bc::window_manager::xcb::GetMouseButton(
-	xcb_button_t	button
+bc::window_manager::MouseButton bc::window_manager::xlib::GetMouseButton(
+	uint32_t	button
 )
 {
-	if( button == XCB_BUTTON_INDEX_1 ) return bc::window_manager::MouseButton::BUTTON_1;
-	else if( button == XCB_BUTTON_INDEX_2 ) return bc::window_manager::MouseButton::BUTTON_3;
-	else if( button == XCB_BUTTON_INDEX_3 ) return bc::window_manager::MouseButton::BUTTON_2;
-	else if( button == XCB_BUTTON_INDEX_4 ) return bc::window_manager::MouseButton::BUTTON_4;
-	else if( button == XCB_BUTTON_INDEX_5 ) return bc::window_manager::MouseButton::BUTTON_5;
+	switch (button)
+	{
+	case Button1:	return bc::window_manager::MouseButton::BUTTON_1;
+	case Button2:	return bc::window_manager::MouseButton::BUTTON_3;
+	case Button3:	return bc::window_manager::MouseButton::BUTTON_2;
+	case Button4:	return bc::window_manager::MouseButton::BUTTON_4;
+	case Button5:	return bc::window_manager::MouseButton::BUTTON_5;
+	}
 	return {};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::KeyboardButton bc::window_manager::xcb::GetKeyboardButton(
-	xcb_keysym_t	keysym
+bc::window_manager::KeyboardButton bc::window_manager::xlib::GetKeyboardButton(
+	KeySym		keysym
 )
 {
 	switch( keysym )

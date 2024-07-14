@@ -22,8 +22,8 @@ bc::List<bc::Text> bc::rhi::GetPlatformSpecificInstanceExtensionNames(
 			return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
 		#endif
 
-		#if BITCRAFTE_WINDOW_MANAGER_X11
-		case bc::window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_X11:
+		#if BITCRAFTE_WINDOW_MANAGER_XLIB
+		case bc::window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XLIB:
 			return { VK_KHR_XLIB_SURFACE_EXTENSION_NAME };
 		#endif
 

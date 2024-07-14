@@ -1,27 +1,26 @@
 
-#include <window_manager_xcb/PreCompiledHeader.hpp>
+#include <window_manager_xlib/PreCompiledHeader.hpp>
 
-#include <window_manager_xcb/xcb_manager/XCBManager.hpp>
-#include <window_manager_xcb/window/XCBWindow.hpp>
+#include <window_manager_xlib/xlib_manager/XLibManager.hpp>
+#include <window_manager_xlib/window/XLibWindow.hpp>
 
 #include <X11/Xlib.h>
-#include <xcb/xcb.h>
-#include "XCBWindow.hpp"
+#include <X11/Xatom.h>
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::XCBWindow::XCBWindow(
-	XCBManager				&	xcb_manager,
+bc::window_manager::XLibWindow::XLibWindow(
+	XLibManager				&	xlib_manager,
 	const WindowCreateInfo	&	window_create_info
 ) :
 	::bc::window_manager::Window( window_create_info ),
-	xcb_manager( xcb_manager ),
-	platform_handles( *xcb_manager.GetPlatformSpecificHandles() )
+	xlib_manager( xlib_manager ),
+	platform_handles( *xlib_manager.GetPlatformSpecificHandles() )
 {
 	auto window_attributes = XSetWindowAttributes {};
-	window_attributes.background_pixel = WhitePixel( platform_handles.display, platform_handles.screen );
-	window_attributes.border_pixel = BlackPixel( platform_handles.display, platform_handles.screen );
+	window_attributes.background_pixel = BlackPixel( platform_handles.display, platform_handles.default_screen );
+	window_attributes.border_pixel = WhitePixel( platform_handles.display, platform_handles.default_screen );
 	window_attributes.event_mask =
 		KeyPressMask |
 		KeyReleaseMask |
@@ -50,7 +49,7 @@ bc::window_manager::XCBWindow::XCBWindow(
 
 	platform_handles.window = XCreateWindow(
 		platform_handles.display,
-		RootWindow( platform_handles.display, platform_handles.screen ),
+		RootWindow( platform_handles.display, platform_handles.default_screen ),
 		window_create_info.position.x,
 		window_create_info.position.y,
 		window_create_info.dimensions.x,
@@ -75,20 +74,19 @@ bc::window_manager::XCBWindow::XCBWindow(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::XCBWindow::~XCBWindow()
+bc::window_manager::XLibWindow::~XLibWindow()
 {
-	xcb_manager.NotifyWindowBeingDestroyed( this );
+	xlib_manager.NotifyWindowBeingDestroyed( this );
 
 	CleanupHandles();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBWindow::CleanupHandles()
+void bc::window_manager::XLibWindow::CleanupHandles()
 {
 	if( platform_handles.window )
 	{
 		XUnmapWindow( platform_handles.display, platform_handles.window );
-		XFlush( platform_handles.display );
 		XDestroyWindow( platform_handles.display, platform_handles.window );
 		XFlush( platform_handles.display );
 		platform_handles.window = None;
@@ -96,14 +94,14 @@ void bc::window_manager::XCBWindow::CleanupHandles()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::XCBWindow::GetDecorated()
+bool bc::window_manager::XLibWindow::GetDecorated()
 {
 	// TODO
 	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBWindow::SetDecorated(
+void bc::window_manager::XLibWindow::SetDecorated(
 	bool is_decorated
 )
 {
@@ -111,14 +109,14 @@ void bc::window_manager::XCBWindow::SetDecorated(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::XCBWindow::GetResizeable()
+bool bc::window_manager::XLibWindow::GetResizeable()
 {
 	// TODO
 	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBWindow::SetResizeable(
+void bc::window_manager::XLibWindow::SetResizeable(
 	bool is_decorated
 )
 {
@@ -126,35 +124,35 @@ void bc::window_manager::XCBWindow::SetResizeable(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBWindow::Update()
+void bc::window_manager::XLibWindow::Update()
 {
 	// TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::XCBWindow::GetPlatformSpecificHandles() const
+const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::XLibWindow::GetPlatformSpecificHandles() const
 {
 	return GetXLibPlatformHandles();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerXCBPlatformHandles * bc::window_manager::XCBWindow::GetXLibPlatformHandles() const
+const bc::window_manager::WindowManagerXLibPlatformHandles * bc::window_manager::XLibWindow::GetXLibPlatformHandles() const
 {
 	return &platform_handles;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBWindow::SetupPropertyHandles()
+void bc::window_manager::XLibWindow::SetupPropertyHandles()
 {
 	// TODO: Make sure that property sizes are automatically calculated properly.
 
 	// Window user pointer property
-	x11_property_handles.window_user_pointer	= xlib::PropertyHandle<XCBWindow*>(
+	x11_property_handles.window_user_pointer	= xlib::PropertyHandle<XLibWindow*>(
 		platform_handles.display,
 		platform_handles.window,
 		platform_handles.window_user_pointer_atom,
-		XCB_ATOM_CARDINAL,
-		xlib::PropertyFormat::F32
+		XA_CARDINAL,
+		xlib::PropertyFormat::F8
 	);
 
 	// Window close property
@@ -162,7 +160,7 @@ void bc::window_manager::XCBWindow::SetupPropertyHandles()
 		platform_handles.display,
 		platform_handles.window,
 		platform_handles.window_protocol_atom,
-		XCB_ATOM_ATOM,
+		XA_ATOM,
 		xlib::PropertyFormat::F32
 	);
 
@@ -170,8 +168,8 @@ void bc::window_manager::XCBWindow::SetupPropertyHandles()
 	x11_property_handles.window_title			= xlib::PropertyHandle<Text>(
 		platform_handles.display,
 		platform_handles.window,
-		XCB_ATOM_WM_NAME,
-		XCB_ATOM_STRING,
+		XA_WM_NAME,
+		XA_STRING,
 		xlib::PropertyFormat::F8
 	);
 
@@ -179,8 +177,8 @@ void bc::window_manager::XCBWindow::SetupPropertyHandles()
 	x11_property_handles.window_icon_name		= xlib::PropertyHandle<Text>(
 		platform_handles.display,
 		platform_handles.window,
-		XCB_ATOM_WM_ICON_NAME,
-		XCB_ATOM_STRING,
+		XA_WM_ICON_NAME,
+		XA_STRING,
 		xlib::PropertyFormat::F8
 	);
 
@@ -188,8 +186,8 @@ void bc::window_manager::XCBWindow::SetupPropertyHandles()
 	x11_property_handles.window_size_hints		= xlib::PropertyHandle<xlib::XSizeHints>(
 		platform_handles.display,
 		platform_handles.window,
-		XCB_ATOM_WM_NORMAL_HINTS,
-		XCB_ATOM_WM_SIZE_HINTS,
+		XA_WM_NORMAL_HINTS,
+		XA_WM_SIZE_HINTS,
 		xlib::PropertyFormat::F32
 	);
 
