@@ -4,8 +4,7 @@
 
 #include <window_manager_xcb/window/XCBWindow.hpp>
 
-#include <xcb/xcb.h>
-#include <xcb/xcb_keysyms.h>
+#include <X11/Xlib.h>
 #include <X11/keysym.h>
 
 
@@ -15,12 +14,12 @@ void bc::window_manager::xcb::SetInputFocus(
 	const XCBWindow	&	window
 )
 {
-	auto handles = window.GetXCBPlatformHandles();
-	xcb_set_input_focus(
-		handles->xcb_connection,
-		XCB_INPUT_FOCUS_PARENT,
-		handles->xcb_window,
-		XCB_CURRENT_TIME
+	auto handles = window.GetXLibPlatformHandles();
+	XSetInputFocus(
+		handles->display,
+		handles->window,
+		RevertToParent,
+		CurrentTime
 	);
 }
 
@@ -31,17 +30,17 @@ void bc::window_manager::xcb::ReplyToPing(
 )
 {
 	// WARNING: Does not work, might not need.
-	auto handles = window.GetXCBPlatformHandles();
-	xcb_client_message_event_t reply = *event;
-	reply.window = handles->xcb_screen->root;
-	xcb_send_event(
-		handles->xcb_connection,
-		0,
-		handles->xcb_screen->root,
-		XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY,
-		reinterpret_cast<const char*>( &reply )
-	);
-	xcb_flush( handles->xcb_connection );
+	//auto handles = window.GetXCBPlatformHandles();
+	//xcb_client_message_event_t reply = *event;
+	//reply.window = handles->xcb_screen->root;
+	//xcb_send_event(
+	//	handles->xcb_connection,
+	//	0,
+	//	handles->xcb_screen->root,
+	//	XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY,
+	//	reinterpret_cast<const char*>( &reply )
+	//);
+	//xcb_flush( handles->xcb_connection );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

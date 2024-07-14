@@ -9,8 +9,6 @@
 #endif
 #if BITCRAFTE_WINDOW_MANAGER_XCB
 #include <X11/Xlib.h>
-#include <xcb/xcb.h>
-#include <xcb/xcb_keysyms.h>
 #endif
 #if BITCRAFTE_WINDOW_MANAGER_WAYLAND
 struct wl_display;
@@ -68,18 +66,16 @@ struct WindowManagerWin32PlatformHandles : public WindowManagerPlatformHandlesBa
 struct WindowManagerXCBPlatformHandles : public WindowManagerPlatformHandlesBase
 {
 	inline WindowManagerXCBPlatformHandles() : WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XCB ) {}
-	Display										*	xlib_display							= nullptr;
-	xcb_connection_t							*	xcb_connection							= nullptr;
-	xcb_screen_t								*	xcb_screen								= nullptr;
-	xcb_window_t									xcb_window								= 0;
-	xcb_key_symbols_t							*	xcb_key_symbols							= {};
-	XIM												xlib_xim								= {};
-	XIC												xlib_xic								= {};
-	xcb_atom_t										window_user_pointer_atom				= {};
-	xcb_atom_t										window_protocol_atom					= {};
-	xcb_atom_t										window_protocol_close_atom				= {};
-	xcb_atom_t										window_protocol_take_focus_atom			= {};
-	xcb_atom_t										window_protocol_ping_atom				= {};
+	::Display									*	display									= nullptr;
+	int												screen									= 0;
+	::XIM											xim										= {};
+	::XIC											xic										= {};
+	::Window										window									= {};
+	::Atom											window_user_pointer_atom				= {};
+	::Atom											window_protocol_atom					= {};
+	::Atom											window_protocol_close_atom				= {};
+	::Atom											window_protocol_take_focus_atom			= {};
+	::Atom											window_protocol_ping_atom				= {};
 };
 #endif
 

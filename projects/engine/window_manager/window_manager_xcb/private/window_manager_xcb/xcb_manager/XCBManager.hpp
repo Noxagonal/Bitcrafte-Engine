@@ -67,8 +67,8 @@ public:
 	void													ProcessMessages();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void													ProcessXCBEvent(
-		xcb_generic_event_t								*	event
+	void													ProcessEvent(
+	XEvent												&	event
 	);
 
 private:

@@ -7,15 +7,12 @@
 #include <window_manager_xcb/WindowManagerXCBComponent.hpp>
 #include <window_manager_xcb/xcb_manager/XCBEvents.hpp>
 
-#include <xcb/xcb.h>
-#include <xcb/xcb_keysyms.h>
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
-#include <X11/Xlib-xcb.h>
 #include <X11/Xlocale.h>
+#include <X11/Xatom.h>
 
 #include <iostream>
-#include "XCBManager.hpp"
 
 
 
@@ -27,20 +24,20 @@ bc::window_manager::XCBManager::XCBManager(
 	window_manager_xcb_component( window_manager_xcb_component )
 {
 	// Open xlib display
-	platform_handles.xlib_display = XOpenDisplay( nullptr );
-	if( platform_handles.xlib_display == nullptr )
+	platform_handles.display = XOpenDisplay( nullptr );
+	if( platform_handles.display == nullptr )
 	{
 		CleanupHandles();
 		diagnostic::Throw( "Failed to open X11 display" );
 	}
 
-	// Get the XCB connection from the Xlib display
-	//platform_handles.xcb_connection = XGetXCBConnection( platform_handles.xlib_display );
-	//if( xcb_connection_has_error( platform_handles.xcb_connection ) )
-	//{
-	//	CleanupHandles();
-	//	diagnostic::Throw( "Failed to get XCB connection" );
-	//}
+	// Get the default screen
+	platform_handles.screen = DefaultScreen( platform_handles.display );
+	if( platform_handles.screen < 0 )
+	{
+		CleanupHandles();
+		diagnostic::Throw( "Failed to get default screen" );
+	}
 
 	// Populate XCB atoms
 	if( auto result = PopulateX11Atoms() )
@@ -49,45 +46,17 @@ bc::window_manager::XCBManager::XCBManager(
 		diagnostic::Throw( "Failed to populate XCB atoms" );
 	}
 
-	// Get XCB screen
-	//auto setup = xcb_get_setup( platform_handles.xcb_connection );
-	//if( !setup )
-	//{
-	//	CleanupHandles();
-	//	diagnostic::Throw( "Failed to get XCB setup" );
-	//}
-	//auto iter = xcb_setup_roots_iterator( setup );
-	//if( iter.rem <= 0 )
-	//{
-	//	CleanupHandles();
-	//	diagnostic::Throw( "Failed to get XCB screen" );
-	//}
-	//platform_handles.xcb_screen = iter.data;
-	//if( !platform_handles.xcb_screen )
-	//{
-	//	CleanupHandles();
-	//	diagnostic::Throw( "Failed to get XCB screen" );
-	//}
-
-	// Allocate key symbols
-	//platform_handles.xcb_key_symbols = xcb_key_symbols_alloc( platform_handles.xcb_connection );
-	//if( !platform_handles.xcb_key_symbols )
-	//{
-	//	CleanupHandles();
-	//	diagnostic::Throw( "Failed to get XCB key symbols" );
-	//}
-
 	// Create an X input method (global)
-	platform_handles.xlib_xim = XOpenIM( platform_handles.xlib_display, nullptr, nullptr, nullptr );
-	if( !platform_handles.xlib_xim )
+	platform_handles.xim = XOpenIM( platform_handles.display, nullptr, nullptr, nullptr );
+	if( !platform_handles.xim )
 	{
 		CleanupHandles();
 		diagnostic::Throw( "Failed to get XIM" );
 	}
 
 	// Create an input context (global)
-	platform_handles.xlib_xic = XCreateIC( platform_handles.xlib_xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, nullptr );
-	if( !platform_handles.xlib_xic )
+	platform_handles.xic = XCreateIC( platform_handles.xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, nullptr );
+	if( !platform_handles.xic )
 	{
 		CleanupHandles();
 		diagnostic::Throw( "Failed to get XIC" );
@@ -105,20 +74,16 @@ bc::window_manager::XCBManager::~XCBManager()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::window_manager::XCBManager::CleanupHandles()
 {
-	xcb_flush( platform_handles.xcb_connection );
+	XFlush( platform_handles.display );
 
-	if( platform_handles.xlib_xic )			XDestroyIC( platform_handles.xlib_xic );
-	platform_handles.xlib_xic 				= nullptr;
+	if( platform_handles.xic )			XDestroyIC( platform_handles.xic );
+	platform_handles.xic 				= nullptr;
 
-	if( platform_handles.xlib_xim )			XCloseIM( platform_handles.xlib_xim );
-	platform_handles.xlib_xim 				= nullptr;
+	if( platform_handles.xim )			XCloseIM( platform_handles.xim );
+	platform_handles.xim 				= nullptr;
 
-	if( platform_handles.xcb_key_symbols )	xcb_key_symbols_free( platform_handles.xcb_key_symbols );
-	platform_handles.xcb_key_symbols 		= nullptr;
-
-	if( platform_handles.xlib_display )		XCloseDisplay( platform_handles.xlib_display );
-	platform_handles.xlib_display 			= nullptr;
-	platform_handles.xcb_connection 		= nullptr;
+	if( platform_handles.display )		XCloseDisplay( platform_handles.display );
+	platform_handles.display 			= nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,52 +121,46 @@ void bc::window_manager::XCBManager::NotifyWindowBeingDestroyed(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::window_manager::XCBManager::ProcessMessages()
 {
-	xcb_generic_event_t * event = nullptr;
-	while( ( event = xcb_poll_for_event( platform_handles.xcb_connection ) ) )
+	auto event = XEvent {};
+	while( true )
 	{
-		ProcessXCBEvent( event );
-		free( event );
+		XNextEvent( platform_handles.display, &event );
+		ProcessEvent( event );
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBManager::ProcessXCBEvent(
-	xcb_generic_event_t * event
+void bc::window_manager::XCBManager::ProcessEvent(
+	XEvent & event
 )
 {
-	// std::cout << "XCB Event: " << static_cast<int>( event->response_type ) << std::endl;
+	std::cout << "Event type: " << event.type << std::endl;
 
-	auto GetXCBWindow = [ this ]( auto window ) -> bc::window_manager::XCBWindow*
+	auto GetWindowPointer = [ this ]( auto window ) -> bc::window_manager::XCBWindow*
 	{
-		return xcb::GetProperty<bc::window_manager::XCBWindow*>(
-			platform_handles.xcb_connection,
+		return xlib::GetProperty<bc::window_manager::XCBWindow*>(
+			platform_handles.display,
 			window,
 			platform_handles.window_user_pointer_atom,
-			XCB_ATOM_CARDINAL,
-			xcb::PropertyFormat::F32
+			XA_CARDINAL,
+			xlib::PropertyFormat::F32
 		);
 	};
 
-	switch( event->response_type & ~0x80 )
+	switch( event.type )
 	{
-		case XCB_KEY_PRESS:
+		case KeyPress:
 		{
-			auto e = reinterpret_cast<xcb_key_press_event_t*>( event );
-			auto window = GetXCBWindow( e->event );
+			auto & e = event.xkey;
+			auto window = GetWindowPointer( e.window );
 
 			auto key = bc::window_manager::KeyboardButton::KEY_UNKNOWN;
 
-			auto modifier_key_flags = xcb::GetModifierKeyFlags( e->state );
+			auto modifier_key_flags = xcb::GetModifierKeyFlags( e.state );
 
 			// Get key code
-			auto key_code_symbol = xcb_key_press_lookup_keysym( platform_handles.xcb_key_symbols, e, 0 );
+			auto key_code_symbol = XLookupKeysym( &e, 0 );
 			auto key_code = bc::window_manager::xcb::GetKeyboardButton( key_code_symbol );
-
-			// Get key symbols
-			//auto keysym_column = i32 {};
-			//if( std::to_underlying( modifier_key_flags & bc::window_manager::ModifierKeyFlags::SHIFT ) ) keysym_column += 1;
-			//if( std::to_underlying( modifier_key_flags & bc::window_manager::ModifierKeyFlags::ALT_GR ) ) keysym_column += 2;
-			//auto keysym = xcb_key_press_lookup_keysym( platform_handles.xcb_key_symbols, e, keysym_column );
 
 			// TODO: Get scancode.
 			auto scancode = i32 {};
@@ -218,31 +177,14 @@ void bc::window_manager::XCBManager::ProcessXCBEvent(
 
 			// Handle text character input.
 			static_assert( sizeof( wchar_t ) == 4 );
-			auto buffer = Array<wchar_t, 16> {};
+			if( XFilterEvent( &event, e.window ) ) return;
+
+			auto buffer = Array<wchar_t, 32> {};
 			auto keysym_output = KeySym {};
 			auto status = Status {};
-			auto x_event = XEvent {};
-			x_event.xkey.type = KeyPress;
-			x_event.xkey.serial = e->sequence;
-			x_event.xkey.send_event = False; // Test this
-			x_event.xkey.display = platform_handles.xlib_display;
-			x_event.xkey.window = e->event;
-			x_event.xkey.root = e->root;
-			x_event.xkey.subwindow = e->child;
-			x_event.xkey.time = e->time;
-			x_event.xkey.x = e->event_x;
-			x_event.xkey.y = e->event_y;
-			x_event.xkey.x_root = e->root_x;
-			x_event.xkey.y_root = e->root_y;
-			x_event.xkey.state = e->state;
-			x_event.xkey.keycode = e->detail;
-			x_event.xkey.same_screen = e->same_screen;
-
-			if( XFilterEvent( &x_event, x_event.xkey.window ) ) break;
-
 			int xmb_lookup_length = XwcLookupString(
 				platform_handles.xlib_xic,
-				&x_event.xkey,
+				&e,
 				buffer.Data(),
 				buffer.Size() - 1,
 				&keysym_output,
@@ -272,275 +214,249 @@ void bc::window_manager::XCBManager::ProcessXCBEvent(
 				window->events.KeyboardCharacter.Signal( character );
 			}
 		}
-		break;
+		return;
 
-		case XCB_KEY_RELEASE:
+		case KeyRelease:
 		{
-			auto e = reinterpret_cast<const xcb_key_release_event_t*>( event );
 			// TODO: Map keys.
 		}
-		break;
+		return;
 
-		case XCB_BUTTON_PRESS:
+		case ButtonPress:
 		{
-			auto e = reinterpret_cast<const xcb_button_press_event_t*>( event );
-			auto window = GetXCBWindow( e->event );
+			auto & e = event.xbutton;
+			auto window = GetWindowPointer( e.window );
 			window->events.MouseButton.Signal(
-				xcb::GetMouseButton( e->detail ),
+				xcb::GetMouseButton( e.button ),
 				bc::window_manager::MouseButtonAction::PRESSED,
-				xcb::GetModifierKeyFlags( e->state )
+				xcb::GetModifierKeyFlags( e.state )
 			);
 		}
-		break;
+		return;
 
-		case XCB_BUTTON_RELEASE:
+		case ButtonRelease:
 		{
-			auto e = reinterpret_cast<const xcb_button_release_event_t*>( event );
-			auto window = GetXCBWindow( e->event );
+			auto & e = event.xbutton;
+			auto window = GetWindowPointer( e.window );
 			window->events.MouseButton.Signal(
-				xcb::GetMouseButton( e->detail ),
+				xcb::GetMouseButton( e.button ),
 				bc::window_manager::MouseButtonAction::RELEASED,
-				xcb::GetModifierKeyFlags( e->state )
+				xcb::GetModifierKeyFlags( e.state )
 			);
 		}
-		break;
+		return;
 
-		case XCB_MOTION_NOTIFY:
+		case MotionNotify:
 		{
-			auto e = reinterpret_cast<const xcb_motion_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_ENTER_NOTIFY:
+		case EnterNotify:
 		{
-			auto e = reinterpret_cast<const xcb_enter_notify_event_t*>( event );
-			auto window = GetXCBWindow( e->event );
+			auto & e = event.xcrossing;
+			auto window = GetWindowPointer( e.window );
 			window->events.MouseEnter.Signal( true );
 		}
-		break;
+		return;
 
-		case XCB_LEAVE_NOTIFY:
+		case LeaveNotify:
 		{
-			auto e = reinterpret_cast<const xcb_leave_notify_event_t*>( event );
-			auto window = GetXCBWindow( e->event );
+			auto & e = event.xcrossing;
+			auto window = GetWindowPointer( e.window );
 			window->events.MouseEnter.Signal( false );
 		}
-		break;
+		return;
 
-		case XCB_FOCUS_IN:
+		case FocusIn:
 		{
-			auto e = reinterpret_cast<const xcb_focus_in_event_t*>( event );
-			auto window = GetXCBWindow( e->event );
+			auto & e = event.xfocus;
+			auto window = GetWindowPointer( e.window );
 			window->events.FocusChanged.Signal( true );
 		}
-		break;
+		return;
 
-		case XCB_FOCUS_OUT:
+		case FocusOut:
 		{
-			auto e = reinterpret_cast<const xcb_focus_out_event_t*>( event );
-			auto window = GetXCBWindow( e->event );
+			auto & e = event.xfocus;
+			auto window = GetWindowPointer( e.window );
 			window->events.FocusChanged.Signal( false );
 		}
-		break;
+		return;
 
-		case XCB_KEYMAP_NOTIFY:
+		case KeymapNotify:
 		{
-			auto e = reinterpret_cast<const xcb_keymap_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_EXPOSE:
+		case Expose:
 		{
-			auto e = reinterpret_cast<const xcb_expose_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_GRAPHICS_EXPOSURE:
+		case GraphicsExpose:
 		{
-			auto e = reinterpret_cast<const xcb_graphics_exposure_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_NO_EXPOSURE:
+		case NoExpose:
 		{
-			auto e = reinterpret_cast<const xcb_no_exposure_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_VISIBILITY_NOTIFY:
+		case VisibilityNotify:
 		{
-			auto e = reinterpret_cast<const xcb_visibility_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_CREATE_NOTIFY:
+		case CreateNotify:
 		{
-			auto e = reinterpret_cast<const xcb_create_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_DESTROY_NOTIFY:
+		case DestroyNotify:
 		{
-			auto e = reinterpret_cast<const xcb_destroy_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_UNMAP_NOTIFY:
+		case UnmapNotify:
 		{
-			auto e = reinterpret_cast<const xcb_unmap_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_MAP_NOTIFY:
+		case MapNotify:
 		{
-			auto e = reinterpret_cast<const xcb_map_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_MAP_REQUEST:
+		case MapRequest:
 		{
-			auto e = reinterpret_cast<const xcb_map_request_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_REPARENT_NOTIFY:
+		case ReparentNotify:
 		{
-			auto e = reinterpret_cast<const xcb_reparent_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_CONFIGURE_NOTIFY:
+		case ConfigureNotify:
 		{
-			auto e = reinterpret_cast<const xcb_configure_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_CONFIGURE_REQUEST:
+		case ConfigureRequest:
 		{
-			auto e = reinterpret_cast<const xcb_configure_request_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_GRAVITY_NOTIFY:
+		case GravityNotify:
 		{
-			auto e = reinterpret_cast<const xcb_gravity_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_RESIZE_REQUEST:
+		case ResizeRequest:
 		{
-			auto e = reinterpret_cast<const xcb_resize_request_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_CIRCULATE_NOTIFY:
+		case CirculateNotify:
 		{
-			auto e = reinterpret_cast<const xcb_circulate_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_CIRCULATE_REQUEST:
+		case CirculateRequest:
 		{
-			auto e = reinterpret_cast<const xcb_circulate_request_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_PROPERTY_NOTIFY:
+		case PropertyNotify:
 		{
-			auto e = reinterpret_cast<const xcb_property_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_SELECTION_CLEAR:
+		case SelectionClear:
 		{
-			auto e = reinterpret_cast<const xcb_selection_clear_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_SELECTION_REQUEST:
+		case SelectionRequest:
 		{
-			auto e = reinterpret_cast<const xcb_selection_request_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_SELECTION_NOTIFY:
+		case SelectionNotify:
 		{
-			auto e = reinterpret_cast<const xcb_selection_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_COLORMAP_NOTIFY:
+		case ColormapNotify:
 		{
-			auto e = reinterpret_cast<const xcb_colormap_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_CLIENT_MESSAGE:
+		case ClientMessage:
 		{
-			auto e = reinterpret_cast<const xcb_client_message_event_t*>( event );
+			auto & e = event.xclient;
 			//if( e->window != platform_handles.screen->root ) break;
-			auto window = GetXCBWindow( e->window );
-			if( e->data.data32[ 0 ] == platform_handles.window_protocol_close_atom )
+			auto window = GetWindowPointer( e.window );
+			if( e.data.l[ 0 ] == platform_handles.window_protocol_close_atom )
 			{
 				window->events.CloseRequested.Signal();
-				break;
+				return;
 			}
-			if( e->data.data32[ 0 ] == platform_handles.window_protocol_take_focus_atom )
+			if( e.data.l[ 0 ] == platform_handles.window_protocol_take_focus_atom )
 			{
 				xcb::SetInputFocus( *window );
-				break;
+				return;
 			}
-			if( e->data.data32[ 0 ] == platform_handles.window_protocol_ping_atom )
+			if( e.data.l[ 0 ] == platform_handles.window_protocol_ping_atom )
 			{
 				// Does not work, might not need.
-				xcb::ReplyToPing( e, *window );
-				break;
+				//xcb::ReplyToPing( e, *window );
+				return;
 			}
 		}
-		break;
+		return;
 
-		case XCB_MAPPING_NOTIFY:
+		case MappingNotify:
 		{
-			auto e = reinterpret_cast<const xcb_mapping_notify_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
-		case XCB_GE_GENERIC:
+		case GenericEvent:
 		{
-			auto e = reinterpret_cast<const xcb_ge_generic_event_t*>( event );
 			// TODO
 		}
-		break;
+		return;
 
 		default:
 		{
 			// TODO
 		}
-		break;
+		return;
 	}
 }
 

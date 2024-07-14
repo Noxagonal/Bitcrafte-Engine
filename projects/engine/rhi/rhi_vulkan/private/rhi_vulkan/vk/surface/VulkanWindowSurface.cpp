@@ -59,8 +59,8 @@ bc::rhi::VulkanWindowSurface::VulkanWindowSurface(
 			auto xcb_handles = static_cast<const window_manager::WindowManagerXCBPlatformHandles*>( window->GetPlatformSpecificHandles() );
 			assert( xcb_handles );
 			assert( xcb_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XCB );
-			assert( xcb_handles->xcb_connection );
-			assert( xcb_handles->xcb_window );
+			assert( xcb_handles->display );
+			assert( xcb_handles->window );
 
 			auto surface_create_info = VkXcbSurfaceCreateInfoKHR{};
 			surface_create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
@@ -68,7 +68,7 @@ bc::rhi::VulkanWindowSurface::VulkanWindowSurface(
 			surface_create_info.flags = 0;
 			surface_create_info.connection = xcb_handles->xcb_connection;
 			surface_create_info.window = xcb_handles->xcb_window;
-			BAssertVkResult( vkCreateXcbSurfaceKHR(
+			BAssertVkResult( vkCreateXLibSurfaceKHR(
 				rhi_vulkan_impl.GetVulkanInstance(),
 				&surface_create_info,
 				rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),

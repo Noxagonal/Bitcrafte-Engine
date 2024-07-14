@@ -15,61 +15,63 @@ bc::window_manager::XCBWindow::XCBWindow(
 	XCBManager				&	xcb_manager,
 	const WindowCreateInfo	&	window_create_info
 ) :
-	Window( window_create_info ),
+	::bc::window_manager::Window( window_create_info ),
 	xcb_manager( xcb_manager ),
 	platform_handles( *xcb_manager.GetPlatformSpecificHandles() )
 {
-	platform_handles.xcb_window = xcb_generate_id( platform_handles.xcb_connection );
+	auto window_attributes = XSetWindowAttributes {};
+	window_attributes.background_pixel = WhitePixel( platform_handles.display, platform_handles.screen );
+	window_attributes.border_pixel = BlackPixel( platform_handles.display, platform_handles.screen );
+	window_attributes.event_mask =
+		KeyPressMask |
+		KeyReleaseMask |
+		ButtonPressMask |
+		ButtonReleaseMask |
+		EnterWindowMask |
+		LeaveWindowMask |
+		PointerMotionMask |
+		PointerMotionHintMask |
+		Button1MotionMask |
+		Button2MotionMask |
+		Button3MotionMask |
+		Button4MotionMask |
+		Button5MotionMask |
+		ButtonMotionMask |
+		KeymapStateMask |
+		ExposureMask |
+		VisibilityChangeMask |
+		StructureNotifyMask |
+		ResizeRedirectMask |
+		SubstructureNotifyMask |
+		SubstructureRedirectMask |FocusChangeMask |
+		PropertyChangeMask |
+		ColormapChangeMask |
+		OwnerGrabButtonMask;
 
-	uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-	uint32_t values[ 32 ] = {};
-	values[ 0 ] = platform_handles.xcb_screen->black_pixel;
-	values[ 1 ] =
-	XCB_EVENT_MASK_KEY_PRESS |
-	XCB_EVENT_MASK_KEY_RELEASE |
-	XCB_EVENT_MASK_BUTTON_PRESS |
-	XCB_EVENT_MASK_BUTTON_RELEASE |
-	XCB_EVENT_MASK_ENTER_WINDOW |
-	XCB_EVENT_MASK_LEAVE_WINDOW |
-	XCB_EVENT_MASK_POINTER_MOTION |
-	XCB_EVENT_MASK_POINTER_MOTION_HINT |
-	XCB_EVENT_MASK_BUTTON_1_MOTION |
-	XCB_EVENT_MASK_BUTTON_2_MOTION |
-	XCB_EVENT_MASK_BUTTON_3_MOTION |
-	XCB_EVENT_MASK_BUTTON_4_MOTION |
-	XCB_EVENT_MASK_BUTTON_5_MOTION |
-	XCB_EVENT_MASK_BUTTON_MOTION |
-	XCB_EVENT_MASK_KEYMAP_STATE |
-	XCB_EVENT_MASK_EXPOSURE |
-	XCB_EVENT_MASK_VISIBILITY_CHANGE |
-	XCB_EVENT_MASK_STRUCTURE_NOTIFY |
-	XCB_EVENT_MASK_RESIZE_REDIRECT |
-	XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-	XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT |
-	XCB_EVENT_MASK_FOCUS_CHANGE |
-	XCB_EVENT_MASK_PROPERTY_CHANGE |
-	XCB_EVENT_MASK_COLOR_MAP_CHANGE |
-	XCB_EVENT_MASK_OWNER_GRAB_BUTTON;
-
-	xcb_create_window(
-		platform_handles.xcb_connection,
-		XCB_COPY_FROM_PARENT,
-		platform_handles.xcb_window,
-		platform_handles.xcb_screen->root,
-		int16_t( window_create_info.position.x ),
-		int16_t( window_create_info.position.y ),
-		uint16_t( window_create_info.dimensions.x ),
-		uint16_t( window_create_info.dimensions.y ),
+	platform_handles.window = XCreateWindow(
+		platform_handles.display,
+		RootWindow( platform_handles.display, platform_handles.screen ),
+		window_create_info.position.x,
+		window_create_info.position.y,
+		window_create_info.dimensions.x,
+		window_create_info.dimensions.y,
 		0,
-		XCB_WINDOW_CLASS_INPUT_OUTPUT,
-		platform_handles.xcb_screen->root_visual,
-		mask,
-		&values
+		CopyFromParent,
+		InputOutput,
+		CopyFromParent,
+		CWBackPixel | CWBorderPixel | CWEventMask,
+		&window_attributes
 	);
-	xcb_map_window( platform_handles.xcb_connection, platform_handles.xcb_window );
-	xcb_flush( platform_handles.xcb_connection );
+	if( !platform_handles.window )
+	{
+		CleanupHandles();
+		diagnostic::Throw( "Failed to create X11 window" );
+	}
 
-	SetupXCBPropertyHandles();
+	XMapWindow( platform_handles.display, platform_handles.window );
+	XFlush( platform_handles.display );
+
+	SetupPropertyHandles();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,13 +79,19 @@ bc::window_manager::XCBWindow::~XCBWindow()
 {
 	xcb_manager.NotifyWindowBeingDestroyed( this );
 
-	if( platform_handles.xcb_window != XCB_NONE )
+	CleanupHandles();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void bc::window_manager::XCBWindow::CleanupHandles()
+{
+	if( platform_handles.window )
 	{
-		xcb_unmap_window( platform_handles.xcb_connection, platform_handles.xcb_window );
-		xcb_flush( platform_handles.xcb_connection );
-		xcb_destroy_window( platform_handles.xcb_connection, platform_handles.xcb_window );
-		xcb_flush( platform_handles.xcb_connection );
-		platform_handles.xcb_window = XCB_NONE;
+		XUnmapWindow( platform_handles.display, platform_handles.window );
+		XFlush( platform_handles.display );
+		XDestroyWindow( platform_handles.display, platform_handles.window );
+		XFlush( platform_handles.display );
+		platform_handles.window = None;
 	}
 }
 
@@ -126,74 +134,74 @@ void bc::window_manager::XCBWindow::Update()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::XCBWindow::GetPlatformSpecificHandles() const
 {
-	return GetXCBPlatformHandles();
+	return GetXLibPlatformHandles();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerXCBPlatformHandles * bc::window_manager::XCBWindow::GetXCBPlatformHandles() const
+const bc::window_manager::WindowManagerXCBPlatformHandles * bc::window_manager::XCBWindow::GetXLibPlatformHandles() const
 {
 	return &platform_handles;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XCBWindow::SetupXCBPropertyHandles()
+void bc::window_manager::XCBWindow::SetupPropertyHandles()
 {
 	// TODO: Make sure that property sizes are automatically calculated properly.
 
 	// Window user pointer property
-	xcb_property_handles.window_user_pointer	= xcb::PropertyHandle<XCBWindow*>(
-		platform_handles.xcb_connection,
-		platform_handles.xcb_window,
+	x11_property_handles.window_user_pointer	= xlib::PropertyHandle<XCBWindow*>(
+		platform_handles.display,
+		platform_handles.window,
 		platform_handles.window_user_pointer_atom,
 		XCB_ATOM_CARDINAL,
-		xcb::PropertyFormat::F32
+		xlib::PropertyFormat::F32
 	);
 
 	// Window close property
-	xcb_property_handles.window_protocols		= xcb::PropertyHandle<List<xcb_atom_t>>(
-		platform_handles.xcb_connection,
-		platform_handles.xcb_window,
+	x11_property_handles.window_protocols		= xlib::PropertyHandle<List<::Atom>>(
+		platform_handles.display,
+		platform_handles.window,
 		platform_handles.window_protocol_atom,
 		XCB_ATOM_ATOM,
-		xcb::PropertyFormat::F32
+		xlib::PropertyFormat::F32
 	);
 
 	// Window title property
-	xcb_property_handles.window_title			= xcb::PropertyHandle<Text>(
-		platform_handles.xcb_connection,
-		platform_handles.xcb_window,
+	x11_property_handles.window_title			= xlib::PropertyHandle<Text>(
+		platform_handles.display,
+		platform_handles.window,
 		XCB_ATOM_WM_NAME,
 		XCB_ATOM_STRING,
-		xcb::PropertyFormat::F8
+		xlib::PropertyFormat::F8
 	);
 
 	// Window icon name property
-	xcb_property_handles.window_icon_name		= xcb::PropertyHandle<Text>(
-		platform_handles.xcb_connection,
-		platform_handles.xcb_window,
+	x11_property_handles.window_icon_name		= xlib::PropertyHandle<Text>(
+		platform_handles.display,
+		platform_handles.window,
 		XCB_ATOM_WM_ICON_NAME,
 		XCB_ATOM_STRING,
-		xcb::PropertyFormat::F8
+		xlib::PropertyFormat::F8
 	);
 
 	// Window size hints
-	xcb_property_handles.window_size_hints		= xcb::PropertyHandle<xcb::XSizeHints>(
-		platform_handles.xcb_connection,
-		platform_handles.xcb_window,
+	x11_property_handles.window_size_hints		= xlib::PropertyHandle<xlib::XSizeHints>(
+		platform_handles.display,
+		platform_handles.window,
 		XCB_ATOM_WM_NORMAL_HINTS,
 		XCB_ATOM_WM_SIZE_HINTS,
-		xcb::PropertyFormat::F32
+		xlib::PropertyFormat::F32
 	);
 
-	xcb_property_handles.window_user_pointer.Change( this );
-	xcb_property_handles.window_protocols.Change(
+	x11_property_handles.window_user_pointer.Change( this );
+	x11_property_handles.window_protocols.Change(
 		{
 			platform_handles.window_protocol_close_atom,
 			platform_handles.window_protocol_take_focus_atom,
 			//platform_handles.window_protocol_ping_atom, // Does not work, might not need.
 		}
 	);
-	xcb_property_handles.window_title.Change( "Testing..." );
-	//xcb_property_handles.window_icon_name.Change( platform_handles.window_icon_name_atom );
-	//xcb_property_handles.window_size_hints.Change( platform_handles.window_size_hints_atom );
+	x11_property_handles.window_title.Change( "Testing..." );
+	//x11_property_handles.window_icon_name.Change( platform_handles.window_icon_name_atom );
+	//x11_property_handles.window_size_hints.Change( platform_handles.window_size_hints_atom );
 }
