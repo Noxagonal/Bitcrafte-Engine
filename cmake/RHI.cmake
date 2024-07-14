@@ -25,8 +25,8 @@ if(NOT DEFINED BITCRAFTE_RHI_INCLUDED)
 	# Get RHI component dependencies which can be used to add a library dependency to a target.
 	function(get_rhi_component_dependencies
 		OUT_LIST
-		RHI_LIST
 	)
+		set(RHI_LIST ${ARGN})
 		set(DEPENDENCY_LIST)
 		foreach(RHI IN LISTS RHI_LIST)
 			if(${RHI} STREQUAL "d3d12")
@@ -46,8 +46,8 @@ if(NOT DEFINED BITCRAFTE_RHI_INCLUDED)
 	# Set RHI compile definitions for a specific target.
 	function(set_target_rhi_component_defines
 		THIS_TARGET_NAME
-		RHI_LIST
 	)
+		set(RHI_LIST ${ARGN})
 		foreach(RHI IN LISTS RHI_LIST)
 			if(${RHI} STREQUAL "d3d12")
 				target_compile_definitions(${THIS_TARGET_NAME}

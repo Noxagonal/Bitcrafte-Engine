@@ -2,7 +2,7 @@
 if(NOT DEFINED BITCRAFTE_WINDOW_MANAGER_INCLUDED)
 	set(BITCRAFTE_WINDOW_MANAGER_INCLUDED TRUE)
 
-	
+
 	# Get a list of supported window managers on the current platform.
 	function(get_supported_window_manager_list
 		OUT_LIST
@@ -12,15 +12,19 @@ if(NOT DEFINED BITCRAFTE_WINDOW_MANAGER_INCLUDED)
 			list(APPEND WINDOW_MANAGER_LIST "win32")
 		elseif(UNIX AND NOT APPLE)
 			if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+				list(APPEND WINDOW_MANAGER_LIST "xcb")
 				list(APPEND WINDOW_MANAGER_LIST "wayland")
 			elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+				list(APPEND WINDOW_MANAGER_LIST "xcb")
 				list(APPEND WINDOW_MANAGER_LIST "wayland")
 			elseif(CMAKE_SYSTEM_NAME STREQUAL "NetBSD" OR CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+				list(APPEND WINDOW_MANAGER_LIST "xcb")
 				list(APPEND WINDOW_MANAGER_LIST "wayland")
 			elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
 				list(APPEND WINDOW_MANAGER_LIST "android")
 			elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
-				list(APPEND WINDOW_MANAGER_LIST "x11") # TODO: Check support for Wayland.
+				list(APPEND WINDOW_MANAGER_LIST "xcb")
+				# TODO: Check support for Wayland.
 			elseif(CMAKE_SYSTEM_NAME STREQUAL "Haiku")
 				list(APPEND WINDOW_MANAGER_LIST "haiku")
 			elseif(CMAKE_SYSTEM_NAME STREQUAL "QNX")
@@ -29,11 +33,16 @@ if(NOT DEFINED BITCRAFTE_WINDOW_MANAGER_INCLUDED)
 				message(FATAL_ERROR "Please add unix window manager component here")
 			endif()
 		elseif(APPLE)
-			list(APPEND WINDOW_MANAGER_LIST "cocoa")
+			if(CMAKE_SYSTEM_NAME STREQUAL "MacOS")
+				list(APPEND WINDOW_MANAGER_LIST "macos")
+			elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+				list(APPEND WINDOW_MANAGER_LIST "ios")
+			else()
+				message(FATAL_ERROR "Please add Apple platform window manager component here")
+			endif()
 		else()
 			message(FATAL_ERROR "Please add platform window manager component here")
 		endif()
-
 		set(${OUT_LIST} ${WINDOW_MANAGER_LIST} PARENT_SCOPE)
 	endfunction()
 
@@ -41,15 +50,15 @@ if(NOT DEFINED BITCRAFTE_WINDOW_MANAGER_INCLUDED)
 	# Get window manager component dependencies which can be used to add a library dependency to a target.
 	function(get_window_manager_component_dependencies
 		OUT_LIST
-		WINDOW_MANAGER_LIST
 	)
+		set(WINDOW_MANAGER_LIST ${ARGN})
 		set(DEPENDENCY_LIST)
 		foreach(WINDOW_MANAGER IN LISTS WINDOW_MANAGER_LIST)
 			if(${WINDOW_MANAGER} STREQUAL "win32")
 				list(APPEND DEPENDENCY_LIST window_manager_win32)
 			endif()
-			if(${WINDOW_MANAGER} STREQUAL "x11")
-				list(APPEND DEPENDENCY_LIST window_manager_x11)
+			if(${WINDOW_MANAGER} STREQUAL "xcb")
+				list(APPEND DEPENDENCY_LIST window_manager_xcb)
 			endif()
 			if(${WINDOW_MANAGER} STREQUAL "wayland")
 				list(APPEND DEPENDENCY_LIST window_manager_wayland)
@@ -57,8 +66,8 @@ if(NOT DEFINED BITCRAFTE_WINDOW_MANAGER_INCLUDED)
 			if(${WINDOW_MANAGER} STREQUAL "android")
 				list(APPEND DEPENDENCY_LIST window_manager_android)
 			endif()
-			if(${WINDOW_MANAGER} STREQUAL "cocoa")
-				list(APPEND DEPENDENCY_LIST window_manager_cocoa)
+			if(${WINDOW_MANAGER} STREQUAL "macos")
+				list(APPEND DEPENDENCY_LIST window_manager_macos)
 			endif()
 			if(${WINDOW_MANAGER} STREQUAL "haiku")
 				list(APPEND DEPENDENCY_LIST window_manager_haiku)
@@ -74,13 +83,19 @@ if(NOT DEFINED BITCRAFTE_WINDOW_MANAGER_INCLUDED)
 	# Set window manager compile definitions for a specific target.
 	function(set_target_window_manager_component_defines
 		THIS_TARGET_NAME
-		WINDOW_MANAGER_LIST
 	)
+		set(WINDOW_MANAGER_LIST ${ARGN})
 		foreach(WINDOW_MANAGER IN LISTS WINDOW_MANAGER_LIST)
 			if(${WINDOW_MANAGER} STREQUAL "win32")
 				target_compile_definitions(${THIS_TARGET_NAME}
 					PRIVATE
 						BITCRAFTE_WINDOW_MANAGER_WIN32=1
+				)
+			endif()
+			if(${WINDOW_MANAGER} STREQUAL "xcb")
+				target_compile_definitions(${THIS_TARGET_NAME}
+					PRIVATE
+						BITCRAFTE_WINDOW_MANAGER_XCB=1
 				)
 			endif()
 			if(${WINDOW_MANAGER} STREQUAL "wayland")

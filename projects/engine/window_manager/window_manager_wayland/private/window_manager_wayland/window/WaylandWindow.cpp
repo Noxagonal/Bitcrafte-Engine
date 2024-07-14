@@ -65,28 +65,12 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
 
 
 
-bc::window_manager::WaylandWindow::Settings::Settings(
-	const bc::window_manager::WindowCreateInfo & window_create_info
-)
-{
-	is_decorated			= window_create_info.decorated;
-	show_minimize_button	= window_create_info.has_minimize_button;
-	show_maximize_button	= window_create_info.has_maximize_button;
-	is_minimized			= window_create_info.initially_minimized;
-	is_maximized			= window_create_info.initially_maximized;
-	allow_drag_resize		= window_create_info.allow_drag_resize;
-	allow_file_drop			= window_create_info.allow_file_drop;
-}
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::WaylandWindow::WaylandWindow(
 	WaylandManager			&	wayland_manager,
 	const WindowCreateInfo	&	window_create_info
 ) :
 	Window( window_create_info ),
-	settings( window_create_info ),
 	wayland_manager( wayland_manager ),
 	platform_handles( *wayland_manager.GetPlatformSpecificHandles() )
 {
@@ -148,7 +132,7 @@ void bc::window_manager::WaylandWindow::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const void * bc::window_manager::WaylandWindow::GetPlatformSpecificHandles() const
+const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::WaylandWindow::GetPlatformSpecificHandles() const
 {
 	return &platform_handles;
 }

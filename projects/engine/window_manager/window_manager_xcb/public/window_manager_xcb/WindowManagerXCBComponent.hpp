@@ -1,12 +1,11 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <window_manager/WindowManagerComponentCreateInfo.hpp>
-#include <window_manager/event/WindowManagerComponentEvents.hpp>
-#include <window_manager/platform/handles/WindowPlatformHandles.hpp>
-#include <window_manager/window/Window.hpp>
 
 #include <core/containers/UniquePtr.hpp>
+
+#include <window_manager/WindowManagerComponent.hpp>
+
 
 
 namespace bc {
@@ -14,35 +13,42 @@ namespace window_manager {
 
 
 
+class XCBManager;
+class Window;
+struct WindowCreateInfo;
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class BITCRAFTE_ENGINE_API WindowManagerComponent
+class WindowManagerXCBComponent : public WindowManagerComponent
 {
 	friend class Window;
 
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	WindowManagerComponent(
+	WindowManagerXCBComponent(
 		const WindowManagerComponentCreateInfo				&	create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual ~WindowManagerComponent();
+	virtual ~WindowManagerXCBComponent();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual void												Run() = 0;
+	virtual void												Run() override;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	virtual UniquePtr<Window>									CreateWindow(
 		const WindowCreateInfo								&	window_create_info
-	) = 0;
+	) override;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual const WindowManagerPlatformHandlesBase			*	GetPlatformSpecificHandles() const = 0;
-
-	WindowManagerComponentEvents								events;
+	virtual const WindowManagerPlatformHandlesBase			*	GetPlatformSpecificHandles() const override;
 
 private:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	UniquePtr<XCBManager>										xcb_manager;
 };
 
 

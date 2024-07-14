@@ -35,7 +35,7 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerWayla
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const void * bc::window_manager::WindowManagerWaylandComponent::GetPlatformSpecificHandles() const
+const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::WindowManagerWaylandComponent::GetPlatformSpecificHandles() const
 {
 	return wayland_manager->GetPlatformSpecificHandles();
 }

@@ -17,56 +17,95 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanWindowSurface::VulkanWindowSurface(
 	RHIVulkanImpl &rhi_vulkan_impl,
-	window_manager::Window *window) : rhi_vulkan_impl(rhi_vulkan_impl)
+	window_manager::Window *window
+) : rhi_vulkan_impl( rhi_vulkan_impl )
 {
-	auto CreatePlatformSpecificSurface = [&rhi_vulkan_impl, window]() -> VkSurfaceKHR
+	auto CreatePlatformSpecificSurface = [ &rhi_vulkan_impl, window ]() -> VkSurfaceKHR
 	{
 		auto result = VkSurfaceKHR{};
+		auto platform_handles = reinterpret_cast<const window_manager::WindowManagerPlatformHandlesBase*>( window->GetPlatformSpecificHandles() );
 
-#if BITCRAFTE_WINDOW_MANAGER_WIN32
+		switch( platform_handles->structure_type) 
+		{
 
-		auto win32_handles = reinterpret_cast<window_manager::WindowManagerWin32PlatformHandles *>(window->GetPlatformSpecificHandles());
-		assert(win32_handles);
-		assert(win32_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WIN32);
-		assert(win32_handles->hInstance);
-		assert(win32_handles->hWnd);
+		#if BITCRAFTE_WINDOW_MANAGER_WIN32
+		case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WIN32:
+		{
+			auto win32_handles = static_cast<const window_manager::WindowManagerWin32PlatformHandles*>( window->GetPlatformSpecificHandles() );
+			assert( win32_handles);
+			assert( win32_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WIN32 );
+			assert( win32_handles->hInstance );
+			assert( win32_handles->hWnd );
 
-		auto surface_create_info = VkWin32SurfaceCreateInfoKHR{};
-		surface_create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surface_create_info.pNext = nullptr;
-		surface_create_info.flags = 0;
-		surface_create_info.hinstance = win32_handles->hInstance;
-		surface_create_info.hwnd = win32_handles->hWnd;
-		BAssertVkResult(vkCreateWin32SurfaceKHR(
-			rhi_vulkan_impl.GetVulkanInstance(),
-			&surface_create_info,
-			rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
-			&result));
+			auto surface_create_info = VkWin32SurfaceCreateInfoKHR{};
+			surface_create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+			surface_create_info.pNext = nullptr;
+			surface_create_info.flags = 0;
+			surface_create_info.hinstance = win32_handles->hInstance;
+			surface_create_info.hwnd = win32_handles->hWnd;
+			BAssertVkResult( vkCreateWin32SurfaceKHR(
+				rhi_vulkan_impl.GetVulkanInstance(),
+				&surface_create_info,
+				rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
+				&result
+			) );
+			break;
+		}
+		#endif
 
-#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
+		#if BITCRAFTE_WINDOW_MANAGER_XCB
+		case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XCB:
+		{
+			auto xcb_handles = static_cast<const window_manager::WindowManagerXCBPlatformHandles*>( window->GetPlatformSpecificHandles() );
+			assert( xcb_handles );
+			assert( xcb_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XCB );
+			assert( xcb_handles->xcb_connection );
+			assert( xcb_handles->xcb_window );
 
-		auto wayland_handles = reinterpret_cast<const window_manager::WindowManagerWaylandPlatformHandles*>( window->GetPlatformSpecificHandles() );
-		assert(wayland_handles);
-		assert(wayland_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND);
-		assert(wayland_handles->display);
-		assert(wayland_handles->surface);
+			auto surface_create_info = VkXcbSurfaceCreateInfoKHR{};
+			surface_create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+			surface_create_info.pNext = nullptr;
+			surface_create_info.flags = 0;
+			surface_create_info.connection = xcb_handles->xcb_connection;
+			surface_create_info.window = xcb_handles->xcb_window;
+			BAssertVkResult( vkCreateXcbSurfaceKHR(
+				rhi_vulkan_impl.GetVulkanInstance(),
+				&surface_create_info,
+				rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
+				&result
+			) );
+			break;
+		}
+		#endif
 
-		auto surface_create_info = VkWaylandSurfaceCreateInfoKHR{};
-		surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
-		surface_create_info.pNext = nullptr;
-		surface_create_info.flags = 0;
-		surface_create_info.display = wayland_handles->display;
-		surface_create_info.surface = wayland_handles->surface;
-		BAssertVkResult(vkCreateWaylandSurfaceKHR(
-			rhi_vulkan_impl.GetVulkanInstance(),
-			&surface_create_info,
-			rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
-			&result)
-		);
+		#if BITCRAFTE_WINDOW_MANAGER_WAYLAND
+		case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND:
+		{
+			auto wayland_handles = static_cast<const window_manager::WindowManagerWaylandPlatformHandles*>( window->GetPlatformSpecificHandles() );
+			assert(	wayland_handles );
+			assert(	wayland_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND );
+			assert(	wayland_handles->display );
+			assert(	wayland_handles->surface );
 
-#else
-#error "Please add window manager specific vulkan window surface creation code here"
-#endif
+			auto surface_create_info = VkWaylandSurfaceCreateInfoKHR{};
+			surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+			surface_create_info.pNext = nullptr;
+			surface_create_info.flags = 0;
+			surface_create_info.display = wayland_handles->display;
+			surface_create_info.surface = wayland_handles->surface;
+			BAssertVkResult( vkCreateWaylandSurfaceKHR(
+				rhi_vulkan_impl.GetVulkanInstance(),
+				&surface_create_info,
+				rhi_vulkan_impl.GetMainThreadAllocationCallbacks(),
+				&result
+			) );
+			break;
+		}
+		#endif
+
+		default:
+			break;
+		}
 
 		return result;
 	};

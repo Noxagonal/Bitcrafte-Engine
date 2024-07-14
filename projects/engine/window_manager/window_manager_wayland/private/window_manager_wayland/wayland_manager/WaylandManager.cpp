@@ -136,11 +136,6 @@ void bc::window_manager::WaylandManager::NotifyWindowBeingDestroyed(
 	active_window_list.Erase( window_ptr );
 }
 
-const bc::window_manager::WindowManagerWaylandPlatformHandles * bc::window_manager::WaylandManager::GetPlatformSpecificHandles() const
-{
-	return &platform_handles;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::window_manager::WaylandManager::ProcessMessages()
 {

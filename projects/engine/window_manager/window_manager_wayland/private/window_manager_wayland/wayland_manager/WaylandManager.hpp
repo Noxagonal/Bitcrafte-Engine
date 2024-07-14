@@ -90,7 +90,7 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const WindowManagerWaylandPlatformHandles					*	GetPlatformSpecificHandles() const;
+	inline const WindowManagerWaylandPlatformHandles			*	GetPlatformSpecificHandles() const { return &platform_handles; }
 
 private:
 

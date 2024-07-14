@@ -11,11 +11,11 @@
 #include <rhi_vulkan/platform/PlatformSpecificExtensionNames.hpp>
 
 #if BITCRAFTE_WINDOW_MANAGER_WIN32
-#include <core/platform/windows/Windows.hpp>
-#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
+#include <core/platform/windows/WinDef.hpp>
+#endif
+
+#if BITCRAFTE_WINDOW_MANAGER_WAYLAND
 #include <wayland-client-core.h>
-#else
-#error "Please add window manager required headers here"
 #endif
 
 
@@ -62,28 +62,57 @@ bc::List<bool> bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentation
 {
 	auto result = List<bool>( family_properties.Size() );
 
+	auto * platform_specific_handles_base = rhi_vulkan_impl->GetWindowManagerComponent().GetPlatformSpecificHandles();
+	assert( platform_specific_handles_base );
+
+	switch (platform_specific_handles_base->structure_type)
+	{
+
 	#if BITCRAFTE_WINDOW_MANAGER_WIN32
-	for( u64 i = 0; i < family_properties.Size(); ++i )
+	case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WIN32:
 	{
-		result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR( vk_physical_device, i );
+		for( u64 i = 0; i < family_properties.Size(); ++i )
+		{
+			result[ i ] = !!vkGetPhysicalDeviceWin32PresentationSupportKHR( vk_physical_device, i );
+		}
+		break;
 	}
-
-	#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
-	auto platform_specific_handles = reinterpret_cast<const window_manager::WindowManagerWaylandPlatformHandles*>( rhi_vulkan_impl->GetWindowManagerComponent().GetPlatformSpecificHandles() );
-	assert( platform_specific_handles );
-	assert( platform_specific_handles->structure_type == window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND );
-	BAssert( platform_specific_handles->display, "Failed to get Wayland display, make sure desktop environment is running on Wayland" );
-
-	auto wayland_display = platform_specific_handles->display;
-	for( u64 i = 0; i < family_properties.Size(); ++i )
-	{
-		result[ i ] = !!vkGetPhysicalDeviceWaylandPresentationSupportKHR( vk_physical_device, i, wayland_display );
-	}
-
-	#else
-	#error "Please add window manager specific queue presentation support query here"
-
 	#endif
+
+	#if BITCRAFTE_WINDOW_MANAGER_XCB
+	case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XCB:
+	{
+		auto platform_specific_handles = static_cast<const window_manager::WindowManagerXCBPlatformHandles*>( platform_specific_handles_base );
+		BAssert( platform_specific_handles->xcb_connection, "Failed to aquire X11 connection, make sure desktop environment is running X11" );
+
+		auto xcb_connection = platform_specific_handles->xcb_connection;
+		for( u64 i = 0; i < family_properties.Size(); ++i )
+		{
+			result[ i ] = !!vkGetPhysicalDeviceXcbPresentationSupportKHR( vk_physical_device, i, xcb_connection, platform_specific_handles->xcb_screen->root_visual );
+		}
+		break;
+	}
+	#endif // BITCRAFTE_WINDOW_MANAGER_XCB
+
+	#if BITCRAFTE_WINDOW_MANAGER_WAYLAND
+	case window_manager::WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND:
+	{
+		auto platform_specific_handles = static_cast<const window_manager::WindowManagerWaylandPlatformHandles*>( platform_specific_handles_base );
+		BAssert( platform_specific_handles->display, "Failed to get Wayland display, make sure desktop environment is running on Wayland" );
+
+		auto wayland_display = platform_specific_handles->display;
+		for( u64 i = 0; i < family_properties.Size(); ++i )
+		{
+			result[ i ] = !!vkGetPhysicalDeviceWaylandPresentationSupportKHR( vk_physical_device, i, wayland_display );
+		}
+		break;
+	}
+	#endif // BITCRAFTE_WINDOW_MANAGER_WAYLAND
+
+	default:
+		BEnsure( 0, "Please add window manager specific queue presentation support query here" );
+		break;
+	}
 
 	return result;
 }
