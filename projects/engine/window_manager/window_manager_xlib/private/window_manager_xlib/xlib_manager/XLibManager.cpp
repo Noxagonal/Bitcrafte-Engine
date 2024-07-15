@@ -156,13 +156,34 @@ void bc::window_manager::XLibManager::ProcessEvent(
 
 	auto GetWindowPointer = [ this ]( auto window ) -> bc::window_manager::XLibWindow*
 	{
-		return xlib::GetProperty<bc::window_manager::XLibWindow*>(
+		Atom actual_type_return = 0;
+		int actual_format_return = 0;
+		unsigned long nitems_return = 0;
+		unsigned long bytes_after_return = 0;
+		unsigned char * data_return = nullptr;
+		XGetWindowProperty(
 			platform_handles.display,
 			window,
 			platform_handles.window_user_pointer_atom,
+			0,
+			2,
+			false,
 			XA_CARDINAL,
-			xlib::PropertyFormat::F8
+			&actual_type_return,
+			&actual_format_return,
+			&nitems_return,
+			&bytes_after_return,
+			&data_return
 		);
+		assert( actual_type_return == XA_CARDINAL );
+		assert( actual_format_return == 32 );
+		assert( nitems_return == 2 );
+		assert( bytes_after_return == 0 );
+		auto data_ull = reinterpret_cast<unsigned long*>( data_return );
+		auto window_ptr = reinterpret_cast<bc::window_manager::XLibWindow*>( ( data_ull[ 0 ] & 0xFFFFFFFF ) + ( data_ull[ 1 ] << 32 ) );
+		XFree( data_return );
+		assert( window_ptr );
+		return window_ptr;
 	};
 
 	switch( event.type )
@@ -481,20 +502,20 @@ void bc::window_manager::XLibManager::ProcessEvent(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::Optional<bc::Text32> bc::window_manager::XLibManager::PopulateX11Atoms()
 {
-	platform_handles.window_user_pointer_atom = xlib::GetAtom( platform_handles.display, "_BITCRAFTE_XLIB_WINDOW_POINTER", true );
+	platform_handles.window_user_pointer_atom = XInternAtom( platform_handles.display, "_BITCRAFTE_XLIB_WINDOW_POINTER", false );
 	if( platform_handles.window_user_pointer_atom == None ) return { "Failed to get _BITCRAFTE_XLIB_WINDOW_POINTER atom" };
 
 	// Protocol atoms
-	platform_handles.window_protocol_atom = xlib::GetAtom( platform_handles.display, "WM_PROTOCOLS", false );
+	platform_handles.window_protocol_atom = XInternAtom( platform_handles.display, "WM_PROTOCOLS", true );
 	if( platform_handles.window_protocol_atom == None ) return { "Failed to get WM_PROTOCOLS atom" };
 
-	platform_handles.window_protocol_close_atom = xlib::GetAtom( platform_handles.display, "WM_DELETE_WINDOW", false );
+	platform_handles.window_protocol_close_atom = XInternAtom( platform_handles.display, "WM_DELETE_WINDOW", true );
 	if( platform_handles.window_protocol_close_atom == None ) return { "Failed to get WM_DELETE_WINDOW atom" };
 
-	platform_handles.window_protocol_take_focus_atom = xlib::GetAtom( platform_handles.display, "WM_TAKE_FOCUS", false );
+	platform_handles.window_protocol_take_focus_atom = XInternAtom( platform_handles.display, "WM_TAKE_FOCUS", true );
 	if( platform_handles.window_protocol_take_focus_atom == None ) return { "Failed to get WM_TAKE_FOCUS atom" };
 
-	platform_handles.window_protocol_ping_atom = xlib::GetAtom( platform_handles.display, "_NET_WM_PING", false );
+	platform_handles.window_protocol_ping_atom = XInternAtom( platform_handles.display, "_NET_WM_PING", true );
 	if( platform_handles.window_protocol_ping_atom == None ) return { "Failed to get _NET_WM_PING atom" };
 
 	return {};

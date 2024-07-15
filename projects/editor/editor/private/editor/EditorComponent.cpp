@@ -91,7 +91,6 @@ bc::editor::EditorComponent::EditorComponent()
 				should_close = true;
 			}
 		);
-
 	}
 	catch( const diagnostic::Exception & exception )
 	{

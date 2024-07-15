@@ -3,7 +3,6 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <window_manager/window/Window.hpp>
 #include <window_manager/platform/handles/WindowPlatformHandles.hpp>
-#include <window_manager_xlib/xlib_manager/XLibProperties.hpp>
 
 
 
@@ -20,16 +19,6 @@ class XLibManager;
 class XLibWindow : public Window
 {
 public:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	struct X11PropertyHandles
-	{
-		xlib::PropertyHandle<XLibWindow*>					window_user_pointer;
-		xlib::PropertyHandle<List<::Atom>>					window_protocols;
-		xlib::PropertyHandle<Text>							window_title;
-		xlib::PropertyHandle<Text>							window_icon_name;
-		xlib::PropertyHandle<xlib::XSizeHints>				window_size_hints;
-	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	XLibWindow(
@@ -70,19 +59,15 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	const WindowManagerXLibPlatformHandles				*	GetXLibPlatformHandles() const;
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline X11PropertyHandles							*	GetX11PropertyHandles() { return &x11_property_handles; }
-
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void													SetupPropertyHandles();
+	void													SetupProperties();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	XLibManager											&	xlib_manager;
 
 	WindowManagerXLibPlatformHandles						platform_handles			= {};
-	X11PropertyHandles										x11_property_handles		= {};
 };
 
 

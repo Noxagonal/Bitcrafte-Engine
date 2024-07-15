@@ -57,7 +57,7 @@ bc::window_manager::XLibWindow::XLibWindow(
 		0,
 		CopyFromParent,
 		InputOutput,
-		CopyFromParent,
+		platform_handles.default_visual,
 		CWBackPixel | CWBorderPixel | CWEventMask,
 		&window_attributes
 	);
@@ -70,7 +70,7 @@ bc::window_manager::XLibWindow::XLibWindow(
 	XMapWindow( platform_handles.display, platform_handles.window );
 	XFlush( platform_handles.display );
 
-	SetupPropertyHandles();
+	SetupProperties();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,64 +142,36 @@ const bc::window_manager::WindowManagerXLibPlatformHandles * bc::window_manager:
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XLibWindow::SetupPropertyHandles()
+void bc::window_manager::XLibWindow::SetupProperties()
 {
-	// TODO: Make sure that property sizes are automatically calculated properly.
-
-	// Window user pointer property
-	x11_property_handles.window_user_pointer	= xlib::PropertyHandle<XLibWindow*>(
+	// Set property handles
+	auto user_pointer_value = reinterpret_cast<u64>( this );
+	auto user_pointer_value_array = Array<unsigned long, 2>( user_pointer_value & 0xFFFFFFFF, user_pointer_value >> 32 );
+	XChangeProperty(
 		platform_handles.display,
 		platform_handles.window,
 		platform_handles.window_user_pointer_atom,
 		XA_CARDINAL,
-		xlib::PropertyFormat::F8
+		32,
+		PropModeReplace,
+		reinterpret_cast<const unsigned char*>( user_pointer_value_array.Data() ),
+		static_cast<int>( user_pointer_value_array.Size() )
 	);
 
-	// Window close property
-	x11_property_handles.window_protocols		= xlib::PropertyHandle<List<::Atom>>(
+	// Set window protocols
+	auto window_protocols = List<::Atom> {
+		platform_handles.window_protocol_close_atom,
+		platform_handles.window_protocol_take_focus_atom,
+		platform_handles.window_protocol_ping_atom
+	};
+	XChangeProperty(
 		platform_handles.display,
 		platform_handles.window,
 		platform_handles.window_protocol_atom,
 		XA_ATOM,
-		xlib::PropertyFormat::F32
+		32,
+		PropModeReplace,
+		reinterpret_cast<const unsigned char*>( window_protocols.Data() ),
+		static_cast<int>( window_protocols.Size() )
 	);
-
-	// Window title property
-	x11_property_handles.window_title			= xlib::PropertyHandle<Text>(
-		platform_handles.display,
-		platform_handles.window,
-		XA_WM_NAME,
-		XA_STRING,
-		xlib::PropertyFormat::F8
-	);
-
-	// Window icon name property
-	x11_property_handles.window_icon_name		= xlib::PropertyHandle<Text>(
-		platform_handles.display,
-		platform_handles.window,
-		XA_WM_ICON_NAME,
-		XA_STRING,
-		xlib::PropertyFormat::F8
-	);
-
-	// Window size hints
-	x11_property_handles.window_size_hints		= xlib::PropertyHandle<xlib::XSizeHints>(
-		platform_handles.display,
-		platform_handles.window,
-		XA_WM_NORMAL_HINTS,
-		XA_WM_SIZE_HINTS,
-		xlib::PropertyFormat::F32
-	);
-
-	x11_property_handles.window_user_pointer.Change( this );
-	x11_property_handles.window_protocols.Change(
-		{
-			platform_handles.window_protocol_close_atom,
-			platform_handles.window_protocol_take_focus_atom,
-			//platform_handles.window_protocol_ping_atom, // Does not work, might not need.
-		}
-	);
-	x11_property_handles.window_title.Change( "Testing..." );
-	//x11_property_handles.window_icon_name.Change( platform_handles.window_icon_name_atom );
-	//x11_property_handles.window_size_hints.Change( platform_handles.window_size_hints_atom );
 }

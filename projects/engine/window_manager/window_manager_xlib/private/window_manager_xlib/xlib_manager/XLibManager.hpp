@@ -3,7 +3,6 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
 #include <window_manager_xlib/window/XLibWindow.hpp>
-#include <window_manager_xlib/xlib_manager/XLibProperties.hpp>
 
 #include <core/containers/Optional.hpp>
 #include <core/containers/List.hpp>
