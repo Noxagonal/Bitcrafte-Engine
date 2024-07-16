@@ -211,7 +211,7 @@ public:
 	/// pointer memory management is not as straightforward as std::unique_ptr.
 	///
 	/// @note
-	/// Up-cast, down-cast and same type cast are supported. It not necessary to use this function to up-cast as it is implicit.
+	/// Up-cast, down-cast and same type cast are supported. It's not necessary to use this function to up-cast as it is implicit.
 	///
 	/// @note
 	/// The contained pointer must be derived from ValueType.
@@ -219,12 +219,12 @@ public:
 	/// @note
 	/// If cast fails, exception will be thrown in debug builds. In release builds, an empty UniquePtr will be returned and current
 	/// UniquePtr will retain ownership.
-	/// 
+	///
 	/// @tparam DerivedValueType
-	/// Type to downcast to.
+	/// Type to cast to.
 	/// 
 	/// @return
-	/// Downcasted unique pointer.
+	/// New unique pointer which is taking ownership of this UniquePtr.
 	template<typename CastToValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )<CastToValueType>											CastTo()
 	{
