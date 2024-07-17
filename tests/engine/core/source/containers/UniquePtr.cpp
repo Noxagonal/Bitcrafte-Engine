@@ -13,7 +13,9 @@ namespace containers {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, BasicInit )
 {
-	using A = bc::UniquePtr<uint32_t>;
+	using namespace bc;
+	
+	using A = bc::UniquePtr<i32>;
 	A a1;
 	EXPECT_TRUE( a1.IsEmpty() );
 
@@ -29,31 +31,31 @@ TEST( UniquePtrContainer, BasicInit )
 	A e1 = A {};
 	EXPECT_TRUE( e1.IsEmpty() );
 
-	A a2( bc::MakeUniquePtr<uint32_t>( 5 ) );
+	A a2( bc::MakeUniquePtr<i32>( 5 ) );
 	EXPECT_FALSE( a2.IsEmpty() );
 
-	A b2 { bc::MakeUniquePtr<uint32_t>( 5 ) };
+	A b2 { bc::MakeUniquePtr<i32>( 5 ) };
 	EXPECT_FALSE( b2.IsEmpty() );
 
-	A c2 = bc::MakeUniquePtr<uint32_t>( 5 );
+	A c2 = bc::MakeUniquePtr<i32>( 5 );
 	EXPECT_FALSE( c2.IsEmpty() );
 
-	A d2 = A( bc::MakeUniquePtr<uint32_t>( 5 ) );
+	A d2 = A( bc::MakeUniquePtr<i32>( 5 ) );
 	EXPECT_FALSE( d2.IsEmpty() );
 
-	A e2 = A { bc::MakeUniquePtr<uint32_t>( 5 ) };
+	A e2 = A { bc::MakeUniquePtr<i32>( 5 ) };
 	EXPECT_FALSE( e2.IsEmpty() );
 
 	A a3;
-	a3 = bc::MakeUniquePtr<uint32_t>( 5 );
+	a3 = bc::MakeUniquePtr<i32>( 5 );
 	EXPECT_FALSE( a3.IsEmpty() );
 
 	A b3;
-	b3 = { bc::MakeUniquePtr<uint32_t>( 5 ) };
+	b3 = { bc::MakeUniquePtr<i32>( 5 ) };
 	EXPECT_FALSE( b3.IsEmpty() );
 
 	A c3;
-	c3 = A { bc::MakeUniquePtr<uint32_t>( 5 ) };
+	c3 = A { bc::MakeUniquePtr<i32>( 5 ) };
 	EXPECT_FALSE( c3.IsEmpty() );
 };
 
@@ -62,9 +64,11 @@ TEST( UniquePtrContainer, BasicInit )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, Clear )
 {
-	using A = bc::UniquePtr<uint32_t>;
+	using namespace bc;
+	
+	using A = bc::UniquePtr<i32>;
 	{
-		auto a = bc::MakeUniquePtr<uint32_t>( 5 );
+		auto a = bc::MakeUniquePtr<i32>( 5 );
 		EXPECT_FALSE( a.IsEmpty() );
 
 		a.Clear();
@@ -78,7 +82,7 @@ TEST( UniquePtrContainer, Clear )
 class UniquePtr_EmplaceObject
 {
 public:
-	UniquePtr_EmplaceObject( size_t value ) : value( value ) {}
+	UniquePtr_EmplaceObject( bc::i32 value ) : value( value ) {}
 	UniquePtr_EmplaceObject( const UniquePtr_EmplaceObject & other ) = default;
 	UniquePtr_EmplaceObject( UniquePtr_EmplaceObject && other ) = default;
 
@@ -87,7 +91,7 @@ public:
 
 	bool operator==( const UniquePtr_EmplaceObject & other ) const { return value == other.value; }
 
-	size_t value = 0;
+	bc::i32 value = 0;
 };
 
 
@@ -95,7 +99,9 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, NonTrivialTypes )
 {
-	using A = bc::UniquePtr<uint32_t>;
+	using namespace bc;
+	
+	using A = bc::UniquePtr<i32>;
 	using B = bc::UniquePtr<UniquePtr_EmplaceObject>;
 
 	{
@@ -131,17 +137,19 @@ concept UniquePtr_MoveConstructibleType = requires( T a )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, StructureCopy )
 {
+	using namespace bc;
+	
 	struct Simple
 	{
-		size_t v1		= {};
-		uint32_t v2		= {};
-		float v3		= {};
-		double v4		= {};
+		u64 v1		= {};
+		i32 v2		= {};
+		f32 v3		= {};
+		f64 v4		= {};
 	};
 
 	using A = bc::UniquePtr<Simple>;
 	{
-		A a = bc::MakeUniquePtr<Simple>( 1, 2, 3.3f, 4.4 );
+		A a = bc::MakeUniquePtr<Simple>( u64( 1 ), 2, 3.3f, 4.4 );
 		EXPECT_FALSE( UniquePtr_CopyConstructibleType<A> );
 	}
 };
@@ -151,18 +159,20 @@ TEST( UniquePtrContainer, StructureCopy )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, StructureMove )
 {
+	using namespace bc;
+	
 	struct Simple
 	{
-		size_t v1		= {};
-		uint32_t v2		= {};
-		float v3		= {};
-		double v4		= {};
+		u64 v1		= {};
+		i32 v2		= {};
+		f32 v3		= {};
+		f64 v4		= {};
 	};
 
 	using A = bc::UniquePtr<Simple>;
 	{
 		EXPECT_TRUE( UniquePtr_MoveConstructibleType<A> );
-		A a = bc::MakeUniquePtr<Simple>( 1, 2, 3.3f, 4.4 );
+		A a = bc::MakeUniquePtr<Simple>( u64( 1 ), 2, 3.3f, 4.4 );
 		A b = std::move( a );
 
 		EXPECT_TRUE( a.IsEmpty() );
@@ -185,14 +195,16 @@ concept UniquePtr_IsMoveableOnlyCopyable = requires( T object )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, MoveableOnlyStructure )
 {
+	using namespace bc;
+	
 	struct MoveableOnly
 	{
-		MoveableOnly( size_t value ) : v1( value ) {};
+		MoveableOnly( bc::i32 value ) : v1( value ) {};
 		MoveableOnly( const MoveableOnly & other ) = delete;
 		MoveableOnly( MoveableOnly && other ) = default;
 		MoveableOnly & operator=( const MoveableOnly & other ) = delete;
 		MoveableOnly & operator=( MoveableOnly && other ) = default;
-		size_t v1 = {};
+		bc::i32 v1 = {};
 	};
 
 	using A = bc::UniquePtr<MoveableOnly>;
@@ -218,10 +230,10 @@ TEST( UniquePtrContainer, MoveableOnlyStructure )
 class UniquePtr_CopyableOnly_Control
 {
 public:
-	static int32_t copy_counter;
-	static int32_t move_counter;
+	static bc::i32 copy_counter;
+	static bc::i32 move_counter;
 
-	size_t data = 0;
+	bc::i32 data = 0;
 
 	UniquePtr_CopyableOnly_Control() {}
 	UniquePtr_CopyableOnly_Control( const UniquePtr_CopyableOnly_Control & other ) { ++copy_counter; }
@@ -230,15 +242,15 @@ public:
 	UniquePtr_CopyableOnly_Control & operator=( const UniquePtr_CopyableOnly_Control & other ) { ++copy_counter; return *this; }
 	UniquePtr_CopyableOnly_Control & operator=( UniquePtr_CopyableOnly_Control && other ) { ++move_counter; return *this; }
 };
-int32_t UniquePtr_CopyableOnly_Control::copy_counter		= 0;
-int32_t UniquePtr_CopyableOnly_Control::move_counter		= 0;
+bc::i32 UniquePtr_CopyableOnly_Control::copy_counter		= 0;
+bc::i32 UniquePtr_CopyableOnly_Control::move_counter		= 0;
 
 class UniquePtr_CopyableOnly
 {
 public:
-	static int32_t copy_counter;
+	static bc::i32 copy_counter;
 
-	size_t data = 0;
+	bc::i32 data = 0;
 
 	UniquePtr_CopyableOnly() {}
 	UniquePtr_CopyableOnly( const UniquePtr_CopyableOnly & other ) { ++copy_counter; }
@@ -251,6 +263,8 @@ int32_t UniquePtr_CopyableOnly::copy_counter		= 0;
 
 TEST( UniquePtrContainer, CopyableOnlyStructure )
 {
+	using namespace bc;
+	
 	UniquePtr_CopyableOnly_Control::copy_counter	= 0;
 	UniquePtr_CopyableOnly_Control::move_counter	= 0;
 
@@ -289,9 +303,9 @@ TEST( UniquePtrContainer, CopyableOnlyStructure )
 class UniquePtr_CtorDtorCounted
 {
 public:
-	static int32_t constructed_counter;
+	static bc::i32 constructed_counter;
 
-	size_t data = 0;
+	bc::i32 data = 0;
 
 	UniquePtr_CtorDtorCounted() { ++constructed_counter; data = constructed_counter; }
 	UniquePtr_CtorDtorCounted( const UniquePtr_CtorDtorCounted & other ) { ++constructed_counter; data = constructed_counter; }
@@ -327,19 +341,21 @@ TEST( UniquePtrContainer, CtorDtorCounter )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, SelfAssignment )
 {
-	using A = bc::UniquePtr<uint32_t>;
+	using namespace bc;
+	
+	using A = bc::UniquePtr<i32>;
 	{
 		A a;
 		a = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 	}
 	{
-		A a = bc::MakeUniquePtr<uint32_t>( 5 );
+		A a = bc::MakeUniquePtr<i32>( 5 );
 		a = std::move( a );
 		EXPECT_FALSE( a.IsEmpty() );
 	}
 	{
-		A a = bc::MakeUniquePtr<uint32_t>( 5 );
+		A a = bc::MakeUniquePtr<i32>( 5 );
 		A b = std::move( a );
 		a = std::move( b );
 		EXPECT_FALSE( a.IsEmpty() );
@@ -352,6 +368,8 @@ TEST( UniquePtrContainer, SelfAssignment )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, ImplicitDerivedTypeMove )
 {
+	using namespace bc;
+	
 	struct Base{};
 	struct Derived : public Base {};
 
@@ -388,6 +406,8 @@ TEST( UniquePtrContainer, ImplicitDerivedTypeMove )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( UniquePtrContainer, CastTo )
 {
+	using namespace bc;
+	
 	struct Base{ virtual ~Base() = default; };
 	struct Derived_1 : public Base {};
 	struct Derived_2 : public Derived_1 {};
