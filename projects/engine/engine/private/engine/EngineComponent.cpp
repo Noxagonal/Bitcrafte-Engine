@@ -103,7 +103,7 @@ bc::UniquePtr<bc::window_manager::WindowManagerComponent> bc::engine::EngineComp
 	return MakeUniquePtr<window_manager::WindowManagerWin32Component>( create_info.window_manager_create_info );
 
 	#elif BITCRAFTE_WINDOW_MANAGER_XLIB && BITCRAFTE_WINDOW_MANAGER_WAYLAND
-	// TODO: Detect which window manager to use based on what the user is currently using. For now, we'll just use XCB.
+	// TODO: Detect which window manager to use based on what the user is currently using. For now, we'll just use Xlib.
 	return MakeUniquePtr<window_manager::WindowManagerXLibComponent>( create_info.window_manager_create_info );
 
 	#elif BITCRAFTE_WINDOW_MANAGER_XLIB
