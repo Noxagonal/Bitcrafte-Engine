@@ -83,7 +83,7 @@ private:
 	{
 		if( std::is_constant_evaluated() )
 		{
-			new( location ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			new( location ) ValueType{ std::forward<ConstructorArgumentTypePack>( constructor_arguments )... };
 			return location;
 		}
 		else
@@ -96,7 +96,7 @@ private:
 
 			// Construct in place with the temporary pointer, which contains the original address, if contained value
 			// throws in its constructor, then original location will remain modified.
-			new( location ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			new( location ) ValueType{ std::forward<ConstructorArgumentTypePack>( constructor_arguments )... };
 			return location;
 		}
 	}
@@ -174,7 +174,7 @@ protected:
 	{
 		if( std::is_constant_evaluated() )
 		{
-			new( location ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			new( location ) ValueType{ std::forward<ConstructorArgumentTypePack>( constructor_arguments )... };
 		}
 		else
 		{
@@ -242,7 +242,7 @@ protected:
 		ConstructorArgumentTypePack					&&	...constructor_arguments
 	)
 	{
-		new( &object ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+		new( &object ) ValueType{ std::forward<ConstructorArgumentTypePack>( constructor_arguments )... };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,7 +291,7 @@ protected:
 		auto end = destination + element_count;
 		for( u64 i = 0; i < element_count; ++i )
 		{
-			new( &destination[ i ] ) ValueType( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
+			new( &destination[ i ] ) ValueType{ std::forward<ConstructorArgumentTypePack>( constructor_arguments )... };
 		}
 	}
 
@@ -329,7 +329,7 @@ protected:
 		auto end = destination + element_count;
 		for( u64 i = 0; i < element_count; ++i )
 		{
-			new( &destination[ i ] ) ValueType( source[ i ] );
+			new( &destination[ i ] ) ValueType{ source[ i ] };
 		}
 	}
 
@@ -366,7 +366,7 @@ protected:
 
 		for( u64 i = 0; i < element_count; ++i )
 		{
-			new( &destination[ i ] ) ValueType( std::move( source[ i ] ) );
+			new( &destination[ i ] ) ValueType{ std::move( source[ i ] ) };
 		}
 	}
 
