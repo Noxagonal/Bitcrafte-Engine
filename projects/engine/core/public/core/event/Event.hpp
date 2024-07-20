@@ -13,6 +13,12 @@ namespace bc {
 
 
 
+// TODO: Event needs a handle for callbacks so that they can be un-registered automatically.
+//   - Needs to be fast, so direct calls only, no indirection via virtual table.
+//   - Needs to be automaticically un-registered when handle is destroyed.
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Event class is a signalling system that can propagate signals to it's listeners.
