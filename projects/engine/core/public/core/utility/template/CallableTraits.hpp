@@ -213,8 +213,14 @@ class CallableObjectResolver<CallableReturnType( CallableClassType::* )( Callabl
 /// @tparam CallableType
 /// Callable object type.
 template<typename CallableType>
-class CallableTraits :
-	// Assume this is a callable object. Delegate resolving to the CallableObjectResolver by default.
+class CallableTraits
+{
+	static_assert( 0, "Not a callable type" );
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<CallableObject CallableType>
+class CallableTraits<CallableType> :
 	public internal_::CallableObjectResolver<decltype( &CallableType::operator() )>
 {};
 
