@@ -9,10 +9,14 @@
 namespace bc {
 namespace rhi {
 
+class RHIVulkanImpl;
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-List<Text>					GetPlatformSpecificInstanceExtensionNames();
+List<Text>					GetPlatformSpecificInstanceExtensionNames(
+	RHIVulkanImpl		&	rhi_vulkan_impl
+);
 
 
 

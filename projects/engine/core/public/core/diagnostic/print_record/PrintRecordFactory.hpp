@@ -16,26 +16,17 @@ namespace diagnostic {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline PrintRecord											MakePrintRecord(
+BITCRAFTE_ENGINE_API
+PrintRecord													MakePrintRecord(
 	bc::internal_::SimpleTextView32							text,
 	PrintRecordTheme										theme
-)
-{
-	auto record = PrintRecord {};
-	auto new_section = PrintRecordSection {};
-	new_section.text = text;
-	new_section.theme = theme;
-	record += new_section;
-	return record;
-}
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline PrintRecord											MakePrintRecord(
+BITCRAFTE_ENGINE_API
+PrintRecord													MakePrintRecord(
 	bc::internal_::SimpleTextView32							text
-)
-{
-	return MakePrintRecord( text, PrintRecordTheme::DEFAULT );
-}
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainer								TextContainerType>
@@ -89,6 +80,7 @@ void														MakePrintRecord_ArgumentList_Collector(
 	const RestTypePack									&	...argument_pack
 )
 {
+	out_buffer += MakePrintRecord( U"\n" );
 	out_buffer += MakePrintRecord_Argument( argument_description, argument_value );
 	if constexpr( sizeof...( argument_pack ) > 0 ) MakePrintRecord_ArgumentList_Collector( out_buffer, argument_pack... );
 }
@@ -125,26 +117,16 @@ PrintRecord													MakePrintRecord_AssertText(
 	auto record = MakePrintRecord( title );
 	if constexpr( sizeof...( argument_pack ) )
 	{
-		record += MakePrintRecord( U"\n" );
 		record += MakePrintRecord_ArgumentList( argument_pack... ).AddIndent();
 	}
 	return record;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline PrintRecord											MakePrintRecord_SourceLocation(
+BITCRAFTE_ENGINE_API
+PrintRecord													MakePrintRecord_SourceLocation(
 	const SourceLocation								&	source_location
-)
-{
-	auto record = MakePrintRecord_Argument( U"File", source_location.GetFile() );
-	record += MakePrintRecord( U"\n" );
-	record += MakePrintRecord_Argument( U"Function", source_location.GetFunction() );
-	record += MakePrintRecord( U"\n" );
-	record += MakePrintRecord_Argument( U"Line", source_location.GetLine() );
-	record += MakePrintRecord( U"\n" );
-	record += MakePrintRecord_Argument( U"Column", source_location.GetColumn() );
-	return record;
-}
+);
 
 
 

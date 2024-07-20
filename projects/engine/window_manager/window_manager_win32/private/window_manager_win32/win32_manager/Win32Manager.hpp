@@ -53,6 +53,9 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	inline const WindowManagerWin32PlatformHandles				*	GetPlatformSpecificHandles() const { return &platform_handles; }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline const WNDCLASSW										&	GetWindowClass() { return window_class; }
 
 private:
@@ -67,6 +70,8 @@ private:
 	WNDCLASSW														window_class				= {};
 
 	List<Win32Window*>												active_window_list;
+
+	WindowManagerWin32PlatformHandles								platform_handles = {};
 };
 
 

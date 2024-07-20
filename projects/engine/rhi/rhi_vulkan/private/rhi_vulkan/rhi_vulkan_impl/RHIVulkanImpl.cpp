@@ -97,6 +97,11 @@ void bc::rhi::RHIVulkanImpl::Start(
 	const RHIComponentStartInfo & rhi_start_info
 )
 {
+	if( rhi_start_info.use_device >= vulkan_instance->GetPhysicalDeviceList().Size() )
+	{
+		bc::diagnostic::Throw( bc::diagnostic::Exception{ "GPU not selected." } );
+	}
+
 	auto & selected_physical_device = vulkan_instance->GetPhysicalDeviceList()[ rhi_start_info.use_device ];
 	vulkan_device = MakeUniquePtr<VulkanDevice>( *this, selected_physical_device, rhi_start_info );
 
@@ -112,7 +117,7 @@ void bc::rhi::RHIVulkanImpl::Start(
 	OnWindowCreated.RegisterCallback( [ this ]( window_manager::Window * window )
 		{
 			auto window_context_create_info = WindowContextCreateInfo {};
-			// TODO: Hard-coded value for now. Eventually this should be get from global settings.
+			// TODO: VSync should be configurable. Hard-coded value for now.
 			// Also this option is only the initial value, the user should be able change this at runtime.
 			// Internally this means recreating the swapchain.
 			// This might also be the wrong place for swapchain considerations. Initial swapchain should be

@@ -14,8 +14,8 @@ bc::rhi::VulkanCommandBuffer::VulkanCommandBuffer(
 	VulkanCommandPool		&	vulkan_command_pool,
 	bool						is_secondary
 ) :
-	rhi_vulkan_impl( rhi_vulkan_impl ),
-	vulkan_command_pool( vulkan_command_pool )
+	rhi_vulkan_impl( &rhi_vulkan_impl ),
+	vulkan_command_pool( &vulkan_command_pool )
 {
 	auto level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	if( is_secondary ) level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
@@ -37,9 +37,11 @@ bc::rhi::VulkanCommandBuffer::VulkanCommandBuffer(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanCommandBuffer::~VulkanCommandBuffer()
 {
+	if( vk_command_buffer == VK_NULL_HANDLE ) return;
+
 	vkFreeCommandBuffers(
-		rhi_vulkan_impl.GetVulkanDevice(),
-		vulkan_command_pool,
+		rhi_vulkan_impl->GetVulkanDevice(),
+		*vulkan_command_pool,
 		1,
 		&vk_command_buffer
 	);

@@ -39,7 +39,7 @@ public:
 	) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static inline consteval SourceLocation					Current(
+	static inline constexpr SourceLocation					Current(
 		u64													line			= __builtin_LINE(),
 		u64													column			= __builtin_COLUMN(),
 		const char										*	file			= __builtin_FILE(),

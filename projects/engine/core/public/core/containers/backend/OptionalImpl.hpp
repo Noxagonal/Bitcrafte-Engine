@@ -77,7 +77,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr explicit BC_CONTAINER_NAME( Optional )( nullptr_t ) noexcept :
+	constexpr explicit BC_CONTAINER_NAME( Optional )( std::nullptr_t ) noexcept :
 		dummy_value( {} ),
 		has_data( false )
 	{}
@@ -138,7 +138,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
-		nullptr_t
+		std::nullptr_t
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();
@@ -266,6 +266,12 @@ public:
 	constexpr bool																						IsEmpty() const noexcept
 	{
 		return !this->has_data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr explicit operator bool() const noexcept
+	{
+		return !IsEmpty();
 	}
 
 private:

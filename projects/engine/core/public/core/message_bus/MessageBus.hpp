@@ -95,7 +95,7 @@ public:
 		);
 		auto packet = std::move( message_packet_list[ packet_index ] );
 		ErasePacketSlot( packet_index );
-		return packet.CastTo<MessageBusPacketType>();
+		return packet.template CastTo<MessageBusPacketType>();
 	}
 
 private:

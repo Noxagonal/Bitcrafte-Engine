@@ -127,16 +127,17 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 	ArgumentsTypePack												&&	...args
 )
 {
-	using TextContainerFullType = typename TextContainerType::ThisFullType;
-	using TextContainerConstViewType = typename TextContainerType::template ThisViewType<true>;
-	using TextContainerCharacterType = typename TextContainerType::ContainedCharacterType;
+	using TextFullType = typename TextContainerType::ThisFullType;
+	using TextFullType32 = typename TextContainerType::template ThisContainerFullType<c32>;
+	using TextViewType = typename TextContainerType::template ThisViewType<true>;
+	using TextCharacterType = typename TextContainerType::ContainedCharacterType;
 
 	constexpr u64 args_count = sizeof...( ArgumentsTypePack );
-	TextContainerFullType out_buffer;
+	TextFullType out_buffer;
 	out_buffer.Reserve( 256 );
 
 	u64 current_argument = 0;
-	TextContainerConstViewType argument_parse_text;
+	TextViewType argument_parse_text;
 
 	// TODO: Get rid of std::from_chars and std::isdigit inside TextFormat function
 	// to lower dependencies to libraries, use our own primitive conversion instead.
@@ -145,27 +146,27 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 	while( it != format_text.end() )
 	{
 
-		if( *it == TextContainerCharacterType( '{' ) )
+		if( *it == TextCharacterType( '{' ) )
 		{
 			// Enter formatted area
 
 			++it;
-			while( *it != TextContainerCharacterType( '}' ) )
+			while( *it != TextCharacterType( '}' ) )
 			{
-				if( *it >= TextContainerCharacterType( '0' ) && *it <= TextContainerCharacterType( '9' ) )
+				if( *it >= TextCharacterType( '0' ) && *it <= TextCharacterType( '9' ) )
 				{
 					auto arg_number_end_it = it;
 					bool found_end = false;
 
 					while( arg_number_end_it != format_text.end() )
 					{
-						if( *arg_number_end_it == TextContainerCharacterType( ':' ) )
+						if( *arg_number_end_it == TextCharacterType( ':' ) )
 						{
 							found_end = true;
 							break;
 
 						}
-						else if( *arg_number_end_it == TextContainerCharacterType( '}' ) )
+						else if( *arg_number_end_it == TextCharacterType( '}' ) )
 						{
 							found_end = true;
 							break;
@@ -173,8 +174,8 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 						++arg_number_end_it;
 					}
 					BAssert( found_end,
-						TextContainerFullType( "Error while formatting text, missing \"}\", format text: \"" ) +
-						format_text + "\""
+						TextFullType32( U"Error while formatting text, missing \"}\", format text: \"" ) +
+						conversion::ToUTF32( format_text ) + U"\""
 					);
 					it += conversion::TextToPrimitive( current_argument, format_text.SubText( it, arg_number_end_it ) );
 				}
@@ -187,7 +188,7 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 					bool found_end = false;
 					while( it != format_text.end() )
 					{
-						if( *it == TextContainerCharacterType( '}' ) )
+						if( *it == TextCharacterType( '}' ) )
 						{
 							found_end = true;
 							break;
@@ -196,12 +197,12 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 					}
 
 					BAssert( found_end,
-						TextContainerFullType( "Error while formatting text, missing \"}\", format text: \"" ) +
-						format_text + "\""
+						TextFullType32( U"Error while formatting text, missing \"}\", format text: \"" ) +
+						conversion::ToUTF32( format_text ) + U"\""
 					);
 
 					auto end = it;
-					argument_parse_text = TextContainerConstViewType { begin, end };
+					argument_parse_text = TextViewType { begin, end };
 				}
 				else if( *it == ' ' )
 				{
@@ -211,21 +212,21 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 				else
 				{
 					diagnostic::Throw(
-						TextContainerFullType( "Error while formatting text, \"{\" must be followed by a number, \":\" or \"}\", format text: \"" ) +
-						format_text + "\""
+						TextFullType32( U"Error while formatting text, \"{\" must be followed by a number, \":\" or \"}\", format text: \"" ) +
+						conversion::ToUTF32( format_text ) + U"\""
 					);
 				}
 			}
 			// Do formatting.
 			if( current_argument >= args_count )
 			{
-				auto current_argument_as_text = TextContainerFullType {};
-				auto argument_count_as_text = TextContainerFullType {};
-				conversion::PrimitiveToText<TextContainerFullType>( current_argument_as_text, current_argument );
-				conversion::PrimitiveToText<TextContainerFullType>( argument_count_as_text, args_count );
-				diagnostic::Throw( TextContainerFullType( "Error while formatting text, text argument number out of range, format text: \"" ) +
-					"\".\nTried accessing argument :\"" + current_argument_as_text +
-					"\".\nNumber of arguments: \"" + argument_count_as_text + "\""
+				auto current_argument_as_text = TextFullType32 {};
+				auto argument_count_as_text = TextFullType32 {};
+				conversion::PrimitiveToText<TextFullType32>( current_argument_as_text, current_argument );
+				conversion::PrimitiveToText<TextFullType32>( argument_count_as_text, args_count );
+				diagnostic::Throw( TextFullType32( U"Error while formatting text, text argument number out of range, format text: \"" ) +
+					U"\".\nTried accessing argument :\"" + current_argument_as_text +
+					U"\".\nNumber of arguments: \"" + argument_count_as_text + U"\""
 				);
 			}
 			internal_::TextFormat_Collector( 0, current_argument, out_buffer, argument_parse_text, std::forward<ArgumentsTypePack>( args )... );

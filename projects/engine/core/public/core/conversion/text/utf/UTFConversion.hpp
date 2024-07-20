@@ -183,7 +183,7 @@ auto											ToUTF32(
 		auto data_in_end	= reinterpret_cast<const char*>( text.Data() + text.Size() );
 		while( data_in < data_in_end ) {
 			u64 read_length = std::mbrtoc32( &c32, data_in, text.Size(), &state );
-			BHardAssert( read_length != u64( -3 ), "Failed to convert to UTF32, corrupt UTF text, UTF-32 does not have surrogates" );
+			BHardAssert( read_length != u64( -3 ), U"Failed to convert to UTF32, corrupt UTF text, UTF-32 does not have surrogates" );
 			if( read_length == 0 ) break;
 			if( read_length == u64( -1 ) ) break;
 			if( read_length == u64( -2 ) ) break;
@@ -204,6 +204,35 @@ auto											ToUTF32(
 	}
 
 	return out;
+}
+
+
+
+// TODO: Convert all char8_t, char16_t, char32_t to c8, c16, c32.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	utility::TextContainerCharacterType			OutTextCharacterType,
+	utility::TextContainerView					TextContainerType
+>
+auto											ToUTF(
+	const TextContainerType					&	text
+)
+{
+	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<OutTextCharacterType>;
+
+	if constexpr( std::is_same_v<OutTextCharacterType, c8> ) {
+		return ToUTF8( text );
+	} else if constexpr( std::is_same_v<OutTextCharacterType, c16> ) {
+		return ToUTF16( text );
+	} else if constexpr( std::is_same_v<OutTextCharacterType, c32> ) {
+		return ToUTF32( text );
+	} else {
+		[]<bool Check = false>() {
+			static_assert(Check, "Failed to convert to UTF, not a valid character type");
+		}();
+		return OutTextContainerType {};
+	}
 }
 
 

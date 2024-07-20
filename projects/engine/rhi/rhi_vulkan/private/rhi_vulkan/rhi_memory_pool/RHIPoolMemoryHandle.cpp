@@ -73,7 +73,7 @@ bc::rhi::RHIPoolMemoryHandle & bc::rhi::RHIPoolMemoryHandle::operator=(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIPoolMemoryHandle & bc::rhi::RHIPoolMemoryHandle::operator=(
-	nullptr_t
+	std::nullptr_t
 )
 {
 	Clear();

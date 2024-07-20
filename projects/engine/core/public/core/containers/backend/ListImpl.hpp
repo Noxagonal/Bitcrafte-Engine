@@ -813,7 +813,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
-		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
@@ -857,7 +857,7 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto result = ThisViewType<true>( *this ).Find( value );
+		auto result = ThisViewType<false>( *this ).Find( value );
 		return Iterator { this, result.GetAddress() };
 	}
 
@@ -901,7 +901,7 @@ public:
 		LambdaType																					&&	lambda
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto result = ThisViewType<true>( *this ).FindIf( lambda );
+		auto result = ThisViewType<false>( *this ).FindIf( lambda );
 		return Iterator { this, result.GetAddress() };
 	}
 

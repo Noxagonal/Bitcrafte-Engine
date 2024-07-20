@@ -82,7 +82,7 @@ bc::rhi::VulkanInstance::VulkanInstance(
 {
 	enabled_extension_names.PushBack( VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME );
 	enabled_extension_names.PushBack( VK_KHR_SURFACE_EXTENSION_NAME );
-	enabled_extension_names += GetPlatformSpecificInstanceExtensionNames();
+	enabled_extension_names += GetPlatformSpecificInstanceExtensionNames( rhi_vulkan_impl );
 
 	// Vulkan validation
 	if( rhi_vulkan_impl.GetDebugSettings().debug_enabled )

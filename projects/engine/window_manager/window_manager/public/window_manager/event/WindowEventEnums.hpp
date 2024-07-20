@@ -2,7 +2,9 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <stdint.h>
+#include <core/data_types/FundamentalTypes.hpp>
+
+#include <utility>
 
 
 
@@ -46,7 +48,10 @@ enum class ModifierKeyFlags : i32
 	SHIFT					= 0x0001,	///< Shift key, either left or right
 	CONTROL					= 0x0002,	///< Ctrl key, either left or right
 	ALT						= 0x0004,	///< Alt key, either left or right
-	SUPER					= 0x0008	///< Windows key, either left or right
+	SUPER					= 0x0008,	///< Windows key, either left or right
+	NUM_LOCK				= 0x0010,	///< Num Lock key
+	CAPS_LOCK				= 0x0020,	///< Caps Lock key
+	ALT_GR					= 0x0040,	///< Alt Gr key
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline ModifierKeyFlags		operator|(
@@ -82,13 +87,22 @@ inline ModifierKeyFlags		operator&=(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Keyboard physical key codes.
+///
+/// @note
+/// These are key codes and map to physical keys on the keyboard. Enum labels follow typical QUERTY layout. Eg. <tt>A</tt> maps
+/// to middle left key on the keyboard regardless of the actual keyboard layout.
+///
+/// @note
+/// Not all keys are supported by all keyboards.
 enum class KeyboardButton : i32
 {
 	KEY_UNKNOWN				= -1,	///< Unrecognized keyboard button
 
 	KEY_SPACE				= 32,	///< Space bar
 	KEY_APOSTROPHE			= 39,	///< <tt>'</tt>
-	KEY_PLUS				= 43,	///< <tt>+</tt>
+	KEY_EQUAL_OR_PLUS		= 43,	///< <tt>=</tt> or <tt>+</tt> usually found next to Backspace.
 	KEY_COMMA				= 44,	///< <tt>,</tt>
 	KEY_MINUS				= 45,	///< <tt>-</tt>
 	KEY_PERIOD				= 46,	///< <tt>.</tt>
@@ -134,7 +148,6 @@ enum class KeyboardButton : i32
 	KEY_BACKSLASH			= 92,	///< US keyboard: <tt>\\</tt>
 	KEY_RIGHT_BRACKET		= 93,	///< US keyboard: <tt>]</tt>
 	KEY_GRAVE_ACCENT		= 96,	///< US keyboard: <tt>`</tt>
-	KEY_AX					= 161,	///< Japanese AX keyboard: 'AX' key.
 	KEY_ANGLE_BRACKETS		= 162,	///< <tt><></tt> or <tt>\|</tt> on RT 102-key kbd.
 
 	KEY_ESCAPE				= 256,	///< <tt>Esc</tt>
@@ -190,7 +203,7 @@ enum class KeyboardButton : i32
 	KEY_NUMPAD_7			= 327,
 	KEY_NUMPAD_8			= 328,
 	KEY_NUMPAD_9			= 329,
-	KEY_NUMPAD_DECIMAL		= 330,	///< Numpad <tt>.</tt> or <tt>,</tt> depending on region
+	KEY_NUMPAD_SEPARATOR	= 330,	///< Numpad <tt>.</tt> or <tt>,</tt> depending on region
 	KEY_NUMPAD_DIVIDE		= 331,	///< Numpad <tt>/</tt>
 	KEY_NUMPAD_MULTIPLY		= 332,	///< Numpad <tt>*</tt>
 	KEY_NUMPAD_SUBTRACT		= 333,	///< Numpad <tt>-</tt>

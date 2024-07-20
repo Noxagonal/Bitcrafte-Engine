@@ -76,6 +76,11 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	List<bool>												GetPhysicalDeviceQueuePresentationSupport(
+		ListView<VkQueueFamilyProperties2>					queue_family_properties
+	) const;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VkPhysicalDevice										vk_physical_device					= VK_NULL_HANDLE;
 
 	VkPhysicalDeviceMemoryProperties2						vk_memory_properties;
@@ -83,7 +88,7 @@ private:
 	VkPhysicalDeviceFeatures2								vk_features;
 	QueueFamilyInfo											queue_family_properties;
 
-	RHIVulkanImpl										&	rhi_vulkan_impl;
+	RHIVulkanImpl										*	rhi_vulkan_impl;
 };
 
 

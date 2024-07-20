@@ -20,5 +20,5 @@ int main(
 	auto engine_editor = bc::editor::EditorComponent();
 	engine_editor.Run();
 
-    return 0;
+	return 0;
 }

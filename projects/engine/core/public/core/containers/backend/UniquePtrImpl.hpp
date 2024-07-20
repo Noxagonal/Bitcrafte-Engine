@@ -2,7 +2,11 @@
 #include <core/containers/backend/ContainerBase.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
+#include <core/diagnostic/assertion/Assert.hpp>
+
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
+#include <core/diagnostic/assertion/HardAssert.hpp>
+
 #else
 #error "Container implementation type not given"
 #endif
@@ -68,7 +72,7 @@ public:
 	constexpr BC_CONTAINER_NAME( UniquePtr )( ) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )( nullptr_t ) noexcept :
+	constexpr BC_CONTAINER_NAME( UniquePtr )( std::nullptr_t ) noexcept :
 		data_ptr( nullptr )
 	{}
 
@@ -108,7 +112,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		nullptr_t
+		std::nullptr_t
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();
@@ -207,7 +211,7 @@ public:
 	/// pointer memory management is not as straightforward as std::unique_ptr.
 	///
 	/// @note
-	/// Up-cast, down-cast and same type cast are supported. It not necessary to use this function to up-cast as it is implicit.
+	/// Up-cast, down-cast and same type cast are supported. It's not necessary to use this function to up-cast as it is implicit.
 	///
 	/// @note
 	/// The contained pointer must be derived from ValueType.
@@ -215,12 +219,12 @@ public:
 	/// @note
 	/// If cast fails, exception will be thrown in debug builds. In release builds, an empty UniquePtr will be returned and current
 	/// UniquePtr will retain ownership.
-	/// 
+	///
 	/// @tparam DerivedValueType
-	/// Type to downcast to.
+	/// Type to cast to.
 	/// 
 	/// @return
-	/// Downcasted unique pointer.
+	/// New unique pointer which is taking ownership of this UniquePtr.
 	template<typename CastToValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )<CastToValueType>											CastTo()
 	{

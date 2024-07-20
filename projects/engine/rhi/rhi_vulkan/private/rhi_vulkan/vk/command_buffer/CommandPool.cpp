@@ -16,7 +16,7 @@ bc::rhi::VulkanCommandPool::VulkanCommandPool(
 	bool					is_transient,
 	bool					is_resettable
 ) :
-	rhi_vulkan_impl( rhi_vulkan_impl )
+	rhi_vulkan_impl( &rhi_vulkan_impl )
 {
 	auto flags = VkCommandPoolCreateFlags {};
 	if( is_transient )		flags |= VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
@@ -39,10 +39,12 @@ bc::rhi::VulkanCommandPool::VulkanCommandPool(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanCommandPool::~VulkanCommandPool()
 {
+	if( vk_command_pool == VK_NULL_HANDLE ) return;
+
 	vkDestroyCommandPool(
-		rhi_vulkan_impl.GetVulkanDevice(),
+		rhi_vulkan_impl->GetVulkanDevice(),
 		vk_command_pool,
-		rhi_vulkan_impl.GetMainThreadAllocationCallbacks()
+		rhi_vulkan_impl->GetMainThreadAllocationCallbacks()
 	);
 }
 
@@ -51,5 +53,5 @@ bc::UniquePtr<bc::rhi::VulkanCommandBuffer> bc::rhi::VulkanCommandPool::Allocate
 	bool is_secondary
 )
 {
-	return MakeUniquePtr<VulkanCommandBuffer>( rhi_vulkan_impl, *this, is_secondary );
+	return MakeUniquePtr<VulkanCommandBuffer>( *rhi_vulkan_impl, *this, is_secondary );
 }
