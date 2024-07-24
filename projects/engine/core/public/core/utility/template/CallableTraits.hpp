@@ -27,6 +27,7 @@ template<
 class CallableTraitsBase
 {
 public:
+	using Signature				= CallableReturnType(CallableParameterTypePack...);
 	using ReturnType			= CallableReturnType;
 	using ParameterTypeList		= TypeList<CallableParameterTypePack...>;
 
@@ -54,7 +55,10 @@ public:
 template<typename Type>
 class CallableObjectResolver
 {
-	static_assert( 0, "Cannot get a callable traits from a non callable type." );
+	static constexpr bool is_callable = []<bool b = false>(){
+		static_assert( b, "Cannot get a callable traits from a non callable type." );
+		return b;
+	}();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -215,7 +219,10 @@ class CallableObjectResolver<CallableReturnType( CallableClassType::* )( Callabl
 template<typename CallableType>
 class CallableTraits
 {
-	static_assert( 0, "Not a callable type" );
+	static constexpr bool is_callable = []<bool b = false>(){
+		static_assert( b, "Not a callable type" );
+		return b;
+	}();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
