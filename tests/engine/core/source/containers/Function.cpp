@@ -310,7 +310,7 @@ TEST( FunctionContainer, Clear )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, FunctionCopy )
+TEST( FunctionContainer, FunctionCopyConstruct )
 {
 	using namespace bc;
 
@@ -341,7 +341,42 @@ TEST( FunctionContainer, FunctionCopy )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallableObjectCopy )
+TEST( FunctionContainer, FunctionCopyOperator )
+{
+	using namespace bc;
+
+	{
+		auto a = Function( TestFunction_void_void );
+		auto b = Function<void()>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( TestFunction_void_u32 );
+		auto b = Function<void( u32 )>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( TestFunction_u32_void );
+		auto b = Function<u32()>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( TestFunction_u32_u32 );
+		auto b = Function<u32( u32 )>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, CallableObjectCopyConstruct )
 {
 	using namespace bc;
 	{
@@ -352,7 +387,7 @@ TEST( FunctionContainer, CallableObjectCopy )
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_void_u32 { void operator()( bc::u32 ) {} } callable_void_u32;
+		struct Callable_void_u32 { void operator()( u32 ) {} } callable_void_u32;
 		auto a = Function( callable_void_u32 );
 		auto b = a;
 		EXPECT_FALSE( a.IsEmpty() );
@@ -375,7 +410,45 @@ TEST( FunctionContainer, CallableObjectCopy )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, LambdaCopy )
+TEST( FunctionContainer, CallableObjectCopyOperator )
+{
+	using namespace bc;
+	{
+		struct Callable_void_void { void operator()() {} } callable_void_void;
+		auto a = Function( callable_void_void );
+		auto b = Function<void()>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		struct Callable_void_u32 { void operator()( u32 ) {} } callable_void_u32;
+		auto a = Function( callable_void_u32 );
+		auto b = Function<void( u32 )>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
+		auto a = Function( callable_u32_void );
+		auto b = Function<u32()>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		struct Callable_u32_u32 { u32 operator()( u32 ) { return 0; } } callable_u32_u32;
+		auto a = Function( callable_u32_u32 );
+		auto b = Function<u32( u32 )>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, LambdaCopyConstruct )
 {
 	using namespace bc;
 
@@ -406,7 +479,42 @@ TEST( FunctionContainer, LambdaCopy )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, RegularFunctionMove )
+TEST( FunctionContainer, LambdaCopyOperator )
+{
+	using namespace bc;
+
+	{
+		auto a = Function( []() {} );
+		auto b = Function<void()>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( []( u32 value ) {} );
+		auto b = Function<void( u32 )>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( []() { return u32( 0 ); } );
+		auto b = Function<u32()>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( []( u32 value ) { return value; } );
+		auto b = Function<u32( u32 )>();
+		b = a;
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, RegularFunctionMoveConstruct )
 {
 	using namespace bc;
 
@@ -437,7 +545,42 @@ TEST( FunctionContainer, RegularFunctionMove )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallableObjectMove )
+TEST( FunctionContainer, RegularFunctionMoveOperator )
+{
+	using namespace bc;
+
+	{
+		auto a = Function( TestFunction_void_void );
+		auto b = Function<void()>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( TestFunction_void_u32 );
+		auto b = Function<void( u32 )>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( TestFunction_u32_void );
+		auto b = Function<u32()>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( TestFunction_u32_u32 );
+		auto b = Function<u32( u32 )>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, CallableObjectMoveConstruct )
 {
 	using namespace bc;
 	{
@@ -471,7 +614,45 @@ TEST( FunctionContainer, CallableObjectMove )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, LambdaMove )
+TEST( FunctionContainer, CallableObjectMoveOperator )
+{
+	using namespace bc;
+	{
+		struct Callable_void_void { void operator()() {} } callable_void_void;
+		auto a = Function( callable_void_void );
+		auto b = Function<void()>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		struct Callable_void_u32 { void operator()( u32 ) {} } callable_void_u32;
+		auto a = Function( callable_void_u32 );
+		auto b = Function<void( u32 )>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
+		auto a = Function( callable_u32_void );
+		auto b = Function<u32()>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		struct Callable_u32_u32 { u32 operator()( u32 value ) { return value; } } callable_u32_u32;
+		auto a = Function( callable_u32_u32 );
+		auto b = Function<u32( u32 )>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, LambdaMoveConstruct )
 {
 	using namespace bc;
 
@@ -496,6 +677,41 @@ TEST( FunctionContainer, LambdaMove )
 	{
 		auto a = Function( []( bc::u32 value ) { return value; } );
 		auto b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, LambdaMoveOperator )
+{
+	using namespace bc;
+
+	{
+		auto a = Function( []() {} );
+		auto b = Function<void()>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( []( bc::u32 value ) {} );
+		auto b = Function<void( u32 )>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( []() { return u32( 0 ); } );
+		auto b = Function<u32()>();
+		b = std::move( a );
+		EXPECT_TRUE( a.IsEmpty() );
+		EXPECT_FALSE( b.IsEmpty() );
+	}
+	{
+		auto a = Function( []( bc::u32 value ) { return value; } );
+		auto b = Function<u32( u32 )>();
+		b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
