@@ -32,22 +32,8 @@ class BC_CONTAINER_NAME( Function );
 template <typename ReturnType, typename ...ParameterTypes>
 class BC_CONTAINER_NAME( Function )<ReturnType( ParameterTypes... )>
 {
-	using MyInvokerBase = ::bc::internal_::InvokerBase<ReturnType, ParameterTypes...>;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	enum class Type : u8
-	{
-		NONE		= 0,
-		FUNCTION,
-		INVOKEABLE_OBJECT,
-	};
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	union LocalStorage
-	{
-		MyInvokerBase												*	heap_alloc_invoker;
-		u8																raw[16];
-	};
+	using MyFunction = ReturnType( ParameterTypes... );
+	using MyInvokerBase = ::bc::internal_::container::InvokerBase<ReturnType, ParameterTypes...>;
 
 public:
 
@@ -79,6 +65,29 @@ public:
 
 	using value_type						= Signature;	// for stl compatibility.
 
+private:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	enum class Type : u8
+	{
+		NONE		= 0,
+		FUNCTION,
+		INVOKEABLE_OBJECT,
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	union alignas( 8 ) LocalStorage
+	{
+		MyFunction													*	function_pointer;
+		MyInvokerBase												*	heap_invoker;
+		typename std::aligned_storage<sizeof( MyInvokerBase ), alignof( MyInvokerBase )>::type
+																		local_invoker;
+		u8																raw[24];
+	};
+	static_assert( sizeof( LocalStorage ) == 24 );
+
+public:
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Function )() noexcept
 	{
@@ -88,11 +97,39 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template <utility::CallableWithReturnAndParameters<ReturnType, ParameterTypes...> FunctorType>
+	BC_CONTAINER_NAME( Function )(
+		const BC_CONTAINER_NAME( Function )							&	other
+	)
+	{
+		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+		memset( &storage, 0, sizeof( decltype( storage ) ) );
+		#endif
+
+		CopyOther( other );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	BC_CONTAINER_NAME( Function )(
+		BC_CONTAINER_NAME( Function )								&&	other
+	) noexcept
+	{
+		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+		memset( &storage, 0, sizeof( decltype( storage ) ) );
+		#endif
+
+		MoveOther( std::move( other ) );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template <typename FunctorType>
 	BC_CONTAINER_NAME( Function )(
 		FunctorType													&&	callable
-	) requires( NOT Function TYPE )
+	) requires(
+		utility::CallableWithReturnAndParameters<FunctorType, ReturnType, ParameterTypes...> &&
+		!std::is_same_v<std::decay_t<FunctorType>, BC_CONTAINER_NAME(Function)>
+	)
 	{
+		// TODO: Make sure that this function is not called for another Function object.
 		static_assert(
 			std::is_copy_constructible_v<std::decay_t<FunctorType>>,
 			"FunctorType must be copy constructible"
@@ -106,23 +143,7 @@ public:
 		memset( &storage, 0, sizeof( decltype( storage ) ) );
 		#endif
 
-		InitInvoker( std::forward<FunctorType>( callable ) );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	BC_CONTAINER_NAME( Function )(
-		const BC_CONTAINER_NAME( Function )							&	other
-	)
-	{
-		CopyOther( other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	BC_CONTAINER_NAME( Function )(
-		BC_CONTAINER_NAME( Function )								&&	other
-	) noexcept
-	{
-		MoveOther( std::move( other ) );
+		StoreInvokeable( std::forward<FunctorType>( callable ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,11 +178,16 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<utility::CallableWithReturnAndParameters<ReturnType, ParameterTypes...> FunctorType>
+	template<typename FunctorType>
 	BC_CONTAINER_NAME( Function )									&	operator=(
 		FunctorType													&&	callable
-	) requires( NOT Function TYPE )
+	) requires(
+		utility::CallableWithReturnAndParameters<FunctorType, ReturnType, ParameterTypes...> &&
+		!std::is_same_v<std::decay_t<FunctorType>, BC_CONTAINER_NAME(Function)>
+	)
 	{
+		// TODO: Make sure that this function is not called for another Function object.
+
 		using FunctorRawType = std::remove_reference_t<std::remove_pointer_t<FunctorType>>;
 		using FunctorTraits = ::bc::utility::CallableTraits<FunctorRawType>;
 
@@ -175,7 +201,7 @@ public:
 		);
 
 		Clear();
-		InitInvoker( std::forward<FunctorType>( callable ) );
+		StoreInvokeable( std::forward<FunctorType>( callable ) );
 
 		return *this;
 	}
@@ -186,19 +212,35 @@ public:
 	) const
 	{
 		BC_ContainerAssert( !IsEmpty(), U"Cannot invoke empty function." );
-		return GetInvokerPointer<MyInvokerBase>()->Invoke( std::forward<ParameterTypes>( args )... );
+		if( this->type == Type::INVOKEABLE_OBJECT ) {
+			auto invoker = GetInvokerPointer<MyInvokerBase>();
+			return invoker->Invoke( std::forward<ParameterTypes>( args )... );
+		}
+		else
+		{
+			auto function_ptr = storage.function_pointer;
+			return function_ptr( std::forward<ParameterTypes>( args )... );
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void																Clear() noexcept
 	{
-		if ( this->type != Type::NONE )
+		if ( this->type == Type::INVOKEABLE_OBJECT )
 		{
-			DestructInvoker();
-			DeallocateInvoker( this->is_stored_locally );
-			this->is_stored_locally = false;
-			this->type = Type::NONE;
+			auto invoker = GetInvokerPointer<MyInvokerBase>();
+			::bc::internal_::container::DestructInvoker( invoker );
+			DeallocateInvoker( invoker, this->is_stored_locally );
 		}
+		this->is_stored_locally = false;
+		this->type = Type::NONE;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	bool																IsStoredLocally() const noexcept
+	{
+		BC_ContainerAssert( !IsEmpty(), U"Cannot check empty function stack locality, results would be meaningless." );
+		return this->is_stored_locally;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,20 +262,28 @@ private:
 		const BC_CONTAINER_NAME( Function )							&	other
 	)
 	{
+		assert( this->type == Type::NONE && "Function already initialized." );
+
 		if( other.type == Type::NONE ) return;
 
 		this->is_stored_locally = other.is_stored_locally;
 		this->type = other.type;
 
-		// TODO: Clone invoker
-		//if( other.is_stored_locally )
-		//{
-		//	this->storage = other.storage;
-		//}
-		//else
-		//{
-		//	this->storage.invoker = other.storage.invoker->Clone();
-		//}
+		if( other.type == Type::INVOKEABLE_OBJECT )
+		{
+			auto other_invoker = other.GetInvokerPointer<MyInvokerBase>();
+			auto other_memory_block_info = other_invoker->GetMemoryBlockInfo();
+			AllocateAndSetInvokerPointer(
+				other.is_stored_locally,
+				other_memory_block_info.size,
+				other_memory_block_info.alignment
+			);
+			other_invoker->CloneInto( GetInvokerPointer<MyInvokerBase>() );
+		}
+		else
+		{
+			this->storage = other.storage;
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -241,6 +291,8 @@ private:
 		BC_CONTAINER_NAME( Function )								&&	other
 	) noexcept
 	{
+		assert( this->type == Type::NONE && "Function already initialized." );
+
 		std::swap( this->is_stored_locally, other.is_stored_locally );
 		std::swap( this->type, other.type );
 		std::swap( this->storage, other.storage );
@@ -248,7 +300,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
-	void																InitInvoker(
+	void																StoreInvokeable(
 		FunctorType													&&	callable
 	)
 	{
@@ -260,38 +312,41 @@ private:
 
 		if constexpr( is_plain_function )
 		{
-			using InvokerType = ::bc::internal_::FunctionInvoker<LocalStorage, ReturnType, ParameterTypes...>;
-
 			this->is_stored_locally = true;
 			this->type = Type::FUNCTION;
 
-			AllocateInvoker<InvokerType, FunctorType>( true );
-			ConstructInvoker<InvokerType, FunctorType>( std::forward<FunctorType>( callable ), true );
+			storage.function_pointer = callable;
 		}
 		else
 		{
-			using InvokerType = ::bc::internal_::ObjectInvoker<LocalStorage, FunctorType, ReturnType, ParameterTypes...>;
+			using InvokerType = ::bc::internal_::container::ObjectInvoker<LocalStorage, FunctorType, ReturnType, ParameterTypes...>;
 
-
-			constexpr auto StorageSize = sizeof( LocalStorage );
-			constexpr auto StorageAlignment = alignof( LocalStorage );
-			constexpr auto FunctorTypeSize = sizeof( FunctorRawType );
-			constexpr auto FunctorTypeAlignment = alignof( FunctorRawType );
-
-			auto trivially_copyable = std::is_trivially_copyable_v<FunctorRawType>;
-			auto smaller_or_equal_to_storage = sizeof( FunctorRawType ) <= StorageSize;
-			auto aligned = alignof( FunctorRawType ) <= StorageAlignment;
-			auto same_alignment = ( StorageAlignment % alignof( FunctorRawType ) == 0 );
-
-
-
-			constexpr bool store_locally = ::bc::internal_::IsFunctorStoredLocally<FunctorRawType, LocalStorage>();
+			constexpr bool store_locally = ::bc::internal_::container::IsInvokerStoredLocally<InvokerType, FunctorRawType, LocalStorage>();
 			this->is_stored_locally = store_locally;
 			this->type = Type::INVOKEABLE_OBJECT;
 
-			AllocateInvoker<InvokerType, FunctorType>( store_locally );
-			ConstructInvoker<InvokerType, FunctorType>( std::forward<FunctorType>( callable ), store_locally );
+			auto invoker = AllocateAndSetInvokerPointer<InvokerType, FunctorType>( store_locally );
+			::bc::internal_::container::ConstructInvoker<InvokerType, FunctorType>(
+				invoker,
+				std::forward<FunctorType>( callable )
+			);
 		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	MyInvokerBase													*	AllocateAndSetInvokerPointer(
+		bool															store_locally,
+		i64																size,
+		i64																alignment
+	)
+	{
+		if( store_locally ) return reinterpret_cast<MyInvokerBase*>( &storage.local_invoker );
+
+		// TODO: Replace with our custom memory allocation.
+		auto invoker = reinterpret_cast<MyInvokerBase*>( malloc( size ) );
+
+		SetInvokerHeapPointer( invoker );
+		return invoker;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,79 +354,70 @@ private:
 		typename InvokerType,
 		typename FunctorType
 	>
-	void																AllocateInvoker(
+	InvokerType														*	AllocateAndSetInvokerPointer(
 		bool															store_locally
 	)
 	{
-		if( store_locally ) return;
-		// TODO: Replace with our custom memory allocation.
-		auto invoker = malloc( sizeof( InvokerType ) );
-		assert( invoker == static_cast<MyInvokerBase*>( invoker ) && "static_cast should not alter invoker pointer." );
-		SetInvokerPointer( reinterpret_cast<InvokerType*>( invoker ) );
+		auto invoker = static_cast<InvokerType*>(
+			AllocateAndSetInvokerPointer(
+				store_locally,
+				sizeof( InvokerType ),
+				alignof( InvokerType )
+			)
+		);
+
+		// This test is needed because we will lose type information later.
+		assert(
+			invoker == static_cast<MyInvokerBase*>( invoker ) &&
+			"static_cast must not alter invoker pointer, multiple inheritance is not allowed."
+		);
+
+		return invoker;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void																DeallocateInvoker(
+		MyInvokerBase												*	invoker,
 		bool															store_locally
 	)
 	{
 		if( store_locally ) return;
 		// TODO: Replace with our custom memory allocation.
-		free( GetInvokerPointer<MyInvokerBase>() );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template <
-		typename InvokerType,
-		typename FunctorType
-	>
-	void																ConstructInvoker(
-		FunctorType													&&	callable,
-		bool															store_locally
-	)
-	{
-		auto * invoker = GetInvokerPointer<InvokerType>();
-		::new( invoker ) InvokerType( std::forward<FunctorType>( callable ) );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																DestructInvoker()
-	{
-		GetInvokerPointer<MyInvokerBase>()->~InvokerBase();
+		free( invoker );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename InvokerType>
-	void																SetInvokerPointer(
+	void																SetInvokerHeapPointer(
 		InvokerType													*	invoker
 	)
 	{
-		assert( invoker != nullptr && "Invoker pointer must not be null." );
+		assert( invoker != nullptr && "Invoker pointer must not be nullptr." );
 		assert( this->is_stored_locally == false && "Invoker pointer must not be set when local storage is used." );
 
-		this->storage.heap_alloc_invoker = invoker;
+		this->storage.heap_invoker = invoker;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename InvokerType>
 	InvokerType														*	GetInvokerPointer()
 	{
-		if( this->is_stored_locally ) return reinterpret_cast<InvokerType*>( storage.raw );
-		return static_cast<InvokerType*>( storage.heap_alloc_invoker );
+		if( this->is_stored_locally ) return reinterpret_cast<InvokerType*>( &storage.local_invoker );
+		return static_cast<InvokerType*>( storage.heap_invoker );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename InvokerType>
 	const InvokerType												*	GetInvokerPointer() const
 	{
-		if( this->is_stored_locally ) return reinterpret_cast<const InvokerType*>( storage.raw );
-		return static_cast<InvokerType*>( storage.heap_alloc_invoker );
+		if( this->is_stored_locally ) return reinterpret_cast<const InvokerType*>( &storage.local_invoker );
+		return static_cast<InvokerType*>( storage.heap_invoker );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	bool																is_stored_locally		= false;
 	Type																type					= Type::NONE;
-	alignas( 8 ) LocalStorage											storage;
+	LocalStorage														storage;
 };
 
 
@@ -394,8 +440,8 @@ BC_CONTAINER_NAME( Function )(FunctorType)
 namespace tests {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check if text containers fulfill size requirements.
-// static_assert( sizeof( BC_CONTAINER_NAME( Function )<void()> ) == 32 );
+// Check if function container fulfills size requirements.
+static_assert( sizeof( BC_CONTAINER_NAME( Function )<void()> ) == 32 );
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD

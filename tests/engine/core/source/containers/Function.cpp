@@ -747,15 +747,15 @@ TEST( FunctionContainer, CallNormalFunction )
 
 	{
 		auto a = Function( TestFunction_void_void );
-		a();
+		EXPECT_NO_THROW( a() );
 	}
 	{
 		auto a = Function( TestFunction_void_u32 );
-		a( 0 );
+		EXPECT_NO_THROW( a( 0 ) );
 	}
 	{
 		auto a = Function( TestFunction_u32_void );
-		a();
+		EXPECT_NO_THROW( a() );
 	}
 	{
 		auto a = Function( TestFunction_u32_u32 );
@@ -771,17 +771,17 @@ TEST( FunctionContainer, CallCallableObject )
 	{
 		struct Callable_void_void { void operator()() {} } callable_void_void;
 		auto a = Function( callable_void_void );
-		a();
+		EXPECT_NO_THROW( a() );
 	}
 	{
 		struct Callable_void_u32 { void operator()( u32 value ) {} } callable_void_u32;
 		auto a = Function( callable_void_u32 );
-		a( 0 );
+		EXPECT_NO_THROW( a( 0 ) );
 	}
 	{
 		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
 		auto a = Function( callable_u32_void );
-		a();
+		EXPECT_NO_THROW( a() );
 	}
 	{
 		struct Callable_u32_u32 { u32 operator()( u32 value ) { return value; } } callable_u32_u32;
@@ -797,20 +797,138 @@ TEST( FunctionContainer, CallLambda )
 	using namespace bc;
 	{
 		auto a = Function( []() {} );
-		a();
+		EXPECT_NO_THROW( a() );
 	}
 	{
 		auto a = Function( []( bc::u32 value ) {} );
-		a( 0 );
+		EXPECT_NO_THROW( a( 0 ) );
 	}
 	{
 		auto a = Function( []() { return u32( 0 ); } );
-		a();
+		EXPECT_NO_THROW( a() );
 	}
 	{
 		auto a = Function( []( bc::u32 value ) { return value; } );
 		auto b = a( 15 );
 		EXPECT_EQ( b, 15 );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, InitHeapAllocatedFunctor )
+{
+	using namespace bc;
+	{
+		u64 t1, t2;
+		// The functor should be stored in the stack, because the capture list is smaller or equal to the Function local storage.
+		auto a = Function( [ & ]( u64 value ) { t1 = value; t2 = value; } );
+		EXPECT_TRUE( a.IsStoredLocally() );
+	}
+	{
+		u64 t1, t2, t3;
+		// The functor should be stored in the heap, because the capture list is larger than the Function local storage.
+		auto a = Function( [ & ]( u64 value ) { t1 = value; t2 = value; t3 = value; } );
+		EXPECT_FALSE( a.IsEmpty() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, CallHeapAllocatedFunctor )
+{
+	using namespace bc;
+	{
+		u64 t1, t2;
+		auto a = Function( [ & ]( u64 value ) { t1 = value; t2 = value; } );
+		EXPECT_NO_THROW( a( 42 ) );
+		EXPECT_EQ( t1, 42 );
+		EXPECT_EQ( t2, 42 );
+	}
+	{
+		u64 t1, t2, t3;
+		auto a = Function( [ & ]( u64 value ) { t1 = value; t2 = value; t3 = value; } );
+		EXPECT_NO_THROW( a( 42 ) );
+		EXPECT_EQ( t1, 42 );
+		EXPECT_EQ( t2, 42 );
+		EXPECT_EQ( t3, 42 );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, NonTriviallyCopyableFunctor )
+{
+	using namespace bc;
+	{
+		struct Callable_NonTriviallyCopyable
+		{
+			Callable_NonTriviallyCopyable() = default;
+			Callable_NonTriviallyCopyable( const Callable_NonTriviallyCopyable & ) {}
+			Callable_NonTriviallyCopyable( Callable_NonTriviallyCopyable && ) = default;
+			Callable_NonTriviallyCopyable & operator=( const Callable_NonTriviallyCopyable & ) { return *this; }
+			Callable_NonTriviallyCopyable & operator=( Callable_NonTriviallyCopyable && ) = default;
+			void operator()() {}
+		} callable_non_trivially_copyable;
+		static_assert( !std::is_trivially_copyable_v<Callable_NonTriviallyCopyable> );
+
+		// The functor should be stored in the heap, because this is a non-trivially copyable type.
+		auto a = Function( callable_non_trivially_copyable );
+		EXPECT_FALSE( a.IsStoredLocally() );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, ThrowDuringCall )
+{
+	using namespace bc;
+	{
+		auto a = Function( []() { throw 1; } );
+		EXPECT_THROW( a(), int );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, ThrowDuringFunctorCopyConstruction )
+{
+	using namespace bc;
+	{
+		struct Callable_ThrowDuringFunctorCopyConstruction
+		{
+			Callable_ThrowDuringFunctorCopyConstruction() = default;
+			Callable_ThrowDuringFunctorCopyConstruction( const Callable_ThrowDuringFunctorCopyConstruction & ) { throw int( 1 ); }
+			Callable_ThrowDuringFunctorCopyConstruction( Callable_ThrowDuringFunctorCopyConstruction && ) { throw float( 2.0f ); };
+			void operator()() {}
+		} callable_throw_during_functor_copy_construction;
+		static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyConstruction> );
+
+		auto a = Function( callable_throw_during_functor_copy_construction );
+		EXPECT_THROW( auto b = a, int );
+
+
+		// TEST:
+		auto std_a = std::function( callable_throw_during_functor_copy_construction );
+		EXPECT_THROW( auto std_b = std_a, int );
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, ThrowDuringFunctorCopyAssignment )
+{
+	using namespace bc;
+	{
+		struct Callable_ThrowDuringFunctorCopyAssignment
+		{
+			Callable_ThrowDuringFunctorCopyAssignment() = default;
+			Callable_ThrowDuringFunctorCopyAssignment( const Callable_ThrowDuringFunctorCopyAssignment & ) = default;
+			Callable_ThrowDuringFunctorCopyAssignment( Callable_ThrowDuringFunctorCopyAssignment && ) = default;
+			Callable_ThrowDuringFunctorCopyAssignment & operator=( const Callable_ThrowDuringFunctorCopyAssignment & ) { throw 1; }
+			Callable_ThrowDuringFunctorCopyAssignment & operator=( Callable_ThrowDuringFunctorCopyAssignment && ) { throw 2; };
+			void operator()() {}
+		} callable_throw_during_functor_copy_assignment;
+		static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyAssignment> );
+
+		auto a = Function( callable_throw_during_functor_copy_assignment );
+		auto b = Function<decltype( a )::Signature>();
+		// No copy or move operator should be called for a functor.
+		EXPECT_NO_THROW( b = a );
 	}
 }
 

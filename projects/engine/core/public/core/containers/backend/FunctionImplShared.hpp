@@ -2,27 +2,57 @@
 
 // The purpose of this file is to add common parts of to both simple and normal versions of the Function.
 
+#include <core/memory/MemoryBlockInfo.hpp>
+
 
 
 namespace bc {
 namespace internal_ {
+namespace container {
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <
+	typename InvokerType,
+	typename FunctorType
+>
+void																ConstructInvoker(
+	InvokerType													*	invoker,
+	FunctorType													&&	callable
+)
+{
+	assert( invoker != nullptr && "Invoker pointer must not be null." );
+	::new( invoker ) InvokerType( std::forward<FunctorType>( callable ) );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename InvokerType>
+void																DestructInvoker(
+	InvokerType													*	invoker
+)
+{
+	assert( invoker != nullptr && "Invoker pointer must not be null." );
+	invoker->~InvokerBase();
+}
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
+	typename InvokerType,
 	typename FunctorType,
 	typename FunctionLocalStorageType
 >
-consteval bool IsFunctorStoredLocally()
+consteval bool IsInvokerStoredLocally()
 {
 	constexpr auto StorageSize = sizeof( FunctionLocalStorageType );
 	constexpr auto StorageAlignment = alignof( FunctionLocalStorageType );
 	return
 		std::is_trivially_copyable_v<FunctorType> &&
-		sizeof( FunctorType ) <= StorageSize &&
-		alignof( FunctorType ) <= StorageAlignment &&
-		( StorageAlignment % alignof( FunctorType ) == 0 );
+		sizeof( InvokerType ) <= StorageSize &&
+		alignof( InvokerType ) <= StorageAlignment &&
+		( StorageAlignment % alignof( InvokerType ) == 0 );
 }
 
 
@@ -38,56 +68,12 @@ class InvokerBase
 {
 public:
 	virtual ~InvokerBase() = default;
+	virtual memory::MemoryBlockInfo GetMemoryBlockInfo() const = 0;
 	virtual ReturnType Invoke( ParameterTypes... args ) const = 0;
-	virtual InvokerBase * Clone() const = 0;
+	virtual void CloneInto( InvokerBase * destination ) const = 0;
 };
 
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Template derived class for specific callable objects
-template<
-	typename FunctionLocalStorageType,
-	typename ReturnType,
-	typename ...ParameterTypes
->
-class FunctionInvoker : public InvokerBase<ReturnType, ParameterTypes...>
-{
-public:
-
-	using Signature = ReturnType(ParameterTypes...);
-
-	static constexpr bool StoredLocally = true;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	FunctionInvoker(
-		Signature															*	f
-	) :
-		functor( f )
-	{}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~FunctionInvoker() = default;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ReturnType Invoke(
-		ParameterTypes...														args
-	) const override
-	{
-		return functor( std::forward<ParameterTypes>( args )... );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	InvokerBase<ReturnType, ParameterTypes...>			*	Clone() const override
-	{
-		auto new_invoker = new FunctionInvoker( functor );
-		return static_cast<InvokerBase<ReturnType, ParameterTypes...>*>( new_invoker );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Signature																*	functor;
-};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -100,21 +86,35 @@ template<
 >
 class ObjectInvoker : public InvokerBase<ReturnType, ParameterTypes...>
 {
+	using MyInvokerBase = InvokerBase<ReturnType, ParameterTypes...>;
+
 public:
 
 	using Signature = ReturnType(ParameterTypes...);
 
-	static constexpr bool StoredLocally = IsFunctorStoredLocally<FunctorType, FunctionLocalStorageType>();
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename FunctorTypeIn>
 	ObjectInvoker(
-		const FunctorType													&	f
+		FunctorTypeIn														&&	f
 	) :
-		functor( f )
+		functor( std::forward<FunctorTypeIn>( f ) )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	ObjectInvoker(
+		const ObjectInvoker													&	other
+	) = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~ObjectInvoker() = default;
+
+	virtual memory::MemoryBlockInfo GetMemoryBlockInfo() const override
+	{
+		return memory::MemoryBlockInfo{
+			.size		= sizeof( decltype( *this ) ),
+			.alignment	= alignof( decltype( *this ) )
+		};
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ReturnType Invoke(
@@ -125,14 +125,15 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	InvokerBase<ReturnType, ParameterTypes...>			*	Clone() const override
+	void																		CloneInto(
+		MyInvokerBase														*	destination
+	) const override
 	{
-		auto new_invoker = new ObjectInvoker<FunctionLocalStorageType, FunctorType, ReturnType, ParameterTypes...>( functor );
-		return static_cast<InvokerBase<ReturnType, ParameterTypes...>*>( new_invoker );
+		ConstructInvoker( static_cast<ObjectInvoker*>( destination ), functor );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const FunctorType															functor;
+	FunctorType																	functor;
 };
 
 
@@ -151,5 +152,6 @@ static_assert( sizeof( InvokerBase<void, int, int> ) == 8 );
 
 
 
+} // namespace container
 } // namespace internal_
 } // namespace bc
