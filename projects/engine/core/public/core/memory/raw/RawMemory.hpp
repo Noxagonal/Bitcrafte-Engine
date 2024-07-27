@@ -234,7 +234,7 @@ inline void												SetSystemMemoryAllocationInfo(
 /// Used to get the SystemMemoryAllocationInfo residing in front of the raw memory given to user.
 ///
 /// @param raw_location
-/// Pointer give to user.
+/// Pointer given to user.
 ///
 /// @return
 /// Pointer to allocation info on success, nullptr if something went wrong.
@@ -264,7 +264,7 @@ inline const SystemMemoryAllocationInfo				*	GetSystemMemoryAllocationInfoFromRa
 /// Used to get the SystemMemoryAllocationInfo residing in front of the raw memory given to user.
 ///
 /// @param raw_location
-/// Pointer give to user.
+/// Pointer given to user.
 ///
 /// @return
 /// Pointer to allocation info on success, nullptr if something went wrong.
