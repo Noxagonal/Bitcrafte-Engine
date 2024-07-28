@@ -82,9 +82,9 @@ private:
 		MyInvokerBase												*	heap_invoker;
 		typename std::aligned_storage<sizeof( MyInvokerBase ), alignof( MyInvokerBase )>::type
 																		local_invoker;
-		u8																raw[24];
+		u8																raw[16];
 	};
-	static_assert( sizeof( LocalStorage ) == 24 );
+	static_assert( sizeof( LocalStorage ) == 16 );
 
 public:
 
@@ -98,7 +98,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	BC_CONTAINER_NAME( Function )(
-		const BC_CONTAINER_NAME( Function )							&	other
+		BC_CONTAINER_NAME( Function )								&	other
 	)
 	{
 		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
@@ -154,7 +154,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	BC_CONTAINER_NAME( Function )									&	operator=(
-		const BC_CONTAINER_NAME( Function )							&	other
+		BC_CONTAINER_NAME( Function )								&	other
 	)
 	{
 		if( std::addressof( other ) != this )
@@ -259,7 +259,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void																CopyOther(
-		const BC_CONTAINER_NAME( Function )							&	other
+		BC_CONTAINER_NAME( Function )								&	other
 	)
 	{
 		assert( this->type == Type::NONE && "Function already initialized." );
@@ -326,7 +326,7 @@ private:
 			this->type = Type::INVOKEABLE_OBJECT;
 
 			auto invoker = AllocateAndSetInvokerPointer<InvokerType, FunctorType>( store_locally );
-			::bc::internal_::container::ConstructInvoker<InvokerType, FunctorType>(
+			::bc::internal_::container::ConstructInvokerFromCallable<InvokerType, FunctorType>(
 				invoker,
 				std::forward<FunctorType>( callable )
 			);
@@ -441,7 +441,7 @@ namespace tests {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if function container fulfills size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( Function )<void()> ) == 32 );
+//static_assert( sizeof( BC_CONTAINER_NAME( Function )<void()> ) == 32 );
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD

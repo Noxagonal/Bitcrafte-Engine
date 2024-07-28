@@ -876,6 +876,30 @@ TEST( FunctionContainer, NonTriviallyCopyableFunctor )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TEST( FunctionContainer, FunctorConstructorCalls )
+{
+	using namespace bc;
+	{
+		struct Callable_ConstructorCallsDetection
+		{
+			i64 value = 0;
+			Callable_ConstructorCallsDetection() { ++value; };
+			Callable_ConstructorCallsDetection( const Callable_ConstructorCallsDetection & ) { value += 10; }
+			Callable_ConstructorCallsDetection( Callable_ConstructorCallsDetection && ) { value += 1000; };
+			Callable_ConstructorCallsDetection & operator=( const Callable_ConstructorCallsDetection & ) { value += 10000; return *this; }
+			Callable_ConstructorCallsDetection & operator=( Callable_ConstructorCallsDetection && ) { value += 100000; return *this; }
+			i64 operator()() { return value; }
+		};
+
+		Callable_ConstructorCallsDetection callable_constructor_calls_detection;
+		EXPECT_EQ( callable_constructor_calls_detection(), 1 );
+
+		auto a = Function( callable_constructor_calls_detection );
+		auto test = a();
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( FunctionContainer, ThrowDuringCall )
 {
 	using namespace bc;

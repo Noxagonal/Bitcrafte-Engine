@@ -17,13 +17,27 @@ template <
 	typename InvokerType,
 	typename FunctorType
 >
-void																ConstructInvoker(
+void																ConstructInvokerFromCallable(
 	InvokerType													*	invoker,
 	FunctorType													&&	callable
 )
 {
 	assert( invoker != nullptr && "Invoker pointer must not be null." );
 	::new( invoker ) InvokerType( std::forward<FunctorType>( callable ) );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <
+	typename InvokerType
+>
+void																ConstructInvokerFromInvoker(
+	InvokerType													*	invoker,
+	InvokerType													*	source
+)
+{
+	assert( invoker != nullptr && "Invoker pointer must not be null." );
+	assert( source != nullptr && "Source invoker pointer must not be null." );
+	::new( invoker ) InvokerType( std::forward<InvokerType>( *source ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +84,7 @@ public:
 	virtual ~InvokerBase() = default;
 	virtual memory::MemoryBlockInfo GetMemoryBlockInfo() const = 0;
 	virtual ReturnType Invoke( ParameterTypes... args ) const = 0;
-	virtual void CloneInto( InvokerBase * destination ) const = 0;
+	virtual void CloneInto( InvokerBase * destination ) = 0;
 };
 
 
@@ -127,9 +141,9 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void																		CloneInto(
 		MyInvokerBase														*	destination
-	) const override
+	) override
 	{
-		ConstructInvoker( static_cast<ObjectInvoker*>( destination ), functor );
+		ConstructInvokerFromInvoker( static_cast<ObjectInvoker*>( destination ), this );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
