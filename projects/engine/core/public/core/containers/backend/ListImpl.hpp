@@ -397,7 +397,7 @@ public:
 		BC_CONTAINER_NAME( List )																	&&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->SwapOther( std::move( other ) );
+		this->Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -432,8 +432,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return *this;
 
-		this->Clear();
-		this->Append( other );
+		BC_CONTAINER_NAME( List ) { other }.Swap( *this );
 		return *this;
 	}
 
@@ -442,7 +441,7 @@ public:
 		BC_CONTAINER_NAME( List )																	&&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->SwapOther( std::move( other ) );
+		this->Swap( other );
 		return *this;
 	}
 

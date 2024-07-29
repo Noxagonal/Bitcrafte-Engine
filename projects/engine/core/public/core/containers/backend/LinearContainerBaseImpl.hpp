@@ -1250,16 +1250,13 @@ protected:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void																						SwapOther(
-		BC_CONTAINER_NAME( LinearContainerBase )													&&	other
+	constexpr void																						Swap(
+		BC_CONTAINER_NAME( LinearContainerBase )													&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		if( this != std::addressof( other ) )
-		{
-			std::swap( this->data_ptr, other.data_ptr );
-			std::swap( this->data_size, other.data_size );
-			std::swap( this->data_capacity, other.data_capacity );
-		}
+		std::swap( this->data_ptr, other.data_ptr );
+		std::swap( this->data_size, other.data_size );
+		std::swap( this->data_capacity, other.data_capacity );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

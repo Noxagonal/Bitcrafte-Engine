@@ -808,7 +808,7 @@ public:
 		BC_CONTAINER_NAME( TextBase )																&&	other
 	) noexcept
 	{
-		this->SwapOther( std::move( other ) );
+		this->Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -863,8 +863,7 @@ public:
 	{
 		if( &other == this ) return *this;
 
-		this->Clear();
-		this->Append( other, 1, 0 );
+		BC_CONTAINER_NAME( TextBase ) { other }.Swap( *this );
 		return *this;
 	}
 
@@ -873,7 +872,9 @@ public:
 		BC_CONTAINER_NAME( TextBase )																&&	other
 	) noexcept
 	{
-		this->SwapOther( std::move( other ) );
+		if( &other == this ) return *this;
+
+		this->Swap( other );
 		return *this;
 	}
 
