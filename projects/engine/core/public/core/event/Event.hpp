@@ -4,8 +4,7 @@
 #include <core/utility/template/TypeList.hpp>
 #include <core/containers/List.hpp>
 #include <core/containers/Map.hpp>
-
-#include <functional>
+#include <core/containers/Function.hpp>
 
 
 
@@ -154,7 +153,7 @@ public:
 	/// @return
 	/// returns callback id which can be used to unregister this callback.
 	u64																RegisterCallback(
-		std::function<void( EventSignalTypePack... )>				callback
+		const Function<void( EventSignalTypePack... )>			&	callback
 	)
 	{
 		++callback_counter;
@@ -247,7 +246,7 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	List<Event<EventSignalTypePack...>*>							listeners;
 	List<Event<EventSignalTypePack...>*>							listening_to;
-	Map<u64, std::function<void( EventSignalTypePack... )>>			callbacks;
+	Map<u64, Function<void( EventSignalTypePack... )>>				callbacks;
 	u64																callback_counter		= 0;
 };
 
