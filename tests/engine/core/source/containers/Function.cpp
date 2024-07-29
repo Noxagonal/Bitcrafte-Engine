@@ -14,148 +14,154 @@ namespace containers {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Basic test functions.
+void TestFunction_void_void() {};
+void TestFunction_void_u32( bc::u32 value ) {};
+bc::u32 TestFunction_u32_void() { return 0; };
+bc::u32 TestFunction_u32_u32( bc::u32 value ) { return value; };
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( FunctionContainer, BasicInit )
 {
 	using namespace bc;
 
 	using A = Function<void()>;
 
-	A a1;
-	EXPECT_TRUE( a1.IsEmpty() );
+	A a;
+	EXPECT_TRUE( a.IsEmpty() );
 
-	A b1 {};
-	EXPECT_TRUE( b1.IsEmpty() );
+	A b {};
+	EXPECT_TRUE( b.IsEmpty() );
 
-	A c1 = {};
-	EXPECT_TRUE( c1.IsEmpty() );
+	A c = {};
+	EXPECT_TRUE( c.IsEmpty() );
 
-	A d1 = A();
-	EXPECT_TRUE( d1.IsEmpty() );
+	A d = A();
+	EXPECT_TRUE( d.IsEmpty() );
 
-	A e1 = A {};
-	EXPECT_TRUE( e1.IsEmpty() );
+	A e = A {};
+	EXPECT_TRUE( e.IsEmpty() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestFunction_void_void() {};
-void TestFunction_void_u32( bc::u32 value ) {};
-bc::u32 TestFunction_u32_void() { return 0; };
-bc::u32 TestFunction_u32_u32( bc::u32 value ) { return value; };
 TEST( FunctionContainer, RegularFunctionInit )
 {
 	using namespace bc;
 
+	{
+		auto a = Function<void()>( TestFunction_void_void );
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto a1 = Function<void()>( TestFunction_void_void );
-	EXPECT_FALSE( a1.IsEmpty() );
+		auto b = Function<void( u32 )>( TestFunction_void_u32 );
+		EXPECT_FALSE( b.IsEmpty() );
 
-	auto b1 = Function<void( u32 )>( TestFunction_void_u32 );
-	EXPECT_FALSE( b1.IsEmpty() );
+		auto c = Function<u32()>( TestFunction_u32_void );
+		EXPECT_FALSE( c.IsEmpty() );
 
-	auto c1 = Function<u32()>( TestFunction_u32_void );
-	EXPECT_FALSE( c1.IsEmpty() );
+		auto d = Function<u32( u32 )>( TestFunction_u32_u32 );
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		auto a = Function<void()>( &TestFunction_void_void );
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto d1 = Function<u32( u32 )>( TestFunction_u32_u32 );
-	EXPECT_FALSE( d1.IsEmpty() );
+		auto b = Function<void( u32 )>( &TestFunction_void_u32 );
+		EXPECT_FALSE( b.IsEmpty() );
 
+		auto c = Function<u32()>( &TestFunction_u32_void );
+		EXPECT_FALSE( c.IsEmpty() );
 
-	auto a2 = Function<void()>( &TestFunction_void_void );
-	EXPECT_FALSE( a2.IsEmpty() );
+		auto d = Function<u32( u32 )>( &TestFunction_u32_u32 );
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		auto a = Function<void()>{ TestFunction_void_void };
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto b2 = Function<void( u32 )>( &TestFunction_void_u32 );
-	EXPECT_FALSE( b2.IsEmpty() );
+		auto b = Function<void( u32 )>{ TestFunction_void_u32 };
+		EXPECT_FALSE( b.IsEmpty() );
 
-	auto c2 = Function<u32()>( &TestFunction_u32_void );
-	EXPECT_FALSE( c2.IsEmpty() );
+		auto c = Function<u32()>{ TestFunction_u32_void };
+		EXPECT_FALSE( c.IsEmpty() );
 
-	auto d2 = Function<u32( u32 )>( &TestFunction_u32_u32 );
-	EXPECT_FALSE( d2.IsEmpty() );
+		auto d = Function<u32( u32 )>{ TestFunction_u32_u32 };
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		auto a = Function<void()>{ &TestFunction_void_void };
+		EXPECT_FALSE( a.IsEmpty() );
 
+		auto b = Function<void( u32 )>{ &TestFunction_void_u32 };
+		EXPECT_FALSE( b.IsEmpty() );
 
-	auto a3 = Function<void()>{ TestFunction_void_void };
-	EXPECT_FALSE( a3.IsEmpty() );
+		auto c = Function<u32()>{ &TestFunction_u32_void };
+		EXPECT_FALSE( c.IsEmpty() );
 
-	auto b3 = Function<void( u32 )>{ TestFunction_void_u32 };
-	EXPECT_FALSE( b3.IsEmpty() );
+		auto d = Function<u32( u32 )>{ &TestFunction_u32_u32 };
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		Function<void()> a = TestFunction_void_void;
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto c3 = Function<u32()>{ TestFunction_u32_void };
-	EXPECT_FALSE( c3.IsEmpty() );
+		Function<void( u32 )> b = TestFunction_void_u32;
+		EXPECT_FALSE( b.IsEmpty() );
 
-	auto d3 = Function<u32( u32 )>{ TestFunction_u32_u32 };
-	EXPECT_FALSE( d3.IsEmpty() );
+		Function<u32()> c = TestFunction_u32_void;
+		EXPECT_FALSE( c.IsEmpty() );
 
+		Function<u32( u32 )> d = TestFunction_u32_u32;
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		Function<void()> a = &TestFunction_void_void;
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto a4 = Function<void()>{ &TestFunction_void_void };
-	EXPECT_FALSE( a4.IsEmpty() );
+		Function<void( u32 )> b = &TestFunction_void_u32;
+		EXPECT_FALSE( b.IsEmpty() );
 
-	auto b4 = Function<void( u32 )>{ &TestFunction_void_u32 };
-	EXPECT_FALSE( b4.IsEmpty() );
+		Function<u32()> c = &TestFunction_u32_void;
+		EXPECT_FALSE( c.IsEmpty() );
 
-	auto c4 = Function<u32()>{ &TestFunction_u32_void };
-	EXPECT_FALSE( c4.IsEmpty() );
+		Function<u32( u32 )> d = &TestFunction_u32_u32;
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		auto a = Function( TestFunction_void_void );
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( a )::Signature, void()> ) );
 
-	auto d4 = Function<u32( u32 )>{ &TestFunction_u32_u32 };
-	EXPECT_FALSE( d4.IsEmpty() );
+		auto b = Function( TestFunction_void_u32 );
+		EXPECT_FALSE( b.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( b )::Signature, void( u32 )> ) );
 
+		auto c = Function( TestFunction_u32_void );
+		EXPECT_FALSE( c.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( c )::Signature, u32()> ) );
 
-	Function<void()> a5 = TestFunction_void_void;
-	EXPECT_FALSE( a5.IsEmpty() );
+		auto d = Function( TestFunction_u32_u32 );
+		EXPECT_FALSE( d.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( d )::Signature, bc::u32( u32 )> ) );
+	}
+	{
+		auto a = Function( &TestFunction_void_void );
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( a )::Signature, void()> ) );
 
-	Function<void( u32 )> b5 = TestFunction_void_u32;
-	EXPECT_FALSE( b5.IsEmpty() );
+		auto b = Function( &TestFunction_void_u32 );
+		EXPECT_FALSE( b.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( b )::Signature, void( u32 )> ) );
 
-	Function<u32()> c5 = TestFunction_u32_void;
-	EXPECT_FALSE( c5.IsEmpty() );
+		auto c = Function( &TestFunction_u32_void );
+		EXPECT_FALSE( c.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( c )::Signature, u32()> ) );
 
-	Function<u32( u32 )> d5 = TestFunction_u32_u32;
-	EXPECT_FALSE( d5.IsEmpty() );
-
-
-	Function<void()> a6 = &TestFunction_void_void;
-	EXPECT_FALSE( a6.IsEmpty() );
-
-	Function<void( u32 )> b6 = &TestFunction_void_u32;
-	EXPECT_FALSE( b6.IsEmpty() );
-
-	Function<u32()> c6 = &TestFunction_u32_void;
-	EXPECT_FALSE( c6.IsEmpty() );
-
-	Function<u32( u32 )> d6 = &TestFunction_u32_u32;
-	EXPECT_FALSE( d6.IsEmpty() );
-
-
-	auto a7 = Function( TestFunction_void_void );
-	EXPECT_FALSE( a7.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( a7 )::Signature, void()> ) );
-
-	auto b7 = Function( TestFunction_void_u32 );
-	EXPECT_FALSE( b7.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( b7 )::Signature, void( u32 )> ) );
-
-	auto c7 = Function( TestFunction_u32_void );
-	EXPECT_FALSE( c7.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( c7 )::Signature, u32()> ) );
-
-	auto d7 = Function( TestFunction_u32_u32 );
-	EXPECT_FALSE( d7.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( d7 )::Signature, bc::u32( u32 )> ) );
-
-
-	auto a8 = Function( &TestFunction_void_void );
-	EXPECT_FALSE( a8.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( a8 )::Signature, void()> ) );
-
-	auto b8 = Function( &TestFunction_void_u32 );
-	EXPECT_FALSE( b8.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( b8 )::Signature, void( u32 )> ) );
-
-	auto c8 = Function( &TestFunction_u32_void );
-	EXPECT_FALSE( c8.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( c8 )::Signature, u32()> ) );
-
-	auto d8 = Function( &TestFunction_u32_u32 );
-	EXPECT_FALSE( d8.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( d8 )::Signature, bc::u32( bc::u32 )> ) );
+		auto d = Function( &TestFunction_u32_u32 );
+		EXPECT_FALSE( d.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( d )::Signature, bc::u32( bc::u32 )> ) );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,48 +174,49 @@ TEST( FunctionContainer, CallableObjectInit )
 	struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
 	struct Callable_u32_u32 { u32 operator()( u32 value ) { return value; } } callable_u32_u32;
 
+	{
+		auto a = Function<void()>( callable_void_void );
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto a1 = Function<void()>( callable_void_void );
-	EXPECT_FALSE( a1.IsEmpty() );
+		auto b = Function<void( bc::u32 )>( callable_void_u32 );
+		EXPECT_FALSE( b.IsEmpty() );
 
-	auto b1 = Function<void( bc::u32 )>( callable_void_u32 );
-	EXPECT_FALSE( b1.IsEmpty() );
+		auto c = Function<bc::u32()>( callable_u32_void );
+		EXPECT_FALSE( c.IsEmpty() );
 
-	auto c1 = Function<bc::u32()>( callable_u32_void );
-	EXPECT_FALSE( c1.IsEmpty() );
+		auto d = Function<bc::u32( bc::u32 )>( callable_u32_u32 );
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		Function<void()> a = callable_void_void;
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto d1 = Function<bc::u32( bc::u32 )>( callable_u32_u32 );
-	EXPECT_FALSE( d1.IsEmpty() );
+		Function<void( bc::u32 )> b = callable_void_u32;
+		EXPECT_FALSE( b.IsEmpty() );
 
+		Function<bc::u32()> c = callable_u32_void;
+		EXPECT_FALSE( c.IsEmpty() );
 
-	Function<void()> a3 = callable_void_void;
-	EXPECT_FALSE( a3.IsEmpty() );
+		Function<bc::u32( bc::u32 )> d = callable_u32_u32;
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		auto a = Function( callable_void_void );
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( a )::Signature, void()> ) );
 
-	Function<void( bc::u32 )> b3 = callable_void_u32;
-	EXPECT_FALSE( b3.IsEmpty() );
+		auto b = Function( callable_void_u32 );
+		EXPECT_FALSE( b.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( b )::Signature, void( u32 )> ) );
 
-	Function<bc::u32()> c3 = callable_u32_void;
-	EXPECT_FALSE( c3.IsEmpty() );
+		auto c = Function( callable_u32_void );
+		EXPECT_FALSE( c.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( c )::Signature, u32()> ) );
 
-	Function<bc::u32( bc::u32 )> d3 = callable_u32_u32;
-	EXPECT_FALSE( d3.IsEmpty() );
-
-
-	auto a4 = Function( callable_void_void );
-	EXPECT_FALSE( a4.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( a4 )::Signature, void()> ) );
-
-	auto b4 = Function( callable_void_u32 );
-	EXPECT_FALSE( b4.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( b4 )::Signature, void( u32 )> ) );
-
-	auto c4 = Function( callable_u32_void );
-	EXPECT_FALSE( c4.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( c4 )::Signature, u32()> ) );
-
-	auto d4 = Function( callable_u32_u32 );
-	EXPECT_FALSE( d4.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( d4 )::Signature, u32( u32 )> ) );
+		auto d = Function( callable_u32_u32 );
+		EXPECT_FALSE( d.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( d )::Signature, u32( u32 )> ) );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,49 +224,49 @@ TEST( FunctionContainer, LambdaInit )
 {
 	using namespace bc;
 
-	auto test = std::function( []() {} );
-	auto test_size = sizeof( test );
+	{
+		auto a = Function<void()>( []() {} );
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto a1 = Function<void()>( []() {} );
-	EXPECT_FALSE( a1.IsEmpty() );
+		auto b = Function<void( u32 )>( []( u32 value ) {} );
+		EXPECT_FALSE( b.IsEmpty() );
 
-	auto b1 = Function<void( u32 )>( []( u32 value ) {} );
-	EXPECT_FALSE( b1.IsEmpty() );
+		auto c = Function<u32()>( []() { return 0; } );
+		EXPECT_FALSE( c.IsEmpty() );
 
-	auto c1 = Function<u32()>( []() { return 0; } );
-	EXPECT_FALSE( c1.IsEmpty() );
+		auto d = Function<u32( u32 )>( []( u32 value ) { return value; } );
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		Function<void()> a = []() {};
+		EXPECT_FALSE( a.IsEmpty() );
 
-	auto d1 = Function<u32( u32 )>( []( u32 value ) { return value; } );
-	EXPECT_FALSE( d1.IsEmpty() );
+		Function<void( u32 )> b = []( u32 value ) {};
+		EXPECT_FALSE( b.IsEmpty() );
 
+		Function<u32()> c = []() { return 0; };
+		EXPECT_FALSE( c.IsEmpty() );
 
-	Function<void()> a2 = []() {};
-	EXPECT_FALSE( a2.IsEmpty() );
+		Function<u32( u32 )> d = []( u32 value ) { return value; };
+		EXPECT_FALSE( d.IsEmpty() );
+	}
+	{
+		auto a = Function( []() {} );
+		EXPECT_FALSE( a.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( a )::Signature, void()> ) );
 
-	Function<void( u32 )> b2 = []( u32 value ) {};
-	EXPECT_FALSE( b2.IsEmpty() );
+		auto b = Function( []( u32 value ) {} );
+		EXPECT_FALSE( b.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( b )::Signature, void( u32 )> ) );
 
-	Function<u32()> c2 = []() { return 0; };
-	EXPECT_FALSE( c2.IsEmpty() );
+		auto c = Function( []() { return u32( 0 ); } );
+		EXPECT_FALSE( c.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( c )::Signature, u32()> ) );
 
-	Function<u32( bc::u32 )> d2 = []( u32 value ) { return value; };
-	EXPECT_FALSE( d2.IsEmpty() );
-
-	auto a3 = Function( []() {} );
-	EXPECT_FALSE( a3.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( a3 )::Signature, void()> ) );
-
-	auto b3 = Function( []( bc::u32 value ) {} );
-	EXPECT_FALSE( b3.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( b3 )::Signature, void( u32 )> ) );
-
-	auto c3 = Function( []() { return u32( 0 ); } );
-	EXPECT_FALSE( c3.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( c3 )::Signature, u32()> ) );
-
-	auto d3 = Function( []( bc::u32 value ) { return value; } );
-	EXPECT_FALSE( d3.IsEmpty() );
-	EXPECT_TRUE( ( std::is_same_v<decltype( d3 )::Signature, u32( u32 )> ) );
+		auto d = Function( []( u32 value ) { return value; } );
+		EXPECT_FALSE( d.IsEmpty() );
+		EXPECT_TRUE( ( std::is_same_v<decltype( d )::Signature, u32( u32 )> ) );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -876,26 +883,60 @@ TEST( FunctionContainer, NonTriviallyCopyableFunctor )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, FunctorConstructorCalls )
+TEST( FunctionContainer, FunctorConstructorAndOperatorCallCounts )
 {
 	using namespace bc;
+	struct Callable_ConstructorCallsDetection
 	{
-		struct Callable_ConstructorCallsDetection
-		{
-			i64 value = 0;
-			Callable_ConstructorCallsDetection() { ++value; };
-			Callable_ConstructorCallsDetection( const Callable_ConstructorCallsDetection & ) { value += 10; }
-			Callable_ConstructorCallsDetection( Callable_ConstructorCallsDetection && ) { value += 1000; };
-			Callable_ConstructorCallsDetection & operator=( const Callable_ConstructorCallsDetection & ) { value += 10000; return *this; }
-			Callable_ConstructorCallsDetection & operator=( Callable_ConstructorCallsDetection && ) { value += 100000; return *this; }
-			i64 operator()() { return value; }
-		};
+		i32 value = 0;
+		Callable_ConstructorCallsDetection() { value += 1; };
+		Callable_ConstructorCallsDetection( const Callable_ConstructorCallsDetection & other ) { value = other.value + 10; }
+		Callable_ConstructorCallsDetection( Callable_ConstructorCallsDetection && other ) { value = other.value + 100; };
+		Callable_ConstructorCallsDetection & operator=( const Callable_ConstructorCallsDetection & other ) { value = other.value + 1000; return *this; }
+		Callable_ConstructorCallsDetection & operator=( Callable_ConstructorCallsDetection && other ) { value = other.value + 10000; return *this; }
+		i32 operator()() { return value; }
+	};
 
-		Callable_ConstructorCallsDetection callable_constructor_calls_detection;
-		EXPECT_EQ( callable_constructor_calls_detection(), 1 );
+	{
+		Callable_ConstructorCallsDetection callable_constructor_calls_detection_std;
+		EXPECT_EQ( callable_constructor_calls_detection_std(), 1 );
 
-		auto a = Function( callable_constructor_calls_detection );
-		auto test = a();
+		// Functor should be move constructed.
+		auto std_a = Function( Callable_ConstructorCallsDetection() );
+		EXPECT_EQ( std_a(), 101 );
+
+		// Functor should be copy constructed.
+		auto std_b = Function( callable_constructor_calls_detection_std );
+		EXPECT_EQ( std_b(), 11 );
+
+		// Functor should be move constructed.
+		auto std_c = Function( std::move( callable_constructor_calls_detection_std ) );
+		EXPECT_EQ( std_c(), 101 );
+	}
+	{
+		auto std_a = Function( Callable_ConstructorCallsDetection() );
+		EXPECT_EQ( std_a(), 101 );
+
+		// Functor should not change its state when Function is move constructed.
+		auto std_b = Function( std::move( std_a ) );
+		EXPECT_EQ( std_b(), 101 );
+
+		// Functor should be copy constructed when Function is copy constructed.
+		auto std_c = Function( std_b );
+		EXPECT_EQ( std_c(), 111 );
+	}
+	{
+		// Functor should be copy constructed when Function is copied.
+		auto std_a1 = Function( Callable_ConstructorCallsDetection() ); // Constructed and moved, Add 101
+		auto std_a2 = Function( Callable_ConstructorCallsDetection() ); // Constructed and moved, Add 101
+		std_a2 = std_a1; // Copy constructed, Add 10
+		EXPECT_EQ( std_a2(), 111 );
+
+		// Functor should not change its state when Function is moved.
+		auto std_b1 = Function( Callable_ConstructorCallsDetection() ); // Add 101
+		auto std_b2 = Function( Callable_ConstructorCallsDetection() ); // Add 101
+		std_b2 = std::move( std_b1 ); // No change
+		EXPECT_EQ( std_b2(), 101 );
 	}
 }
 
@@ -913,23 +954,55 @@ TEST( FunctionContainer, ThrowDuringCall )
 TEST( FunctionContainer, ThrowDuringFunctorCopyConstruction )
 {
 	using namespace bc;
+
+	struct CopyThrow {};
+	struct MoveThrow {};
+
+	struct Callable_ThrowDuringFunctorCopyConstruction
 	{
-		struct Callable_ThrowDuringFunctorCopyConstruction
-		{
-			Callable_ThrowDuringFunctorCopyConstruction() = default;
-			Callable_ThrowDuringFunctorCopyConstruction( const Callable_ThrowDuringFunctorCopyConstruction & ) { throw int( 1 ); }
-			Callable_ThrowDuringFunctorCopyConstruction( Callable_ThrowDuringFunctorCopyConstruction && ) { throw float( 2.0f ); };
-			void operator()() {}
-		} callable_throw_during_functor_copy_construction;
-		static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyConstruction> );
+		Callable_ThrowDuringFunctorCopyConstruction() = default;
+		Callable_ThrowDuringFunctorCopyConstruction( const Callable_ThrowDuringFunctorCopyConstruction & ) { throw CopyThrow {}; }
+		Callable_ThrowDuringFunctorCopyConstruction( Callable_ThrowDuringFunctorCopyConstruction && ) {};
+		void operator()() {}
+	} callable_throw_during_functor_copy_construction;
+	static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyConstruction> );
 
-		auto a = Function( callable_throw_during_functor_copy_construction );
-		EXPECT_THROW( auto b = a, int );
-
-
-		// TEST:
-		auto std_a = std::function( callable_throw_during_functor_copy_construction );
-		EXPECT_THROW( auto std_b = std_a, int );
+	{
+		EXPECT_THROW( auto a = Function( callable_throw_during_functor_copy_construction ), CopyThrow );
+	}
+	{
+		auto a = Function<void()>();
+		EXPECT_THROW( a = Function( callable_throw_during_functor_copy_construction ), CopyThrow );
+	}
+	{
+		auto a = Function<void()>();
+		auto b = Function<void()>();
+		EXPECT_NO_THROW( a = b );
+	}
+	{
+		auto a = Function<void()>();
+		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		EXPECT_THROW( a = b, CopyThrow );
+	}
+	{
+		auto a = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		EXPECT_THROW( a = b, CopyThrow );
+	}
+	{
+		auto a = Function<void()>();
+		auto b = Function<void()>();
+		EXPECT_NO_THROW( a = std::move( b ) );
+	}
+	{
+		auto a = Function<void()>();
+		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		EXPECT_NO_THROW( a = std::move( b ) );
+	}
+	{
+		auto a = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		EXPECT_NO_THROW( a = std::move( b ) );
 	}
 }
 
@@ -937,22 +1010,32 @@ TEST( FunctionContainer, ThrowDuringFunctorCopyConstruction )
 TEST( FunctionContainer, ThrowDuringFunctorCopyAssignment )
 {
 	using namespace bc;
-	{
-		struct Callable_ThrowDuringFunctorCopyAssignment
-		{
-			Callable_ThrowDuringFunctorCopyAssignment() = default;
-			Callable_ThrowDuringFunctorCopyAssignment( const Callable_ThrowDuringFunctorCopyAssignment & ) = default;
-			Callable_ThrowDuringFunctorCopyAssignment( Callable_ThrowDuringFunctorCopyAssignment && ) = default;
-			Callable_ThrowDuringFunctorCopyAssignment & operator=( const Callable_ThrowDuringFunctorCopyAssignment & ) { throw 1; }
-			Callable_ThrowDuringFunctorCopyAssignment & operator=( Callable_ThrowDuringFunctorCopyAssignment && ) { throw 2; };
-			void operator()() {}
-		} callable_throw_during_functor_copy_assignment;
-		static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyAssignment> );
 
+	struct CopyThrow {};
+	struct MoveThrow {};
+
+	struct Callable_ThrowDuringFunctorCopyAssignment
+	{
+		Callable_ThrowDuringFunctorCopyAssignment() = default;
+		Callable_ThrowDuringFunctorCopyAssignment( const Callable_ThrowDuringFunctorCopyAssignment & ) = default;
+		Callable_ThrowDuringFunctorCopyAssignment( Callable_ThrowDuringFunctorCopyAssignment && ) = default;
+		Callable_ThrowDuringFunctorCopyAssignment & operator=( const Callable_ThrowDuringFunctorCopyAssignment & ) { throw CopyThrow {}; }
+		Callable_ThrowDuringFunctorCopyAssignment & operator=( Callable_ThrowDuringFunctorCopyAssignment && ) { throw MoveThrow {}; };
+		void operator()() {}
+	} callable_throw_during_functor_copy_assignment;
+	static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyAssignment> );
+
+	{
 		auto a = Function( callable_throw_during_functor_copy_assignment );
 		auto b = Function<decltype( a )::Signature>();
 		// No copy or move operator should be called for a functor.
 		EXPECT_NO_THROW( b = a );
+	}
+	{
+		auto a = Function( callable_throw_during_functor_copy_assignment );
+		auto b = Function<decltype( a )::Signature>();
+		// No copy or move operator should be called for a functor.
+		EXPECT_NO_THROW( b = std::move( a ) );
 	}
 }
 

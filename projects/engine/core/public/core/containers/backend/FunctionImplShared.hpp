@@ -13,153 +13,193 @@ namespace container {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template <
-	typename InvokerType,
-	typename FunctorType
+template<
+	typename FunctorType,
+	typename FunctionLocalStorageType
 >
-void																ConstructInvokerFromCallable(
-	InvokerType													*	invoker,
-	FunctorType													&&	callable
+FunctorType														*	AllocateFunctor(
+	bool															is_stored_locally,
+	FunctionLocalStorageType									&	storage
 )
 {
-	assert( invoker != nullptr && "Invoker pointer must not be null." );
-	::new( invoker ) InvokerType( std::forward<FunctorType>( callable ) );
+	if( is_stored_locally )
+	{
+		assert( sizeof( FunctorType ) <= sizeof( FunctionLocalStorageType ) && "Functor type is too big." );
+		assert( alignof( FunctorType ) <= alignof( FunctionLocalStorageType ) && "Functor alignment does not fit in storage." );
+		return reinterpret_cast<FunctorType*>( storage.raw );
+	}
+	else
+	{
+		storage.heap_functor = malloc( sizeof( FunctorType ) );
+		return static_cast<FunctorType*>( storage.heap_functor );
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template <
-	typename InvokerType
+template<
+	typename FunctionLocalStorageType
 >
-void																ConstructInvokerFromInvoker(
-	InvokerType													*	invoker,
-	InvokerType													*	source
+void																FreeFunctor(
+	bool															is_stored_locally,
+	FunctionLocalStorageType									&	storage
 )
 {
-	assert( invoker != nullptr && "Invoker pointer must not be null." );
-	assert( source != nullptr && "Source invoker pointer must not be null." );
-	::new( invoker ) InvokerType( std::forward<InvokerType>( *source ) );
+	if( is_stored_locally ) return;
+
+	free( storage.heap_functor );
+
+	#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+	memset( &storage, 0, sizeof( FunctionLocalStorageType ) );
+	#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename InvokerType>
-void																DestructInvoker(
-	InvokerType													*	invoker
+template<
+	typename FunctorType,
+	typename FunctionLocalStorageType
+>
+const FunctorType												*	GetFunctorPointer(
+	bool															is_stored_locally,
+	const FunctionLocalStorageType								&	storage
 )
 {
-	assert( invoker != nullptr && "Invoker pointer must not be null." );
-	invoker->~InvokerBase();
+	if( is_stored_locally ) return reinterpret_cast<const FunctorType*>( storage.raw );
+	return static_cast<const FunctorType*>( storage.heap_functor );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	typename FunctorType,
+	typename FunctionLocalStorageType
+>
+FunctorType														*	GetFunctorPointer(
+	bool															is_stored_locally,
+	FunctionLocalStorageType									&	storage
+)
+{
+	if( is_stored_locally ) return reinterpret_cast<FunctorType*>( storage.raw );
+	return static_cast<FunctorType*>( storage.heap_functor );
 }
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	typename InvokerType,
 	typename FunctorType,
 	typename FunctionLocalStorageType
 >
-consteval bool IsInvokerStoredLocally()
+consteval bool IsFunctorStoredLocally()
 {
 	constexpr auto StorageSize = sizeof( FunctionLocalStorageType );
 	constexpr auto StorageAlignment = alignof( FunctionLocalStorageType );
 	return
 		std::is_trivially_copyable_v<FunctorType> &&
-		sizeof( InvokerType ) <= StorageSize &&
-		alignof( InvokerType ) <= StorageAlignment &&
-		( StorageAlignment % alignof( InvokerType ) == 0 );
+		sizeof( FunctorType ) <= StorageSize &&
+		alignof( FunctorType ) <= StorageAlignment &&
+		( StorageAlignment % alignof( FunctorType ) == 0 );
 }
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Abstract base class for callable objects
-template<
-	typename ReturnType,
-	typename ...ParameterTypes
->
-class InvokerBase
-{
-public:
-	virtual ~InvokerBase() = default;
-	virtual memory::MemoryBlockInfo GetMemoryBlockInfo() const = 0;
-	virtual ReturnType Invoke( ParameterTypes... args ) const = 0;
-	virtual void CloneInto( InvokerBase * destination ) = 0;
-};
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Template derived class for specific callable objects
 template<
 	typename FunctionLocalStorageType,
-	typename FunctorType,
 	typename ReturnType,
 	typename ...ParameterTypes
 >
-class ObjectInvoker : public InvokerBase<ReturnType, ParameterTypes...>
+class FunctorManagerBase
 {
-	using MyInvokerBase = InvokerBase<ReturnType, ParameterTypes...>;
-
 public:
 
-	using Signature = ReturnType(ParameterTypes...);
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual ~FunctorManagerBase() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<typename FunctorTypeIn>
-	ObjectInvoker(
-		FunctorTypeIn														&&	f
-	) :
-		functor( std::forward<FunctorTypeIn>( f ) )
-	{}
+	virtual ReturnType Invoke( 
+		bool									is_stored_locally,
+		FunctionLocalStorageType			&	storage,
+		ParameterTypes...						args
+	) = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ObjectInvoker(
-		const ObjectInvoker													&	other
-	) = default;
+	virtual void								Clone(
+		bool									is_stored_locally,
+		FunctorManagerBase					&	destination_manager,
+		FunctionLocalStorageType			&	destination,
+		FunctionLocalStorageType			&	source
+	) const = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~ObjectInvoker() = default;
+	virtual void								DestructFunctor(
+		bool									is_stored_locally,
+		FunctionLocalStorageType			&	storage
+	) = 0;
+};
 
-	virtual memory::MemoryBlockInfo GetMemoryBlockInfo() const override
-	{
-		return memory::MemoryBlockInfo{
-			.size		= sizeof( decltype( *this ) ),
-			.alignment	= alignof( decltype( *this ) )
-		};
-	}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	typename FunctorType,
+	typename FunctionLocalStorageType,
+	typename ReturnType,
+	typename ...ParameterTypes
+>
+class FunctorManager : public FunctorManagerBase<FunctionLocalStorageType, ReturnType, ParameterTypes...>
+{
+public:
+
+	using MyFunctorManagerBase = FunctorManagerBase<FunctionLocalStorageType, ReturnType, ParameterTypes...>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ReturnType Invoke(
-		ParameterTypes...														args
-	) const override
-	{
-		return functor( std::forward<ParameterTypes>( args )... );
-	}
+	FunctorManager() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																		CloneInto(
-		MyInvokerBase														*	destination
+	virtual ReturnType							Invoke(
+		bool									is_stored_locally,
+		FunctionLocalStorageType			&	storage,
+		ParameterTypes...						args
 	) override
 	{
-		ConstructInvokerFromInvoker( static_cast<ObjectInvoker*>( destination ), this );
+		auto functor_pointer = GetFunctorPointer<FunctorType, FunctionLocalStorageType>( is_stored_locally, storage );
+		return ( *functor_pointer )( std::forward<ParameterTypes>( args )... );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	FunctorType																	functor;
+	virtual void								Clone(
+		bool									is_stored_locally,
+		MyFunctorManagerBase				&	destination_manager,
+		FunctionLocalStorageType			&	destination,
+		FunctionLocalStorageType			&	source
+	) const override
+	{
+		// Allocate space for the functor in destination storage.
+		auto functor_pointer = ::bc::internal_::container::AllocateFunctor<FunctorType, FunctionLocalStorageType>(
+			is_stored_locally,
+			destination
+		);
+
+		// Copy the functor from source to destination by invoking the copy constructor.
+		::new( functor_pointer ) FunctorType( *GetFunctorPointer<FunctorType, FunctionLocalStorageType>( is_stored_locally, source ) );
+
+		::new( &destination_manager ) FunctorManager();
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual void								DestructFunctor(
+		bool									is_stored_locally,
+		FunctionLocalStorageType			&	storage
+	) override
+	{
+		auto functor_pointer = GetFunctorPointer<FunctorType, FunctionLocalStorageType>( is_stored_locally, storage );
+		functor_pointer->~FunctorType();
+	}
 };
 
 
 
 #if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 namespace tests {
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check if text containers fulfill size requirements.
-static_assert( sizeof( InvokerBase<void> ) == 8 );
-static_assert( sizeof( InvokerBase<void, int> ) == 8 );
-static_assert( sizeof( InvokerBase<void, int, int> ) == 8 );
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
