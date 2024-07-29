@@ -90,6 +90,19 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructor to move data from another UniquePtr which contains an inherited type.
+	///
+	/// This allows the use of UniquePtr as a base class and directly move another UniquePtr to it with inherited type.
+	///
+	/// @tparam OtherValueType
+	/// Type of the data in the other UniquePtr.
+	///
+	/// @param other
+	/// The other container.
+	///
+	/// @return
+	/// Reference to this.
 	template<typename OtherValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )(
 		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
@@ -131,6 +144,19 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Operator to move data from another UniquePtr which contains an inherited type.
+	///
+	/// This allows the use of UniquePtr as a base class and directly move another UniquePtr to it with inherited type.
+	///
+	/// @tparam OtherValueType
+	/// Type of the data in the other UniquePtr.
+	///
+	/// @param other
+	/// The other container.
+	///
+	/// @return
+	/// Reference to this.
 	template<typename OtherValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
 		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
