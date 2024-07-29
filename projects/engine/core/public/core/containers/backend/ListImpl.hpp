@@ -441,6 +441,8 @@ public:
 		BC_CONTAINER_NAME( List )																	&&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
+		if( std::addressof( other ) == this ) return *this;
+
 		this->Swap( other );
 		return *this;
 	}
