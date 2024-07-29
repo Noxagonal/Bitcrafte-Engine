@@ -86,7 +86,7 @@ public:
 		BC_CONTAINER_NAME( UniquePtr )																&&	other
 	) noexcept
 	{
-		this->SwapOther( std::move( other ) );
+		this->Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,8 @@ public:
 	) noexcept
 	{
 		if( this == std::addressof( other ) ) return *this;
-		this->SwapOther( std::move( other ) );
+
+		this->Swap( other );
 		return *this;
 	}
 
@@ -283,8 +284,8 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																								SwapOther(
-		BC_CONTAINER_NAME( UniquePtr )																&&	other
+	void																								Swap(
+		BC_CONTAINER_NAME( UniquePtr )																&	other
 	) noexcept
 	{
 		std::swap( this->data_ptr, other.data_ptr );
