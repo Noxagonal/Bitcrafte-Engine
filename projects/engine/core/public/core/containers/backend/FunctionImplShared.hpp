@@ -128,7 +128,7 @@ public:
 		bool									is_stored_locally,
 		FunctorManagerBase					&	destination_manager,
 		FunctionLocalStorageType			&	destination,
-		FunctionLocalStorageType			&	source
+		const FunctionLocalStorageType		&	source
 	) const = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ public:
 		bool									is_stored_locally,
 		MyFunctorManagerBase				&	destination_manager,
 		FunctionLocalStorageType			&	destination,
-		FunctionLocalStorageType			&	source
+		const FunctionLocalStorageType		&	source
 	) const override
 	{
 		// Allocate space for the functor in destination storage.

@@ -99,7 +99,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	BC_CONTAINER_NAME( Function )(
-		BC_CONTAINER_NAME( Function )								&	other
+		const BC_CONTAINER_NAME( Function )							&	other
 	)
 	{
 		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
@@ -160,7 +160,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	BC_CONTAINER_NAME( Function )									&	operator=(
-		BC_CONTAINER_NAME( Function )								&	other
+		const BC_CONTAINER_NAME( Function )							&	other
 	)
 	{
 		if( std::addressof( other ) != this )
@@ -273,7 +273,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void																Copy(
-		BC_CONTAINER_NAME( Function )								&	other
+		const BC_CONTAINER_NAME( Function )							&	other
 	)
 	{
 		assert( this->type == Type::NONE && "Function already initialized." );
@@ -286,7 +286,7 @@ private:
 		if( other.type == Type::INVOKEABLE_OBJECT )
 		{
 			auto my_manager = reinterpret_cast<MyFunctorManagerBase*>( &this->functor_manager );
-			auto other_manager = reinterpret_cast<MyFunctorManagerBase*>( &other.functor_manager );
+			auto other_manager = reinterpret_cast<const MyFunctorManagerBase*>( &other.functor_manager );
 			other_manager->Clone( other.is_stored_locally, *my_manager, this->storage, other.storage );
 		}
 		else
@@ -372,6 +372,15 @@ namespace tests {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if function container fulfills size requirements.
 static_assert( sizeof( BC_CONTAINER_NAME( Function )<void()> ) == 32 );
+
+// Check that the function satisfies basic copy and move constraints.
+static_assert( std::is_copy_constructible_v<BC_CONTAINER_NAME( Function )<void()>> );
+static_assert( std::is_move_constructible_v<BC_CONTAINER_NAME( Function )<void()>> );
+static_assert( std::is_nothrow_move_constructible_v<BC_CONTAINER_NAME( Function )<void()>> );
+
+static_assert( std::is_copy_assignable_v<BC_CONTAINER_NAME( Function )<void()>> );
+static_assert( std::is_move_assignable_v<BC_CONTAINER_NAME( Function )<void()>> );
+static_assert( std::is_nothrow_move_assignable_v<BC_CONTAINER_NAME( Function )<void()>> );
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
