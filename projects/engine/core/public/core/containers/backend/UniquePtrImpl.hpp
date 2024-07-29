@@ -133,7 +133,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )												&	operator=(
+	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
 		BC_CONTAINER_NAME( UniquePtr )																&&	other
 	) noexcept
 	{
@@ -163,6 +163,7 @@ public:
 	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
 	{
 		this->Clear();
+
 		this->data_ptr = other.data_ptr;
 		other.data_ptr = nullptr;
 		return *this;
@@ -262,12 +263,12 @@ public:
 
 		if constexpr( std::is_base_of_v<CastToValueType, ValueType> )
 		{
-			// No cast or upcast
+			// No cast or upcast.
 			return BC_CONTAINER_NAME( UniquePtr )( std::move( *this ) );
 		}
 		else if constexpr( std::is_base_of_v<ValueType, CastToValueType> )
 		{
-			// Downcast
+			// Downcast.
 			auto casted_ptr = dynamic_cast<CastToValueType*>( this->data_ptr );
 			BC_ContainerAssert( casted_ptr, U"Failed to downcast" );
 			if( casted_ptr == nullptr ) return {};
