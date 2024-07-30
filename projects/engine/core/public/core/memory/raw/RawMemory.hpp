@@ -20,8 +20,8 @@ namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Used to store allocation information in front of the raw pointer given to user.
-struct alignas( 64 ) SystemMemoryAllocationInfo
+/// Used to store allocation information in front of the pointer given to user.
+struct alignas( 64 ) MemoryAllocationHeader
 {
 	void					*	system_allocated_location		= nullptr;
 	void					*	payload_location				= nullptr;
@@ -34,33 +34,33 @@ struct alignas( 64 ) SystemMemoryAllocationInfo
 
 	u64							checksum						= 0;
 };
-static_assert( sizeof( SystemMemoryAllocationInfo ) == 64 );
-static_assert( alignof( SystemMemoryAllocationInfo ) == 64 );
+static_assert( sizeof( MemoryAllocationHeader ) == 64 );
+static_assert( alignof( MemoryAllocationHeader ) == 64 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Calculates the checksum specifically for the SystemMemoryAllocationInfo
+/// Calculates the checksum specifically for the MemoryAllocationHeader
 ///
 /// @note
-/// The last field of SystemMemoryAllocationInfo is a checksum, it is always ignored by this function.
+/// The last field of MemoryAllocationHeader is a checksum, it is always ignored by this function.
 ///
-/// @param allocation_info
-/// Allocation info we want to calculate the checksum for. The last field of the SystemMemoryAllocationInfo is a checksum and is
+/// @param allocation_header
+/// Allocation info we want to calculate the checksum for. The last field of the MemoryAllocationHeader is a checksum and is
 /// ignored.
 ///
 /// @return
-/// Checksum for SystemMemoryAllocationInfo.
-inline u64												CalculateSystemMemoryAllocationInfoInfoChecksum(
-	const SystemMemoryAllocationInfo				&	allocation_info
+/// Checksum for MemoryAllocationHeader.
+inline u64												CalculateMemoryAllocationHeaderChecksum(
+	const MemoryAllocationHeader					&	allocation_header
 )
 {
 	#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 	// Checksum calculation is disabled for shipping builds, errors should have been caught in development builds.
 
-	auto bytes = reinterpret_cast<const u8*>( &allocation_info );
-	auto size = sizeof( SystemMemoryAllocationInfo ) - sizeof( u64 );
+	auto bytes = reinterpret_cast<const u8*>( &allocation_header );
+	auto size = sizeof( MemoryAllocationHeader ) - sizeof( u64 );
 	u64 checksum = 0xDEADBEEFDEADBEEF;
 	for( u64 i = 0; i < size; ++i )
 	{
@@ -125,15 +125,15 @@ inline void											*	AlignMemoryToRequirement(
 /// Alignment requirement for the payload.
 ///
 /// @return
-/// Required allocation size that has enough space for both SystemMemoryAllocationInfo and the payload at its correct alignment
+/// Required allocation size that has enough space for both MemoryAllocationHeader and the payload at its correct alignment
 /// requirement.
 inline u64												CalculateMinimumRequiredSystemMemoryAllocationSize(
 	u64													payload_size,
 	u64													payload_alignment_requirement
 )
 {
-	if( payload_alignment_requirement < alignof( SystemMemoryAllocationInfo ) ) payload_alignment_requirement = alignof( SystemMemoryAllocationInfo );
-	auto minimum_allocation_size = payload_size + payload_alignment_requirement + sizeof( SystemMemoryAllocationInfo );
+	if( payload_alignment_requirement < alignof( MemoryAllocationHeader ) ) payload_alignment_requirement = alignof( MemoryAllocationHeader );
+	auto minimum_allocation_size = payload_size + payload_alignment_requirement + sizeof( MemoryAllocationHeader );
 
 	assert( minimum_allocation_size > payload_size && "Allocation size was smaller than payload size, this should never happen" );
 
@@ -144,7 +144,7 @@ inline u64												CalculateMinimumRequiredSystemMemoryAllocationSize(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// This calculates the SystemMemoryAllocationInfo from an already allocated system allocation.
+/// This creates the MemoryAllocationHeader from an already allocated system allocation.
 ///
 /// @warning
 /// This is an internal_ function used when allocating a new memory block from system, please do not use.
@@ -163,7 +163,7 @@ inline u64												CalculateMinimumRequiredSystemMemoryAllocationSize(
 ///
 /// @return
 /// New allocation info that can be used to store memory allocation info in front of the pointer given to user.
-inline SystemMemoryAllocationInfo						CalculateSystemMemoryAllocationInfoFromSystemAllocation(
+inline MemoryAllocationHeader							CreateMemoryAllocationHeader(
 	void											*	system_allocated_location,
 	u64													system_allocated_size,
 	u64													payload_size,
@@ -184,29 +184,29 @@ inline SystemMemoryAllocationInfo						CalculateSystemMemoryAllocationInfoFromSy
 	BHardAssert( payload_alignment_requirement <= 0x8000, U"Calculate system memory allocation info from system allocation, payload alignment must be smaller or equal to 32kb" );
 	BHardAssert( is_payload_alignment_requirement_power_of_2, U"Cannot calculate system memory allocation info from system allocation, alignment must be power of 2" );
 
-	auto allocation_info							= SystemMemoryAllocationInfo {};
-	allocation_info.system_allocated_location		= system_allocated_location;
-	allocation_info.payload_location				= AlignMemoryToRequirement(
-		reinterpret_cast<u8*>( system_allocated_location ) + sizeof( SystemMemoryAllocationInfo ),
-		std::max( payload_alignment_requirement, alignof( SystemMemoryAllocationInfo ) )
+	auto allocation_header							= MemoryAllocationHeader {};
+	allocation_header.system_allocated_location		= system_allocated_location;
+	allocation_header.payload_location				= AlignMemoryToRequirement(
+		reinterpret_cast<u8*>( system_allocated_location ) + sizeof( MemoryAllocationHeader ),
+		std::max( payload_alignment_requirement, alignof( MemoryAllocationHeader ) )
 	);
-	allocation_info.system_allocation_size			= system_allocated_size;
-	allocation_info.payload_size					= payload_size;
-	allocation_info.payload_alignment_requirement	= payload_alignment_requirement;
+	allocation_header.system_allocation_size		= system_allocated_size;
+	allocation_header.payload_size					= payload_size;
+	allocation_header.payload_alignment_requirement	= payload_alignment_requirement;
 
-	allocation_info.checksum						= CalculateSystemMemoryAllocationInfoInfoChecksum(
-		allocation_info
+	allocation_header.checksum						= CalculateMemoryAllocationHeaderChecksum(
+		allocation_header
 	);
 
-	auto system_allocated_ptr_memory_position = reinterpret_cast<uintptr_t>( allocation_info.system_allocated_location );
+	auto system_allocated_ptr_memory_position = reinterpret_cast<uintptr_t>( allocation_header.system_allocated_location );
 	auto system_allocated_ptr_memory_position_end = system_allocated_ptr_memory_position + system_allocated_size;
-	auto payload_ptr_memory_position = reinterpret_cast<uintptr_t>( allocation_info.payload_location );
+	auto payload_ptr_memory_position = reinterpret_cast<uintptr_t>( allocation_header.payload_location );
 
 	assert( payload_ptr_memory_position >= system_allocated_ptr_memory_position && "Payload pointer was smaller than system allocated" );
 	assert( !( payload_ptr_memory_position % payload_alignment_requirement ) && "Payload pointer not aligned properly" );
 	assert( payload_ptr_memory_position + payload_size <= system_allocated_ptr_memory_position_end && "Payload does not fit into allocated memory" );
 
-	return allocation_info;
+	return allocation_header;
 }
 
 
@@ -215,89 +215,78 @@ inline SystemMemoryAllocationInfo						CalculateSystemMemoryAllocationInfoFromSy
 /// @brief
 /// Sets the system memory allocation info in front of user returned pointer.
 ///
-/// @param allocation_info
+/// @param allocation_header
 /// Allocation info. This contains everything needed to set itself at the proper location.
-inline void												SetSystemMemoryAllocationInfo(
-	SystemMemoryAllocationInfo						&	allocation_info
+inline void												SetMemoryAllocationHeader(
+	MemoryAllocationHeader							&	allocation_header
 )
 {
-	auto allocation_info_position = reinterpret_cast<uintptr_t>( allocation_info.payload_location ) - sizeof( SystemMemoryAllocationInfo );
-	assert( !( allocation_info_position % alignof( SystemMemoryAllocationInfo ) ) && "Allocation info must be aligned to alignof( SystemMemoryAllocationInfo )");
-	auto allocation_info_ptr = reinterpret_cast<SystemMemoryAllocationInfo*>( allocation_info_position );
-	*allocation_info_ptr = allocation_info;
+	auto allocation_header_position = reinterpret_cast<uintptr_t>( allocation_header.payload_location ) - sizeof( MemoryAllocationHeader );
+	assert( !( allocation_header_position % alignof( MemoryAllocationHeader ) ) && "Allocation info must be aligned to alignof( MemoryAllocationHeader )");
+	auto allocation_header_ptr = reinterpret_cast<MemoryAllocationHeader*>( allocation_header_position );
+	*allocation_header_ptr = allocation_header;
 }
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Used to get the SystemMemoryAllocationInfo residing in front of the raw memory given to user.
+/// Used to get the MemoryAllocationHeader residing in front of the memory pointer given to user.
 ///
-/// @param raw_location
+/// @param user_location
 /// Pointer given to user.
 ///
 /// @return
 /// Pointer to allocation info on success, nullptr if something went wrong.
-inline const SystemMemoryAllocationInfo				*	GetSystemMemoryAllocationInfoFromRawPointer(
-	const void										*	raw_location
+inline const MemoryAllocationHeader					*	GetMemoryAllocationHeaderFromUserPointer(
+	const void										*	user_location
 )
 {
-	if( raw_location == nullptr ) return nullptr; // raw_location was nullptr, return.
+	if( user_location == nullptr ) return nullptr; // user_location was nullptr, return.
 
-	auto raw_ptr_position = reinterpret_cast<uintptr_t>( raw_location );
-	if( raw_ptr_position % alignof( SystemMemoryAllocationInfo ) ) return nullptr; // raw_location isn't aligned to SystemMemoryAllocationInfo, which is the minimum, return.
+	auto user_ptr_position = reinterpret_cast<uintptr_t>( user_location );
+	if( user_ptr_position % alignof( MemoryAllocationHeader ) ) return nullptr; // user_location isn't aligned to MemoryAllocationHeader, which is the minimum, return.
 
-	auto raw_location_bytes = reinterpret_cast<const u8*>( raw_location );
+	auto user_location_bytes = reinterpret_cast<const u8*>( user_location );
 
-	auto allocation_info = reinterpret_cast<const SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
+	auto allocation_header = reinterpret_cast<const MemoryAllocationHeader*>( user_location_bytes - sizeof( MemoryAllocationHeader ) );
 
 	#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
-	auto allocation_info_checksum = CalculateSystemMemoryAllocationInfoInfoChecksum( *allocation_info );
-	if( allocation_info->checksum != allocation_info_checksum ) return nullptr; // Checksum mismatch, this is not a runtime allocated memory block.
+	auto allocation_header_checksum = CalculateMemoryAllocationHeaderChecksum( *allocation_header );
+	if( allocation_header->checksum != allocation_header_checksum ) return nullptr; // Checksum mismatch, this is not a runtime allocated memory block.
 	#endif
 
-	return allocation_info;
+	return allocation_header;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Used to get the SystemMemoryAllocationInfo residing in front of the raw memory given to user.
+/// Used to get the MemoryAllocationHeader residing in front of the memory pointer given to user.
 ///
-/// @param raw_location
+/// @param user_location
 /// Pointer given to user.
 ///
 /// @return
 /// Pointer to allocation info on success, nullptr if something went wrong.
-inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPointer(
-	void											*	raw_location
+inline MemoryAllocationHeader						*	GetMemoryAllocationHeaderFromUserPointer(
+	void											*	user_location
 )
 {
-	if( raw_location == nullptr )
-	{
-		return nullptr;
-	}
+	if( user_location == nullptr ) return nullptr; // user_location was nullptr, return.
 
-	auto raw_ptr_position = reinterpret_cast<uintptr_t>( raw_location );
-	if( raw_ptr_position % alignof( SystemMemoryAllocationInfo ) )
-	{
-		// raw_location isn't aligned to SystemMemoryAllocationInfo, which is the minimum, return.
-		return nullptr;
-	}
+	auto user_ptr_position = reinterpret_cast<uintptr_t>( user_location );
+	if( user_ptr_position % alignof( MemoryAllocationHeader ) ) return nullptr; // user_location isn't aligned to MemoryAllocationHeader, which is the minimum, return.
 
-	auto raw_location_bytes = reinterpret_cast<u8*>( raw_location );
+	auto user_location_bytes = reinterpret_cast<u8*>( user_location );
 
-	auto allocation_info = reinterpret_cast<SystemMemoryAllocationInfo*>( raw_location_bytes - sizeof( SystemMemoryAllocationInfo ) );
+	auto allocation_header = reinterpret_cast<MemoryAllocationHeader*>( user_location_bytes - sizeof( MemoryAllocationHeader ) );
 
 	#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
-	auto allocation_info_checksum = CalculateSystemMemoryAllocationInfoInfoChecksum( *allocation_info );
-	if( allocation_info->checksum != allocation_info_checksum )
-	{
-		// Checksum mismatch, this is not a runtime allocated memory block.
-		return nullptr;
-	}
+	auto allocation_header_checksum = CalculateMemoryAllocationHeaderChecksum( *allocation_header );
+	if( allocation_header->checksum != allocation_header_checksum ) return nullptr; // Checksum mismatch, this is not a runtime allocated memory block.
 	#endif
 
-	return allocation_info;
+	return allocation_header;
 }
 
 
@@ -306,26 +295,26 @@ inline SystemMemoryAllocationInfo					*	GetSystemMemoryAllocationInfoFromRawPoin
 /// @brief
 /// Calculates the unused but allocated space for the payload in an allocation.
 ///
-/// @param allocation_info
+/// @param allocation_header
 /// Allocation info to existing memory allocation.
 ///
 /// @return
 /// Unused space left after the payload.
 inline u64												CalculateUnusedPayloadSpaceInAllocation(
-	const SystemMemoryAllocationInfo				&	allocation_info
+	const MemoryAllocationHeader					&	allocation_header
 )
 {
 	BHardAssert(
-		allocation_info.payload_location > allocation_info.system_allocated_location,
+		allocation_header.payload_location > allocation_header.system_allocated_location,
 		U"Cannot calculate unused space in allocation, payload location was before system allocation location"
 	);
 
-	auto payload_offset_to_system_ptr = reinterpret_cast<u64>( allocation_info.payload_location ) - reinterpret_cast<u64>( allocation_info.system_allocated_location );
+	auto payload_offset_to_system_ptr = reinterpret_cast<u64>( allocation_header.payload_location ) - reinterpret_cast<u64>( allocation_header.system_allocated_location );
 	BHardAssert(
-		allocation_info.system_allocation_size >= payload_offset_to_system_ptr + allocation_info.payload_size,
+		allocation_header.system_allocation_size >= payload_offset_to_system_ptr + allocation_header.payload_size,
 		U"Cannot calculate unused space in allocation, apparent system allocation size was smaller than actual space required by the payload"
 	);
-	return allocation_info.system_allocation_size - payload_offset_to_system_ptr - allocation_info.payload_size;
+	return allocation_header.system_allocation_size - payload_offset_to_system_ptr - allocation_header.payload_size;
 }
 
 
@@ -334,7 +323,7 @@ inline u64												CalculateUnusedPayloadSpaceInAllocation(
 /// @brief
 /// Checks if allocation is in-place re-allocate-able, meaning it can be reused.
 ///
-/// @param allocation_info
+/// @param allocation_header
 /// Allocation info describing the allocated memory.
 ///
 /// @param new_size
@@ -343,12 +332,12 @@ inline u64												CalculateUnusedPayloadSpaceInAllocation(
 /// @return
 /// True if allocation can accomodate the new size, false if new size does not fit into already allocated memory.
 inline bool												IsInPlaceReallocateable_Runtime(
-	const SystemMemoryAllocationInfo				&	allocation_info,
+	const MemoryAllocationHeader					&	allocation_header,
 	u64													new_size
 )
 {
-	auto allocation_remaining_payload_size = CalculateUnusedPayloadSpaceInAllocation( allocation_info );
-	return allocation_info.payload_size + allocation_remaining_payload_size >= new_size;
+	auto allocation_remaining_payload_size = CalculateUnusedPayloadSpaceInAllocation( allocation_header );
+	return allocation_header.payload_size + allocation_remaining_payload_size >= new_size;
 }
 
 
@@ -360,7 +349,7 @@ inline bool												IsInPlaceReallocateable_Runtime(
 /// @warning
 /// Current system memory allocation must have enough space to accommodate the new payload size.
 ///
-/// @param allocation_info
+/// @param allocation_header
 /// Allocation info struct describing the allocation.
 ///
 /// @param new_size
@@ -369,25 +358,25 @@ inline bool												IsInPlaceReallocateable_Runtime(
 /// @return
 /// Pointer to payload start, this is the same as original payload pointer.
 inline void											*	InPlaceReallocateMemory_Runtime(
-	SystemMemoryAllocationInfo						&	allocation_info,
+	MemoryAllocationHeader							&	allocation_header,
 	u64													new_size
 )
 {
-	assert( IsInPlaceReallocateable_Runtime( allocation_info, new_size ) && "Not in place reallocateable, size too large" );
+	BHardAssert( IsInPlaceReallocateable_Runtime( allocation_header, new_size ), U"Not in place reallocateable, size too large" );
 
 	// Reallocation fits inside the old memory pointer, we can just reuse it.
-	auto new_allocation_info = CalculateSystemMemoryAllocationInfoFromSystemAllocation(
-		allocation_info.system_allocated_location,
-		allocation_info.system_allocation_size,
+	auto new_allocation_header = CreateMemoryAllocationHeader(
+		allocation_header.system_allocated_location,
+		allocation_header.system_allocation_size,
 		new_size,
-		allocation_info.payload_alignment_requirement
+		allocation_header.payload_alignment_requirement
 	);
-	SetSystemMemoryAllocationInfo( new_allocation_info );
+	SetMemoryAllocationHeader( new_allocation_header );
 	assert(
-		allocation_info.payload_location == new_allocation_info.payload_location &&
+		allocation_header.payload_location == new_allocation_header.payload_location &&
 		"Expected old payload location to match new payload location."
 	);
-	return new_allocation_info.payload_location;
+	return new_allocation_header.payload_location;
 }
 
 
@@ -702,8 +691,8 @@ constexpr bool					IsInPlaceReallocateable(
 	}
 	else
 	{
-		auto allocation_info = internal_::GetSystemMemoryAllocationInfoFromRawPointer( location );
-		return internal_::IsInPlaceReallocateable_Runtime( *allocation_info, new_count * sizeof( ValueType ) );
+		auto allocation_header = internal_::GetMemoryAllocationHeaderFromUserPointer( location );
+		return internal_::IsInPlaceReallocateable_Runtime( *allocation_header, new_count * sizeof( ValueType ) );
 	}
 }
 
@@ -745,15 +734,15 @@ constexpr ValueType				*	InPlaceReallocateMemory(
 	}
 	else
 	{
-		auto allocation_info = internal_::GetSystemMemoryAllocationInfoFromRawPointer( old_location );
+		auto allocation_header = internal_::GetMemoryAllocationHeaderFromUserPointer( old_location );
 
-		BHardAssert( allocation_info, U"Could not in-place reallocate memory, allocation header not found. This was not allocated using engine utilities or pointer did not point to the beginning of the allocated block." );
+		BHardAssert( allocation_header, U"Could not in-place reallocate memory, allocation header not found. This was not allocated using engine utilities or pointer did not point to the beginning of the allocated block." );
 		BHardAssert(
-			allocation_info->payload_size != new_count * sizeof( ValueType ),
+			allocation_header->payload_size != new_count * sizeof( ValueType ),
 			U"Could not in-place reallocate memory, new reserved element count is the same as the old element count, this check should be done earlier"
 		);
 
-		return reinterpret_cast<ValueType*>( internal_::InPlaceReallocateMemory_Runtime( *allocation_info, new_count * sizeof( ValueType ) ) );
+		return reinterpret_cast<ValueType*>( internal_::InPlaceReallocateMemory_Runtime( *allocation_header, new_count * sizeof( ValueType ) ) );
 	}
 }
 
