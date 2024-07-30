@@ -17,7 +17,7 @@ namespace utility {
 /// @brief
 /// Helper class to represent a list of types.
 ///
-/// This class is useful when dealing with template parameter packs.
+/// This class is useful when you need to store a list of types and query information about them.
 ///
 /// @tparam ...TypePack
 /// Template parameter pack of types that the TypeList represents.
@@ -32,10 +32,11 @@ public:
 	///
 	/// Usage example:
 	/// @code
+	/// using TypeListSample = TypeList<int, float, double>;
+	///
 	/// template<typename... ArgumentsPack>
 	/// class ClassTemplateSample {};
-	/// 
-	/// using TypeListSample = TypeList<int, float, double>;
+	///
 	/// using PopulatedClassTemplateSample = TypeListSample::ApplyTo<ClassTemplateSample>;
 	/// // PopulatedClassTemplateSample will be equivalent to ClassTemplateSample<int, float, double>
 	/// @endcode
@@ -55,7 +56,9 @@ public:
 	/// Usage example:
 	/// @code
 	/// using TypeListSample = TypeList<int, float, double>;
-	/// using Type = TypeListSample::template IndexToType<0>;
+	/// using Type_0 = TypeListSample::template IndexToType<0>;
+	/// using Type_1 = TypeListSample::template IndexToType<1>;
+	/// // Type_0 will be "int", Type_1 will be "float"
 	/// @endcode
 	/// 
 	/// @tparam Index
@@ -76,7 +79,9 @@ public:
 	/// Usage example:
 	/// @code
 	/// using TypeListSample = TypeList<int, float, double>;
-	/// constexpr u64 index = TypeListSample::template TypeToIndex<float>();
+	/// constexpr u64 index_int = TypeListSample::template TypeToIndex<int>();
+	/// constexpr u64 index_float = TypeListSample::template TypeToIndex<float>();
+	/// // index_int will be 0, index_float will be 1
 	/// @endcode
 	///
 	/// @tparam TypeToFind
@@ -98,6 +103,7 @@ public:
 	/// @code
 	/// using TypeListSample = TypeList<int, float, double>;
 	/// constexpr u64 count = TypeListSample::Size();
+	/// // count will be 3
 	/// @endcode
 	///
 	/// @return
@@ -113,8 +119,9 @@ public:
 	/// 
 	/// Usage example:
 	/// @code
-	/// using TypeListSample = TypeList<int, float, double>;
+	/// using TypeListSample = TypeList<int, float, double, float>;
 	/// constexpr u64 count = TypeListSample::template CountType<float>();
+	/// // count will be 2
 	/// @endcode
 	/// 
 	/// @tparam TypeToCount
@@ -138,7 +145,9 @@ public:
 	/// Usage example:
 	/// @code
 	/// using TypeListSample = TypeList<int, float, double>;
-	/// constexpr bool has_type = TypeListSample::template HasType<float>();
+	/// constexpr bool has_float_type = TypeListSample::template HasType<float>();
+	/// constexpr bool has_char_type = TypeListSample::template HasType<char>();
+	/// // has_float_type will be "true", has_char_type will be "false"
 	/// @endcode
 	/// 
 	/// @tparam TypeToCheck
@@ -158,8 +167,11 @@ public:
 	///
 	/// Usage example:
 	/// @code
-	/// using TypeListSample = TypeList<int, float, double>;
-	/// constexpr bool is_unique = TypeListSample::template IsTypeUnique<float>();
+	/// using TypeListSample = TypeList<int, float, double, false>;
+	/// constexpr bool is_float_unique = TypeListSample::template IsTypeUnique<float>();
+	/// constexpr bool is_int_unique = TypeListSample::template IsTypeUnique<int>();
+	/// // constexpr bool is_char_unique = TypeListSample::template IsTypeUnique<char>();
+	/// // is_float_unique will be "false", is_int_unique will be "true", is_char_unique would cause a compile time error.
 	/// @endcode
 	/// 
 	/// @tparam TypeToCheck
@@ -179,8 +191,11 @@ public:
 	///
 	/// Usage example:
 	/// @code
-	/// using TypeListSample = TypeList<int, float, double>;
-	/// constexpr bool has_duplicates = TypeListSample::HasDuplicates();
+	/// using TypeListSample1 = TypeList<int, float, double>;
+	/// using TypeListSample2 = TypeList<int, float, double, int>;
+	/// constexpr bool has_duplicates_1 = TypeListSample1::HasDuplicates();
+	/// constexpr bool has_duplicates_2 = TypeListSample2::HasDuplicates();
+	/// // has_duplicates_1 will be "false", has_duplicates_2 will be "true"
 	/// @endcode
 	///
 	/// @return
@@ -199,11 +214,16 @@ public:
 	/// 
 	/// Usage example:
 	/// @code
-	/// struct Base {};
-	/// struct DerivedFromBase : Base {};
-	/// struct OtherDerivedType : Base {};
-	/// using TypeListSample = TypeList<DerivedFromBase, OtherDerivedType>;
-	/// constexpr bool is_each_derived_from_base = TypeListSample::template IsEachDerivedFromBase<Base>();
+	/// struct Base_A {};
+	/// struct Base_B {};
+	/// struct Derived_A1 : Base_A {};
+	/// struct Derived_A2 : Base_A {};
+	/// struct Derived_B3 : Base_B {};
+	/// using TypeListSample_1 = TypeList<Derived_A1, Derived_A2>;
+	/// using TypeListSample_2 = TypeList<Derived_A1, Derived_A2, Derived_B3>;
+	/// constexpr bool is_each_derived_from_base_1 = TypeListSample_1::template IsEachDerivedFromBase<Base_A>();
+	/// constexpr bool is_each_derived_from_base_2 = TypeListSample_2::template IsEachDerivedFromBase<Base_A>();
+	/// // is_each_derived_from_base_1 will be "true", is_each_derived_from_base_2 will be "false"
 	/// @endcode
 	/// 
 	/// @tparam BaseType
@@ -228,8 +248,11 @@ public:
 	/// Usage example:
 	/// @code
 	/// using TypeListSample = TypeList<int, float, double>;
-	/// using OtherTypeListSample = TypeList<int, float, double>;
-	/// constexpr bool matches = TypeListSample::template Matches<OtherTypeListSample>();
+	/// using OtherTypeListSample_1 = TypeList<int, float, double>;
+	/// using OtherTypeListSample_2 = TypeList<int, float, char>;
+	/// constexpr bool matches_1 = TypeListSample::template Matches<OtherTypeListSample_1>();
+	/// constexpr bool matches_2 = TypeListSample::template Matches<OtherTypeListSample_2>();
+	/// // matches_1 will be "true", matches_2 will be "false"
 	/// @endcode
 	/// 
 	/// @tparam OtherTypeList
@@ -254,8 +277,11 @@ public:
 	/// Usage example:
 	/// @code
 	/// auto type_list_sample = TypeList<int, float, double>;
-	/// auto other_type_list_sample = TypeList<int, float, double>;
-	/// constexpr bool matches = type_list_sample == other_type_list_sample;
+	/// auto other_type_list_sample_1 = TypeList<int, float, double>;
+	/// auto other_type_list_sample_2 = TypeList<int, float, char>;
+	/// constexpr bool matches_1 = type_list_sample == other_type_list_sample_1;
+	/// constexpr bool matches_2 = type_list_sample == other_type_list_sample_2;
+	/// // matches_1 will be "true", matches_2 will be "false"
 	/// @endcode
 	/// 
 	/// @tparam OtherTypeList
@@ -303,9 +329,10 @@ private:
 	{
 		consteval static bool EqualityTest()
 		{
+			// Return as soon as we find a mismatch, skipping the remaining types.
 			if constexpr( !std::is_same_v<T, U> ) return false;
 
-			// Recursively call EqualityTest with the remaining elements
+			// Recursively call EqualityTest with the remaining elements.
 			return MatchCheckHelper<TypeList<Ts...>, TypeList<Us...>>::EqualityTest();
 		}
 	};
