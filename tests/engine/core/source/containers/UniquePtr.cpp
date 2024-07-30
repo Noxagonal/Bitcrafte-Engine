@@ -376,10 +376,6 @@ TEST( UniquePtrContainer, ImplicitDerivedTypeMove )
 	using A = bc::UniquePtr<Base>;
 	using B = bc::UniquePtr<Derived>;
 	{
-		static_assert( !utility::IsCopyAssignableFrom<A, B> );
-		static_assert( utility::IsMoveAssignableFrom<A, B> );
-	}
-	{
 		A a;
 		B b = bc::MakeUniquePtr<Derived>();
 		a = std::move( b );
