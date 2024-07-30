@@ -52,7 +52,7 @@ concept AssignableFrom =
 	// CommonReferenceWith<const std::remove_reference_t<Type>&, const std::remove_reference_t<From>&> &&
 	requires( Type type, From&& from )
 	{
-		{ type = std::forward<From>( from ) } -> SameAs<From>;
+		{ type = static_cast<From&&>( from ) } -> SameAs<Type>;
 	};
 
 template<typename Type>
