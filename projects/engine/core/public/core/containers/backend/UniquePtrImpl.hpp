@@ -1,5 +1,6 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/diagnostic/assertion/Assert.hpp>
@@ -328,13 +329,12 @@ private:
 namespace tests {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check if text containers fulfill size requirements.
+// Check if container fulfill size requirements.
 static_assert( sizeof( BC_CONTAINER_NAME( UniquePtr )<u32> ) == 8 );
 
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check if text containers fulfill concept requirements.
+// Check if container fulfill concept requirements.
 static_assert( !utility::ContainerView<BC_CONTAINER_NAME( UniquePtr )<u32>> );
 static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<u32>> );
 static_assert( !utility::Container<BC_CONTAINER_NAME( UniquePtr )<u32>> );
@@ -346,6 +346,102 @@ static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( UniquePtr )<u32>> );
 static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
 static_assert( !utility::TextContainer<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Check if container is constructible from other containers.
+// Not constructible via copy.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<u32>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
+// Constructible via move.
+static_assert(
+	utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<u32>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
+// Not assignable via copy.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
+// Assignable via move.
+static_assert(
+	utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct UniquePtrTestContainerBase {};
+struct UniquePtrTestContainerDerived : UniquePtrTestContainerBase {};
+struct UniquePtrTestContainerNotDerived {};
+// Not copy constructible from derived.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not copy constructible from not derived.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+// Move constructible from derived.
+static_assert(
+	utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not move constructible from not derived.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+// Not copy assignable from derived.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not copy assignable from not derived.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+
+// Move assignable from derived.
+static_assert(
+	utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not move assignable from not derived.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+
+
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
