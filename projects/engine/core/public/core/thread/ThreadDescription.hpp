@@ -53,7 +53,8 @@ public:
 		ThreadDescription					&&	other
 	)
 	{
-		SwapOther( std::move( other ) );
+		auto lock_guard = std::lock_guard( other.modify_mutex );
+		Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +67,11 @@ public:
 		ThreadDescription					&&	other
 	)
 	{
-		SwapOther( std::move( other ) );
+		std::lock( modify_mutex, other.modify_mutex );
+		auto my_lock_guard = std::lock_guard( modify_mutex, std::adopt_lock );
+		auto other_lock_guard = std::lock_guard( other.modify_mutex, std::adopt_lock );
+
+		Swap( other );
 		return *this;
 	}
 
@@ -80,8 +85,12 @@ public:
 
 private:
 
-	inline void									SwapOther(
-		ThreadDescription					&&	other
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	std::mutex									modify_mutex;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	inline void									Swap(
+		ThreadDescription					&	other
 	)
 	{
 		std::swap( this->pool_thread, other.pool_thread );
@@ -91,23 +100,22 @@ private:
 		std::swap( this->thread_id, other.thread_id );
 	}
 
-	// TODO: Move this to utilities.
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Swaps two atomic values.
+	///
+	/// @warning
+	/// Internal use only. Assumes that the mutexes are locked.
 	template<typename Type>
 	void										AtomicSwap(
 		std::atomic<Type>					&	left,
 		std::atomic<Type>					&	right
 	)
 	{
-		Type left_expected	= left.load();
-		Type right_expected	= right.load();
-
-		while( !left.compare_exchange_weak( left_expected, right_expected ) ||
-			!right.compare_exchange_weak( right_expected, left_expected ) )
-		{
-			// Retry if the compare_exchange fails (values have changed)
-			left_expected	= left.load();
-			right_expected	= right.load();
-		}
+		auto left_value = left.load();
+		auto right_value = right.load();
+		left.store( right_value );
+		right.store( left_value );
 	}
 };
 
