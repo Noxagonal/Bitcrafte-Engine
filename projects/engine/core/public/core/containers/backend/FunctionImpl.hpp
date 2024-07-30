@@ -242,9 +242,8 @@ public:
 		if ( this->type == Type::INVOKEABLE_OBJECT )
 		{
 			auto manager = reinterpret_cast<MyFunctorManagerBase*>( &this->functor_manager );
-			manager->DestructFunctor( this->is_stored_locally, this->storage );
+			manager->ClearFunctor( this->is_stored_locally, this->storage );
 			manager->~MyFunctorManagerBase();
-			bc::internal_::container::FreeFunctor<LocalStorage>( this->is_stored_locally, this->storage );
 		}
 		this->is_stored_locally = false;
 		this->type = Type::NONE;

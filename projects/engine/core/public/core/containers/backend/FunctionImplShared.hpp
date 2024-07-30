@@ -3,6 +3,8 @@
 // The purpose of this file is to add common parts of to both simple and normal versions of the Function.
 
 #include <core/memory/MemoryBlockInfo.hpp>
+#include <string.h>
+#include <core/memory/raw/RawMemory.hpp>
 
 
 
@@ -30,13 +32,14 @@ FunctorType														*	AllocateFunctor(
 	}
 	else
 	{
-		storage.heap_functor = malloc( sizeof( FunctorType ) );
+		storage.heap_functor = memory::AllocateMemory<FunctorType>( 1, alignof( FunctorType ) );
 		return static_cast<FunctorType*>( storage.heap_functor );
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
+	typename FunctorType,
 	typename FunctionLocalStorageType
 >
 void																FreeFunctor(
@@ -46,7 +49,7 @@ void																FreeFunctor(
 {
 	if( is_stored_locally ) return;
 
-	free( storage.heap_functor );
+	memory::FreeMemory<FunctorType>( reinterpret_cast<FunctorType*>( storage.heap_functor ), 1 );
 
 	#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 	memset( &storage, 0, sizeof( FunctionLocalStorageType ) );
@@ -117,7 +120,7 @@ public:
 	virtual ~FunctorManagerBase() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual ReturnType Invoke( 
+	virtual ReturnType							Invoke( 
 		bool									is_stored_locally,
 		FunctionLocalStorageType			&	storage,
 		ParameterTypes...						args
@@ -132,7 +135,7 @@ public:
 	) const = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual void								DestructFunctor(
+	virtual void								ClearFunctor(
 		bool									is_stored_locally,
 		FunctionLocalStorageType			&	storage
 	) = 0;
@@ -186,13 +189,14 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual void								DestructFunctor(
+	virtual void								ClearFunctor(
 		bool									is_stored_locally,
 		FunctionLocalStorageType			&	storage
 	) override
 	{
 		auto functor_pointer = GetFunctorPointer<FunctorType, FunctionLocalStorageType>( is_stored_locally, storage );
 		functor_pointer->~FunctorType();
+		FreeFunctor<FunctorType, FunctionLocalStorageType>( is_stored_locally, storage );
 	}
 };
 
