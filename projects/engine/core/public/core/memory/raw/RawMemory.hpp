@@ -412,6 +412,8 @@ constexpr inline void			FreeMemory_Consteval(
 	u64							count
 ) noexcept
 {
+	static_assert( std::is_constant_evaluated(), "This function must be called in constant evaluated context" );
+
 	std::allocator<ValueType>{}.deallocate( location, size_t( count ) );
 }
 
@@ -443,6 +445,8 @@ constexpr ValueType			*	AllocateMemory_Consteval(
 	u64							alignment_requirement
 ) noexcept
 {
+	static_assert( std::is_constant_evaluated(), "This function must be called in constant evaluated context" );
+
 	return std::allocator<ValueType>{}.allocate( size_t( count ) );
 }
 
@@ -484,6 +488,8 @@ constexpr ValueType			*	ReallocateMemory_Consteval(
 	u64							new_count
 ) noexcept
 {
+	static_assert( std::is_constant_evaluated(), "This function must be called in constant evaluated context" );
+
 	auto new_location = AllocateMemory_Consteval<ValueType>( new_count, alignof( ValueType ) );
 	auto common_length = old_count < new_count ? old_count : new_count;
 	for( u64 i = 0; i < common_length; i++ )
@@ -578,7 +584,11 @@ constexpr void					FreeMemory(
 	u64							count
 ) noexcept
 {
+	#if __cpp_if_consteval
+	if consteval
+	#else
 	if( std::is_constant_evaluated() )
+	#endif
 	{
 		internal_::FreeMemory_Consteval<ValueType>( location, count );
 	}
@@ -605,7 +615,11 @@ constexpr ValueType			*	AllocateMemory(
 	u64							alignment_requirement
 ) noexcept
 {
+	#if __cpp_if_consteval
+	if consteval
+	#else
 	if( std::is_constant_evaluated() )
+	#endif
 	{
 		return internal_::AllocateMemory_Consteval<ValueType>( count, alignment_requirement );
 	}
@@ -630,7 +644,11 @@ constexpr ValueType			*	ReallocateMemory(
 {
 	static_assert( std::is_trivial_v<ValueType>, "Type must be trivial for it to be reallocated via this function" );
 
+	#if __cpp_if_consteval
+	if consteval
+	#else
 	if( std::is_constant_evaluated() )
+	#endif
 	{
 		return internal_::ReallocateMemory_Consteval<ValueType>( old_location, old_count, new_count );
 	}
@@ -674,7 +692,11 @@ constexpr bool					IsInPlaceReallocateable(
 	u64							new_count
 )
 {
+	#if __cpp_if_consteval
+	if consteval
+	#else
 	if( std::is_constant_evaluated() )
+	#endif
 	{
 		return false;
 	}
@@ -713,7 +735,11 @@ constexpr ValueType				*	InPlaceReallocateMemory(
 	u64								new_count
 )
 {
+	#if __cpp_if_consteval
+	if consteval
+	#else
 	if( std::is_constant_evaluated() )
+	#endif
 	{
 		return internal_::ReallocateMemory_Consteval<ValueType>( old_location, old_count, new_count );
 	}
