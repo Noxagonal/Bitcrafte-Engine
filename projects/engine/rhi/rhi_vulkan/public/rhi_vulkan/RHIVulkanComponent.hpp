@@ -42,7 +42,7 @@ public:
 	virtual List<Text>													GetGraphicsCardList() override;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	int64_t																GetPrimaryGraphicsCardIndex() override;
+	i64																	GetPrimaryGraphicsCardIndex() override;
 
 private:
 

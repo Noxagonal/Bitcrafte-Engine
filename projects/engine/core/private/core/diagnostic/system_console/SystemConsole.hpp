@@ -8,7 +8,7 @@
 
 namespace bc {
 namespace diagnostic {
-namespace internal {
+namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -29,7 +29,7 @@ namespace internal {
 ///	Color of the background of the letters you wish to print. ( not entire console window )
 void								SystemConsolePrintRawUTF8(
 	const char8_t				*	raw_text,
-	size_t							raw_text_length,
+	u64								raw_text_length,
 	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
 	PrintRecordColor				background_color		= PrintRecordColor::DEFAULT
 );
@@ -43,12 +43,12 @@ void								SystemConsolePrintRawUTF8(
 /// more readable, however, the console window does not expand to a new size, rather a scroll bar appears on the bottom of the
 /// console window.
 void								SetupSystemConsole(
-	size_t							characters_per_line_num
+	u64								characters_per_line_num
 );
 
 
 
-} // internal
+} // internal_
 
 
 
@@ -98,7 +98,7 @@ void								SystemConsolePrint(
 {
 	if constexpr( std::is_same_v<char8_t, typename ContainerType::ContainedCharacterType> || std::is_same_v<char, typename ContainerType::ContainedCharacterType> ) {
 		// char8_t and char can be printed directly without conversion.
-		internal::SystemConsolePrintRawUTF8(
+		internal_::SystemConsolePrintRawUTF8(
 			text.Data(),
 			text.Size(),
 			foreground_color,
@@ -108,7 +108,7 @@ void								SystemConsolePrint(
 	} else {
 		// char16_t and char32_t must be converted into UTF8 first.
 		auto buffer = conversion::ToUTF8( text );
-		internal::SystemConsolePrintRawUTF8(
+		internal_::SystemConsolePrintRawUTF8(
 			buffer.Data(),
 			buffer.Size(),
 			foreground_color,
@@ -171,7 +171,7 @@ void								SystemConsolePrint(
 /// 
 /// @param background_color
 ///	Color of the background of the letters you wish to print. ( not entire console window )
-template<utility::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
+template<utility::TextContainerCharacterType CharacterType, u64 CharacterArraySize>
 void								SystemConsolePrint(
 	const CharacterType				( &text )[ CharacterArraySize ],
 	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
@@ -179,7 +179,7 @@ void								SystemConsolePrint(
 )
 {
 	static_assert( CharacterArraySize > 0 );
-	SystemConsolePrint( SimpleTextViewBase<CharacterType, true>( text, CharacterArraySize ), foreground_color, background_color );
+	SystemConsolePrint( bc::internal_::SimpleTextViewBase<CharacterType, true>( text, CharacterArraySize ), foreground_color, background_color );
 }
 
 
@@ -204,14 +204,14 @@ void								SystemConsolePrint(
 /// 
 /// @param theme
 ///	Text and background color of the message according to a theme.
-template<utility::TextContainerCharacterType CharacterType, size_t CharacterArraySize>
+template<utility::TextContainerCharacterType CharacterType, u64 CharacterArraySize>
 void								SystemConsolePrint(
 	const CharacterType				( &text )[ CharacterArraySize ],
 	PrintRecordTheme				theme
 )
 {
 	static_assert( CharacterArraySize > 0 );
-	SystemConsolePrint( SimpleTextViewBase<CharacterType, true> { text, CharacterArraySize }, theme );
+	SystemConsolePrint( bc::internal_::SimpleTextViewBase<CharacterType, true> { text, CharacterArraySize }, theme );
 }
 
 

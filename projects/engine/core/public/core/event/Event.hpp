@@ -1,14 +1,20 @@
 #pragma once
 
 #include <core/diagnostic/assertion/Assert.hpp>
+#include <core/utility/template/TypeList.hpp>
 #include <core/containers/List.hpp>
 #include <core/containers/Map.hpp>
-
-#include <functional>
+#include <core/containers/Function.hpp>
 
 
 
 namespace bc {
+
+
+
+// TODO: Event needs a handle for callbacks so that they can be un-registered automatically.
+//   - Needs to be fast, so direct calls only, no indirection via virtual table.
+//   - Needs to be automaticically un-registered when handle is destroyed.
 
 
 
@@ -47,6 +53,8 @@ template<typename ...EventSignalTypePack>
 class Event
 {
 public:
+
+	using EventSignalTypeList = utility::TypeList<EventSignalTypePack...>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Event() = default;
@@ -93,7 +101,7 @@ public:
 	)
 	{
 		BAssert( listeners.Find( event ) == listeners.end(), "tried registering same observer twice to the same event" );
-		#if BITCRAFTE_DEVELOPMENT_BUILD
+		#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 		// Returns true if this is found in any of the other events.
 		auto FindCircularDependencies = []( Event<EventSignalTypePack...> * self, Event<EventSignalTypePack...> * event ) -> bool
 		{
@@ -135,16 +143,17 @@ public:
 	/// cb::Event::UnRegisterCallback()
 	/// 
 	/// @warning
-	/// There are no way to automatically unregister callbacks. Be mindful of registering member functions and lambdas that capture
-	/// anything as those callbacks will still be called even if the object is destroyed.
+	/// If callback lifetime is shorter than the event, this will cause a crash. To get around this, make an event with lifetime as
+	/// long as the callback and register the newly created event as a listener to the event you want to listen to, and register the
+	/// callback to the newly created event.
 	///
 	/// @param callback
 	///	Function to call when this event is signalled.
 	/// 
 	/// @return
 	/// returns callback id which can be used to unregister this callback.
-	uint64_t														RegisterCallback(
-		std::function<void( EventSignalTypePack... )>				callback
+	u64																RegisterCallback(
+		const Function<void( EventSignalTypePack... )>			&	callback
 	)
 	{
 		++callback_counter;
@@ -176,7 +185,7 @@ public:
 	/// @param callback_id
 	///	Previously registered id you got from Event::RegisterCallback().
 	void															UnRegisterCallback(
-		uint64_t													callback_id
+		u64															callback_id
 	)
 	{
 		auto it = callbacks.Find( callback_id );
@@ -216,7 +225,7 @@ public:
 	///
 	/// @return
 	/// Number of listeners
-	size_t															GetObserverCount()
+	u64																GetObserverCount()
 	{
 		return listeners.Size();
 	}
@@ -227,7 +236,7 @@ public:
 	///
 	/// @return
 	/// Number of listening_to events.
-	size_t															GetObservingCount()
+	u64																GetObservingCount()
 	{
 		return listening_to.Size();
 	}
@@ -237,8 +246,8 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	List<Event<EventSignalTypePack...>*>							listeners;
 	List<Event<EventSignalTypePack...>*>							listening_to;
-	Map<uint64_t, std::function<void( EventSignalTypePack... )>>	callbacks;
-	uint64_t														callback_counter		= 0;
+	Map<u64, Function<void( EventSignalTypePack... )>>				callbacks;
+	u64																callback_counter		= 0;
 };
 
 

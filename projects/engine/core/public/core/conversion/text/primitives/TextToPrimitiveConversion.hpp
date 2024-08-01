@@ -9,7 +9,7 @@
 
 namespace bc {
 namespace conversion {
-namespace internal {
+namespace internal_ {
 
 
 
@@ -22,14 +22,14 @@ concept TextToBoolConvertible = std::is_same_v<ValueType, bool>;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename ValueType>
 concept TextToIntegerConvertible =
-std::is_same_v<ValueType, int8_t> ||
-std::is_same_v<ValueType, uint8_t> ||
-std::is_same_v<ValueType, int16_t> ||
-std::is_same_v<ValueType, uint16_t> ||
-std::is_same_v<ValueType, int32_t> ||
-std::is_same_v<ValueType, uint32_t> ||
-std::is_same_v<ValueType, int64_t> ||
-std::is_same_v<ValueType, uint64_t>;
+std::is_same_v<ValueType, i8> ||
+std::is_same_v<ValueType, u8> ||
+std::is_same_v<ValueType, i16> ||
+std::is_same_v<ValueType, u16> ||
+std::is_same_v<ValueType, i32> ||
+std::is_same_v<ValueType, u32> ||
+std::is_same_v<ValueType, i64> ||
+std::is_same_v<ValueType, u64>;
 
 
 
@@ -39,7 +39,7 @@ concept TextToFloatingConvertible = std::is_floating_point_v<ValueType>;
 
 
 
-} // internal
+} // internal_
 
 
 
@@ -63,9 +63,9 @@ concept TextToFloatingConvertible = std::is_floating_point_v<ValueType>;
 ///	Text which contains the value we want to convert.
 template<
 	utility::TextContainerView					TextContainerType,
-	internal::TextToBoolConvertible				ValueType
+	internal_::TextToBoolConvertible			ValueType
 >
-constexpr size_t								TextToPrimitive(
+constexpr u64								TextToPrimitive(
 	ValueType								&	out_value,
 	const TextContainerType					&	in_text
 )
@@ -130,7 +130,7 @@ constexpr size_t								TextToPrimitive(
 /// AUTOMATIC option automatically parses values starting with "0o" as octal, "0b" as binary and "0x" as hexadecimal. Other
 /// options do not automatically parse the text and expects the text to be the value portion without any prefix. Eg. You might
 /// want to read text that is "5FA0", which does not contain "0x" but you know is hexadecimal.
-enum class TextToIntegerConversionFormat : uint32_t
+enum class TextToIntegerConversionFormat : u32
 {
 	AUTOMATIC	= 0,		///< Detect "0b", "0o" and "0x" beginning texts as binary, octal and hex respectively.
 	BINARY		= 2,		///< Base-2
@@ -161,9 +161,9 @@ enum class TextToIntegerConversionFormat : uint32_t
 /// static_cast<TextToIntegerConversionFormat>( 5 ).
 template<
 	utility::TextContainerView					TextContainerType,
-	internal::TextToIntegerConvertible			ValueType
+	internal_::TextToIntegerConvertible			ValueType
 >
-constexpr size_t								TextToPrimitive(
+constexpr u64								TextToPrimitive(
 	ValueType								&	out_value,
 	const TextContainerType					&	in_text,
 	TextToIntegerConversionFormat				text_format		= TextToIntegerConversionFormat::AUTOMATIC
@@ -173,7 +173,7 @@ constexpr size_t								TextToPrimitive(
 	using ASCIIType				= typename TextContainerType::template ThisContainerFullType<char>;
 	using ASCIIViewType			= typename ASCIIType::template ThisViewType<true>;
 
-	auto FixEndPosition = []( ASCIIViewType in_text_view, size_t end_position ) -> size_t
+	auto FixEndPosition = []( ASCIIViewType in_text_view, u64 end_position ) -> u64
 	{
 		// On success, std::from_chars either returns pointer to the first non-number, or a pointer to
 		// the last number, depending on if the text contained only numbers. Here we fix it so that
@@ -195,7 +195,7 @@ constexpr size_t								TextToPrimitive(
 
 		} else {
 			in_buffer.Resize( in_text.Size() );
-			for( size_t i = 0; i < in_text.Size(); i++ ) {
+			for( u64 i = 0; i < in_text.Size(); i++ ) {
 				in_buffer[ i ] = char( std::tolower( in_text[ i ] ) );
 			}
 			in_buffer_view = in_buffer;
@@ -239,7 +239,7 @@ constexpr size_t								TextToPrimitive(
 	if constexpr( std::is_same_v<char, CharacterType> || std::is_same_v<char8_t, CharacterType> ) {
 		if( std::underlying_type_t<TextToIntegerConversionFormat>( text_format ) >
 			std::underlying_type_t<TextToIntegerConversionFormat>( TextToIntegerConversionFormat::DECIMAL ) ) {
-			for( size_t i = 0; i < in_buffer.Size(); i++ ) {
+			for( u64 i = 0; i < in_buffer.Size(); i++ ) {
 				in_buffer[ i ] = tolower( in_buffer[ i ] );
 			}
 		}
@@ -252,7 +252,7 @@ constexpr size_t								TextToPrimitive(
 		int( text_format )
 	);
 	if( result.ec == std::errc() ) {
-		size_t end_position = result.ptr - in_buffer_view.Data();
+		u64 end_position = result.ptr - in_buffer_view.Data();
 		return FixEndPosition( in_buffer_view, end_position );
 	}
 	if( result.ec == std::errc::result_out_of_range ) {
@@ -264,7 +264,7 @@ constexpr size_t								TextToPrimitive(
 		// Value was larger than this primitive type can hold, set the value to maximum.
 		out_value = std::numeric_limits<CharacterType>::max();
 
-		size_t end_position = result.ptr - in_buffer_view.Data();
+		u64 end_position = result.ptr - in_buffer_view.Data();
 		return end_position;
 	}
 
@@ -281,7 +281,7 @@ constexpr size_t								TextToPrimitive(
 ///
 ///	Unlike FloatToTextConversionFormat, these are not flags and may not be used together. Scientific notation or fixed type is
 /// always resolved automatically, hex is resolved only if type is left at AUTOMATIC and value starts with "0x".
-enum class TextToFloatConversionFormat : uint32_t
+enum class TextToFloatConversionFormat : u32
 {
 	AUTOMATIC	= 0,	///< Automatically resolves if the value is decimal or hex. (Default)
 	DECIMAL,			///< Allows scientific notations as well as fixed representation, but not hex.
@@ -310,9 +310,9 @@ enum class TextToFloatConversionFormat : uint32_t
 ///	Value text representation. See TextToFloatConversionFormat.
 template<
 	utility::TextContainerView					TextContainerType,
-	internal::TextToFloatingConvertible			ValueType
+	internal_::TextToFloatingConvertible		ValueType
 >
-constexpr size_t								TextToPrimitive(
+constexpr u64									TextToPrimitive(
 	ValueType								&	out_value,
 	const TextContainerType					&	in_text,
 	TextToFloatConversionFormat					text_format				= TextToFloatConversionFormat::AUTOMATIC
@@ -322,7 +322,7 @@ constexpr size_t								TextToPrimitive(
 	using ASCIIType				= typename TextContainerType::template NonViewBaseType<char>;
 	using ASCIIViewType			= typename ASCIIType::ViewType;
 
-	auto FixEndPosition = []( ASCIIViewType in_text_view, size_t end_position ) -> size_t
+	auto FixEndPosition = []( ASCIIViewType in_text_view, u64 end_position ) -> u64
 	{
 		// On success, std::from_chars either returns pointer to the first non-number, or a pointer to
 		// the last number, depending on if the text contained only numbers. Here we fix it so that
@@ -344,7 +344,7 @@ constexpr size_t								TextToPrimitive(
 
 		} else {
 			in_buffer.Resize( in_text.Size() );
-			for( size_t i = 0; i < in_text.Size(); i++ ) {
+			for( u64 i = 0; i < in_text.Size(); i++ ) {
 				in_buffer[ i ] = char( std::tolower( in_text[ i ] ) );
 			}
 			in_buffer_view = in_buffer;
@@ -375,7 +375,7 @@ constexpr size_t								TextToPrimitive(
 	if constexpr( std::is_same_v<char, CharacterType> || std::is_same_v<char8_t, CharacterType> ) {
 		if( std::underlying_type_t<TextToFloatConversionFormat>( text_format ) &
 			std::underlying_type_t<TextToFloatConversionFormat>( TextToFloatConversionFormat::HEX ) ) {
-			for( size_t i = 0; i < in_buffer.Size(); i++ ) {
+			for( u64 i = 0; i < in_buffer.Size(); i++ ) {
 				in_buffer[ i ] = tolower( in_buffer[ i ] );
 			}
 		}
@@ -395,7 +395,7 @@ constexpr size_t								TextToPrimitive(
 		);
 
 		if( result.ec == std::errc() ) {
-			size_t end_position = result.ptr - in_buffer_view.Data();
+			u64 end_position = result.ptr - in_buffer_view.Data();
 			return FixEndPosition( in_buffer_view, end_position );
 		}
 	}

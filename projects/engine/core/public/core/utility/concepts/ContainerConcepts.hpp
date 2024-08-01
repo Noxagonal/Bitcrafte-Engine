@@ -23,7 +23,7 @@ concept ContainerIterator = requires(
 	typename Type::IteratorContainerType;
 
 	container = type.GetContainer();
-	data = type.GetData();
+	data = type.Get();
 };
 
 
@@ -39,9 +39,9 @@ concept ContainerIterator = requires(
 template<typename CharacterType>
 concept TextContainerCharacterType =
 std::is_same_v<CharacterType, char> ||
-std::is_same_v<CharacterType, char8_t> ||
-std::is_same_v<CharacterType, char16_t> ||
-std::is_same_v<CharacterType, char32_t>;
+std::is_same_v<CharacterType, c8> ||
+std::is_same_v<CharacterType, c16> ||
+std::is_same_v<CharacterType, c32>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -95,7 +95,7 @@ concept STLContainer = requires(
 template<typename ContainerType>
 concept ContainerView = requires(
 	ContainerType											container,
-	size_t													size,
+	u64														size,
 	typename ContainerType::ConstIterator					const_iterator
 	)
 {
@@ -228,14 +228,15 @@ concept LinearContainerEditableView = requires(
 template<typename ContainerType>
 concept LinearContainer = requires(
 	ContainerType											container,
-	size_t													size
+	u64														size
 )
 {
 	requires( LinearContainerEditableView<ContainerType> );
 	requires( Container<ContainerType> );
 
-	container.Reserve( size );
-	container.Resize( size );
+	container[ 0 ];
+	// container.Reserve( size );
+	// container.Resize( size );
 };
 
 
@@ -290,7 +291,7 @@ concept TextContainerEditableView = requires(
 template<typename ContainerType>
 concept TextContainer = requires(
 	ContainerType											container,
-	size_t													size
+	u64														size
 	)
 {
 	requires( LinearContainer<ContainerType> );

@@ -1,5 +1,6 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
+#include <core/containers/backend/ContainerUtilities.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/containers/backend/LinearContainerBaseNormal.hpp>
@@ -8,6 +9,8 @@
 #else
 #error "Container implementation type not given"
 #endif
+
+#include <core/utility/concepts/CallableConcepts.hpp>
 
 #include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
@@ -96,7 +99,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		const ValueType																				*	from_data,
-		size_t																							size
+		u64																								size
 	) noexcept requires( IsDataConst == true )
 		:
 		Base(
@@ -108,7 +111,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
 		ValueType																					*	from_data,
-		size_t																							size
+		u64																								size
 	) noexcept requires( IsDataConst == false )
 		:
 		Base(
@@ -144,7 +147,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
-		return container_bases::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +166,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
-		return container_bases::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +183,7 @@ public:
 		const ValueType																				&	value
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFind( value ) );
+		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearch<ValueType, true>( this->data_ptr, this->data_size, value ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +200,7 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFind( value ) );
+		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearch<ValueType, IsConst>( this->data_ptr, this->data_size, value ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +221,7 @@ public:
 		LambdaType																					&&	lambda
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFindIf( lambda ) );
+		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearchIf<ValueType, true>( this->data_ptr, this->data_size, lambda ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +242,7 @@ public:
 		LambdaType																					&&	lambda
 	) BC_CONTAINER_NOEXCEPT
 	{
-		return IteratorBase<IsConst>( this, this->DoFindIf( lambda ) );
+		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearchIf<ValueType, IsConst>( this->data_ptr, this->data_size, lambda ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -384,7 +387,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )(
 		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( other );
 	}
@@ -394,13 +397,13 @@ public:
 		BC_CONTAINER_NAME( List )																	&&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->SwapOther( std::move( other ) );
+		this->Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )(
 		std::initializer_list<ValueType>																init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( init_list );
 	}
@@ -409,14 +412,14 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( List )(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr explicit BC_CONTAINER_NAME( List )(
-		size_t																							initial_size
+		u64																								initial_size
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Resize( initial_size );
@@ -425,12 +428,11 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )																&	operator=(
 		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		if( std::addressof( other ) == this ) return *this;
 
-		this->Clear();
-		this->Append( other );
+		BC_CONTAINER_NAME( List ) { other }.Swap( *this );
 		return *this;
 	}
 
@@ -439,7 +441,9 @@ public:
 		BC_CONTAINER_NAME( List )																	&&	other
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->SwapOther( std::move( other ) );
+		if( std::addressof( other ) == this ) return *this;
+
+		this->Swap( other );
 		return *this;
 	}
 
@@ -447,7 +451,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( List )																&	operator=(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		if( other.Data() >= this->Data() && other.Data() < this->Data() + this->Size() )
 		{
@@ -465,7 +469,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( List )																&	operator=(
 		std::initializer_list<ValueType>																init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Clear();
 		this->Append( init_list );
@@ -483,7 +487,7 @@ public:
 	/// Reference to this.
 	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
 		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + other.Size();
 		this->Append( other, 1, reserve_space );
@@ -502,7 +506,7 @@ public:
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
 		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + other.Size();
 		this->Append( other, 1, reserve_space );
@@ -520,7 +524,7 @@ public:
 	/// Reference to this.
 	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
 		const std::initializer_list<ValueType>														&	init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + init_list.size();
 		this->Append( init_list, 1, reserve_space );
@@ -543,7 +547,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
-		return container_bases::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -562,7 +566,7 @@ public:
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
-		return container_bases::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -580,7 +584,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return true;
 
-		return container_bases::CheckContainerContentsMatch( *this, other );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -598,7 +602,7 @@ public:
 	{
 		if( std::addressof( other ) == this ) return false;
 
-		return container_bases::CheckContainerContentsDiffer( *this, other );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -643,7 +647,7 @@ public:
 		);
 		return Iterator {
 			this,
-			this->DoErase( at.GetData() )
+			this->DoErase( at.GetAddress() )
 		};
 	}
 
@@ -675,8 +679,66 @@ public:
 		);
 		return Iterator {
 			this,
-			this->DoErase( from.GetData(), to.GetData() )
+			this->DoErase( from.GetAddress(), to.GetAddress() )
 		};
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase value if callback return true.
+	///
+	///	Run for every element of the list and if callable returns true, that element is removed.
+	///
+	/// @note
+	/// This function goes through every element, it will not stop at the first occurrence.
+	/// 
+	/// @param callable
+	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
+	template<utility::CallableWithReturnAndParameters<bool, const ValueType&> CallableType>
+	constexpr void																						EraseIf(
+		CallableType																					callable
+	) BC_CONTAINER_NOEXCEPT
+	{
+		auto it = begin();
+		while( it != end() )
+		{
+			if( callable( *it ) )
+			{
+				it = Erase( it );
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Erase first value if callback return true.
+	///
+	///	Run for every element of the list and if callable returns true, that element is removed.
+	///
+	/// @note
+	/// This function only erases the first found element and returns as soon as it is erased.
+	/// 
+	/// @param callable
+	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
+	template<utility::CallableWithReturnAndParameters<bool, const ValueType&> CallableType>
+	constexpr void																						EraseFirstIf(
+		CallableType																					callable
+	) BC_CONTAINER_NOEXCEPT
+	{
+		auto it = begin();
+		while( it != end() )
+		{
+			if( callable( *it ) )
+			{
+				Erase( it );
+				return;
+			}
+			++it;
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -704,16 +766,16 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const ValueType																				&	value,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> )
+		u64																								count			= 1,
+		u64																								headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
-				at.GetData(),
+				at.GetAddress(),
 				value,
 				count,
 				headroom
@@ -747,16 +809,16 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
-		size_t																							count			= 1,
-		size_t																							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+		u64																								count			= 1,
+		u64																								headroom		= 0
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
-		BC_ContainerAssert( at.GetContainer() == this, "Iterator points to a wrong container" );
+		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
 			this,
 			this->DoInsert(
-				at.GetData(),
+				at.GetAddress(),
 				other,
 				count,
 				headroom
@@ -779,7 +841,7 @@ public:
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).Find( value );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -796,8 +858,8 @@ public:
 		const ValueType																				&	value
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto result = ThisViewType<true>( *this ).Find( value );
-		return Iterator { this, result.GetData() };
+		auto result = ThisViewType<false>( *this ).Find( value );
+		return Iterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -819,7 +881,7 @@ public:
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		auto result = ThisViewType<true>( *this ).FindIf( lambda );
-		return ConstIterator { this, result.GetData() };
+		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -840,8 +902,8 @@ public:
 		LambdaType																					&&	lambda
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto result = ThisViewType<true>( *this ).FindIf( lambda );
-		return Iterator { this, result.GetData() };
+		auto result = ThisViewType<false>( *this ).FindIf( lambda );
+		return Iterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -939,39 +1001,42 @@ using BC_CONTAINER_NAME( EditableListView ) = BC_CONTAINER_NAME( ListViewBase )<
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( ListView )<uint32_t> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( EditableListView )<uint32_t> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( List )<uint32_t> ) == 24 );
+static_assert( sizeof( BC_CONTAINER_NAME( ListView )<u32> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( EditableListView )<u32> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( List )<u32> ) == 24 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill concept requirements.
-static_assert( utility::ContainerView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( utility::Container<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( List )<u32>> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( List )<u32>> );
+static_assert( utility::Container<BC_CONTAINER_NAME( List )<u32>> );
 
-static_assert( utility::ContainerView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( !utility::Container<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( EditableListView )<u32>> );
+static_assert( utility::ContainerEditableView<BC_CONTAINER_NAME( EditableListView )<u32>> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( EditableListView )<u32>> );
 
-static_assert( utility::ContainerView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !utility::Container<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( utility::ContainerView<BC_CONTAINER_NAME( ListView )<u32>> );
+static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( ListView )<u32>> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( ListView )<u32>> );
 
-static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( List )<uint32_t>> );
-static_assert( utility::LinearContainer<BC_CONTAINER_NAME( List )<uint32_t>> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( List )<u32>> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( List )<u32>> );
+static_assert( utility::LinearContainer<BC_CONTAINER_NAME( List )<u32>> );
 
-static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
-static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( EditableListView )<uint32_t>> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( EditableListView )<u32>> );
+static_assert( utility::LinearContainerEditableView<BC_CONTAINER_NAME( EditableListView )<u32>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( EditableListView )<u32>> );
 
-static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( ListView )<uint32_t>> );
-static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( ListView )<uint32_t>> );
+static_assert( utility::LinearContainerView<BC_CONTAINER_NAME( ListView )<u32>> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( ListView )<u32>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( ListView )<u32>> );
 
 static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( List )<char32_t>> );
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( List )<char32_t>> );
@@ -984,6 +1049,9 @@ static_assert( !utility::TextContainer<BC_CONTAINER_NAME( EditableListView )<cha
 static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( ListView )<char32_t>> );
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( ListView )<char32_t>> );
 static_assert( !utility::TextContainer<BC_CONTAINER_NAME( ListView )<char32_t>> );
+
+} // tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 

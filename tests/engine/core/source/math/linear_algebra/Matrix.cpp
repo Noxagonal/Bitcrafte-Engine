@@ -1,7 +1,7 @@
 
 #include <gtest/gtest.h>
 
-#include <core/math/linear_algebra/Matrix.hpp>
+#include <core/math/Matrix.hpp>
 
 
 
@@ -47,9 +47,9 @@ TEST( Matrix, Multiplication )
 	using M3 = bc::math::Matrix3d;
 	using M4 = bc::math::Matrix4d;
 
-	using V2 = bc::math::Vector2d;
-	using V3 = bc::math::Vector3d;
-	using V4 = bc::math::Vector4d;
+	using V2 = bc::math::Vec2f64;
+	using V3 = bc::math::Vec3f64;
+	using V4 = bc::math::Vec4f64;
 
 	// 2D
 	{

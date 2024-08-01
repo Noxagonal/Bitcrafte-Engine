@@ -53,7 +53,7 @@ bc::List<bc::Text> bc::rhi::RHIVulkanComponent::GetGraphicsCardList()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int64_t bc::rhi::RHIVulkanComponent::GetPrimaryGraphicsCardIndex()
+bc::i64 bc::rhi::RHIVulkanComponent::GetPrimaryGraphicsCardIndex()
 {
 	return rhi_vulkan_impl->GetBestPhysicalDevice();
 }

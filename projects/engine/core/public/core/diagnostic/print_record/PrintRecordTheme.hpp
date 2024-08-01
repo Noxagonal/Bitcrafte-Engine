@@ -14,7 +14,7 @@ namespace diagnostic {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Text or background color used for a log.
-enum class PrintRecordColor : uint8_t
+enum class PrintRecordColor : u8
 {
 	BLACK			= 0,
 	DARK_BLUE		= 1,
@@ -41,7 +41,7 @@ enum class PrintRecordColor : uint8_t
 ///
 /// @see
 /// GetSystemConsoleThemeColors()
-enum class PrintRecordTheme : uint32_t
+enum class PrintRecordTheme : u32
 {
 	DEFAULT			= 0,
 

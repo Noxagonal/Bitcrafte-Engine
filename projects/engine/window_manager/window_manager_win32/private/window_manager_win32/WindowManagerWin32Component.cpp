@@ -33,3 +33,9 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerWin32
 {
 	return win32_manager->CreateWindow( window_create_info );
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const void * bc::window_manager::WindowManagerWin32Component::GetPlatformSpecificHandles() const
+{
+	return win32_manager->GetPlatformSpecificHandles();
+}

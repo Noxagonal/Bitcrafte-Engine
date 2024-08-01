@@ -16,45 +16,36 @@ namespace diagnostic {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline PrintRecord											MakePrintRecord(
-	SimpleTextView32										text,
+BITCRAFTE_ENGINE_API
+PrintRecord													MakePrintRecord(
+	bc::internal_::SimpleTextView32							text,
 	PrintRecordTheme										theme
-)
-{
-	auto record = PrintRecord {};
-	auto new_section = PrintRecordSection {};
-	new_section.text = text;
-	new_section.theme = theme;
-	record += new_section;
-	return record;
-}
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline PrintRecord											MakePrintRecord(
-	SimpleTextView32										text
-)
-{
-	return MakePrintRecord( text, PrintRecordTheme::DEFAULT );
-}
+BITCRAFTE_ENGINE_API
+PrintRecord													MakePrintRecord(
+	bc::internal_::SimpleTextView32							text
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainer								TextContainerType>
 PrintRecord													MakePrintRecord(
 	TextContainerType										text,
 	PrintRecordTheme										theme
-) requires ( !std::is_same_v<std::decay_t<TextContainerType>, SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, SimpleText32> )
+) requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleText32> )
 {
-	static_assert( !std::is_same_v<TextContainerType, SimpleTextView32> );
-	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), theme );
+	static_assert( !std::is_same_v<TextContainerType, bc::internal_::SimpleTextView32> );
+	return MakePrintRecord( text::TextFormat( bc::internal_::SimpleTextView32( U"{}" ), text ), theme );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainer								TextContainerType>
 PrintRecord													MakePrintRecord(
 	TextContainerType										text
-) requires ( !std::is_same_v<std::decay_t<TextContainerType>, SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, SimpleText32> )
+) requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleText32> )
 {
-	return MakePrintRecord( text::TextFormat( SimpleTextView32( U"{}" ), text ), PrintRecordTheme::DEFAULT );
+	return MakePrintRecord( text::TextFormat( bc::internal_::SimpleTextView32( U"{}" ), text ), PrintRecordTheme::DEFAULT );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +65,7 @@ PrintRecord													MakePrintRecord_Argument(
 	return record;
 }
 
-namespace internal {
+namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
@@ -89,11 +80,12 @@ void														MakePrintRecord_ArgumentList_Collector(
 	const RestTypePack									&	...argument_pack
 )
 {
+	out_buffer += MakePrintRecord( U"\n" );
 	out_buffer += MakePrintRecord_Argument( argument_description, argument_value );
 	if constexpr( sizeof...( argument_pack ) > 0 ) MakePrintRecord_ArgumentList_Collector( out_buffer, argument_pack... );
 }
 
-} // internal
+} // internal_
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
@@ -107,7 +99,7 @@ PrintRecord													MakePrintRecord_ArgumentList(
 	static_assert( sizeof...( argument_pack ) % 2 == 0, "Argument list must be a pair of values, 'text' : 'value', argument pack size was odd" );
 
 	auto buffer = PrintRecord {};
-	internal::MakePrintRecord_ArgumentList_Collector( buffer, argument_pack... );
+	internal_::MakePrintRecord_ArgumentList_Collector( buffer, argument_pack... );
 	return buffer;
 }
 
@@ -116,7 +108,7 @@ template<
 	typename												...ArgumentTypePack
 >
 PrintRecord													MakePrintRecord_AssertText(
-	SimpleTextView32										title,
+	bc::internal_::SimpleTextView32							title,
 	const ArgumentTypePack								&	...argument_pack
 )
 {
@@ -125,26 +117,16 @@ PrintRecord													MakePrintRecord_AssertText(
 	auto record = MakePrintRecord( title );
 	if constexpr( sizeof...( argument_pack ) )
 	{
-		record += MakePrintRecord( U"\n" );
 		record += MakePrintRecord_ArgumentList( argument_pack... ).AddIndent();
 	}
 	return record;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline PrintRecord											MakePrintRecord_SourceLocation(
+BITCRAFTE_ENGINE_API
+PrintRecord													MakePrintRecord_SourceLocation(
 	const SourceLocation								&	source_location
-)
-{
-	auto record = MakePrintRecord_Argument( U"File", source_location.GetFile() );
-	record += MakePrintRecord( U"\n" );
-	record += MakePrintRecord_Argument( U"Function", source_location.GetFunction() );
-	record += MakePrintRecord( U"\n" );
-	record += MakePrintRecord_Argument( U"Line", source_location.GetLine() );
-	record += MakePrintRecord( U"\n" );
-	record += MakePrintRecord_Argument( U"Column", source_location.GetColumn() );
-	return record;
-}
+);
 
 
 

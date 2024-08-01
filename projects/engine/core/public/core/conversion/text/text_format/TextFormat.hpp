@@ -12,15 +12,15 @@ namespace text {
 
 template<
 	utility::TextContainerCharacterType									CharacterType,
-	size_t 																CharacterArraySize,
+	u64																	CharacterArraySize,
 	typename															...ArgumentsTypePack
 >
-constexpr SimpleTextBase<CharacterType>									TextFormat(
+constexpr bc::internal_::SimpleTextBase<CharacterType>					TextFormat(
 	const CharacterType ( &format_text )[ CharacterArraySize ],
 	ArgumentsTypePack												&&	...arguments
 )
 {
-	return TextFormat( SimpleTextViewBase<CharacterType, true>( format_text, CharacterArraySize ), std::forward<ArgumentsTypePack>( arguments )... );
+	return TextFormat( bc::internal_::SimpleTextViewBase<CharacterType, true>( format_text, CharacterArraySize ), std::forward<ArgumentsTypePack>( arguments )... );
 }
 
 

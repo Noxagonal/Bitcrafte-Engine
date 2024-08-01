@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/data_types/FundamentalTypes.hpp>
+
 #include <core/utility/concepts/ValueConcepts.hpp>
 
 #include <cmath>
@@ -14,7 +16,7 @@ namespace math {
 
 
 
-static constexpr double			PI			= std::numbers::pi;
+static constexpr f64			PI			= std::numbers::pi;
 
 
 

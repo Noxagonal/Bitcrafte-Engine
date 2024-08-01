@@ -1,6 +1,6 @@
 
 #include <rhi_vulkan/PreCompiledHeader.hpp>
-#include <rhi_vulkan/vk/renderpass/RenderPass.hpp>
+#include <rhi_vulkan/vk/renderpass/Renderpass.hpp>
 
 #include <rhi_vulkan/rhi_vulkan_impl/RHIVulkanImpl.hpp>
 #include <rhi_vulkan/vk/device/VulkanDevice.hpp>
@@ -19,7 +19,7 @@ bc::rhi::VulkanRenderPass::VulkanRenderPass(
 	//auto use_multisampling = create_info.multisamples != VK_SAMPLE_COUNT_1_BIT;
 	//
 	//auto attachment_create_info_list = List<VkAttachmentDescription2>();
-	//for( size_t i = 0; i < attachment_list.Size(); i++ )
+	//for( u64 i = 0; i < attachment_list.Size(); i++ )
 	//{
 	//	// TODO: Determined by attachment
 	//	auto flags = VK_ATTACHMENT_DESCRIPTION_MAY_ALIAS_BIT;
@@ -42,10 +42,10 @@ bc::rhi::VulkanRenderPass::VulkanRenderPass(
 	//auto subpass_create_info_color_attachment_reference_list			= List<List<VkAttachmentReference2>> {};
 	//auto subpass_create_info_resolve_attachment_reference_list			= List<List<VkAttachmentReference2>> {};
 	//auto subpass_create_info_depth_stencil_attachment_reference_list	= List<VkAttachmentReference2> {};
-	//auto subpass_create_info_preserve_attachment_reference_list			= List<List<uint32_t>> {};
-	//for( size_t i = 0; i < subpass_list.Size(); i++ )
+	//auto subpass_create_info_preserve_attachment_reference_list			= List<List<u32>> {};
+	//for( u64 i = 0; i < subpass_list.Size(); i++ )
 	//{
-	//	for( size_t r = 0; r < subpass_input_references[ i ].Size(); r++ )
+	//	for( u64 r = 0; r < subpass_input_references[ i ].Size(); r++ )
 	//	{
 	//		subpass_create_info_input_attachment_reference_list[ i ][ r ].sType			= VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
 	//		subpass_create_info_input_attachment_reference_list[ i ][ r ].pNext			= nullptr;
@@ -54,7 +54,7 @@ bc::rhi::VulkanRenderPass::VulkanRenderPass(
 	//		subpass_create_info_input_attachment_reference_list[ i ][ r ].aspectMask	= determined_by_attachment_format;
 	//	}
 	//
-	//	for( size_t r = 0; r < subpass_color_references[ i ].Size(); r++ )
+	//	for( u64 r = 0; r < subpass_color_references[ i ].Size(); r++ )
 	//	{
 	//		subpass_create_info_color_attachment_reference_list[ i ][ r ].sType			= VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
 	//		subpass_create_info_color_attachment_reference_list[ i ][ r ].pNext			= nullptr;
@@ -63,7 +63,7 @@ bc::rhi::VulkanRenderPass::VulkanRenderPass(
 	//		subpass_create_info_color_attachment_reference_list[ i ][ r ].aspectMask	= determined_by_attachment_format;
 	//	}
 	//
-	//	for( size_t r = 0; r < subpass_resolve_references[ i ].Size(); r++ )
+	//	for( u64 r = 0; r < subpass_resolve_references[ i ].Size(); r++ )
 	//	{
 	//		subpass_create_info_resolve_attachment_reference_list[ i ][ r ].sType		= VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
 	//		subpass_create_info_resolve_attachment_reference_list[ i ][ r ].pNext		= nullptr;
@@ -78,7 +78,7 @@ bc::rhi::VulkanRenderPass::VulkanRenderPass(
 	//	subpass_create_info_depth_stencil_attachment_reference_list[ i ].layout			= determined_by_subpass_reference;
 	//	subpass_create_info_depth_stencil_attachment_reference_list[ i ].aspectMask		= determined_by_attachment_format;
 	//
-	//	for( size_t r = 0; r < subpass_preserve_references[ i ].Size(); r++ )
+	//	for( u64 r = 0; r < subpass_preserve_references[ i ].Size(); r++ )
 	//	{
 	//		subpass_create_info_preserve_attachment_reference_list[ i ][ r ] = determined_by_subpass_reference;
 	//	}
@@ -88,18 +88,18 @@ bc::rhi::VulkanRenderPass::VulkanRenderPass(
 	//	subpass_create_info_list[ i ].flags						= 0;
 	//	subpass_create_info_list[ i ].pipelineBindPoint			= determined_by_subpass;
 	//	subpass_create_info_list[ i ].viewMask					= 0;
-	//	subpass_create_info_list[ i ].inputAttachmentCount		= uint32_t( subpass_create_info_input_attachment_reference_list[ i ].Size() );
+	//	subpass_create_info_list[ i ].inputAttachmentCount		= u32( subpass_create_info_input_attachment_reference_list[ i ].Size() );
 	//	subpass_create_info_list[ i ].pInputAttachments			= subpass_create_info_input_attachment_reference_list[ i ].Data();
-	//	subpass_create_info_list[ i ].colorAttachmentCount		= uint32_t( subpass_create_info_color_attachment_reference_list[ i ].Size() );
+	//	subpass_create_info_list[ i ].colorAttachmentCount		= u32( subpass_create_info_color_attachment_reference_list[ i ].Size() );
 	//	subpass_create_info_list[ i ].pColorAttachments			= subpass_create_info_color_attachment_reference_list[ i ].Data();
 	//	subpass_create_info_list[ i ].pResolveAttachments		= subpass_create_info_resolve_attachment_reference_list[ i ].Data();
 	//	subpass_create_info_list[ i ].pDepthStencilAttachment	= &subpass_create_info_depth_stencil_attachment_reference_list[ i ];
-	//	subpass_create_info_list[ i ].preserveAttachmentCount	= uint32_t( subpass_create_info_preserve_attachment_reference_list[ i ].Size() );
+	//	subpass_create_info_list[ i ].preserveAttachmentCount	= u32( subpass_create_info_preserve_attachment_reference_list[ i ].Size() );
 	//	subpass_create_info_list[ i ].pPreserveAttachments		= subpass_create_info_preserve_attachment_reference_list[ i ].Data();
 	//}
 	//
 	//auto subpass_dependency_create_info_list		= List<VkSubpassDependency2>();
-	//for( size_t i = 0; i < subpass_dependencies.Size(); i++ )
+	//for( u64 i = 0; i < subpass_dependencies.Size(); i++ )
 	//{
 	//	subpass_dependency_create_info_list[ i ].sType				= VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2;
 	//	subpass_dependency_create_info_list[ i ].pNext				= nullptr;
@@ -119,11 +119,11 @@ bc::rhi::VulkanRenderPass::VulkanRenderPass(
 	//render_pass_create_info.sType					= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2;
 	//render_pass_create_info.pNext					= nullptr;
 	//render_pass_create_info.flags					= 0;
-	//render_pass_create_info.attachmentCount			= uint32_t( attachment_create_info_list.Size() );
+	//render_pass_create_info.attachmentCount			= u32( attachment_create_info_list.Size() );
 	//render_pass_create_info.pAttachments			= attachment_create_info_list.Data();
-	//render_pass_create_info.subpassCount			= uint32_t( subpass_create_info_list.Size() );
+	//render_pass_create_info.subpassCount			= u32( subpass_create_info_list.Size() );
 	//render_pass_create_info.pSubpasses				= subpass_create_info_list.Data();
-	//render_pass_create_info.dependencyCount			= uint32_t( subpass_dependency_create_info_list.Size() );
+	//render_pass_create_info.dependencyCount			= u32( subpass_dependency_create_info_list.Size() );
 	//render_pass_create_info.pDependencies			= subpass_dependency_create_info_list.Data();
 	//render_pass_create_info.correlatedViewMaskCount	= 0;
 	//render_pass_create_info.pCorrelatedViewMasks	= nullptr;

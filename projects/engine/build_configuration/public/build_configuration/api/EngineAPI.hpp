@@ -45,8 +45,8 @@
 #endif
 
 // define dynamic library export/import
-#if BITCRAFTE_ENGINE_SHARED
-#if BITCRAFTE_ENGINE_COMPONENT
+#if BITCRAFTE_IS_ENGINE_SHARED
+#if BITCRAFTE_IS_ENGINE_COMPONENT
 #define BITCRAFTE_ENGINE_API				__declspec(dllexport)
 #else
 #define BITCRAFTE_ENGINE_API				__declspec(dllimport)
@@ -76,8 +76,8 @@
 #endif
 
 // define dynamic library export/import
-#if BITCRAFTE_ENGINE_SHARED
-#if BITCRAFTE_ENGINE_COMPONENT
+#if BITCRAFTE_IS_ENGINE_SHARED
+#if BITCRAFTE_IS_ENGINE_COMPONENT
 #define BITCRAFTE_ENGINE_API				__attribute__((visibility("default")))
 #else
 #define BITCRAFTE_ENGINE_API
@@ -100,8 +100,8 @@
 #endif
 
 // define dynamic library export/import
-#if BITCRAFTE_ENGINE_SHARED
-#if BITCRAFTE_ENGINE_COMPONENT
+#if BITCRAFTE_IS_ENGINE_SHARED
+#if BITCRAFTE_IS_ENGINE_COMPONENT
 #define BITCRAFTE_ENGINE_API				__attribute__((visibility("default")))
 #else
 #define BITCRAFTE_ENGINE_API

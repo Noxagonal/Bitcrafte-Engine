@@ -1,0 +1,38 @@
+#pragma once
+
+#include <build_configuration/BuildConfigurationComponent.hpp>
+
+#include <scene/entity/component/mesh/MeshComponent.hpp>
+
+
+
+namespace bc {
+namespace scene {
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Dynamic mesh component is used to display mesh that can change at runtime.
+///
+/// Meant for meshes with changing geometry, eg. Skeletal meshes.
+///
+/// @note
+/// Also works with meshes with changing number of vertices.
+class DynamicMeshComponent : public MeshComponent
+{
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	DynamicMeshComponent();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual ~DynamicMeshComponent() override;
+
+private:
+};
+
+
+
+} // scene
+} // bc

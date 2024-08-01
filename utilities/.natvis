@@ -2,6 +2,17 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
+	<Type Name="bc::Array&lt;*&gt;">
+		<DisplayString>{{ size={$T2} }}</DisplayString>
+		<Expand>
+			<Item Name="[size]" ExcludeView="simple">$T2</Item>
+			<ArrayItems>
+				<Size>$T2</Size>
+				<ValuePointer>data</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
 	<Type Name="bc::List&lt;*&gt;">
 		<DisplayString>{{ size={data_size} }}</DisplayString>
 		<Expand>

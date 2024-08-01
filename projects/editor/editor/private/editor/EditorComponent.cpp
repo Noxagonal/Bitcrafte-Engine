@@ -1,6 +1,7 @@
 
 #include <editor/PreCompiledHeader.hpp>
 #include <core/diagnostic/logger/Logger.hpp>
+#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 #include <core/thread/ThreadPool.hpp>
 
 #include <engine/EngineComponent.hpp>
@@ -67,10 +68,10 @@ bc::editor::EditorComponent::EditorComponent()
 
 		{
 			auto gpus = engine->GetRHIComponent()->GetGraphicsCardList();
-			auto report = diagnostic::MakePrintRecord( U"GPUs found on system" );
-			report += diagnostic::MakePrintRecord( U"\n" );
-			for( size_t i = 0; i < gpus.Size(); i++ )
+			auto report = diagnostic::MakePrintRecord_Argument( U"GPUs found on system", gpus.Size() );
+			for( u64 i = 0; i < gpus.Size(); i++ )
 			{
+				report += diagnostic::MakePrintRecord( U"\n" );
 				report += diagnostic::MakePrintRecord_Argument( i, gpus[ i ] ).AddIndent();
 			}
 			core->GetLogger()->LogInfo( report );
@@ -90,7 +91,6 @@ bc::editor::EditorComponent::EditorComponent()
 				should_close = true;
 			}
 		);
-
 	}
 	catch( const diagnostic::Exception & exception )
 	{

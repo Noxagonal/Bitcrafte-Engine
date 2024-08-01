@@ -1,6 +1,9 @@
 
 cmake_minimum_required(VERSION 3.22)
 
+include("${CMAKE_SOURCE_DIR}/cmake/BitCrafteEngineComponent.cmake")
+include("${CMAKE_SOURCE_DIR}/cmake/WindowManager.cmake")
+
 
 
 # Add window manager component.
@@ -75,10 +78,10 @@ endfunction()
 
 
 
+# add window manager components.
 add_subdirectory("window_manager")
-if(BITCRAFTE_BUILD_WINDOW_WIN32)
-	add_subdirectory("window_manager_win32")
-endif()
-if(BITCRAFTE_BUILD_WINDOW_WAYLAND)
-	add_subdirectory("window_manager_wayland")
-endif()
+set(WINDOW_MANAGER_LIST)
+get_supported_window_manager_list(WINDOW_MANAGER_LIST)
+foreach(WINDOW_MANAGER IN LISTS WINDOW_MANAGER_LIST)
+	add_subdirectory("window_manager_${WINDOW_MANAGER}")
+endforeach()

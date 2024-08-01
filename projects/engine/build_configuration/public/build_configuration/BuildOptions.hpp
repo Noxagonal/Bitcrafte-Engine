@@ -36,8 +36,8 @@
 
 // Size in bytes of a single allocation from the GPU or host, linear = buffers, linear images, all host resources.
 // Non-linear resources are optimal images stored inside the GPU in a way what is fastest for GPU to access.
-#define BITCRAFTE_VULKAN_MEMORY_POOL_SINGLE_LINEAR_ALLOCATION_SIZE					( size_t( 1024 ) * 1024 * 64 )
-#define BITCRAFTE_VULKAN_MEMORY_POOL_SINGLE_NON_LINEAR_ALLOCATION_SIZE				( size_t( 1024 ) * 1024 * 256 )
+#define BITCRAFTE_VULKAN_MEMORY_POOL_SINGLE_LINEAR_ALLOCATION_SIZE					( 1024ll * 1024 * 64 )
+#define BITCRAFTE_VULKAN_MEMORY_POOL_SINGLE_NON_LINEAR_ALLOCATION_SIZE				( 1024ll * 1024 * 256 )
 
 #define BITCRAFTE_VULKAN_DESCRIPTOR_AUTO_POOL_CATEGORY_MINIMUM_COMPATIBILITY		( 0.85 )
 #define BITCRAFTE_VULKAN_DESCRIPTOR_AUTO_POOL_ALLOCATION_BATCH_SIZE					( 256 )

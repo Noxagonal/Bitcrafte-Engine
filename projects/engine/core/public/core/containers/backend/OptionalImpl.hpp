@@ -12,6 +12,7 @@
 
 
 namespace bc {
+BC_CONTAINER_NAMESPACE_START;
 
 
 
@@ -33,7 +34,7 @@ class BC_CONTAINER_NAME( Optional ) : private container_bases::ContainerResource
 	{
 	public:
 		inline NonTrivialType() {}
-		uint8_t dummy_value = {};
+		u8 dummy_value = {};
 	};
 	static_assert( !std::is_trivial_v<NonTrivialType> );
 	static_assert( sizeof( NonTrivialType ) == 1 );
@@ -76,7 +77,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr explicit BC_CONTAINER_NAME( Optional )( nullptr_t ) noexcept :
+	constexpr explicit BC_CONTAINER_NAME( Optional )( std::nullptr_t ) noexcept :
 		dummy_value( {} ),
 		has_data( false )
 	{}
@@ -137,7 +138,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
-		nullptr_t
+		std::nullptr_t
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();
@@ -267,6 +268,12 @@ public:
 		return !this->has_data;
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr explicit operator bool() const noexcept
+	{
+		return !IsEmpty();
+	}
+
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,31 +308,38 @@ private:
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( Optional )<uint8_t> ) == 2 );
-static_assert( sizeof( BC_CONTAINER_NAME( Optional )<uint16_t> ) == 4 );
-static_assert( sizeof( BC_CONTAINER_NAME( Optional )<uint32_t> ) == 8 );
-static_assert( sizeof( BC_CONTAINER_NAME( Optional )<uint64_t> ) == 16 );
+static_assert( sizeof( BC_CONTAINER_NAME( Optional )<u8> ) == 2 );
+static_assert( sizeof( BC_CONTAINER_NAME( Optional )<u16> ) == 4 );
+static_assert( sizeof( BC_CONTAINER_NAME( Optional )<u32> ) == 8 );
+static_assert( sizeof( BC_CONTAINER_NAME( Optional )<u64> ) == 16 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if text containers fulfill concept requirements.
-static_assert( !utility::ContainerView<BC_CONTAINER_NAME( Optional )<uint32_t>> );
-static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( Optional )<uint32_t>> );
-static_assert( !utility::Container<BC_CONTAINER_NAME( Optional )<uint32_t>> );
+static_assert( !utility::ContainerView<BC_CONTAINER_NAME( Optional )<u32>> );
+static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( Optional )<u32>> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( Optional )<u32>> );
 
-static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( Optional )<uint32_t>> );
-static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( Optional )<uint32_t>> );
-static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( Optional )<uint32_t>> );
+static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( Optional )<u32>> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( Optional )<u32>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( Optional )<u32>> );
 
-static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( Optional )<char32_t>> );
-static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( Optional )<char32_t>> );
-static_assert( !utility::TextContainer<BC_CONTAINER_NAME( Optional )<char32_t>> );
+static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( Optional )<c32>> );
+static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( Optional )<c32>> );
+static_assert( !utility::TextContainer<BC_CONTAINER_NAME( Optional )<c32>> );
+
+} // tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 
+BC_CONTAINER_NAMESPACE_END;
 } // bc
 
 

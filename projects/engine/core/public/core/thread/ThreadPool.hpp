@@ -6,7 +6,7 @@
 #include <core/thread/ThreadDescription.hpp>
 #include <core/thread/Task.hpp>
 
-#include <core/utility/concepts/LambdaConcepts.hpp>
+#include <core/utility/concepts/CallableConcepts.hpp>
 
 #include <core/containers/UniquePtr.hpp>
 #include <core/containers/List.hpp>
@@ -228,12 +228,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -270,12 +270,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -311,12 +311,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -348,12 +348,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::IsLambdaAcceptingParameters<LambdaType, Task&> || utility::IsLambdaAcceptingParameters<LambdaType>,
+			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::IsLambdaReturningVoid<LambdaType, Task&> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult, Task&> ||
-			utility::IsLambdaReturningVoid<LambdaType> || utility::IsLambdaReturningType<LambdaType, TaskExecutionResult>,
+			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
+			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -370,7 +370,7 @@ public:
 	///
 	/// @return
 	/// Number of tasks queued.
-	size_t													GetTaskQueueCount() const;
+	u64														GetTaskQueueCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -378,7 +378,7 @@ public:
 	///
 	/// @return
 	/// Number of tasks being executed.
-	size_t													GetTaskRunningCount() const;
+	u64														GetTaskRunningCount() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -420,26 +420,26 @@ private:
 			Thread										&	thread
 		) override
 		{
-			constexpr bool non_void1 = utility::IsLambdaSignature<LambdaType, void>;
-			constexpr bool non_void2 = utility::IsLambdaSignature<LambdaType, void, Task&>;
-			constexpr bool non_void3 = utility::IsLambdaSignature<LambdaType, TaskExecutionResult>;
-			constexpr bool non_void4 = utility::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&>;
+			constexpr bool non_void1 = utility::CallableWithParameters<LambdaType, void>;
+			constexpr bool non_void2 = utility::CallableWithParameters<LambdaType, void, Task&>;
+			constexpr bool non_void3 = utility::CallableWithParameters<LambdaType, TaskExecutionResult>;
+			constexpr bool non_void4 = utility::CallableWithParameters<LambdaType, TaskExecutionResult, Task&>;
 
-			if constexpr( utility::IsLambdaSignature<LambdaType, void> )
+			if constexpr( utility::CallableWithParameters<LambdaType, void> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( utility::IsLambdaSignature<LambdaType, void, Task&> )
+			else if constexpr( utility::CallableWithParameters<LambdaType, void, Task&> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( utility::IsLambdaSignature<LambdaType, TaskExecutionResult> )
+			else if constexpr( utility::CallableWithParameters<LambdaType, TaskExecutionResult> )
 			{
 				return lambda_function();
 			}
-			else if constexpr( utility::IsLambdaSignature<LambdaType, TaskExecutionResult, Task&> )
+			else if constexpr( utility::CallableWithParameters<LambdaType, TaskExecutionResult, Task&> )
 			{
 				return lambda_function();
 			}
@@ -479,7 +479,7 @@ private:
 	List<ThreadIdentifier>									GetTaskThreadLockIDs()
 	{
 		List<ThreadIdentifier> ret;
-		for( size_t i = 0; i < thread_description_list.Size(); i++ )
+		for( u64 i = 0; i < thread_description_list.Size(); i++ )
 		{
 			if( dynamic_cast<ThreadType*>( thread_description_list[ i ]->pool_thread.Get() ) != nullptr )
 			{

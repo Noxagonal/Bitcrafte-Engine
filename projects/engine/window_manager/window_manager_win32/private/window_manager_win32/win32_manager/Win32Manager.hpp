@@ -7,8 +7,7 @@
 #include <core/containers/List.hpp>
 #include <core/containers/UniquePtr.hpp>
 
-#include <Windows.h>
-#undef CreateWindow
+#include <core/platform/windows/Windows.hpp>
 
 
 
@@ -54,6 +53,9 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	inline const WindowManagerWin32PlatformHandles				*	GetPlatformSpecificHandles() const { return &platform_handles; }
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline const WNDCLASSW										&	GetWindowClass() { return window_class; }
 
 private:
@@ -68,6 +70,8 @@ private:
 	WNDCLASSW														window_class				= {};
 
 	List<Win32Window*>												active_window_list;
+
+	WindowManagerWin32PlatformHandles								platform_handles = {};
 };
 
 

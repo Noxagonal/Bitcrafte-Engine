@@ -2,13 +2,9 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <window_manager/window/Window.hpp>
-
-#include <Windows.h>
-// Prevent polluting CreateWindow all over the place
-#undef CreateWindow
-
 #include <window_manager/platform/handles/WindowPlatformHandles.hpp>
 
+#include <core/platform/windows/Windows.hpp>
 
 
 
@@ -48,9 +44,6 @@ public:
 		bool is_maximized									= false;
 		bool allow_drag_resize								= false;
 		bool allow_file_drop								= false;
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		DWORD												MakeWindowStyle() const;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,19 +81,14 @@ public:
 	void													Update();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const RuntimeInfo							&	GetRuntimeInfo() { return runtime_info; }
-	inline const Settings								&	GetSettings() { return settings; }
+	virtual WindowManagerPlatformHandlesBase			*	GetPlatformSpecificHandles() override;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual void										*	GetPlatformSpecificHandles();
-
+	DWORD													MakeWindowStyle() const;
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Win32Manager										&	win32_manager;
-
-	RuntimeInfo												runtime_info;
-	Settings												settings;
 
 	WindowManagerWin32PlatformHandles						platform_handles			= {};
 

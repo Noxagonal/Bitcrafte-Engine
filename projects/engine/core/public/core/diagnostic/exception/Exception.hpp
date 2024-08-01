@@ -22,7 +22,30 @@ class BITCRAFTE_ENGINE_API Exception
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Exception() = default;
+	/// @brief
+	/// Construct an Exception object.
+	///
+	/// @param print_record
+	///	General info of what caused the exception. Eg, "Index out of scope" when iterating over an array. See
+	/// bc::diagnostic::PrintRecord for more info on how to construct a print record.
+	///
+	/// @param source_location
+	/// This reports the source location where this function was called. If left as default, source location will point to the line
+	/// where this function was called.
+	///
+	/// @param stack_trace
+	/// This reports the source location where this function was called. If left as default, stack trace will point to the function
+	/// where this function was called.
+	constexpr inline Exception(
+		const PrintRecord		&	print_record			= PrintRecord{},
+		const SourceLocation	&	source_location			= SourceLocation::Current(),
+		const StackTrace		&	stack_trace 			= StackTrace::Current()
+	) noexcept :
+		message{ print_record },
+		source_location{ source_location },
+		stack_trace{ stack_trace },
+		next{ nullptr }
+	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr inline Exception(
@@ -33,7 +56,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception(
+	constexpr Exception(
 		Exception										&&	other
 	) = default;
 
@@ -47,7 +70,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception							&	operator=(
+	constexpr Exception									&	operator=(
 		Exception										&&	other
 	) = default;
 
@@ -90,9 +113,10 @@ public:
 	{
 		assert( std::addressof( next_exception ) != this && "next_exception was this exception" );
 		if( std::addressof( next_exception ) == this ) return;
-		this->next = MakeSimpleUniquePtr<Exception>( next_exception );
+		this->next = bc::internal_::MakeSimpleUniquePtr<Exception>( next_exception );
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr inline bool									IsEmpty() const noexcept
 	{
 		return this->message.IsEmpty();
@@ -100,6 +124,7 @@ public:
 
 private:
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr inline void									CopyOther(
 		const Exception									&	other
 	)
@@ -125,38 +150,8 @@ private:
 	///
 	/// This is used when an exception is caught by something which will then throw its own exception with additional information.
 	/// The original exception may be stored here.
-	SimpleUniquePtr<Exception>								next;
+	bc::internal_::SimpleUniquePtr<Exception>				next;
 };
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Build an Exception structure.
-///
-/// @param print_record
-///	General info of what caused the exception. Eg, "Index out of scope" when iterating over an array. See
-/// bc::diagnostic::PrintRecord for more info on how to construct a print record.
-///
-/// @param source_location
-/// This reports the source location where this function was called. If left as default, source location will point to the line
-/// where this function was called.
-///
-/// @param stack_trace
-/// This reports the source location where this function was called. If left as default, stack trace will point to the function
-/// where this function was called.
-///
-/// @return New Exception object.
-BITCRAFTE_ENGINE_API
-Exception												MakeException(
-	const PrintRecord								&	print_record,
-	const SourceLocation							&	source_location				= SourceLocation::Current(),
-	const StackTrace								&	stack_trace					= StackTrace::Current()
-);
-
-
-
-#if BITCRAFTE_DEVELOPMENT_BUILD
 
 
 
@@ -177,40 +172,18 @@ Exception												MakeException(
 ///	Exception to throw.
 BITCRAFTE_ENGINE_API
 void													Throw [[noreturn]] (
-	const Exception									&	exception
+	const Exception									&	exception,
+	SourceLocation										source_location					= SourceLocation::Current()
 );
 
 
 
-#else // BITCRAFTE_DEVELOPMENT_BUILD
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline void												Throw [[noreturn]] (
-	const Exception									&	exception
-)
-{
-	// TODO: Should call our own abort/terminate function which makes sure all potentially problematic
-	// system resources like files are closed. Our own abort/terminate function can also launch crash
-	// report application.
-
-	std::abort();
-}
-
-
-
-
-#endif // BITCRAFTE_DEVELOPMENT_BUILD
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Throw exception with message and optional information.
 ///
 /// Example:
-/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 6.
+/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 8.
 ///		diagnostic::Throw(
 ///			diagnostic::MakePrintRecord_AssertText( "Index out of scope",
 ///				"List size", size,
@@ -220,7 +193,7 @@ inline void												Throw [[noreturn]] (
 /// Will output:
 ///		Index out of scope
 ///		- List size: 5
-///		- Accessed index: 6
+///		- Accessed index: 8
 ///
 /// @note
 ///	Depending on where the exception is thrown, this will either disable parts of the engine or cause general crash of the
@@ -239,26 +212,17 @@ inline void												Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
-inline void												Throw [[noreturn]] (
+void													Throw [[noreturn]] (
 	const PrintRecord								&	print_record,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
-)
-{
-	Throw(
-		MakeException(
-			print_record,
-			source_location,
-			StackTrace::Current( 1 )
-		)
-	);
-}
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Throw exception with message and optional information.
 ///
 /// Example:
-/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 6.
+/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 8.
 ///		diagnostic::Throw(
 ///			diagnostic::MakePrintRecord_AssertText( "Index out of scope",
 ///				"List size", size,
@@ -268,7 +232,7 @@ inline void												Throw [[noreturn]] (
 /// Will output:
 ///		Index out of scope
 ///		- List size: 5
-///		- Accessed index: 6
+///		- Accessed index: 8
 ///
 /// @note
 ///	Depending on where the exception is thrown, this will either disable parts of the engine or cause general crash of the
@@ -287,26 +251,17 @@ inline void												Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
-inline void												Throw [[noreturn]] (
-	const SimpleTextView32								message,
+void													Throw [[noreturn]] (
+	const bc::internal_::SimpleTextView32				message,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
-)
-{
-	Throw(
-		MakeException(
-			PrintRecord( message ),
-			source_location,
-			StackTrace::Current( 1 )
-		)
-	);
-}
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Throw exception with message and optional information.
 ///
 /// Example:
-/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 6.
+/// Eg. Index out of scope: Assuming list size is 5 and accessed index was 8.
 ///		diagnostic::Throw(
 ///			diagnostic::MakePrintRecord_AssertText( "Index out of scope",
 ///				"List size", size,
@@ -316,7 +271,7 @@ inline void												Throw [[noreturn]] (
 /// Will output:
 ///		Index out of scope
 ///		- List size: 5
-///		- Accessed index: 6
+///		- Accessed index: 8
 ///
 /// @note
 ///	Depending on where the exception is thrown, this will either disable parts of the engine or cause general crash of the
@@ -335,18 +290,18 @@ inline void												Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
-template<utility::TextContainerCharacterType CharacterType, size_t StringArraySize>
+template<utility::TextContainerCharacterType CharacterType, u64 StringArraySize>
 void													Throw [[noreturn]] (
 	const CharacterType( &message )[ StringArraySize ],
 	const SourceLocation							&	source_location				= SourceLocation::Current()
 )
 {
 	Throw(
-		MakeException(
+		Exception{
 			PrintRecord( message ),
 			source_location,
 			StackTrace::Current( 1 )
-		)
+		}
 	);
 }
 

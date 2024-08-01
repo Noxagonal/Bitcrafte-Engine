@@ -11,6 +11,10 @@ VkImageAspectFlagBits bc::rhi::CreateAspectMaskFromFormat(
 {
 	switch( format )
 	{
+	case VK_FORMAT_UNDEFINED:
+	case VK_FORMAT_MAX_ENUM:
+		return {};
+
 	case VK_FORMAT_R4G4_UNORM_PACK8:
 	case VK_FORMAT_R4G4B4A4_UNORM_PACK16:
 	case VK_FORMAT_B4G4R4A4_UNORM_PACK16:

@@ -50,11 +50,11 @@ auto											ToUTF8(
 		std::mbstate_t state {};
 		char c8_buffer[ MB_LEN_MAX ];
 
-		for( size_t i = 0; i < text.Size(); ++i ) {
+		for( u64 i = 0; i < text.Size(); ++i ) {
 			char16_t c16 = text[ i ];
-			size_t c8_length = std::c16rtomb( c8_buffer, c16, &state );
-			if( c8_length != size_t( -1 ) ) {
-				for( size_t c = 0; c < c8_length; ++c ) {
+			u64 c8_length = std::c16rtomb( c8_buffer, c16, &state );
+			if( c8_length != u64( -1 ) ) {
+				for( u64 c = 0; c < c8_length; ++c ) {
 					out.PushBack( c8_buffer[ c ] );
 				}
 			}
@@ -66,11 +66,11 @@ auto											ToUTF8(
 		std::mbstate_t state {};
 		char c8_buffer[ MB_LEN_MAX ];
 
-		for( size_t i = 0; i < text.Size(); ++i ) {
+		for( u64 i = 0; i < text.Size(); ++i ) {
 			char32_t c32 = text[ i ];
-			size_t c8_length = std::c32rtomb( c8_buffer, c32, &state );
-			if( c8_length != size_t( -1 ) ) {
-				for( size_t c = 0; c < c8_length; ++c ) {
+			u64 c8_length = std::c32rtomb( c8_buffer, c32, &state );
+			if( c8_length != u64( -1 ) ) {
+				for( u64 c = 0; c < c8_length; ++c ) {
 					out.PushBack( c8_buffer[ c ] );
 				}
 			}
@@ -121,10 +121,10 @@ auto											ToUTF16(
 		auto data_in		= reinterpret_cast<const char*>( text.Data() );
 		auto data_in_end	= reinterpret_cast<const char*>( text.Data() + text.Size() );
 		while( data_in < data_in_end ) {
-			size_t read_length = std::mbrtoc16( &c16, data_in, text.Size(), &state );
+			u64 read_length = std::mbrtoc16( &c16, data_in, text.Size(), &state );
 			if( read_length == 0 ) break;
-			if( read_length == size_t( -1 ) ) break;
-			if( read_length == size_t( -2 ) ) break;
+			if( read_length == u64( -1 ) ) break;
+			if( read_length == u64( -2 ) ) break;
 			out.PushBack( c16 );
 			data_in += read_length;
 		}
@@ -182,11 +182,11 @@ auto											ToUTF32(
 		auto data_in		= reinterpret_cast<const char*>( text.Data() );
 		auto data_in_end	= reinterpret_cast<const char*>( text.Data() + text.Size() );
 		while( data_in < data_in_end ) {
-			size_t read_length = std::mbrtoc32( &c32, data_in, text.Size(), &state );
-			BHardAssert( read_length != size_t( -3 ), "Failed to convert to UTF32, corrupt UTF text, UTF-32 does not have surrogates" );
+			u64 read_length = std::mbrtoc32( &c32, data_in, text.Size(), &state );
+			BHardAssert( read_length != u64( -3 ), U"Failed to convert to UTF32, corrupt UTF text, UTF-32 does not have surrogates" );
 			if( read_length == 0 ) break;
-			if( read_length == size_t( -1 ) ) break;
-			if( read_length == size_t( -2 ) ) break;
+			if( read_length == u64( -1 ) ) break;
+			if( read_length == u64( -2 ) ) break;
 			out.PushBack( c32 );
 			data_in += read_length;
 		}
@@ -204,6 +204,35 @@ auto											ToUTF32(
 	}
 
 	return out;
+}
+
+
+
+// TODO: Convert all char8_t, char16_t, char32_t to c8, c16, c32.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	utility::TextContainerCharacterType			OutTextCharacterType,
+	utility::TextContainerView					TextContainerType
+>
+auto											ToUTF(
+	const TextContainerType					&	text
+)
+{
+	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<OutTextCharacterType>;
+
+	if constexpr( std::is_same_v<OutTextCharacterType, c8> ) {
+		return ToUTF8( text );
+	} else if constexpr( std::is_same_v<OutTextCharacterType, c16> ) {
+		return ToUTF16( text );
+	} else if constexpr( std::is_same_v<OutTextCharacterType, c32> ) {
+		return ToUTF32( text );
+	} else {
+		[]<bool Check = false>() {
+			static_assert(Check, "Failed to convert to UTF, not a valid character type");
+		}();
+		return OutTextContainerType {};
+	}
 }
 
 

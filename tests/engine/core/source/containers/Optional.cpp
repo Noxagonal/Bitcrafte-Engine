@@ -63,17 +63,17 @@ TEST( OptionalContainer, Clear )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class EmplaceObject
+class Optional_EmplaceObject
 {
 public:
-	EmplaceObject( size_t value ) : value( value ) {}
-	EmplaceObject( const EmplaceObject & other ) = default;
-	EmplaceObject( EmplaceObject && other ) = default;
+	Optional_EmplaceObject( size_t value ) : value( value ) {}
+	Optional_EmplaceObject( const Optional_EmplaceObject & other ) = default;
+	Optional_EmplaceObject( Optional_EmplaceObject && other ) = default;
 
-	EmplaceObject & operator=( const EmplaceObject & other ) = default;
-	EmplaceObject & operator=( EmplaceObject && other ) = default;
+	Optional_EmplaceObject & operator=( const Optional_EmplaceObject & other ) = default;
+	Optional_EmplaceObject & operator=( Optional_EmplaceObject && other ) = default;
 
-	bool operator==( const EmplaceObject & other ) const { return value == other.value; }
+	bool operator==( const Optional_EmplaceObject & other ) const { return value == other.value; }
 
 	size_t value = 0;
 };
@@ -84,7 +84,7 @@ public:
 TEST( OptionalContainer, NonTrivialTypes )
 {
 	using A = bc::Optional<uint32_t>;
-	using B = bc::Optional<EmplaceObject>;
+	using B = bc::Optional<Optional_EmplaceObject>;
 
 	{
 		A a( 5 );
@@ -93,14 +93,6 @@ TEST( OptionalContainer, NonTrivialTypes )
 		EXPECT_EQ( a.Get(), 5 );
 		EXPECT_EQ( b.Get(), 5 );
 		EXPECT_EQ( b.Get().value, 5 );
-	}
-	{
-		A a1;
-		a1.Emplace( 5 );
-
-		B b1;
-		std::optional<EmplaceObject> c1;
-		b1.Emplace( 5 );
 	}
 };
 

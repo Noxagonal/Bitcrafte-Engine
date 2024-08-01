@@ -26,10 +26,18 @@
 // Include window components.
 #if BITCRAFTE_WINDOW_MANAGER_WIN32
 #include <window_manager_win32/WindowManagerWin32Component.hpp>
-#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
+#endif
+
+#if BITCRAFTE_WINDOW_MANAGER_XLIB
+#include <window_manager_xlib/WindowManagerXLibComponent.hpp>
+#endif
+
+#if BITCRAFTE_WINDOW_MANAGER_XCB
+#include <window_manager_xcb/WindowManagerXCBComponent.hpp>
+#endif
+
+#if BITCRAFTE_WINDOW_MANAGER_WAYLAND
 #include <window_manager_wayland/WindowManagerWaylandComponent.hpp>
-#else
-#warning "No Window component included, using dummy interface"
 #endif
 
 
@@ -94,11 +102,21 @@ bc::UniquePtr<bc::window_manager::WindowManagerComponent> bc::engine::EngineComp
 	#if BITCRAFTE_WINDOW_MANAGER_WIN32
 	return MakeUniquePtr<window_manager::WindowManagerWin32Component>( create_info.window_manager_create_info );
 
+	#elif BITCRAFTE_WINDOW_MANAGER_XLIB && BITCRAFTE_WINDOW_MANAGER_WAYLAND
+	// TODO: Detect which window manager to use based on what the user is currently using. For now, we'll just use Xlib.
+	return MakeUniquePtr<window_manager::WindowManagerXLibComponent>( create_info.window_manager_create_info );
+
+	#elif BITCRAFTE_WINDOW_MANAGER_XLIB
+	return MakeUniquePtr<window_manager::WindowManagerXLibComponent>( create_info.window_manager_create_info );
+
+	#elif BITCRAFTE_WINDOW_MANAGER_XCB
+	return MakeUniquePtr<window_manager::WindowManagerXCBComponent>( create_info.window_manager_create_info );
+
 	#elif BITCRAFTE_WINDOW_MANAGER_WAYLAND
 	return MakeUniquePtr<window_manager::WindowManagerWaylandComponent>( create_info.window_manager_create_info );
 
 	#else
-	#error "No window manager selected"
+	#error "No window manager available"
 	#endif // Window manager selection
 }
 

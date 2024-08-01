@@ -24,7 +24,7 @@ VkDeviceSize CalculateAlignmentForBuffer(
 		VkDeviceSize( physical_device_limits.minMemoryMapAlignment )
 	);
 
-	return VkDeviceSize( ( ( ( int64_t( unaligned_size ) - 1 ) / buffer_alignment ) + 1 ) * buffer_alignment );
+	return VkDeviceSize( ( ( ( bc::i64( unaligned_size ) - 1 ) / buffer_alignment ) + 1 ) * buffer_alignment );
 }
 
 
@@ -101,15 +101,15 @@ bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateImageMemory(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateMemory(
 	bool										is_linear,
-	internal::RHIPoolMemoryRequirements		&	memory_requirements,
+	internal_::RHIPoolMemoryRequirements	&	memory_requirements,
 	VkMemoryPropertyFlagBits					property_flags
 )
 {
 	// TODO: add tests and error reports
 	auto memory_type_index = FindMemoryTypeIndex( memory_requirements, property_flags );
-	assert( memory_type_index != UINT32_MAX );
+	assert( memory_type_index != std::numeric_limits<decltype( memory_type_index )>::max() );
 
-	List<internal::RHIMemoryPoolChunk> * chunk_group = nullptr;
+	List<internal_::RHIMemoryPoolChunk> * chunk_group = nullptr;
 	if( is_linear )
 	{
 		chunk_group = &linear_chunks[ memory_type_index ];
@@ -119,8 +119,8 @@ bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateMemory(
 		chunk_group = &non_linear_chunks[ memory_type_index ];
 	}
 
-	internal::RHIMemoryPoolChunk			*	selected_chunk	= nullptr;
-	internal::RHIMemoryPoolChunk::Block		*	selected_block	= nullptr;
+	internal_::RHIMemoryPoolChunk			*	selected_chunk	= nullptr;
+	internal_::RHIMemoryPoolChunk::Block	*	selected_block	= nullptr;
 	for( auto & c : *chunk_group )
 	{
 		selected_chunk				= &c;
@@ -183,22 +183,22 @@ void bc::rhi::RHIMemoryPool::FreePoolMemory(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::internal::RHIMemoryPoolChunk::Block * bc::rhi::RHIMemoryPool::AllocateBlock(
-	internal::RHIMemoryPoolChunk			&	chunk,
-	internal::RHIPoolMemoryRequirements		&	memory_requirements
+bc::rhi::internal_::RHIMemoryPoolChunk::Block * bc::rhi::RHIMemoryPool::AllocateBlock(
+	internal_::RHIMemoryPoolChunk			&	chunk,
+	internal_::RHIPoolMemoryRequirements	&	memory_requirements
 )
 {
 	auto alignment				= memory_requirements.memory_requirements.alignment;
 	auto size					= memory_requirements.memory_requirements.size;
 
 	auto InsertChunkBlock = [ &chunk ](
-		List<internal::RHIMemoryPoolChunk::Block>::Iterator		where,
+		List<internal_::RHIMemoryPoolChunk::Block>::Iterator	where,
 		VkDeviceSize											offset,
 		VkDeviceSize											size,
 		VkDeviceSize											alignment
-		) -> internal::RHIMemoryPoolChunk::Block*
+		) -> internal_::RHIMemoryPoolChunk::Block*
 		{
-			auto block = internal::RHIMemoryPoolChunk::Block {};
+			auto block = internal_::RHIMemoryPoolChunk::Block {};
 			block.id		= chunk.block_id_counter;
 			block.offset	= offset;
 			block.size		= size;
@@ -225,7 +225,7 @@ bc::rhi::internal::RHIMemoryPoolChunk::Block * bc::rhi::RHIMemoryPool::AllocateB
 
 	//for( auto b = chunk.blocks.begin(); b != chunk.blocks.end(); ++b )
 	//{
-	//	if( b->id != UINT64_MAX )
+	//	if( b->id != std::numeric_limits<decltype( b->id )>::max() )
 	//	{
 	//		auto prev = b - 1;
 	//		
@@ -247,10 +247,10 @@ bc::rhi::internal::RHIMemoryPoolChunk::Block * bc::rhi::RHIMemoryPool::AllocateB
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::Pair<VkResult, bc::rhi::internal::RHIMemoryPoolChunk*> bc::rhi::RHIMemoryPool::AllocateChunk(
-	bc::List<bc::rhi::internal::RHIMemoryPoolChunk>		*	chunk_group,
+bc::Pair<VkResult, bc::rhi::internal_::RHIMemoryPoolChunk*> bc::rhi::RHIMemoryPool::AllocateChunk(
+	bc::List<bc::rhi::internal_::RHIMemoryPoolChunk>	*	chunk_group,
 	VkDeviceSize											size,
-	uint32_t												memory_type_index
+	u32														memory_type_index
 )
 {
 	assert( chunk_group );
@@ -272,7 +272,7 @@ bc::Pair<VkResult, bc::rhi::internal::RHIMemoryPoolChunk*> bc::rhi::RHIMemoryPoo
 		return { result, nullptr };
 	}
 
-	chunk_group->PushBack( internal::RHIMemoryPoolChunk() );
+	chunk_group->PushBack( internal_::RHIMemoryPoolChunk() );
 	auto new_chunk		= &chunk_group->Back();
 	new_chunk->id		= chunk_id_counter++;
 	new_chunk->memory	= memory;
@@ -284,17 +284,17 @@ bc::Pair<VkResult, bc::rhi::internal::RHIMemoryPoolChunk*> bc::rhi::RHIMemoryPoo
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::RHIMemoryPool::FreeBlock(
-	uint32_t	memory_type_index,
+	u32			memory_type_index,
 	bool		is_linear,
-	uint64_t	chunk_id,
-	uint64_t	block_id
+	u64			chunk_id,
+	u64			block_id
 )
 {
-	assert( memory_type_index != UINT32_MAX );
-	assert( chunk_id != UINT64_MAX );
-	assert( block_id != UINT64_MAX );
+	assert( memory_type_index != std::numeric_limits<decltype( memory_type_index )>::max() );
+	assert( chunk_id != std::numeric_limits<decltype( chunk_id )>::max() );
+	assert( block_id != std::numeric_limits<decltype( block_id )>::max() );
 
-	List<internal::RHIMemoryPoolChunk> * chunk_group = nullptr;
+	List<internal_::RHIMemoryPoolChunk> * chunk_group = nullptr;
 	if( is_linear )
 	{
 		chunk_group = &linear_chunks[ memory_type_index ];
@@ -304,7 +304,7 @@ void bc::rhi::RHIMemoryPool::FreeBlock(
 		chunk_group = &non_linear_chunks[ memory_type_index ];
 	}
 
-	internal::RHIMemoryPoolChunk * selected_chunk = nullptr;
+	internal_::RHIMemoryPoolChunk * selected_chunk = nullptr;
 	for( auto & c : *chunk_group )
 	{
 		if( c.id == chunk_id )
@@ -334,8 +334,8 @@ void bc::rhi::RHIMemoryPool::FreeBlock(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::RHIMemoryPool::FreeChunk(
-	List<internal::RHIMemoryPoolChunk>	&	chunk_group,
-	internal::RHIMemoryPoolChunk		&	chunk
+	List<internal_::RHIMemoryPoolChunk>	&	chunk_group,
+	internal_::RHIMemoryPoolChunk		&	chunk
 )
 {
 	FreeChunkMemory( chunk );
@@ -347,14 +347,14 @@ void bc::rhi::RHIMemoryPool::FreeChunk(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::RHIMemoryPool::FreeChunkMemory(
-	internal::RHIMemoryPoolChunk	&	chunk
+	internal_::RHIMemoryPoolChunk	&	chunk
 )
 {
 	vkFreeMemory( rhi_vulkan_impl.GetVulkanDevice(), chunk.memory, rhi_vulkan_impl.GetMainThreadAllocationCallbacks() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::internal::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetBufferMemoryRequirements(
+bc::rhi::internal_::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetBufferMemoryRequirements(
 	VkBuffer buffer
 )
 {
@@ -377,7 +377,7 @@ bc::rhi::internal::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetBufferMe
 		&buffer_memory_requirements
 	);
 
-	auto result = internal::RHIPoolMemoryRequirements {};
+	auto result = internal_::RHIPoolMemoryRequirements {};
 	result.memory_requirements				= buffer_memory_requirements.memoryRequirements;
 	result.requires_dedicated_allocation	= dedicated_requirements.requiresDedicatedAllocation;
 	result.prefers_dedicated_allocation		= dedicated_requirements.prefersDedicatedAllocation;
@@ -385,7 +385,7 @@ bc::rhi::internal::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetBufferMe
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::internal::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetImageMemoryRequirements(
+bc::rhi::internal_::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetImageMemoryRequirements(
 	VkImage image
 )
 {
@@ -408,7 +408,7 @@ bc::rhi::internal::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetImageMem
 		&buffer_memory_requirements
 	);
 
-	auto result = internal::RHIPoolMemoryRequirements {};
+	auto result = internal_::RHIPoolMemoryRequirements {};
 	result.memory_requirements				= buffer_memory_requirements.memoryRequirements;
 	result.requires_dedicated_allocation	= dedicated_requirements.requiresDedicatedAllocation;
 	result.prefers_dedicated_allocation		= dedicated_requirements.prefersDedicatedAllocation;
@@ -416,12 +416,12 @@ bc::rhi::internal::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetImageMem
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t bc::rhi::RHIMemoryPool::FindMemoryTypeIndex(
-	internal::RHIPoolMemoryRequirements		&	memory_requirements,
+bc::u32 bc::rhi::RHIMemoryPool::FindMemoryTypeIndex(
+	internal_::RHIPoolMemoryRequirements		&	memory_requirements,
 	VkMemoryPropertyFlags						propertyFlags
 )
 {
-	for( uint32_t i=0; i < physical_device_memory_properties.memoryTypeCount; ++i )
+	for( u32 i=0; i < physical_device_memory_properties.memoryTypeCount; ++i )
 	{
 		if( memory_requirements.memory_requirements.memoryTypeBits & ( 1 << i ) )
 		{
@@ -431,5 +431,5 @@ uint32_t bc::rhi::RHIMemoryPool::FindMemoryTypeIndex(
 			}
 		}
 	}
-	return UINT32_MAX;
+	return std::numeric_limits<u32>::max();
 }

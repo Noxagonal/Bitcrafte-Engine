@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/data_types/FundamentalTypes.hpp>
+
 #include <algorithm>
 
 
@@ -23,9 +25,9 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline constexpr Version(
-		uint32_t						major,
-		uint32_t						minor,
-		uint32_t						patch
+		u32						major,
+		u32						minor,
+		u32						patch
 	) noexcept :
 		major( major ),
 		minor( minor ),
@@ -42,9 +44,9 @@ public:
 	/// @return
 	/// Packed version info where the 3 highest bits are the variant number, next 7 highest bits are major, next 10 bits are minor,
 	/// and the last 12 bits are the patch number.
-	inline constexpr uint32_t			ToVulkanPacked() const noexcept
+	inline constexpr u32			ToVulkanPacked() const noexcept
 	{
-		return ( ( ( (uint32_t)( major ) & 0x7FU ) << 22U ) ) | ( ( (uint32_t)( minor ) & 0x3FFU ) << 12U ) | ( (uint32_t)( patch ) & 0xFFFU );
+		return ( ( ( (u32)( major ) & 0x7FU ) << 22U ) ) | ( ( (u32)( minor ) & 0x3FFU ) << 12U ) | ( (u32)( patch ) & 0xFFFU );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,22 +57,22 @@ public:
 	/// Packed version info where the 3 highest bits are the variant number, next 7 highest bits are major, next 10 bits are minor,
 	/// and the last 12 bits are the patch number.
 	inline constexpr void				FromVulkanPacked(
-		uint32_t						packed
+		u32						packed
 	) noexcept
 	{
-		major = ( ( (uint32_t)( packed ) >> 22U ) & 0x7FU );
-		minor = ( ( (uint32_t)( packed ) >> 12U ) & 0x3FFU );
-		patch = ( (uint32_t)( packed ) & 0xFFFU );
+		major = ( ( (u32)( packed ) >> 22U ) & 0x7FU );
+		minor = ( ( (u32)( packed ) >> 12U ) & 0x3FFU );
+		patch = ( (u32)( packed ) & 0xFFFU );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	uint32_t					major				= {};
-	uint32_t					minor				= {};
-	uint32_t					patch				= {};
+	u32					major				= {};
+	u32					minor				= {};
+	u32					patch				= {};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static_assert( sizeof( Version ) == sizeof( uint32_t ) * 3 );
+static_assert( sizeof( Version ) == sizeof( u32 ) * 3 );
 
 
 

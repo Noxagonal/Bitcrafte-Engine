@@ -12,7 +12,7 @@ namespace thread {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class TaskPriority : uint32_t
+enum class TaskPriority : u32
 {
 	REALTIME		= 0,	///< Task must be run immediately and always before any other tasks regardless how old they are.
 

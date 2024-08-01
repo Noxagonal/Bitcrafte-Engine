@@ -8,7 +8,7 @@
 #include <rhi_vulkan/vk/surface/VulkanWindowSurface.hpp>
 #include <rhi_vulkan/vk/device/VulkanDevice.hpp>
 #include <rhi_vulkan/vk/physical_device/VulkanPhysicalDevice.hpp>
-#include <core/math/linear_algebra/Vector.hpp>
+#include <core/math/Vector.hpp>
 
 
 
@@ -35,7 +35,7 @@ bc::rhi::VulkanSwapchain::VulkanSwapchain(
 
 	auto GetSwapchainMinimumImageCount = [ &swapchain_create_info ]( const VkSurfaceCapabilitiesKHR & surface_capabilities )
 		{
-			auto image_count = uint32_t {};
+			auto image_count = u32 {};
 			if( swapchain_create_info.use_v_sync )
 			{
 				image_count = 2;	// Vsync enabled, we only need 2 swapchain images
@@ -69,7 +69,7 @@ bc::rhi::VulkanSwapchain::VulkanSwapchain(
 
 			List<VkPresentModeKHR> surface_present_modes;
 			{
-				uint32_t present_mode_count = 0;
+				u32 present_mode_count = 0;
 				BAssertVkResult( vkGetPhysicalDeviceSurfacePresentModesKHR(
 					rhi_vulkan_impl.GetVulkanDevice().GetVulkanPhysicalDevice(),
 					window_surface,
@@ -92,7 +92,7 @@ bc::rhi::VulkanSwapchain::VulkanSwapchain(
 		};
 
 	auto CreateSwapchain = [ &rhi_vulkan_impl, &window_surface, &swapchain_create_info, &old_swapchain ](
-		uint32_t								swapchain_minimum_image_count,
+		u32										swapchain_minimum_image_count,
 		const VkSurfaceCapabilitiesKHR		&	surface_capabilities,
 		const VkPresentModeKHR				&	present_mode
 		) -> VkSwapchainKHR
@@ -137,7 +137,7 @@ bc::rhi::VulkanSwapchain::VulkanSwapchain(
 	auto GetSwapchainImages = [ &rhi_vulkan_impl ]( VkSwapchainKHR vk_swapchain ) -> List<VkImage>
 		{
 			auto swapchain_images		= List<VkImage> {};
-			auto swapchain_image_count	= uint32_t {};
+			auto swapchain_image_count	= u32 {};
 			BAssertVkResult( vkGetSwapchainImagesKHR(
 				rhi_vulkan_impl.GetVulkanDevice(),
 				vk_swapchain,

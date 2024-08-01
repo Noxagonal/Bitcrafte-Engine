@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/data_types/FundamentalTypes.hpp>
+
 
 
 namespace bc {
@@ -37,9 +39,9 @@ public:
 	) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static inline consteval SourceLocation					Current(
-		size_t												line			= __builtin_LINE(),
-		size_t												column			= __builtin_COLUMN(),
+	static inline constexpr SourceLocation					Current(
+		u64													line			= __builtin_LINE(),
+		u64													column			= __builtin_COLUMN(),
 		const char										*	file			= __builtin_FILE(),
 		const char										*	function		= __builtin_FUNCTION()
 	) noexcept
@@ -53,13 +55,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr size_t 								GetLine() const noexcept
+	inline constexpr u64 									GetLine() const noexcept
 	{
 		return line;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr size_t 								GetColumn() const noexcept
+	inline constexpr u64	 								GetColumn() const noexcept
 	{
 		return column;
 	}
@@ -79,8 +81,8 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	size_t													line			= {};
-	size_t													column			= {};
+	u64														line			= {};
+	u64														column			= {};
 	const char											*	file			= {};
 	const char											*	function		= {};
 };

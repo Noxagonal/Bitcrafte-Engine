@@ -228,7 +228,7 @@ LRESULT CALLBACK WndProc(
 	case WM_MOVE:
 	{
 		auto window_position = MAKEPOINTS( l_param );
-		win32_window->events.PositionChanged.Signal( bc::math::Vector2i { static_cast<int64_t>( window_position.x ), static_cast<int64_t>( window_position.y ) } );
+		win32_window->events.PositionChanged.Signal( bc::math::Vec2i32 { static_cast<i32>( window_position.x ), static_cast<i32>( window_position.y ) } );
 		break;
 	}
 
@@ -260,7 +260,7 @@ LRESULT CALLBACK WndProc(
 				win32_window->events.StateChanged.Signal( win32_window->runtime_info.current_windows_state );
 			}
 		}
-		win32_window->events.SizeChanged.Signal( bc::math::Vector2i { static_cast<int64_t>( LOWORD( l_param ) ), static_cast<int64_t>( HIWORD( l_param ) ) } );
+		win32_window->events.SizeChanged.Signal( bc::math::Vec2i32 { static_cast<i32>( LOWORD( l_param ) ), static_cast<i32>( HIWORD( l_param ) ) } );
 		break;
 	}
 
@@ -347,7 +347,7 @@ LRESULT CALLBACK WndProc(
 			SetUpMouseLeaveTracking();
 		}
 		auto mouse_pos = MAKEPOINTS( l_param );
-		win32_window->events.MousePosition.Signal( bc::math::Vector2d { static_cast<double>( mouse_pos.x ), static_cast<double>( mouse_pos.y ) } );
+		win32_window->events.MousePosition.Signal( bc::math::Vec2f64 { static_cast<f64>( mouse_pos.x ), static_cast<f64>( mouse_pos.y ) } );
 		break;
 	}
 
@@ -358,11 +358,11 @@ LRESULT CALLBACK WndProc(
 	}
 
 	case WM_MOUSEWHEEL:
-		win32_window->events.MouseScroll.Signal( bc::math::Vector2d { 0.0, static_cast<double>( GET_WHEEL_DELTA_WPARAM( w_param ) ) } );
+		win32_window->events.MouseScroll.Signal( bc::math::Vec2f64 { 0.0, static_cast<f64>( GET_WHEEL_DELTA_WPARAM( w_param ) ) } );
 		break;
 
 	case WM_MOUSEHWHEEL:
-		win32_window->events.MouseScroll.Signal( bc::math::Vector2d { static_cast<double>( GET_WHEEL_DELTA_WPARAM( w_param ), 0.0 ) } );
+		win32_window->events.MouseScroll.Signal( bc::math::Vec2f64 { static_cast<f64>( GET_WHEEL_DELTA_WPARAM( w_param ), 0.0 ) } );
 		break;
 
 
@@ -373,7 +373,7 @@ LRESULT CALLBACK WndProc(
 	{
 		bc::window_manager::KeyboardButton keyboard_button = MapVirtualKeyToKeyboardButton( w_param, l_param );
 		bc::window_manager::KeyboardButtonAction action = bc::window_manager::KeyboardButtonAction::PRESSED;
-		int32_t scancode = HIWORD( l_param ) & 0xFF;
+		i32 scancode = HIWORD( l_param ) & 0xFF;
 		if( l_param & ( 1 << 24 ) ) scancode |= 0xE000;
 		int repeat_count = LOWORD( l_param );
 		if( repeat_count > 1 ) action = bc::window_manager::KeyboardButtonAction::REPEATED;
@@ -386,7 +386,7 @@ LRESULT CALLBACK WndProc(
 	{
 		bc::window_manager::KeyboardButton keyboard_button = MapVirtualKeyToKeyboardButton( w_param, l_param );
 		bc::window_manager::KeyboardButtonAction action = bc::window_manager::KeyboardButtonAction::RELEASED;
-		int32_t scancode = HIWORD( l_param ) & 0xFF;
+		i32 scancode = HIWORD( l_param ) & 0xFF;
 		if( l_param & ( 1 << 24 ) ) scancode |= 0xE000;
 		win32_window->events.KeyboardKey.Signal( keyboard_button, scancode, action, GetModifierKeys() );
 		break;
@@ -397,7 +397,7 @@ LRESULT CALLBACK WndProc(
 	// Text input.
 	case WM_CHAR:
 	{
-		win32_window->events.KeyboardCharacter.Signal( static_cast<int32_t>( w_param ) );
+		win32_window->events.KeyboardCharacter.Signal( static_cast<c32>( w_param ) );
 		break;
 	}
 	case WM_UNICHAR:
@@ -408,7 +408,7 @@ LRESULT CALLBACK WndProc(
 			return TRUE;
 		}
 
-		win32_window->events.KeyboardCharacter.Signal( static_cast<int32_t>( w_param ) );
+		win32_window->events.KeyboardCharacter.Signal( static_cast<c32>( w_param ) );
 		break;
 	}
 

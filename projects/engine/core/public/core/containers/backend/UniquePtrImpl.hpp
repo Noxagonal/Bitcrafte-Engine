@@ -1,8 +1,13 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
+#include <core/diagnostic/assertion/Assert.hpp>
+
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
+#include <core/diagnostic/assertion/HardAssert.hpp>
+
 #else
 #error "Container implementation type not given"
 #endif
@@ -12,6 +17,7 @@
 
 
 namespace bc {
+BC_CONTAINER_NAMESPACE_START;
 
 
 
@@ -21,7 +27,11 @@ namespace bc {
 ///
 /// @note
 /// This container can handle objects which constructor may throw. If there's a chance that the object constructor may throw,
-/// it should be wrapped into a UniquePtr or Optional.
+/// it can still be wrapped into a UniquePtr or Optional.
+///
+/// @note
+/// Aquiring raw pointers is not supported. Likewise releasing raw pointers is not supported. This is because internal memory
+/// management is not as straightforward as std::unique_ptr.
 ///
 /// @tparam ValueType
 /// Type of the contained object/element.
@@ -63,7 +73,7 @@ public:
 	constexpr BC_CONTAINER_NAME( UniquePtr )( ) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )( nullptr_t ) noexcept :
+	constexpr BC_CONTAINER_NAME( UniquePtr )( std::nullptr_t ) noexcept :
 		data_ptr( nullptr )
 	{}
 
@@ -77,27 +87,32 @@ public:
 		BC_CONTAINER_NAME( UniquePtr )																&&	other
 	) noexcept
 	{
-		this->SwapOther( std::move( other ) );
+		this->Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructor to move data from another UniquePtr which contains an inherited type.
+	///
+	/// This allows the use of UniquePtr as a base class and directly move another UniquePtr to it with inherited type.
+	///
+	/// @tparam OtherValueType
+	/// Type of the data in the other UniquePtr.
+	///
+	/// @param other
+	/// The other container.
+	///
+	/// @return
+	/// Reference to this.
 	template<typename OtherValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )(
 		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
-	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> )
+	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
 	{
 		this->data_ptr = other.data_ptr;
 		other.data_ptr = nullptr;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr explicit BC_CONTAINER_NAME( UniquePtr )(
-		ValueType																					*	claim_pointer
-	) noexcept
-	{
-		this->data_ptr = claim_pointer;
-	}
-	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ~BC_CONTAINER_NAME( UniquePtr )() BC_CONTAINER_NOEXCEPT
 	{
@@ -111,20 +126,10 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		nullptr_t
+		std::nullptr_t
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();
-		return *this;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		ValueType																					*	claim_pointer
-	) BC_CONTAINER_NOEXCEPT
-	{
-		this->Clear();
-		this->data_ptr = claim_pointer;
 		return *this;
 	}
 
@@ -133,17 +138,33 @@ public:
 		BC_CONTAINER_NAME( UniquePtr )																&&	other
 	) noexcept
 	{
-		this->SwapOther( std::move( other ) );
+		if( this == std::addressof( other ) ) return *this;
+
+		this->Swap( other );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Operator to move data from another UniquePtr which contains an inherited type.
+	///
+	/// This allows the use of UniquePtr as a base class and directly move another UniquePtr to it with inherited type.
+	///
+	/// @tparam OtherValueType
+	/// Type of the data in the other UniquePtr.
+	///
+	/// @param other
+	/// The other container.
+	///
+	/// @return
+	/// Reference to this.
 	template<typename OtherValueType>
 	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
 		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
-	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> )
+	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
 	{
 		this->Clear();
+
 		this->data_ptr = other.data_ptr;
 		other.data_ptr = nullptr;
 		return *this;
@@ -211,6 +232,55 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Casts and releases the contained pointer to the new unique pointer.
+	///
+	/// Transfers ownership of the contained pointer to a new unique pointer. This is a helper function primarily for downcasting,
+	/// this function is provided mostly because releasing ownership of the contained pointer is not supported. This is because raw
+	/// pointer memory management is not as straightforward as std::unique_ptr.
+	///
+	/// @note
+	/// Up-cast, down-cast and same type cast are supported. It's not necessary to use this function to up-cast as it is implicit.
+	///
+	/// @note
+	/// The contained pointer must be derived from ValueType.
+	///
+	/// @note
+	/// If cast fails, exception will be thrown in debug builds. In release builds, an empty UniquePtr will be returned and current
+	/// UniquePtr will retain ownership.
+	///
+	/// @tparam DerivedValueType
+	/// Type to cast to.
+	/// 
+	/// @return
+	/// New unique pointer which is taking ownership of this UniquePtr.
+	template<typename CastToValueType>
+	constexpr BC_CONTAINER_NAME( UniquePtr )<CastToValueType>											CastTo()
+	{
+		static_assert(
+			std::is_base_of_v<ValueType, CastToValueType> || std::is_base_of_v<CastToValueType, ValueType>,
+			"Cannot cast, Types have no correlation"
+		);
+
+		if constexpr( std::is_base_of_v<CastToValueType, ValueType> )
+		{
+			// No cast or upcast.
+			return BC_CONTAINER_NAME( UniquePtr )( std::move( *this ) );
+		}
+		else if constexpr( std::is_base_of_v<ValueType, CastToValueType> )
+		{
+			// Downcast.
+			auto casted_ptr = dynamic_cast<CastToValueType*>( this->data_ptr );
+			BC_ContainerAssert( casted_ptr, U"Failed to downcast" );
+			if( casted_ptr == nullptr ) return {};
+			auto downcasted_unique_ptr = BC_CONTAINER_NAME( UniquePtr )<CastToValueType>();
+			downcasted_unique_ptr.data_ptr = casted_ptr;
+			this->data_ptr = nullptr;
+			return downcasted_unique_ptr;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void																						Clear() BC_CONTAINER_NOEXCEPT
 	{
 		if( this->data_ptr == nullptr ) return;
@@ -242,8 +312,8 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																								SwapOther(
-		BC_CONTAINER_NAME( UniquePtr )																&&	other
+	void																								Swap(
+		BC_CONTAINER_NAME( UniquePtr )																&	other
 	) noexcept
 	{
 		std::swap( this->data_ptr, other.data_ptr );
@@ -255,28 +325,130 @@ private:
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check if text containers fulfill size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( UniquePtr )<uint32_t> ) == 8 );
-
-
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Check if text containers fulfill concept requirements.
-static_assert( !utility::ContainerView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !utility::Container<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+// Check if container fulfill size requirements.
+static_assert( sizeof( BC_CONTAINER_NAME( UniquePtr )<u32> ) == 8 );
 
-static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
-static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( UniquePtr )<uint32_t>> );
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Check if container fulfill concept requirements.
+static_assert( !utility::ContainerView<BC_CONTAINER_NAME( UniquePtr )<u32>> );
+static_assert( !utility::ContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<u32>> );
+static_assert( !utility::Container<BC_CONTAINER_NAME( UniquePtr )<u32>> );
+
+static_assert( !utility::LinearContainerView<BC_CONTAINER_NAME( UniquePtr )<u32>> );
+static_assert( !utility::LinearContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<u32>> );
+static_assert( !utility::LinearContainer<BC_CONTAINER_NAME( UniquePtr )<u32>> );
 
 static_assert( !utility::TextContainerView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
 static_assert( !utility::TextContainerEditableView<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
 static_assert( !utility::TextContainer<BC_CONTAINER_NAME( UniquePtr )<char32_t>> );
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Check if container is constructible from other containers.
+// Not constructible via copy.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<u32>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
+// Constructible via move.
+static_assert(
+	utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<u32>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
+// Not assignable via copy.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
+// Assignable via move.
+static_assert(
+	utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<u32>>
+	>
+);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct UniquePtrTestContainerBase {};
+struct UniquePtrTestContainerDerived : UniquePtrTestContainerBase {};
+struct UniquePtrTestContainerNotDerived {};
+// Not copy constructible from derived.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not copy constructible from not derived.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+// Move constructible from derived.
+static_assert(
+	utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not move constructible from not derived.
+static_assert(
+	!utility::ConstructibleFrom<
+		BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+// Not copy assignable from derived.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not copy assignable from not derived.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+
+// Move assignable from derived.
+static_assert(
+	utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerDerived>>
+	>
+);
+// Not move assignable from not derived.
+static_assert(
+	!utility::AssignableFrom<
+		std::add_lvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerBase>>,
+		std::add_rvalue_reference_t<BC_CONTAINER_NAME( UniquePtr )<UniquePtrTestContainerNotDerived>>
+	>
+);
+
+
+
+} // tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+
+
+
+BC_CONTAINER_NAMESPACE_END;
 } // bc
 
 

@@ -6,6 +6,7 @@
 
 
 namespace bc {
+namespace internal_ {
 
 
 
@@ -39,4 +40,5 @@ SimpleUniquePtr<ValueType>								MakeSimpleUniquePtr(
 
 
 
+} // internal_
 } // bc

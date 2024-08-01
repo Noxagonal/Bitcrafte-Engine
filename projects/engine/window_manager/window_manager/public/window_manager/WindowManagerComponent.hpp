@@ -3,6 +3,7 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <window_manager/WindowManagerComponentCreateInfo.hpp>
 #include <window_manager/event/WindowManagerComponentEvents.hpp>
+#include <window_manager/platform/handles/WindowPlatformHandles.hpp>
 #include <window_manager/window/Window.hpp>
 
 #include <core/containers/UniquePtr.hpp>
@@ -26,7 +27,7 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~WindowManagerComponent();
+	virtual ~WindowManagerComponent();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	virtual void												Run() = 0;
@@ -35,6 +36,9 @@ public:
 	virtual UniquePtr<Window>									CreateWindow(
 		const WindowCreateInfo								&	window_create_info
 	) = 0;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual const WindowManagerPlatformHandlesBase			*	GetPlatformSpecificHandles() const = 0;
 
 	WindowManagerComponentEvents								events;
 

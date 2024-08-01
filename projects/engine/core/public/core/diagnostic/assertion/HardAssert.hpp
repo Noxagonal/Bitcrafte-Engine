@@ -9,25 +9,19 @@ namespace bc {
 
 
 
-#if BITCRAFTE_DEVELOPMENT_BUILD
+#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Make sure condition is true or crash the application.
+/// Make sure condition is true in development builds. Test is disabled in shipping builds.
 ///
-/// BHardAssert is similar to C/C++ assert. BHardAssert is meant to be used in situations where BAssert is not available. For
-/// example in SimpleTextBase which are not allowed to throw.
-///
-///	Similar to assert but invokes custom crash handler. This macro is also active in development release builds, it is only
-/// disabled in shipping builds. Regular C/C++ assert macro should still be used when debugging the engine itself.
-///
-/// This macro is not meant to be used in situations that should always panic when something goes wrong, for example, failure to
-/// allocate memory from the system should always panic and that test should be done in shipping builds too.
+/// Similar to assert and will crash the application if condition is false. BHardAssert is meant to be used
+/// in situations where BAssert is not available, for example in functions that are not allowed to throw exceptions.
 ///
 /// @see
-/// BAssert
+/// BAssert, bc::diagnostic::Panic()
 ///
 /// @warning
 /// Do not ignore these errors, final shipping release will not do these checks and if they're not handled during  development,
@@ -48,7 +42,7 @@ do {																				\
 
 
 
-#else
+#else // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 
 
@@ -56,7 +50,7 @@ do {																				\
 
 
 
-#endif
+#endif // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
 
 

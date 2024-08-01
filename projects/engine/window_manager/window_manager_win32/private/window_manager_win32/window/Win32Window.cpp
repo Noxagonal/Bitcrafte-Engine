@@ -6,35 +6,6 @@
 
 
 
-bc::window_manager::Win32Window::Settings::Settings(
-	const bc::window_manager::WindowCreateInfo & window_create_info
-)
-{
-	is_decorated			= window_create_info.decorated;
-	show_minimize_button	= window_create_info.has_minimize_button;
-	show_maximize_button	= window_create_info.has_maximize_button;
-	is_minimized			= window_create_info.initially_minimized;
-	is_maximized			= window_create_info.initially_maximized;
-	allow_drag_resize		= window_create_info.allow_drag_resize;
-	allow_file_drop			= window_create_info.allow_file_drop;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DWORD bc::window_manager::Win32Window::Settings::MakeWindowStyle() const
-{
-	return
-		( is_decorated ? ( WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU ) : 0 ) |
-		( is_visible ? ( WS_VISIBLE ) : 0 ) |
-		( show_minimize_button && is_decorated ? ( WS_MINIMIZEBOX ) : 0 ) |
-		( show_maximize_button && is_decorated ? ( WS_MAXIMIZEBOX ) : 0 ) |
-		( allow_drag_resize ? ( WS_THICKFRAME ) : 0 ) |
-		( allow_file_drop ? ( WS_EX_ACCEPTFILES ) : 0 ) |
-		( is_maximized ? ( WS_MAXIMIZE ) : 0 ) |
-		( is_minimized ? ( WS_MINIMIZE ) : 0 );
-}
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::Win32Window::Win32Window(
 	Win32Manager			&	win32_manager,
@@ -124,7 +95,21 @@ void bc::window_manager::Win32Window::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void * bc::window_manager::Win32Window::GetPlatformSpecificHandles()
+const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::Win32Window::GetPlatformSpecificHandles() const
 {
 	return &platform_handles;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+DWORD bc::window_manager::Win32Window::MakeWindowStyle() const
+{
+	return
+		( settings.is_decorated ? ( WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU ) : 0 ) |
+		( settings.is_visible ? ( WS_VISIBLE ) : 0 ) |
+		( settings.show_minimize_button && is_decorated ? ( WS_MINIMIZEBOX ) : 0 ) |
+		( settings.show_maximize_button && is_decorated ? ( WS_MAXIMIZEBOX ) : 0 ) |
+		( settings.allow_drag_resize ? ( WS_THICKFRAME ) : 0 ) |
+		( settings.allow_file_drop ? ( WS_EX_ACCEPTFILES ) : 0 ) |
+		( settings.is_maximized ? ( WS_MAXIMIZE ) : 0 ) |
+		( settings.is_minimized ? ( WS_MINIMIZE ) : 0 );
 }

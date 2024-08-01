@@ -99,7 +99,7 @@ void bc::diagnostic::Logger::Log(
 
 	// TODO: Do formatting on both Log functions.
 
-	uint64_t exception_counter = 0;
+	u64 exception_counter = 0;
 	while( current_exception_in_chain )
 	{
 		auto exception_message = MakePrintRecord_Argument( U"Exception", exception_counter );
@@ -130,7 +130,7 @@ void bc::diagnostic::Logger::PushLogEntry(
 	const LogEntry		&	log_entry
 )
 {
-#if !BITCRAFTE_DEVELOPMENT_BUILD
+#if !BITCRAFTE_GAME_DEVELOPMENT_BUILD
 	if( log_entry.severity == LogReportSeverity::DEBUG ) return;
 #endif
 

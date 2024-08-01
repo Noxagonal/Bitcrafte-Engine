@@ -12,6 +12,7 @@
 
 
 namespace bc {
+BC_CONTAINER_NAMESPACE_START;
 
 
 
@@ -60,7 +61,7 @@ public:
 	constexpr BC_CONTAINER_NAME( Pair )(
 		const FirstType																				&	first,
 		const SecondType																			&	second
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<FirstType> && std::is_copy_constructible_v<SecondType> ) :
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<SecondType> ) :
 		first( first ),
 		second( second )
 	{}
@@ -69,7 +70,7 @@ public:
 	constexpr BC_CONTAINER_NAME( Pair )(
 		const FirstType																				&	first,
 		SecondType																					&&	second
-	) BC_CONTAINER_NOEXCEPT requires( std::is_copy_constructible_v<FirstType> && std::is_move_constructible_v<SecondType> ) :
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<SecondType> ) :
 		first( first ),
 		second( std::move( second ) )
 	{}
@@ -78,7 +79,7 @@ public:
 	constexpr BC_CONTAINER_NAME( Pair )(
 		FirstType																					&&	first,
 		const SecondType																			&	second
-	) BC_CONTAINER_NOEXCEPT requires( std::is_move_constructible_v<FirstType> && std::is_copy_constructible_v<SecondType> ) :
+	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<SecondType> ) :
 		first( std::move( first ) ),
 		second( second )
 	{}
@@ -87,7 +88,7 @@ public:
 	constexpr BC_CONTAINER_NAME( Pair )(
 		FirstType																					&&	first,
 		SecondType																					&&	second
-	) noexcept requires( std::is_move_constructible_v<FirstType> && std::is_move_constructible_v<SecondType> ) :
+	) noexcept requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<SecondType> ) :
 		first( std::move( first ) ),
 		second( std::move( second ) )
 	{}
@@ -121,12 +122,19 @@ public:
 
 
 
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if pair container fulfills size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( Pair )<uint32_t, uint32_t> ) == ( sizeof( uint32_t ) + sizeof( uint32_t ) ) );
+static_assert( sizeof( BC_CONTAINER_NAME( Pair )<u32, u32> ) == ( sizeof( u32 ) + sizeof( u32 ) ) );
+
+} // tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
 
+BC_CONTAINER_NAMESPACE_END;
 } // bc
 
 

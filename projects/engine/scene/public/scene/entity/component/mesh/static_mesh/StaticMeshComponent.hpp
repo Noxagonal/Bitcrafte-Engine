@@ -1,0 +1,36 @@
+#pragma once
+
+#include <build_configuration/BuildConfigurationComponent.hpp>
+
+#include <scene/entity/component/mesh/MeshComponent.hpp>
+
+
+
+namespace bc {
+namespace scene {
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Static mesh component is used to display unchanging mesh in the scene.
+///
+/// This is the fastest way of rendering meshes, use whenever possible, however it can only be used for meshes that do not
+/// change during runtime.
+class StaticMeshComponent : public MeshComponent
+{
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	StaticMeshComponent();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	virtual ~StaticMeshComponent() override;
+
+private:
+};
+
+
+
+} // scene
+} // bc

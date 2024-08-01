@@ -44,8 +44,8 @@ private:
 
 	RHIVulkanImpl							&	rhi_vulkan_impl;
 
-	math::Vector2u								image_size								= {};
-	List<math::Vector2u>						mip_levels;
+	math::Vec2u32								image_size								= {};
+	List<math::Vec2u32>							mip_levels;
 
 	VkFormat									image_format							= {};
 	VkImageAspectFlagBits						image_aspect_mask						= {};

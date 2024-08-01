@@ -56,8 +56,8 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VkCommandBuffer										vk_command_buffer					= VK_NULL_HANDLE;
 
-	RHIVulkanImpl									&	rhi_vulkan_impl;
-	VulkanCommandPool								&	vulkan_command_pool;
+	RHIVulkanImpl									*	rhi_vulkan_impl;
+	VulkanCommandPool								*	vulkan_command_pool;
 };
 
 

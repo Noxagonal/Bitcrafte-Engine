@@ -4,6 +4,33 @@
 #include <core/diagnostic/logger/Logger.hpp>
 #include <core/thread/ThreadPool.hpp>
 
+#include <locale>
+#include <clocale>
+#include <iostream>
+
+
+
+namespace bc {
+namespace internal_ {
+
+void SetGlobalLocale()
+{
+	// Set the C global locale to UTF-8
+	std::setlocale(LC_ALL, "C.UTF-8");
+
+	// Set the C++ global locale to UTF-8
+	std::locale::global(std::locale("C.UTF-8"));
+
+	// Set the C++ output streams to use UTF-8
+	std::cout.imbue(std::locale());
+
+	// Platform dependent, Windows uses utf-16 by default, Linux uses utf-32 by default.
+	// std::wcout.imbue(std::locale());
+};
+
+} // namespace internal_
+} // namespace bc
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,6 +45,8 @@ bc::CoreComponent::CoreComponent(
 {
 	BHardAssert( global_core == nullptr, "More than one core instance is not allowed" );
 	global_core = this;
+
+	internal_::SetGlobalLocale();
 
 	// TODO: Start memory pool.
 

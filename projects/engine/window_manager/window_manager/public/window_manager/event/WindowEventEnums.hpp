@@ -2,7 +2,9 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <stdint.h>
+#include <core/data_types/FundamentalTypes.hpp>
+
+#include <utility>
 
 
 
@@ -12,14 +14,14 @@ namespace window_manager {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class MouseButtonAction : int32_t
+enum class MouseButtonAction : i32
 {
 	RELEASED				= 0,	///< Button was lift up.
 	PRESSED					= 1,	///< Button was pressed down.
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class KeyboardButtonAction : int32_t
+enum class KeyboardButtonAction : i32
 {
 	RELEASED				= 0,	///< Button was lift up.
 	PRESSED					= 1,	///< Button was pressed down.
@@ -27,7 +29,7 @@ enum class KeyboardButtonAction : int32_t
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class MouseButton : int32_t
+enum class MouseButton : i32
 {
 	BUTTON_1				= 0,		///< Left mouse button
 	BUTTON_2				= 1,		///< Right mouse button
@@ -41,12 +43,15 @@ enum class MouseButton : int32_t
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class ModifierKeyFlags : int32_t
+enum class ModifierKeyFlags : i32
 {
 	SHIFT					= 0x0001,	///< Shift key, either left or right
 	CONTROL					= 0x0002,	///< Ctrl key, either left or right
 	ALT						= 0x0004,	///< Alt key, either left or right
-	SUPER					= 0x0008	///< Windows key, either left or right
+	SUPER					= 0x0008,	///< Windows key, either left or right
+	NUM_LOCK				= 0x0010,	///< Num Lock key
+	CAPS_LOCK				= 0x0020,	///< Caps Lock key
+	ALT_GR					= 0x0040,	///< Alt Gr key
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline ModifierKeyFlags		operator|(
@@ -82,13 +87,22 @@ inline ModifierKeyFlags		operator&=(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class KeyboardButton : int32_t
+/// @brief
+/// Keyboard physical key codes.
+///
+/// @note
+/// These are key codes and map to physical keys on the keyboard. Enum labels follow typical QUERTY layout. Eg. <tt>A</tt> maps
+/// to middle left key on the keyboard regardless of the actual keyboard layout.
+///
+/// @note
+/// Not all keys are supported by all keyboards.
+enum class KeyboardButton : i32
 {
 	KEY_UNKNOWN				= -1,	///< Unrecognized keyboard button
 
 	KEY_SPACE				= 32,	///< Space bar
 	KEY_APOSTROPHE			= 39,	///< <tt>'</tt>
-	KEY_PLUS				= 43,	///< <tt>+</tt>
+	KEY_EQUAL_OR_PLUS		= 43,	///< <tt>=</tt> or <tt>+</tt> usually found next to Backspace.
 	KEY_COMMA				= 44,	///< <tt>,</tt>
 	KEY_MINUS				= 45,	///< <tt>-</tt>
 	KEY_PERIOD				= 46,	///< <tt>.</tt>
@@ -134,7 +148,6 @@ enum class KeyboardButton : int32_t
 	KEY_BACKSLASH			= 92,	///< US keyboard: <tt>\\</tt>
 	KEY_RIGHT_BRACKET		= 93,	///< US keyboard: <tt>]</tt>
 	KEY_GRAVE_ACCENT		= 96,	///< US keyboard: <tt>`</tt>
-	KEY_AX					= 161,	///< Japanese AX keyboard: 'AX' key.
 	KEY_ANGLE_BRACKETS		= 162,	///< <tt><></tt> or <tt>\|</tt> on RT 102-key kbd.
 
 	KEY_ESCAPE				= 256,	///< <tt>Esc</tt>
@@ -190,7 +203,7 @@ enum class KeyboardButton : int32_t
 	KEY_NUMPAD_7			= 327,
 	KEY_NUMPAD_8			= 328,
 	KEY_NUMPAD_9			= 329,
-	KEY_NUMPAD_DECIMAL		= 330,	///< Numpad <tt>.</tt> or <tt>,</tt> depending on region
+	KEY_NUMPAD_SEPARATOR	= 330,	///< Numpad <tt>.</tt> or <tt>,</tt> depending on region
 	KEY_NUMPAD_DIVIDE		= 331,	///< Numpad <tt>/</tt>
 	KEY_NUMPAD_MULTIPLY		= 332,	///< Numpad <tt>*</tt>
 	KEY_NUMPAD_SUBTRACT		= 333,	///< Numpad <tt>-</tt>
@@ -211,7 +224,7 @@ enum class KeyboardButton : int32_t
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-enum class WindowState : int32_t
+enum class WindowState : i32
 {
 	WINDOWED				= 0,	///< Window is in normal windowed mode.
 	FULLSCREEN				= 1,	///< Window is in fullscreen mode.

@@ -5,6 +5,15 @@
 #include <iostream>
 #include <sstream>
 
+#if defined( BITCRAFTE_PLATFORM_WINDOWS )
+#include <core/platform/windows/Windows.hpp>
+#elif defined( BITCRAFTE_PLATFORM_LINUX )
+#include <core/platform/linux/Linux.hpp>
+#else
+#error "Please add platform support here."
+#endif
+#include <core/conversion/text/text_format/TextFormat.hpp>
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +149,7 @@ const wchar_t * PrintRecordColorToWCharANSIBackgroundColorCode(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::basic_ostream<char8_t> & operator<<(
 	std::basic_ostream<char8_t>					&	out,
-	const bc::SimpleTextView8					&	in
+	const bc::internal_::SimpleTextView8			&	in
 )
 {
 	std::basic_ostringstream<char8_t> ss;
@@ -155,19 +164,17 @@ std::basic_ostream<char8_t> & operator<<(
 
 #if defined( BITCRAFTE_PLATFORM_WINDOWS )
 
-#include <Windows.h>
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
+void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 	const char8_t						*	raw_text,
-	size_t									raw_text_length,
+	u64										raw_text_length,
 	bc::diagnostic::PrintRecordColor		foreground_color,
 	bc::diagnostic::PrintRecordColor		background_color
 )
 {
-	auto text = SimpleTextView8( raw_text, raw_text_length );
+	auto text = bc::internal_::SimpleTextView8( raw_text, raw_text_length );
 	auto text_as_utf16 = conversion::ToUTF16( text );
 
 	auto lock_guard = std::lock_guard( print_mutex );
@@ -222,8 +229,8 @@ void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal::SetupSystemConsole(
-	size_t characters_per_line_num
+void bc::diagnostic::internal_::SetupSystemConsole(
+	u64 characters_per_line_num
 )
 {
 	HANDLE std_out_handle = GetStdHandle( STD_OUTPUT_HANDLE );
@@ -297,27 +304,28 @@ void bc::diagnostic::internal::SetupSystemConsole(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::SetupSystemConsole(
-	size_t characters_per_line_num
+void bc::diagnostic::internal_::SetupSystemConsole(
+	bc::u64 characters_per_line_num
 )
 {
-	auto set_characters_per_line_syscall_string = TextFormat( "stty cols {}", characters_per_line_num );
-	std::system( set_characters_per_line_syscall_string );
+	auto set_characters_per_line_syscall_string = bc::text::TextFormat( "stty cols {}", characters_per_line_num );
+	std::system( set_characters_per_line_syscall_string.ToCStr() );
 }
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
+void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 	const char8_t						*	raw_text,
-	size_t									raw_text_length,
+	bc::u64									raw_text_length,
 	bc::diagnostic::PrintRecordColor		foreground_color,
 	bc::diagnostic::PrintRecordColor		background_color
 )
 {
 	// TODO: Test ConsolePrint on Linux machine.
+	using namespace bc;
 
-	auto text = SimpleText8( SimpleTextView8( raw_text, raw_text_length ) );
+	auto text = bc::internal_::SimpleText8( bc::internal_::SimpleTextView8( raw_text, raw_text_length ) );
 
 	std::lock_guard<std::mutex> lock_guard( print_mutex );
 
@@ -331,8 +339,9 @@ void bc::diagnostic::internal::SystemConsolePrintRawUTF8(
 		<< ";"
 		<< PrintRecordColorToCharANSIBackgroundColorCode( background_color )
 		<< "m"
-		<< reinterpret_cast<char*>( text.ToCStr() )
-		<< RES;
+		<< reinterpret_cast<const char*>( text.ToCStr() )
+		<< RES
+		<< std::flush;
 
 	//std::cout << "\033[" << foreground_color_map[ foreground_color ] << ";" << background_color_map[ background_color ] << "m"
 	//	<< Text8( text ).ToCStr()
