@@ -65,7 +65,7 @@ LRESULT CALLBACK WndProc(
 		{
 			if( w_param == VK_SPACE )			return bc::window_manager::KeyboardButton::KEY_SPACE;
 			if( w_param == VK_OEM_7 )			return bc::window_manager::KeyboardButton::KEY_APOSTROPHE;		// Double check.
-			if( w_param == VK_OEM_PLUS )		return bc::window_manager::KeyboardButton::KEY_PLUS;			// Double check.
+			if( w_param == VK_OEM_PLUS )		return bc::window_manager::KeyboardButton::KEY_EQUAL_OR_PLUS;
 			if( w_param == VK_OEM_COMMA )		return bc::window_manager::KeyboardButton::KEY_COMMA;
 			if( w_param == VK_OEM_MINUS )		return bc::window_manager::KeyboardButton::KEY_MINUS;
 			if( w_param == VK_OEM_PERIOD )		return bc::window_manager::KeyboardButton::KEY_PERIOD;
@@ -111,7 +111,6 @@ LRESULT CALLBACK WndProc(
 			if( w_param == VK_OEM_5 )			return bc::window_manager::KeyboardButton::KEY_BACKSLASH;
 			if( w_param == VK_OEM_6 )			return bc::window_manager::KeyboardButton::KEY_RIGHT_BRACKET;
 			if( w_param == VK_OEM_3 )			return bc::window_manager::KeyboardButton::KEY_GRAVE_ACCENT;
-			if( w_param == VK_OEM_AX )			return bc::window_manager::KeyboardButton::KEY_AX;
 			if( w_param == VK_OEM_102 )			return bc::window_manager::KeyboardButton::KEY_ANGLE_BRACKETS;
 
 			if( w_param == VK_ESCAPE )			return bc::window_manager::KeyboardButton::KEY_ESCAPE;
@@ -177,7 +176,7 @@ LRESULT CALLBACK WndProc(
 			if( w_param == VK_NUMPAD7 )			return bc::window_manager::KeyboardButton::KEY_NUMPAD_7;
 			if( w_param == VK_NUMPAD8 )			return bc::window_manager::KeyboardButton::KEY_NUMPAD_8;
 			if( w_param == VK_NUMPAD9 )			return bc::window_manager::KeyboardButton::KEY_NUMPAD_9;
-			if( w_param == VK_DECIMAL )			return bc::window_manager::KeyboardButton::KEY_NUMPAD_DECIMAL;
+			if( w_param == VK_DECIMAL )			return bc::window_manager::KeyboardButton::KEY_NUMPAD_SEPARATOR;
 			if( w_param == VK_DIVIDE )			return bc::window_manager::KeyboardButton::KEY_NUMPAD_DIVIDE;
 			if( w_param == VK_MULTIPLY )		return bc::window_manager::KeyboardButton::KEY_NUMPAD_MULTIPLY;
 			if( w_param == VK_SUBTRACT )		return bc::window_manager::KeyboardButton::KEY_NUMPAD_SUBTRACT;

@@ -5,7 +5,7 @@
 #include <cstdint>
 
 #if BITCRAFTE_WINDOW_MANAGER_WIN32
-#include <core/platform/windows/WinDef.hpp>
+#include <core/platform/windows/Windows.hpp>
 #endif
 
 #if BITCRAFTE_WINDOW_MANAGER_XLIB

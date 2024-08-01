@@ -12,13 +12,13 @@ bc::window_manager::Win32Window::Win32Window(
 	const WindowCreateInfo	&	window_create_info
 ) :
 	Window( window_create_info ),
-	settings( window_create_info ),
 	win32_manager( win32_manager )
 {
 	platform_handles.hWnd		= NULL;
 	platform_handles.hInstance	= win32_manager.GetWindowClass().hInstance;
 
-	style = settings.MakeWindowStyle();
+	settings = MakeSettingsFromCreateInfo( window_create_info );
+	style = MakeWindowStyleFromSettings( settings );
 
 	// Create a window
 	platform_handles.hWnd = CreateWindowExW(
@@ -101,15 +101,38 @@ const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager:
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DWORD bc::window_manager::Win32Window::MakeWindowStyle() const
+bc::window_manager::Win32Window::Settings bc::window_manager::Win32Window::MakeSettingsFromCreateInfo(
+	const WindowCreateInfo & window_create_info
+) const
 {
+	static_assert( sizeof( WindowCreateInfo ) == 24, "If this is not true, this function needs to be updated" );
+
+	Settings settings;
+	settings.is_decorated					= window_create_info.decorated;
+	settings.is_visible						= window_create_info.initially_visible;
+	settings.show_minimize_button			= window_create_info.has_minimize_button;
+	settings.show_maximize_button			= window_create_info.has_maximize_button;
+	settings.is_minimized					= window_create_info.initially_minimized;
+	settings.is_maximized					= window_create_info.initially_maximized;
+	settings.allow_drag_resize				= window_create_info.allow_drag_resize;
+	settings.allow_file_drop				= window_create_info.allow_file_drop;
+	return settings;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+DWORD bc::window_manager::Win32Window::MakeWindowStyleFromSettings(
+	const Settings & from_settings
+) const
+{
+	static_assert( sizeof( Settings ) == 8, "If this is not true, this function needs to be updated" );
+
 	return
-		( settings.is_decorated ? ( WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU ) : 0 ) |
-		( settings.is_visible ? ( WS_VISIBLE ) : 0 ) |
-		( settings.show_minimize_button && is_decorated ? ( WS_MINIMIZEBOX ) : 0 ) |
-		( settings.show_maximize_button && is_decorated ? ( WS_MAXIMIZEBOX ) : 0 ) |
-		( settings.allow_drag_resize ? ( WS_THICKFRAME ) : 0 ) |
-		( settings.allow_file_drop ? ( WS_EX_ACCEPTFILES ) : 0 ) |
-		( settings.is_maximized ? ( WS_MAXIMIZE ) : 0 ) |
-		( settings.is_minimized ? ( WS_MINIMIZE ) : 0 );
+		( from_settings.is_decorated ? ( WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU ) : 0 ) |
+		( from_settings.is_visible ? ( WS_VISIBLE ) : 0 ) |
+		( from_settings.show_minimize_button && from_settings.is_decorated ? ( WS_MINIMIZEBOX ) : 0 ) |
+		( from_settings.show_maximize_button && from_settings.is_decorated ? ( WS_MAXIMIZEBOX ) : 0 ) |
+		( from_settings.allow_drag_resize ? ( WS_THICKFRAME ) : 0 ) |
+		( from_settings.allow_file_drop ? ( WS_EX_ACCEPTFILES ) : 0 ) |
+		( from_settings.is_maximized ? ( WS_MAXIMIZE ) : 0 ) |
+		( from_settings.is_minimized ? ( WS_MINIMIZE ) : 0 );
 }

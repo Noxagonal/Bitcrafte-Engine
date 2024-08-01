@@ -43,7 +43,7 @@ public:
 	) override;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual const void 										*	GetPlatformSpecificHandles() const override;
+	virtual const WindowManagerPlatformHandlesBase			*	GetPlatformSpecificHandles() const override;
 
 private:
 

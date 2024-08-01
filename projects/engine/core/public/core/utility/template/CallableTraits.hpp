@@ -1261,15 +1261,15 @@ static_assert( CallableTraits<decltype( &CallableMemberTestConstVolatileRValueRe
 
 
 // Lambdas.
-static_assert( std::is_same_v<CallableTraits<decltype( []() {} )>::ReturnType, void> );
-static_assert( std::is_same_v<CallableTraits<decltype( []() { return 0; } )>::ReturnType, int> );
-static_assert( std::is_same_v<CallableTraits<decltype( []( int, float, double ) {} )>::ReturnType, void> );
-static_assert( std::is_same_v<CallableTraits<decltype( []( int, float, double ) { return 0; } )>::ReturnType, int> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []() {} )>::ReturnType, void> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []() { return 0; } )>::ReturnType, int> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []( int, float, double ) {} )>::ReturnType, void> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []( int, float, double ) { return 0; } )>::ReturnType, int> );
 
-static_assert( std::is_same_v<CallableTraits<decltype( []() {} )>::ParameterTypeList, TypeList<>> );
-static_assert( std::is_same_v<CallableTraits<decltype( []() { return 0; } )>::ParameterTypeList, TypeList<>> );
-static_assert( std::is_same_v<CallableTraits<decltype( []( int, float, double ) {} )>::ParameterTypeList, TypeList<int, float, double>> );
-static_assert( std::is_same_v<CallableTraits<decltype( []( int, float, double ) { return 0; } )>::ParameterTypeList, TypeList<int, float, double>> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []() {} )>::ParameterTypeList, TypeList<>> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []() { return 0; } )>::ParameterTypeList, TypeList<>> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []( int, float, double ) {} )>::ParameterTypeList, TypeList<int, float, double>> );
+static_assert( std::is_same_v<typename CallableTraits<decltype( []( int, float, double ) { return 0; } )>::ParameterTypeList, TypeList<int, float, double>> );
 
 static_assert( CallableTraits<decltype( []() {} )>::IsPlainFunction() == false );
 static_assert( CallableTraits<decltype( []() {} )>::IsMemberFunction() == false );

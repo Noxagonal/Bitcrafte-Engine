@@ -39,6 +39,7 @@ void								Panic [[noreturn]] (
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BITCRAFTE_ENGINE_API
 void								Panic [[noreturn]] (
 	const PrintRecord			&	message,
 	SourceLocation					source_location					= SourceLocation::Current()

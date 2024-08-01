@@ -35,7 +35,7 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerWin32
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const void * bc::window_manager::WindowManagerWin32Component::GetPlatformSpecificHandles() const
+const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::WindowManagerWin32Component::GetPlatformSpecificHandles() const
 {
 	return win32_manager->GetPlatformSpecificHandles();
 }
