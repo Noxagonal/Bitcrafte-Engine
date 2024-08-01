@@ -401,8 +401,6 @@ constexpr inline void			FreeMemory_Consteval(
 	u64							count
 ) noexcept
 {
-	static_assert( std::is_constant_evaluated(), "This function must be called in constant evaluated context" );
-
 	std::allocator<ValueType>{}.deallocate( location, size_t( count ) );
 }
 
@@ -434,8 +432,6 @@ constexpr ValueType			*	AllocateMemory_Consteval(
 	u64							alignment_requirement
 ) noexcept
 {
-	static_assert( std::is_constant_evaluated(), "This function must be called in constant evaluated context" );
-
 	return std::allocator<ValueType>{}.allocate( size_t( count ) );
 }
 
@@ -477,8 +473,6 @@ constexpr ValueType			*	ReallocateMemory_Consteval(
 	u64							new_count
 ) noexcept
 {
-	static_assert( std::is_constant_evaluated(), "This function must be called in constant evaluated context" );
-
 	auto new_location = AllocateMemory_Consteval<ValueType>( new_count, alignof( ValueType ) );
 	auto common_length = old_count < new_count ? old_count : new_count;
 	for( u64 i = 0; i < common_length; i++ )
