@@ -36,7 +36,7 @@ public:
 	/// @param stack_trace
 	/// This reports the source location where this function was called. If left as default, stack trace will point to the function
 	/// where this function was called.
-	constexpr inline Exception(
+	inline Exception(
 		const PrintRecord		&	print_record			= PrintRecord{},
 		const SourceLocation	&	source_location			= SourceLocation::Current(),
 		const StackTrace		&	stack_trace 			= StackTrace::Current()
@@ -48,7 +48,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception(
+	inline Exception(
 		const Exception									&	other
 	)
 	{
@@ -56,12 +56,12 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr Exception(
+	inline Exception(
 		Exception										&&	other
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline Exception							&	operator=(
+	inline Exception									&	operator=(
 		const Exception									&	other
 	)
 	{
@@ -70,30 +70,30 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr Exception									&	operator=(
+	inline Exception									&	operator=(
 		Exception										&&	other
 	) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const PrintRecord					&	GetMessage() const noexcept
+	inline const PrintRecord							&	GetMessage() const noexcept
 	{
 		return this->message;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const SourceLocation				&	GetSourceLocation() const noexcept
+	inline const SourceLocation							&	GetSourceLocation() const noexcept
 	{
 		return this->source_location;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const StackTrace					&	GetStackTrace() const noexcept
+	inline const StackTrace								&	GetStackTrace() const noexcept
 	{
 		return this->stack_trace;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline const Exception					*	GetNextException() const noexcept
+	inline const Exception								*	GetNextException() const noexcept
 	{
 		return this->next.Get();
 	}
@@ -107,7 +107,7 @@ public:
 	///
 	/// @param next_exception
 	/// Exception we wish to store inside this exception.
-	constexpr inline void									SetNextException(
+	inline void												SetNextException(
 		const Exception									&	next_exception
 	)
 	{
@@ -117,7 +117,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline bool									IsEmpty() const noexcept
+	inline bool												IsEmpty() const noexcept
 	{
 		return this->message.IsEmpty();
 	}
@@ -125,7 +125,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr inline void									CopyOther(
+	inline void												CopyOther(
 		const Exception									&	other
 	)
 	{
