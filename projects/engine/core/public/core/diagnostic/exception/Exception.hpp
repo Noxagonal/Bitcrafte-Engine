@@ -212,6 +212,7 @@ void													Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
+BITCRAFTE_ENGINE_API
 void													Throw [[noreturn]] (
 	const PrintRecord								&	print_record,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
@@ -251,6 +252,7 @@ void													Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
+BITCRAFTE_ENGINE_API
 void													Throw [[noreturn]] (
 	const bc::internal_::SimpleTextView32				message,
 	const SourceLocation							&	source_location				= SourceLocation::Current()
