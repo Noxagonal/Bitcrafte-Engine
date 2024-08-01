@@ -16,13 +16,13 @@ namespace internal_ {
 void SetGlobalLocale()
 {
 	// Set the C global locale to UTF-8
-	std::setlocale(LC_ALL, "C.UTF-8");
+	std::setlocale( LC_ALL, "en_US.UTF-8" );
 
 	// Set the C++ global locale to UTF-8
-	std::locale::global(std::locale("C.UTF-8"));
+	std::locale::global( std::locale( "en_US.UTF-8" ) );
 
 	// Set the C++ output streams to use UTF-8
-	std::cout.imbue(std::locale());
+	std::cout.imbue( std::locale() );
 
 	// Platform dependent, Windows uses utf-16 by default, Linux uses utf-32 by default.
 	// std::wcout.imbue(std::locale());
