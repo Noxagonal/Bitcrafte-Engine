@@ -18,4 +18,5 @@ add_engine_window_manager_component(${THIS_TARGET_NAME}
 
 get_supported_window_manager_list(WINDOW_MANAGER_LIST)
 message(STATUS "Supported window managers: ${WINDOW_MANAGER_LIST}")
+
 set_target_window_manager_component_defines(${THIS_TARGET_NAME} ${WINDOW_MANAGER_LIST})

@@ -74,6 +74,13 @@ function(add_engine_window_manager_component
 		PROPERTIES
 			FOLDER							"projects/engine/window_manager"
 	)
+
+	add_library("${ENGINE_WINDOW_COMPONENT_NAME}_interface" INTERFACE)
+	target_include_directories("${ENGINE_WINDOW_COMPONENT_NAME}_interface"
+		INTERFACE
+			"${CMAKE_CURRENT_SOURCE_DIR}/public"
+	)
+
 endfunction()
 
 
@@ -84,4 +91,5 @@ set(WINDOW_MANAGER_LIST)
 get_supported_window_manager_list(WINDOW_MANAGER_LIST)
 foreach(WINDOW_MANAGER IN LISTS WINDOW_MANAGER_LIST)
 	add_subdirectory("window_manager_${WINDOW_MANAGER}")
+	target_link_libraries(window_manager PRIVATE "window_manager_${WINDOW_MANAGER}_interface")
 endforeach()

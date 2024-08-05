@@ -6,10 +6,12 @@
 
 #include <core/containers/List.hpp>
 #include <core/containers/Text.hpp>
+#include <core/containers/UniquePtr.hpp>
 
 
 
 namespace bc {
+namespace window_manager { class WindowManagerComponent; }
 namespace rhi {
 
 
@@ -38,6 +40,14 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	virtual i64															GetPrimaryGraphicsCardIndex() = 0;
 };
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UniquePtr<RHIComponent>													CreateRHIComponent(
+	window_manager::WindowManagerComponent							&	window_manager,
+	const RHIComponentCreateInfo									&	create_info
+);
 
 
 

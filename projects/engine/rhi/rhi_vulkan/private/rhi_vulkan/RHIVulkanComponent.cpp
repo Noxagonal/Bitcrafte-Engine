@@ -8,8 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanComponent::RHIVulkanComponent(
-	window_manager::WindowManagerComponent		&	window_manager_component,
-	const RHIComponentCreateInfo				&	create_info
+	::bc::window_manager::WindowManagerComponent	&	window_manager_component,
+	const RHIComponentCreateInfo					&	create_info
 ) :
 	RHIComponent( create_info )
 {

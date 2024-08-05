@@ -20,3 +20,5 @@ add_engine_rhi_component(${THIS_TARGET_NAME}
 
 get_supported_rhi_list(RHI_LIST)
 message(STATUS "Supported RHIs: ${RHI_LIST}")
+
+set_target_rhi_component_defines(${THIS_TARGET_NAME} ${RHI_LIST})

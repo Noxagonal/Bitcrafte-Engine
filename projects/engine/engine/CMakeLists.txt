@@ -40,6 +40,3 @@ add_engine_component(${THIS_TARGET_NAME}
 		${WINDOW_MANAGER_COMPONENT_DEPENDENCIES}
 		${RHI_COMPONENT_DEPENDENCIES}
 )
-
-set_target_window_manager_component_defines(${THIS_TARGET_NAME} ${WINDOW_MANAGER_LIST})
-set_target_rhi_component_defines(${THIS_TARGET_NAME} ${RHI_LIST})

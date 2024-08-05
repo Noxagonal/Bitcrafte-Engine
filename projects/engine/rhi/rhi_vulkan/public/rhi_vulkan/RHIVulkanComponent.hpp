@@ -26,7 +26,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIVulkanComponent(
-		window_manager::WindowManagerComponent						&	window_manager_component,
+		::bc::window_manager::WindowManagerComponent				&	window_manager_component,
 		const RHIComponentCreateInfo								&	create_info
 	);
 

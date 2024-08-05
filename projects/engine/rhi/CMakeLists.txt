@@ -74,6 +74,13 @@ function(add_engine_rhi_component
 		PROPERTIES
 			FOLDER							"projects/engine/rhi"
 	)
+
+	add_library("${ENGINE_RHI_COMPONENT_NAME}_interface" INTERFACE)
+	target_include_directories("${ENGINE_RHI_COMPONENT_NAME}_interface"
+		INTERFACE
+			"${CMAKE_CURRENT_SOURCE_DIR}/public"
+	)
+
 endfunction()
 
 
@@ -84,4 +91,5 @@ set(RHI_LIST)
 get_supported_rhi_list(RHI_LIST)
 foreach(RHI IN LISTS RHI_LIST)
 	add_subdirectory("rhi_${RHI}")
+	target_link_libraries(rhi PRIVATE "rhi_${RHI}_interface")
 endforeach()
