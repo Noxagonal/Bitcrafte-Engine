@@ -3,7 +3,6 @@
 #include <core/containers/backend/ContainerBase.hpp>
 #include <core/utility/template/CallableTraits.hpp>
 #include <core/utility/concepts/CallableConcepts.hpp>
-#include "FunctionImplShared.hpp"
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/diagnostic/assertion/Assert.hpp>
@@ -112,8 +111,89 @@ private:
 	static_assert( sizeof( LocalStorage ) == 16 );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	using MyFunctorManagerBase = ::bc::internal_::container::FunctorManagerBase<LocalStorage, ReturnType, ParameterTypes...>;
-	using FunctorManagerStorage = std::aligned_storage_t<sizeof( MyFunctorManagerBase ), alignof( MyFunctorManagerBase )>;
+	class FunctorManagerBase
+	{
+	public:
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		virtual ~FunctorManagerBase() noexcept = default;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		virtual ReturnType							Invoke(
+			bool									is_stored_locally,
+			LocalStorage						&	storage,
+			ParameterTypes...						args
+		) BC_CONTAINER_NOEXCEPT = 0;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		virtual void								Clone(
+			bool									is_stored_locally,
+			FunctorManagerBase					&	destination_manager,
+			LocalStorage						&	destination,
+			const LocalStorage					&	source
+		) const BC_CONTAINER_NOEXCEPT = 0;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		virtual void								ClearFunctor(
+			bool									is_stored_locally,
+			LocalStorage						&	storage
+		) noexcept = 0;
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename FunctorType>
+	class FunctorManager : public FunctorManagerBase
+	{
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		FunctorManager() = default;
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		virtual ReturnType							Invoke(
+			bool									is_stored_locally,
+			LocalStorage						&	storage,
+			ParameterTypes...						args
+		) BC_CONTAINER_NOEXCEPT override
+		{
+			auto functor_pointer = GetFunctorPointer<FunctorType>( is_stored_locally, storage );
+			return ( *functor_pointer )( std::forward<ParameterTypes>( args )... );
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		virtual void								Clone(
+			bool									is_stored_locally,
+			FunctorManagerBase					&	destination_manager,
+			LocalStorage						&	destination,
+			const LocalStorage					&	source
+		) const BC_CONTAINER_NOEXCEPT override
+		{
+			// Allocate space for the functor in destination storage.
+			auto functor_pointer = AllocateFunctor<FunctorType>(
+				is_stored_locally,
+				destination
+			);
+
+			// Copy the functor from source to destination by invoking the copy constructor.
+			::new( functor_pointer ) FunctorType( *GetFunctorPointer<FunctorType>( is_stored_locally, source ) );
+
+			::new( &destination_manager ) FunctorManager();
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		virtual void								ClearFunctor(
+			bool									is_stored_locally,
+			LocalStorage						&	storage
+		) noexcept override
+		{
+			auto functor_pointer = GetFunctorPointer<FunctorType>( is_stored_locally, storage );
+			functor_pointer->~FunctorType();
+			FreeFunctor<FunctorType>( is_stored_locally, storage );
+		}
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	using FunctorManagerStorage = std::aligned_storage_t<sizeof( FunctorManagerBase ), alignof( FunctorManagerBase )>;
 
 public:
 
@@ -295,7 +375,7 @@ public:
 
 		if( this->type == Type::INVOKEABLE_OBJECT )
 		{
-			auto manager = reinterpret_cast<MyFunctorManagerBase*>( &this->functor_manager );
+			auto manager = reinterpret_cast<FunctorManagerBase*>( &this->functor_manager );
 			return manager->Invoke( this->is_stored_locally, this->storage, std::forward<ParameterTypes>( args )... );
 		}
 		else
@@ -312,9 +392,9 @@ public:
 	{
 		if ( this->type == Type::INVOKEABLE_OBJECT )
 		{
-			auto manager = reinterpret_cast<MyFunctorManagerBase*>( &this->functor_manager );
+			auto manager = reinterpret_cast<FunctorManagerBase*>( &this->functor_manager );
 			manager->ClearFunctor( this->is_stored_locally, this->storage );
-			manager->~MyFunctorManagerBase();
+			manager->~FunctorManagerBase();
 		}
 		this->is_stored_locally = false;
 		this->type = Type::NONE;
@@ -373,8 +453,8 @@ private:
 
 		if( other.type == Type::INVOKEABLE_OBJECT )
 		{
-			auto my_manager = reinterpret_cast<MyFunctorManagerBase*>( &this->functor_manager );
-			auto other_manager = reinterpret_cast<const MyFunctorManagerBase*>( &other.functor_manager );
+			auto my_manager = reinterpret_cast<FunctorManagerBase*>( &this->functor_manager );
+			auto other_manager = reinterpret_cast<const FunctorManagerBase*>( &other.functor_manager );
 			other_manager->Clone( other.is_stored_locally, *my_manager, this->storage, other.storage );
 		}
 		else
@@ -415,20 +495,91 @@ private:
 		}
 		else
 		{
-			using FunctorManagerType = ::bc::internal_::container::FunctorManager<FunctorBaseType, LocalStorage, ReturnType, ParameterTypes...>;
-			static_assert( sizeof( FunctorManagerType ) == 8, "FunctorManager size is not 8 bytes." );
-			static_assert( alignof( FunctorManagerType ) == alignof( MyFunctorManagerBase ), "FunctorManager alignment is not equal to MyFunctorManagerBase." );
+			using NewFunctorManagerType = FunctorManager<FunctorBaseType>;
+			static_assert( sizeof( NewFunctorManagerType ) == 8, "FunctorManager size is not 8 bytes." );
+			static_assert( alignof( NewFunctorManagerType ) == alignof( FunctorManagerBase ), "NewFunctorManagerType alignment is not equal to FunctorManagerBase." );
 
-			constexpr bool store_locally = ::bc::internal_::container::IsFunctorStoredLocally<FunctorBaseType, LocalStorage>();
+			constexpr bool store_locally = TestFunctorCanBeStoredLocally<FunctorBaseType>();
 
 			this->is_stored_locally = store_locally;
 			this->type = Type::INVOKEABLE_OBJECT;
 
-			auto functor_pointer = ::bc::internal_::container::AllocateFunctor<FunctorBaseType, LocalStorage>( store_locally, storage );
+			auto functor_pointer = AllocateFunctor<FunctorBaseType>( store_locally, storage );
 			::new( functor_pointer ) FunctorBaseType( std::forward<FunctorType>( functor ) );
 
-			::new( &this->functor_manager ) FunctorManagerType();
+			::new( &this->functor_manager ) NewFunctorManagerType();
 		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename FunctorType>
+	static FunctorType												*	AllocateFunctor(
+		bool															is_stored_locally,
+		LocalStorage												&	storage
+	) noexcept
+	{
+		if( is_stored_locally )
+		{
+			assert( sizeof( FunctorType ) <= sizeof( LocalStorage ) && "Functor type is too big." );
+			assert( alignof( FunctorType ) <= alignof( LocalStorage ) && "Functor alignment does not fit in storage." );
+			return reinterpret_cast<FunctorType*>( storage.raw );
+		}
+		else
+		{
+			storage.heap_functor = memory::AllocateMemory<FunctorType>( 1, alignof( FunctorType ) );
+			return static_cast<FunctorType*>( storage.heap_functor );
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename FunctorType>
+	static void															FreeFunctor(
+		bool															is_stored_locally,
+		LocalStorage												&	storage
+	) noexcept
+	{
+		if( is_stored_locally ) return;
+
+		memory::FreeMemory<FunctorType>( reinterpret_cast<FunctorType*>( storage.heap_functor ), 1 );
+
+		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+		memset( &storage, 0, sizeof( LocalStorage ) );
+		#endif
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename FunctorType>
+	static const FunctorType										*	GetFunctorPointer(
+		bool															is_stored_locally,
+		const LocalStorage											&	storage
+	) noexcept
+	{
+		if( is_stored_locally ) return reinterpret_cast<const FunctorType*>( storage.raw );
+		return static_cast<const FunctorType*>( storage.heap_functor );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename FunctorType>
+	static FunctorType												*	GetFunctorPointer(
+		bool															is_stored_locally,
+		LocalStorage												&	storage
+	) noexcept
+	{
+		if( is_stored_locally ) return reinterpret_cast<FunctorType*>( storage.raw );
+		return static_cast<FunctorType*>( storage.heap_functor );
+		}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename FunctorType>
+	static consteval bool												TestFunctorCanBeStoredLocally() noexcept
+	{
+		constexpr auto StorageSize = sizeof( LocalStorage );
+		constexpr auto StorageAlignment = alignof( LocalStorage );
+		return
+			std::is_trivially_copyable_v<FunctorType> &&
+			sizeof( FunctorType ) <= StorageSize &&
+			alignof( FunctorType ) <= StorageAlignment &&
+			( StorageAlignment % alignof( FunctorType ) == 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
