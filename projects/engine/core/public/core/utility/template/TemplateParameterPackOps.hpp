@@ -419,5 +419,61 @@ static_assert( IsEachParameterPackTypeDerivedFromType<IsEachParameterPackTypeDer
 
 
 
+namespace internal_ {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<size_t CurrentMaxSize, typename ...InTypePack>
+struct FindMaxSizeTypeInParameterPack_Helper;
+
+// Specialization for when we reach the end of the parameter pack, or empty parameter pack.
+template<size_t CurrentMaxSize>
+struct FindMaxSizeTypeInParameterPack_Helper<CurrentMaxSize> : public std::integral_constant<size_t, CurrentMaxSize> {};
+
+// Specialization for when we still have not reached the end of the parameter pack.
+template<size_t CurrentMaxSize, typename CurrentType, typename ...InTypePack>
+struct FindMaxSizeTypeInParameterPack_Helper<CurrentMaxSize, CurrentType, InTypePack...> : public std::conditional_t<
+	( sizeof( CurrentType ) > CurrentMaxSize ),
+	FindMaxSizeTypeInParameterPack_Helper<sizeof( CurrentType ), InTypePack...>,
+	FindMaxSizeTypeInParameterPack_Helper<CurrentMaxSize, InTypePack...>>
+{};
+} // namespace internal_
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Finds the largest type in given template parameter pack.
+///
+/// @note
+/// If template parameter pack is empty, then this will result in 0.
+///
+/// Usage example:
+/// @code
+/// constexpr size_t max_size = FindMaxSizeTypeInParameterPack<f32, u8, f64, u16>::value; // This will result in 8.
+/// @endcode
+///
+/// @tparam ...InTypePack
+/// Template parameter pack of types to search.
+template<typename ...InTypePack>
+struct FindMaxSizeTypeInParameterPack : public internal_::FindMaxSizeTypeInParameterPack_Helper<0, InTypePack...> {};
+
+#ifdef BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
+
+static_assert( FindMaxSizeTypeInParameterPack<>::value == 0 );
+static_assert( FindMaxSizeTypeInParameterPack<u8>::value == 1 );
+static_assert( FindMaxSizeTypeInParameterPack<u8, u8>::value == 1 );
+static_assert( FindMaxSizeTypeInParameterPack<u16>::value == 2 );
+static_assert( FindMaxSizeTypeInParameterPack<u16, u16>::value == 2 );
+static_assert( FindMaxSizeTypeInParameterPack<u32>::value == 4 );
+static_assert( FindMaxSizeTypeInParameterPack<u32, u32>::value == 4 );
+static_assert( FindMaxSizeTypeInParameterPack<u8, u16, u32>::value == 4 );
+static_assert( FindMaxSizeTypeInParameterPack<u8, u16, u32, u64>::value == 8 );
+static_assert( FindMaxSizeTypeInParameterPack<u64, u32, u16, u8>::value == 8 );
+static_assert( FindMaxSizeTypeInParameterPack<u64, u8, u32, u16>::value == 8 );
+static_assert( FindMaxSizeTypeInParameterPack<u32, u64, u16, u8>::value == 8 );
+static_assert( FindMaxSizeTypeInParameterPack<u8, u32, u64, u16>::value == 8 );
+} // namespace tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+
+
+
 } // utility
 } // bc

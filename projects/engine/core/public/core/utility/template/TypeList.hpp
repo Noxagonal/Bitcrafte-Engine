@@ -115,6 +115,24 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
+	/// Get the size of the largest type in the TypeList.
+	/// 
+	/// Usage example:
+	/// @code
+	/// using TypeListSample = TypeList<i32, u8, f64, u16>;
+	/// constexpr u64 max_size = TypeListSample::template TypeMaxSize();
+	/// // max_size will be 8 because f64 is 8 bytes.
+	/// @endcode
+	///
+	/// @return
+	/// Maximum size of the TypeList.
+	consteval static u64 TypeMaxSize()
+	{
+		return FindMaxSizeTypeInParameterPack<TypePack...>::value;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
 	/// Counts the number of instances of CountType in this TypeList.
 	/// 
 	/// Usage example:
