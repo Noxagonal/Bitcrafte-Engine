@@ -22,7 +22,7 @@ template<
 FunctorType														*	AllocateFunctor(
 	bool															is_stored_locally,
 	FunctionLocalStorageType									&	storage
-)
+) noexcept
 {
 	if( is_stored_locally )
 	{
@@ -45,7 +45,7 @@ template<
 void																FreeFunctor(
 	bool															is_stored_locally,
 	FunctionLocalStorageType									&	storage
-)
+) noexcept
 {
 	if( is_stored_locally ) return;
 
@@ -64,7 +64,7 @@ template<
 const FunctorType												*	GetFunctorPointer(
 	bool															is_stored_locally,
 	const FunctionLocalStorageType								&	storage
-)
+) noexcept
 {
 	if( is_stored_locally ) return reinterpret_cast<const FunctorType*>( storage.raw );
 	return static_cast<const FunctorType*>( storage.heap_functor );
@@ -78,7 +78,7 @@ template<
 FunctorType														*	GetFunctorPointer(
 	bool															is_stored_locally,
 	FunctionLocalStorageType									&	storage
-)
+) noexcept
 {
 	if( is_stored_locally ) return reinterpret_cast<FunctorType*>( storage.raw );
 	return static_cast<FunctorType*>( storage.heap_functor );
@@ -91,7 +91,7 @@ template<
 	typename FunctorType,
 	typename FunctionLocalStorageType
 >
-consteval bool IsFunctorStoredLocally()
+consteval bool IsFunctorStoredLocally() noexcept
 {
 	constexpr auto StorageSize = sizeof( FunctionLocalStorageType );
 	constexpr auto StorageAlignment = alignof( FunctionLocalStorageType );
@@ -117,7 +117,7 @@ class FunctorManagerBase
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual ~FunctorManagerBase() = default;
+	virtual ~FunctorManagerBase() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	virtual ReturnType							Invoke( 
@@ -138,7 +138,7 @@ public:
 	virtual void								ClearFunctor(
 		bool									is_stored_locally,
 		FunctionLocalStorageType			&	storage
-	) = 0;
+	) noexcept = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ public:
 	virtual void								ClearFunctor(
 		bool									is_stored_locally,
 		FunctionLocalStorageType			&	storage
-	) override
+	) noexcept override
 	{
 		auto functor_pointer = GetFunctorPointer<FunctorType, FunctionLocalStorageType>( is_stored_locally, storage );
 		functor_pointer->~FunctorType();
