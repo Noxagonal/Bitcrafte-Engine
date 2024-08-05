@@ -124,7 +124,11 @@ public:
 	///
 	/// Packets can be claimed using MessageBus::ClaimPacket().
 	///
-	/// The event is signalled on the thread that sent the packet.
+	/// @note
+	/// The event is signalled by the thread that sent the packet.
+	///
+	/// @warning
+	/// The event is not thread safe. Listeners are responsible for making sure that they don't cause race conditions.
 	///
 	/// @see MessageBus::ClaimPacket()
 	///
