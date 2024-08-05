@@ -74,7 +74,7 @@ public:
 	/// If this TypeList contains multiple of the same type, only the index to the first occurrence of the type will be returned.
 	///
 	/// @note
-	/// If the type is not in the TypeList, this will cause a compile time error with message "Type not found".
+	/// If the type was not found, a compile time error will be generated with message "Type not found".
 	///
 	/// Usage example:
 	/// @code
@@ -88,7 +88,7 @@ public:
 	/// Type to find index for.
 	/// 
 	/// @return
-	/// Index to first occurance of TypeToFind in TypeList.
+	/// Index to first occurrence of TypeToFind in TypeList.
 	template<typename TypeToFind>
 	consteval static u64 TypeToIndex()
 	{
