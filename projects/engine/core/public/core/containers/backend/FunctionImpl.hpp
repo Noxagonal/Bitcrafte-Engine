@@ -144,9 +144,9 @@ private:
 	template<typename FunctorType>
 	class FunctorManager : public FunctorManagerBase
 	{
-public:
+	public:
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		FunctorManager() = default;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +202,7 @@ public:
 	/// Default constructor.
 	constexpr BC_CONTAINER_NAME( Function )() noexcept
 	{
-		DebugZeroStorage();
+		DebugClearStorage();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ public:
 		const BC_CONTAINER_NAME( Function )							&	other
 	)
 	{
-		DebugZeroStorage();
+		DebugClearStorage();
 
 		Copy( other );
 	}
@@ -230,7 +230,7 @@ public:
 		BC_CONTAINER_NAME( Function )								&&	other
 	) noexcept
 	{
-		DebugZeroStorage();
+		DebugClearStorage();
 
 		Swap( other );
 	}
@@ -278,7 +278,7 @@ public:
 			"Function must be constructible from the FunctorType"
 		);
 
-		DebugZeroStorage();
+		DebugClearStorage();
 
 		Store( std::forward<FunctorType>( functor ) );
 	}
@@ -398,7 +398,7 @@ public:
 		}
 		this->is_stored_locally = false;
 		this->type = Type::NONE;
-		DebugZeroStorage();
+		DebugClearStorage();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -567,7 +567,7 @@ private:
 	{
 		if( is_stored_locally ) return reinterpret_cast<FunctorType*>( storage.raw );
 		return static_cast<FunctorType*>( storage.heap_functor );
-		}
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
@@ -583,7 +583,7 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																DebugZeroStorage() noexcept
+	void																DebugClearStorage() noexcept
 	{
 		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 		memset( &storage, 0, sizeof( decltype( storage ) ) );
