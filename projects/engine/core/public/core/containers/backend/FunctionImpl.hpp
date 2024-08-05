@@ -27,6 +27,32 @@ BC_CONTAINER_NAMESPACE_START;
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Container for storing functions, callable objects and lambdas so that they can be invoked later via this container.
+///
+/// We'll refer to functions, callable objects and lambdas as "functors".
+///
+/// This container is similar to std::function, it stores a functor and allows it to be invoked later. This is especially useful
+/// when storing lambdas to be invoked later.
+///
+/// @note
+/// There is a small performance cost when using this container, especially from callable objects like lambdas, mostly from CPU
+/// cache misses. Try to avoid using this in hot loops.
+///
+/// Usage example:
+/// @code
+/// auto my_function = bc::Function(
+///		[]( int a, float b )
+/// 	{
+/// 		return a * b;
+/// 	};
+///	);
+/// auto result = my_function( 2, 3.0f );
+/// @endcode
+///
+/// @tparam Signature
+/// Signature of the contained function. Eg. <tt>int(int, float)</tt>
 template<typename Signature>
 class BC_CONTAINER_NAME( Function );
 
@@ -85,18 +111,26 @@ private:
 	};
 	static_assert( sizeof( LocalStorage ) == 16 );
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	using MyFunctorManagerBase = ::bc::internal_::container::FunctorManagerBase<LocalStorage, ReturnType, ParameterTypes...>;
 	using FunctorManagerStorage = std::aligned_storage_t<sizeof( MyFunctorManagerBase ), alignof( MyFunctorManagerBase )>;
 
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Default constructor.
 	constexpr BC_CONTAINER_NAME( Function )() noexcept
 	{
 		DebugZeroStorage();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Copy constructor.
+	///
+	/// @param other
+	/// Function to copy.
 	BC_CONTAINER_NAME( Function )(
 		const BC_CONTAINER_NAME( Function )							&	other
 	)
@@ -107,6 +141,11 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Move constructor.
+	///
+	/// @param other
+	/// Function to move.
 	BC_CONTAINER_NAME( Function )(
 		BC_CONTAINER_NAME( Function )								&&	other
 	) noexcept
@@ -117,7 +156,15 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template <typename FunctorType>
+	/// @brief
+	/// Construct from a functor type.
+	///
+	/// @tparam FunctorType
+	/// Type of the functor.
+	///
+	/// @param functor
+	/// Functor to store.
+	template<typename FunctorType>
 	BC_CONTAINER_NAME( Function )(
 		FunctorType													&&	functor
 	) BC_CONTAINER_NOEXCEPT
@@ -163,6 +210,11 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Copy assignment operator.
+	///
+	/// @param other
+	/// Function to copy.
 	BC_CONTAINER_NAME( Function )									&	operator=(
 		const BC_CONTAINER_NAME( Function )							&	other
 	) BC_CONTAINER_NOEXCEPT
@@ -175,6 +227,11 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Move assignment operator.
+	///
+	/// @param other
+	/// Function to move.
 	BC_CONTAINER_NAME( Function )									&	operator=(
 		BC_CONTAINER_NAME( Function )								&&	other
 	) noexcept
@@ -192,6 +249,17 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Functor assignment operator.
+	///
+	/// @tparam FunctorType
+	/// Type of the functor to assign.
+	///
+	/// @param functor
+	/// The functor to assign.
+	///
+	/// @return
+	/// A reference to this object.
 	template<typename FunctorType>
 	BC_CONTAINER_NAME( Function )									&	operator=(
 		FunctorType													&&	functor
@@ -208,7 +276,17 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ReturnType operator()(
+	/// @brief
+	/// Invokes the stored functor.
+	///
+	/// @note
+	/// If this Function is empty, an exception will be thrown in debug builds, and program will crash in release builds.
+	///
+	/// @param args
+	/// Arguments to pass to the functor.
+	///
+	/// @return
+	/// The return value of the functor.
 	ReturnType															operator()(
 		ParameterTypes...												args
 	)
@@ -228,6 +306,8 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Clears the Function, making it empty.
 	void																Clear() noexcept
 	{
 		if ( this->type == Type::INVOKEABLE_OBJECT )
@@ -242,6 +322,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Checks if the function is stored in the stack.
+	///
+	/// This is useful mostly for debugging purposes. Typically you don't need this, unless you are collecting statistics.
+	///
+	/// @return
+	/// true if the function is stored in the stack, false when the function is stored in the heap.
 	bool																IsStoredLocally() const noexcept
 	{
 		BC_ContainerAssert( !IsEmpty(), U"Cannot check empty function stack locality, results would be meaningless." );
@@ -249,12 +336,22 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Checks if the function is empty.
+	///
+	/// @return
+	/// true if the function is empty and cannot be invoked, false otherwise.
 	bool																IsEmpty() const noexcept
 	{
 		return this->type == Type::NONE;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Checks if the function stores a functor.
+	///
+	/// @return
+	/// true if the function is not empty and can be invoked, false otherwise.
 	explicit operator bool() const noexcept
 	{
 		return !IsEmpty();
