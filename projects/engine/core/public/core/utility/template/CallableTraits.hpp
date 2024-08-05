@@ -55,10 +55,11 @@ public:
 template<typename Type>
 class CallableObjectResolver
 {
-	static constexpr bool is_callable = []<bool b = false>(){
-		static_assert( b, "Cannot get a callable traits from a non callable type." );
-		return b;
-	}();
+	// Disabled default error condition because it may be useful to use this class as a test in SFINAE, eg. in deduction guides.
+	//static constexpr bool is_callable = []<bool b = false>(){
+	//	static_assert( b, "Cannot get a callable traits from a non callable type." );
+	//	return b;
+	//}();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,10 +220,11 @@ class CallableObjectResolver<CallableReturnType( CallableClassType::* )( Callabl
 template<typename CallableType>
 class CallableTraits
 {
-	static constexpr bool is_callable = []<bool b = false>(){
-		static_assert( b, "Not a callable type" );
-		return b;
-	}();
+	// Disabled default error condition because it may be useful to use this class as a test in SFINAE, eg. in deduction guides.
+	//static constexpr bool is_callable = []<bool b = false>(){
+	//	static_assert( b, "Not a callable type" );
+	//	return b;
+	//}();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
