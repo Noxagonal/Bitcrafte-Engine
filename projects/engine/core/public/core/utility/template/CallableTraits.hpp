@@ -3,7 +3,7 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
 #include <core/data_types/FundamentalTypes.hpp>
-#include <core/utility/concepts/CallableConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/utility/template/TypeList.hpp>
 
 
@@ -228,7 +228,7 @@ class CallableTraits
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<CallableObject CallableType>
+template<InvocableObject CallableType>
 class CallableTraits<CallableType> :
 	public internal_::CallableObjectResolver<decltype( &CallableType::operator() )>
 {};

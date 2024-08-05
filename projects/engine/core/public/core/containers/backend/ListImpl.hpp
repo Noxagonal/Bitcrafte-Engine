@@ -1,6 +1,7 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
 #include <core/containers/backend/ContainerUtilities.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/containers/backend/LinearContainerBaseNormal.hpp>
@@ -9,8 +10,6 @@
 #else
 #error "Container implementation type not given"
 #endif
-
-#include <core/utility/concepts/CallableConcepts.hpp>
 
 #include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
@@ -694,7 +693,7 @@ public:
 	/// 
 	/// @param callable
 	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
-	template<utility::CallableWithReturnAndParameters<bool, const ValueType&> CallableType>
+	template<utility::InvocableWithReturn<bool, const ValueType&> CallableType>
 	constexpr void																						EraseIf(
 		CallableType																					callable
 	) BC_CONTAINER_NOEXCEPT
@@ -724,7 +723,7 @@ public:
 	/// 
 	/// @param callable
 	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
-	template<utility::CallableWithReturnAndParameters<bool, const ValueType&> CallableType>
+	template<utility::InvocableWithReturn<bool, const ValueType&> CallableType>
 	constexpr void																						EraseFirstIf(
 		CallableType																					callable
 	) BC_CONTAINER_NOEXCEPT

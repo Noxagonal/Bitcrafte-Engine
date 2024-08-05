@@ -6,7 +6,7 @@
 #include <core/thread/ThreadDescription.hpp>
 #include <core/thread/Task.hpp>
 
-#include <core/utility/concepts/CallableConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 
 #include <core/containers/UniquePtr.hpp>
 #include <core/containers/List.hpp>
@@ -228,12 +228,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
+			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
-			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
+			utility::InvocableWithReturn<LambdaType, void, Task&> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::InvocableWithReturn<LambdaType, void> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -270,12 +270,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
+			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
-			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
+			utility::InvocableWithReturn<LambdaType, void, Task&> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::InvocableWithReturn<LambdaType, void> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -311,12 +311,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
+			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
-			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
+			utility::InvocableWithReturn<LambdaType, void, Task&> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::InvocableWithReturn<LambdaType, void> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -348,12 +348,12 @@ public:
 	)
 	{
 		static_assert(
-			utility::CallableWithParameters<LambdaType, Task&> || utility::CallableWithParameters<LambdaType>,
+			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
 			"Task lambda must accept reference to a task or nothing, Eg. '[](){}' or '[]( Task & task ){}"
 		);
 		static_assert(
-			utility::CallableWithReturnAndParameters<LambdaType, void, Task&> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult, Task&> ||
-			utility::CallableWithReturnAndParameters<LambdaType, void> || utility::CallableWithReturnAndParameters<LambdaType, TaskExecutionResult>,
+			utility::InvocableWithReturn<LambdaType, void, Task&> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult, Task&> ||
+			utility::InvocableWithReturn<LambdaType, void> || utility::InvocableWithReturn<LambdaType, TaskExecutionResult>,
 			"Lambda task must return task state or nothing, Eg. '[]( Task & task ){}' or '[]( Task & task ){ return TaskExecutionResult::FINISHED; }'"
 		);
 
@@ -420,26 +420,26 @@ private:
 			Thread										&	thread
 		) override
 		{
-			constexpr bool non_void1 = utility::CallableWithParameters<LambdaType, void>;
-			constexpr bool non_void2 = utility::CallableWithParameters<LambdaType, void, Task&>;
-			constexpr bool non_void3 = utility::CallableWithParameters<LambdaType, TaskExecutionResult>;
-			constexpr bool non_void4 = utility::CallableWithParameters<LambdaType, TaskExecutionResult, Task&>;
+			constexpr bool non_void1 = utility::Invocable<LambdaType, void>;
+			constexpr bool non_void2 = utility::Invocable<LambdaType, void, Task&>;
+			constexpr bool non_void3 = utility::Invocable<LambdaType, TaskExecutionResult>;
+			constexpr bool non_void4 = utility::Invocable<LambdaType, TaskExecutionResult, Task&>;
 
-			if constexpr( utility::CallableWithParameters<LambdaType, void> )
+			if constexpr( utility::Invocable<LambdaType, void> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( utility::CallableWithParameters<LambdaType, void, Task&> )
+			else if constexpr( utility::Invocable<LambdaType, void, Task&> )
 			{
 				lambda_function();
 				return TaskExecutionResult::FINISHED;
 			}
-			else if constexpr( utility::CallableWithParameters<LambdaType, TaskExecutionResult> )
+			else if constexpr( utility::Invocable<LambdaType, TaskExecutionResult> )
 			{
 				return lambda_function();
 			}
-			else if constexpr( utility::CallableWithParameters<LambdaType, TaskExecutionResult, Task&> )
+			else if constexpr( utility::Invocable<LambdaType, TaskExecutionResult, Task&> )
 			{
 				return lambda_function();
 			}

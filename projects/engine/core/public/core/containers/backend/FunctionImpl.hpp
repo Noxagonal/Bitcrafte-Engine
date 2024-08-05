@@ -2,7 +2,6 @@
 #include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/containers/backend/ContainerBase.hpp>
 #include <core/utility/template/CallableTraits.hpp>
-#include <core/utility/concepts/CallableConcepts.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/diagnostic/assertion/Assert.hpp>
@@ -606,7 +605,7 @@ BC_CONTAINER_NAME( Function )( ReturnType ( * )( ParameterTypes... ) )
 
 // Deduction guide for invokeable objects.
 template<typename FunctorType>
-requires( !std::is_pointer_v<FunctorType> && !std::is_reference_v<FunctorType> && !std::is_same_v<FunctorType, void> && !std::is_lvalue_reference_v<FunctorType> && !std::is_rvalue_reference_v<FunctorType> && utility::CallableObject<FunctorType> )
+requires( !std::is_pointer_v<FunctorType> && !std::is_reference_v<FunctorType> && !std::is_same_v<FunctorType, void> && !std::is_lvalue_reference_v<FunctorType> && !std::is_rvalue_reference_v<FunctorType> && utility::InvocableObject<FunctorType> )
 BC_CONTAINER_NAME( Function )(FunctorType)
 	-> BC_CONTAINER_NAME( Function )<typename utility::CallableTraits<FunctorType>::Signature>;
 
