@@ -165,55 +165,55 @@ TEST( FunctionContainer, RegularFunctionInit )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallableObjectInit )
+TEST( FunctionContainer, InvocableObjectInit )
 {
 	using namespace bc;
 
-	struct Callable_void_void { void operator()() {} } callable_void_void;
-	struct Callable_void_u32 { void operator()( u32 value ) {} } callable_void_u32;
-	struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
-	struct Callable_u32_u32 { u32 operator()( u32 value ) { return value; } } callable_u32_u32;
+	struct Invocable_void_void { void operator()() {} } Invocable_void_void;
+	struct Invocable_void_u32 { void operator()( u32 value ) {} } Invocable_void_u32;
+	struct Invocable_u32_void { u32 operator()() { return 0; } } Invocable_u32_void;
+	struct Invocable_u32_u32 { u32 operator()( u32 value ) { return value; } } Invocable_u32_u32;
 
 	{
-		auto a = Function<void()>( callable_void_void );
+		auto a = Function<void()>( Invocable_void_void );
 		EXPECT_FALSE( a.IsEmpty() );
 
-		auto b = Function<void( bc::u32 )>( callable_void_u32 );
+		auto b = Function<void( bc::u32 )>( Invocable_void_u32 );
 		EXPECT_FALSE( b.IsEmpty() );
 
-		auto c = Function<bc::u32()>( callable_u32_void );
+		auto c = Function<bc::u32()>( Invocable_u32_void );
 		EXPECT_FALSE( c.IsEmpty() );
 
-		auto d = Function<bc::u32( bc::u32 )>( callable_u32_u32 );
+		auto d = Function<bc::u32( bc::u32 )>( Invocable_u32_u32 );
 		EXPECT_FALSE( d.IsEmpty() );
 	}
 	{
-		Function<void()> a = callable_void_void;
+		Function<void()> a = Invocable_void_void;
 		EXPECT_FALSE( a.IsEmpty() );
 
-		Function<void( bc::u32 )> b = callable_void_u32;
+		Function<void( bc::u32 )> b = Invocable_void_u32;
 		EXPECT_FALSE( b.IsEmpty() );
 
-		Function<bc::u32()> c = callable_u32_void;
+		Function<bc::u32()> c = Invocable_u32_void;
 		EXPECT_FALSE( c.IsEmpty() );
 
-		Function<bc::u32( bc::u32 )> d = callable_u32_u32;
+		Function<bc::u32( bc::u32 )> d = Invocable_u32_u32;
 		EXPECT_FALSE( d.IsEmpty() );
 	}
 	{
-		auto a = Function( callable_void_void );
+		auto a = Function( Invocable_void_void );
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_TRUE( ( std::is_same_v<decltype( a )::Signature, void()> ) );
 
-		auto b = Function( callable_void_u32 );
+		auto b = Function( Invocable_void_u32 );
 		EXPECT_FALSE( b.IsEmpty() );
 		EXPECT_TRUE( ( std::is_same_v<decltype( b )::Signature, void( u32 )> ) );
 
-		auto c = Function( callable_u32_void );
+		auto c = Function( Invocable_u32_void );
 		EXPECT_FALSE( c.IsEmpty() );
 		EXPECT_TRUE( ( std::is_same_v<decltype( c )::Signature, u32()> ) );
 
-		auto d = Function( callable_u32_u32 );
+		auto d = Function( Invocable_u32_u32 );
 		EXPECT_FALSE( d.IsEmpty() );
 		EXPECT_TRUE( ( std::is_same_v<decltype( d )::Signature, u32( u32 )> ) );
 	}
@@ -294,8 +294,8 @@ TEST( FunctionContainer, Clear )
 		EXPECT_TRUE( a.IsEmpty() );
 	}
 	{
-		struct Callable_void_void { void operator()() {} } callable_void_void;
-		auto a = A( callable_void_void );
+		struct Invocable_void_void { void operator()() {} } Invocable_void_void;
+		auto a = A( Invocable_void_void );
 		EXPECT_FALSE( a.IsEmpty() );
 
 		a.Clear();
@@ -383,33 +383,33 @@ TEST( FunctionContainer, FunctionCopyOperator )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallableObjectCopyConstruct )
+TEST( FunctionContainer, InvocableObjectCopyConstruct )
 {
 	using namespace bc;
 	{
-		struct Callable_void_void { void operator()() {} } callable_void_void;
-		auto a = Function( callable_void_void );
+		struct Invocable_void_void { void operator()() {} } Invocable_void_void;
+		auto a = Function( Invocable_void_void );
 		auto b = a;
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_void_u32 { void operator()( u32 ) {} } callable_void_u32;
-		auto a = Function( callable_void_u32 );
+		struct Invocable_void_u32 { void operator()( u32 ) {} } Invocable_void_u32;
+		auto a = Function( Invocable_void_u32 );
 		auto b = a;
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
-		auto a = Function( callable_u32_void );
+		struct Invocable_u32_void { u32 operator()() { return 0; } } Invocable_u32_void;
+		auto a = Function( Invocable_u32_void );
 		auto b = a;
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_u32 { u32 operator()( u32 ) { return 0; } } callable_u32_u32;
-		auto a = Function( callable_u32_u32 );
+		struct Invocable_u32_u32 { u32 operator()( u32 ) { return 0; } } Invocable_u32_u32;
+		auto a = Function( Invocable_u32_u32 );
 		auto b = a;
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
@@ -417,36 +417,36 @@ TEST( FunctionContainer, CallableObjectCopyConstruct )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallableObjectCopyOperator )
+TEST( FunctionContainer, InvocableObjectCopyOperator )
 {
 	using namespace bc;
 	{
-		struct Callable_void_void { void operator()() {} } callable_void_void;
-		auto a = Function( callable_void_void );
+		struct Invocable_void_void { void operator()() {} } Invocable_void_void;
+		auto a = Function( Invocable_void_void );
 		auto b = Function<void()>();
 		b = a;
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_void_u32 { void operator()( u32 ) {} } callable_void_u32;
-		auto a = Function( callable_void_u32 );
+		struct Invocable_void_u32 { void operator()( u32 ) {} } Invocable_void_u32;
+		auto a = Function( Invocable_void_u32 );
 		auto b = Function<void( u32 )>();
 		b = a;
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
-		auto a = Function( callable_u32_void );
+		struct Invocable_u32_void { u32 operator()() { return 0; } } Invocable_u32_void;
+		auto a = Function( Invocable_u32_void );
 		auto b = Function<u32()>();
 		b = a;
 		EXPECT_FALSE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_u32 { u32 operator()( u32 ) { return 0; } } callable_u32_u32;
-		auto a = Function( callable_u32_u32 );
+		struct Invocable_u32_u32 { u32 operator()( u32 ) { return 0; } } Invocable_u32_u32;
+		auto a = Function( Invocable_u32_u32 );
 		auto b = Function<u32( u32 )>();
 		b = a;
 		EXPECT_FALSE( a.IsEmpty() );
@@ -587,33 +587,33 @@ TEST( FunctionContainer, RegularFunctionMoveOperator )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallableObjectMoveConstruct )
+TEST( FunctionContainer, InvocableObjectMoveConstruct )
 {
 	using namespace bc;
 	{
-		struct Callable_void_void { void operator()() {} } callable_void_void;
-		auto a = Function( callable_void_void );
+		struct Invocable_void_void { void operator()() {} } Invocable_void_void;
+		auto a = Function( Invocable_void_void );
 		auto b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_void_u32 { void operator()() {} } callable_void_u32;
-		auto a = Function( callable_void_u32 );
+		struct Invocable_void_u32 { void operator()() {} } Invocable_void_u32;
+		auto a = Function( Invocable_void_u32 );
 		auto b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
-		auto a = Function( callable_u32_void );
+		struct Invocable_u32_void { u32 operator()() { return 0; } } Invocable_u32_void;
+		auto a = Function( Invocable_u32_void );
 		auto b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_u32 { u32 operator()( u32 value ) { return value; } } callable_u32_u32;
-		auto a = Function( callable_u32_u32 );
+		struct Invocable_u32_u32 { u32 operator()( u32 value ) { return value; } } Invocable_u32_u32;
+		auto a = Function( Invocable_u32_u32 );
 		auto b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
@@ -621,36 +621,36 @@ TEST( FunctionContainer, CallableObjectMoveConstruct )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallableObjectMoveOperator )
+TEST( FunctionContainer, InvocableObjectMoveOperator )
 {
 	using namespace bc;
 	{
-		struct Callable_void_void { void operator()() {} } callable_void_void;
-		auto a = Function( callable_void_void );
+		struct Invocable_void_void { void operator()() {} } Invocable_void_void;
+		auto a = Function( Invocable_void_void );
 		auto b = Function<void()>();
 		b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_void_u32 { void operator()( u32 ) {} } callable_void_u32;
-		auto a = Function( callable_void_u32 );
+		struct Invocable_void_u32 { void operator()( u32 ) {} } Invocable_void_u32;
+		auto a = Function( Invocable_void_u32 );
 		auto b = Function<void( u32 )>();
 		b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
-		auto a = Function( callable_u32_void );
+		struct Invocable_u32_void { u32 operator()() { return 0; } } Invocable_u32_void;
+		auto a = Function( Invocable_u32_void );
 		auto b = Function<u32()>();
 		b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
 		EXPECT_FALSE( b.IsEmpty() );
 	}
 	{
-		struct Callable_u32_u32 { u32 operator()( u32 value ) { return value; } } callable_u32_u32;
-		auto a = Function( callable_u32_u32 );
+		struct Invocable_u32_u32 { u32 operator()( u32 value ) { return value; } } Invocable_u32_u32;
+		auto a = Function( Invocable_u32_u32 );
 		auto b = Function<u32( u32 )>();
 		b = std::move( a );
 		EXPECT_TRUE( a.IsEmpty() );
@@ -772,27 +772,27 @@ TEST( FunctionContainer, CallNormalFunction )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TEST( FunctionContainer, CallCallableObject )
+TEST( FunctionContainer, CallInvocableObject )
 {
 	using namespace bc;
 	{
-		struct Callable_void_void { void operator()() {} } callable_void_void;
-		auto a = Function( callable_void_void );
+		struct Invocable_void_void { void operator()() {} } Invocable_void_void;
+		auto a = Function( Invocable_void_void );
 		EXPECT_NO_THROW( a() );
 	}
 	{
-		struct Callable_void_u32 { void operator()( u32 value ) {} } callable_void_u32;
-		auto a = Function( callable_void_u32 );
+		struct Invocable_void_u32 { void operator()( u32 value ) {} } Invocable_void_u32;
+		auto a = Function( Invocable_void_u32 );
 		EXPECT_NO_THROW( a( 0 ) );
 	}
 	{
-		struct Callable_u32_void { u32 operator()() { return 0; } } callable_u32_void;
-		auto a = Function( callable_u32_void );
+		struct Invocable_u32_void { u32 operator()() { return 0; } } Invocable_u32_void;
+		auto a = Function( Invocable_u32_void );
 		EXPECT_NO_THROW( a() );
 	}
 	{
-		struct Callable_u32_u32 { u32 operator()( u32 value ) { return value; } } callable_u32_u32;
-		auto a = Function( callable_u32_u32 );
+		struct Invocable_u32_u32 { u32 operator()( u32 value ) { return value; } } Invocable_u32_u32;
+		auto a = Function( Invocable_u32_u32 );
 		auto b = a( 15 );
 		EXPECT_EQ( b, 15 );
 	}
@@ -865,19 +865,19 @@ TEST( FunctionContainer, NonTriviallyCopyableFunctor )
 {
 	using namespace bc;
 	{
-		struct Callable_NonTriviallyCopyable
+		struct Invocable_NonTriviallyCopyable
 		{
-			Callable_NonTriviallyCopyable() = default;
-			Callable_NonTriviallyCopyable( const Callable_NonTriviallyCopyable & ) {}
-			Callable_NonTriviallyCopyable( Callable_NonTriviallyCopyable && ) = default;
-			Callable_NonTriviallyCopyable & operator=( const Callable_NonTriviallyCopyable & ) { return *this; }
-			Callable_NonTriviallyCopyable & operator=( Callable_NonTriviallyCopyable && ) = default;
+			Invocable_NonTriviallyCopyable() = default;
+			Invocable_NonTriviallyCopyable( const Invocable_NonTriviallyCopyable & ) {}
+			Invocable_NonTriviallyCopyable( Invocable_NonTriviallyCopyable && ) = default;
+			Invocable_NonTriviallyCopyable & operator=( const Invocable_NonTriviallyCopyable & ) { return *this; }
+			Invocable_NonTriviallyCopyable & operator=( Invocable_NonTriviallyCopyable && ) = default;
 			void operator()() {}
-		} callable_non_trivially_copyable;
-		static_assert( !std::is_trivially_copyable_v<Callable_NonTriviallyCopyable> );
+		} Invocable_non_trivially_copyable;
+		static_assert( !std::is_trivially_copyable_v<Invocable_NonTriviallyCopyable> );
 
 		// The functor should be stored in the heap, because this is a non-trivially copyable type.
-		auto a = Function( callable_non_trivially_copyable );
+		auto a = Function( Invocable_non_trivially_copyable );
 		EXPECT_FALSE( a.IsStoredLocally() );
 	}
 }
@@ -886,35 +886,35 @@ TEST( FunctionContainer, NonTriviallyCopyableFunctor )
 TEST( FunctionContainer, FunctorConstructorAndOperatorCallCounts )
 {
 	using namespace bc;
-	struct Callable_ConstructorCallsDetection
+	struct Invocable_ConstructorCallsDetection
 	{
 		i32 value = 0;
-		Callable_ConstructorCallsDetection() { value += 1; };
-		Callable_ConstructorCallsDetection( const Callable_ConstructorCallsDetection & other ) { value = other.value + 10; }
-		Callable_ConstructorCallsDetection( Callable_ConstructorCallsDetection && other ) { value = other.value + 100; };
-		Callable_ConstructorCallsDetection & operator=( const Callable_ConstructorCallsDetection & other ) { value = other.value + 1000; return *this; }
-		Callable_ConstructorCallsDetection & operator=( Callable_ConstructorCallsDetection && other ) { value = other.value + 10000; return *this; }
+		Invocable_ConstructorCallsDetection() { value += 1; };
+		Invocable_ConstructorCallsDetection( const Invocable_ConstructorCallsDetection & other ) { value = other.value + 10; }
+		Invocable_ConstructorCallsDetection( Invocable_ConstructorCallsDetection && other ) { value = other.value + 100; };
+		Invocable_ConstructorCallsDetection & operator=( const Invocable_ConstructorCallsDetection & other ) { value = other.value + 1000; return *this; }
+		Invocable_ConstructorCallsDetection & operator=( Invocable_ConstructorCallsDetection && other ) { value = other.value + 10000; return *this; }
 		i32 operator()() { return value; }
 	};
 
 	{
-		Callable_ConstructorCallsDetection callable_constructor_calls_detection_std;
-		EXPECT_EQ( callable_constructor_calls_detection_std(), 1 );
+		Invocable_ConstructorCallsDetection Invocable_constructor_calls_detection_std;
+		EXPECT_EQ( Invocable_constructor_calls_detection_std(), 1 );
 
 		// Functor should be move constructed.
-		auto std_a = Function( Callable_ConstructorCallsDetection() );
+		auto std_a = Function( Invocable_ConstructorCallsDetection() );
 		EXPECT_EQ( std_a(), 101 );
 
 		// Functor should be copy constructed.
-		auto std_b = Function( callable_constructor_calls_detection_std );
+		auto std_b = Function( Invocable_constructor_calls_detection_std );
 		EXPECT_EQ( std_b(), 11 );
 
 		// Functor should be move constructed.
-		auto std_c = Function( std::move( callable_constructor_calls_detection_std ) );
+		auto std_c = Function( std::move( Invocable_constructor_calls_detection_std ) );
 		EXPECT_EQ( std_c(), 101 );
 	}
 	{
-		auto std_a = Function( Callable_ConstructorCallsDetection() );
+		auto std_a = Function( Invocable_ConstructorCallsDetection() );
 		EXPECT_EQ( std_a(), 101 );
 
 		// Functor should not change its state when Function is move constructed.
@@ -927,14 +927,14 @@ TEST( FunctionContainer, FunctorConstructorAndOperatorCallCounts )
 	}
 	{
 		// Functor should be copy constructed when Function is copied.
-		auto std_a1 = Function( Callable_ConstructorCallsDetection() ); // Constructed and moved, Add 101
-		auto std_a2 = Function( Callable_ConstructorCallsDetection() ); // Constructed and moved, Add 101
+		auto std_a1 = Function( Invocable_ConstructorCallsDetection() ); // Constructed and moved, Add 101
+		auto std_a2 = Function( Invocable_ConstructorCallsDetection() ); // Constructed and moved, Add 101
 		std_a2 = std_a1; // Copy constructed, Add 10
 		EXPECT_EQ( std_a2(), 111 );
 
 		// Functor should not change its state when Function is moved.
-		auto std_b1 = Function( Callable_ConstructorCallsDetection() ); // Add 101
-		auto std_b2 = Function( Callable_ConstructorCallsDetection() ); // Add 101
+		auto std_b1 = Function( Invocable_ConstructorCallsDetection() ); // Add 101
+		auto std_b2 = Function( Invocable_ConstructorCallsDetection() ); // Add 101
 		std_b2 = std::move( std_b1 ); // No change
 		EXPECT_EQ( std_b2(), 101 );
 	}
@@ -958,21 +958,21 @@ TEST( FunctionContainer, ThrowDuringFunctorCopyConstruction )
 	struct CopyThrow {};
 	struct MoveThrow {};
 
-	struct Callable_ThrowDuringFunctorCopyConstruction
+	struct Invocable_ThrowDuringFunctorCopyConstruction
 	{
-		Callable_ThrowDuringFunctorCopyConstruction() = default;
-		Callable_ThrowDuringFunctorCopyConstruction( const Callable_ThrowDuringFunctorCopyConstruction & ) { throw CopyThrow {}; }
-		Callable_ThrowDuringFunctorCopyConstruction( Callable_ThrowDuringFunctorCopyConstruction && ) {};
+		Invocable_ThrowDuringFunctorCopyConstruction() = default;
+		Invocable_ThrowDuringFunctorCopyConstruction( const Invocable_ThrowDuringFunctorCopyConstruction & ) { throw CopyThrow {}; }
+		Invocable_ThrowDuringFunctorCopyConstruction( Invocable_ThrowDuringFunctorCopyConstruction && ) {};
 		void operator()() {}
-	} callable_throw_during_functor_copy_construction;
-	static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyConstruction> );
+	} Invocable_throw_during_functor_copy_construction;
+	static_assert( !std::is_trivially_copyable_v<Invocable_ThrowDuringFunctorCopyConstruction> );
 
 	{
-		EXPECT_THROW( auto a = Function( callable_throw_during_functor_copy_construction ), CopyThrow );
+		EXPECT_THROW( auto a = Function( Invocable_throw_during_functor_copy_construction ), CopyThrow );
 	}
 	{
 		auto a = Function<void()>();
-		EXPECT_THROW( a = Function( callable_throw_during_functor_copy_construction ), CopyThrow );
+		EXPECT_THROW( a = Function( Invocable_throw_during_functor_copy_construction ), CopyThrow );
 	}
 	{
 		auto a = Function<void()>();
@@ -981,12 +981,12 @@ TEST( FunctionContainer, ThrowDuringFunctorCopyConstruction )
 	}
 	{
 		auto a = Function<void()>();
-		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		auto b = Function<void()>( Invocable_ThrowDuringFunctorCopyConstruction{} );
 		EXPECT_THROW( a = b, CopyThrow );
 	}
 	{
-		auto a = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
-		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		auto a = Function<void()>( Invocable_ThrowDuringFunctorCopyConstruction{} );
+		auto b = Function<void()>( Invocable_ThrowDuringFunctorCopyConstruction{} );
 		EXPECT_THROW( a = b, CopyThrow );
 	}
 	{
@@ -996,12 +996,12 @@ TEST( FunctionContainer, ThrowDuringFunctorCopyConstruction )
 	}
 	{
 		auto a = Function<void()>();
-		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		auto b = Function<void()>( Invocable_ThrowDuringFunctorCopyConstruction{} );
 		EXPECT_NO_THROW( a = std::move( b ) );
 	}
 	{
-		auto a = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
-		auto b = Function<void()>( Callable_ThrowDuringFunctorCopyConstruction{} );
+		auto a = Function<void()>( Invocable_ThrowDuringFunctorCopyConstruction{} );
+		auto b = Function<void()>( Invocable_ThrowDuringFunctorCopyConstruction{} );
 		EXPECT_NO_THROW( a = std::move( b ) );
 	}
 }
@@ -1014,25 +1014,25 @@ TEST( FunctionContainer, ThrowDuringFunctorCopyAssignment )
 	struct CopyThrow {};
 	struct MoveThrow {};
 
-	struct Callable_ThrowDuringFunctorCopyAssignment
+	struct Invocable_ThrowDuringFunctorCopyAssignment
 	{
-		Callable_ThrowDuringFunctorCopyAssignment() = default;
-		Callable_ThrowDuringFunctorCopyAssignment( const Callable_ThrowDuringFunctorCopyAssignment & ) = default;
-		Callable_ThrowDuringFunctorCopyAssignment( Callable_ThrowDuringFunctorCopyAssignment && ) = default;
-		Callable_ThrowDuringFunctorCopyAssignment & operator=( const Callable_ThrowDuringFunctorCopyAssignment & ) { throw CopyThrow {}; }
-		Callable_ThrowDuringFunctorCopyAssignment & operator=( Callable_ThrowDuringFunctorCopyAssignment && ) { throw MoveThrow {}; };
+		Invocable_ThrowDuringFunctorCopyAssignment() = default;
+		Invocable_ThrowDuringFunctorCopyAssignment( const Invocable_ThrowDuringFunctorCopyAssignment & ) = default;
+		Invocable_ThrowDuringFunctorCopyAssignment( Invocable_ThrowDuringFunctorCopyAssignment && ) = default;
+		Invocable_ThrowDuringFunctorCopyAssignment & operator=( const Invocable_ThrowDuringFunctorCopyAssignment & ) { throw CopyThrow {}; }
+		Invocable_ThrowDuringFunctorCopyAssignment & operator=( Invocable_ThrowDuringFunctorCopyAssignment && ) { throw MoveThrow {}; };
 		void operator()() {}
-	} callable_throw_during_functor_copy_assignment;
-	static_assert( !std::is_trivially_copyable_v<Callable_ThrowDuringFunctorCopyAssignment> );
+	} Invocable_throw_during_functor_copy_assignment;
+	static_assert( !std::is_trivially_copyable_v<Invocable_ThrowDuringFunctorCopyAssignment> );
 
 	{
-		auto a = Function( callable_throw_during_functor_copy_assignment );
+		auto a = Function( Invocable_throw_during_functor_copy_assignment );
 		auto b = Function<decltype( a )::Signature>();
 		// No copy or move operator should be called for a functor.
 		EXPECT_NO_THROW( b = a );
 	}
 	{
-		auto a = Function( callable_throw_during_functor_copy_assignment );
+		auto a = Function( Invocable_throw_during_functor_copy_assignment );
 		auto b = Function<decltype( a )::Signature>();
 		// No copy or move operator should be called for a functor.
 		EXPECT_NO_THROW( b = std::move( a ) );

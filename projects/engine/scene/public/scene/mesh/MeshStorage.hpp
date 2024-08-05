@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <core/utility/concepts/CallableConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/containers/List.hpp>
 #include <core/containers/UniquePtr.hpp>
 

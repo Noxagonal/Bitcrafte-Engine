@@ -394,7 +394,7 @@ concept Regular = std::regular<Type>;
 /// @brief
 /// Concept to test if a functor can be called with the specified argument types.
 ///
-/// Test to see if a functor (a function, callable object, or lambda) can be called with the specified argument types.
+/// Test to see if a functor (a function, invocable object, or lambda) can be called with the specified argument types.
 /// 
 /// @tparam Functor
 /// Functor to test if it can be called.
@@ -409,7 +409,7 @@ concept Invocable = std::invocable<Functor, ArgumentTypePack...>;
 /// @brief
 /// Concept to test if a functor can be called with the specified argument types and returns a specified type.
 ///
-/// Test to see if a functor (a function, callable object, or lambda) can be called with the specified argument types and that
+/// Test to see if a functor (a function, invocable object, or lambda) can be called with the specified argument types and that
 /// the functor return type matches the specified return type.
 ///
 /// @tparam Functor

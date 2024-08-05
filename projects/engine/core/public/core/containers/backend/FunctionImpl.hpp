@@ -1,7 +1,7 @@
 
 #include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/containers/backend/ContainerBase.hpp>
-#include <core/utility/template/CallableTraits.hpp>
+#include <core/utility/template/InvocableTraits.hpp>
 
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/diagnostic/assertion/Assert.hpp>
@@ -27,15 +27,15 @@ BC_CONTAINER_NAMESPACE_START;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Container for storing functions, callable objects and lambdas so that they can be invoked later via this container.
+/// Container for storing functions, invocable objects and lambdas so that they can be invoked later via this container.
 ///
-/// We'll refer to functions, callable objects and lambdas as "functors".
+/// We'll refer to functions, invocable objects and lambdas as "functors".
 ///
 /// This container is similar to std::function, it stores a functor and allows it to be invoked later. This is especially useful
 /// when storing lambdas to be invoked later.
 ///
 /// @note
-/// There is a small performance cost when using this container, especially from callable objects like lambdas, mostly from CPU
+/// There is a small performance cost when using this container, especially from invocable objects like lambdas, mostly from CPU
 /// cache misses. Try to avoid using this in hot loops.
 ///
 /// Usage example:
@@ -63,7 +63,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	using Signature = ReturnType( ParameterTypes... );
-	using Traits = ::bc::utility::CallableTraits<Signature>;
+	using Traits = ::bc::utility::InvocableTraits<Signature>;
 
 	//using ReturnType = typename Traits::ReturnType;
 	//using CallParameterTypeList = typename Traits::ParameterTypeList;
@@ -255,7 +255,7 @@ public:
 	)
 	{
 		using FunctorBaseType = std::remove_reference_t<std::remove_pointer_t<std::decay_t<FunctorType>>>;
-		using FunctorTraits = ::bc::utility::CallableTraits<FunctorBaseType>;
+		using FunctorTraits = ::bc::utility::InvocableTraits<FunctorBaseType>;
 
 		#if BC_CONTAINER_IMPLEMENTATION_SIMPLE
 		// This might be too restrictive, but simple implementation should always be noexcept, this is one way to enforce it.
@@ -482,7 +482,7 @@ private:
 		assert( this->type == Type::NONE && "Function already initialized." );
 
 		using FunctorBaseType = std::remove_reference_t<std::remove_pointer_t<FunctorType>>;
-		using FunctorTraits = ::bc::utility::CallableTraits<FunctorBaseType>;
+		using FunctorTraits = ::bc::utility::InvocableTraits<FunctorBaseType>;
 		constexpr bool is_plain_function = FunctorTraits::IsPlainFunction();
 
 		if constexpr( is_plain_function )
@@ -607,7 +607,7 @@ BC_CONTAINER_NAME( Function )( ReturnType ( * )( ParameterTypes... ) )
 template<typename FunctorType>
 requires( !std::is_pointer_v<FunctorType> && !std::is_reference_v<FunctorType> && !std::is_same_v<FunctorType, void> && !std::is_lvalue_reference_v<FunctorType> && !std::is_rvalue_reference_v<FunctorType> && utility::InvocableObject<FunctorType> )
 BC_CONTAINER_NAME( Function )(FunctorType)
-	-> BC_CONTAINER_NAME( Function )<typename utility::CallableTraits<FunctorType>::Signature>;
+	-> BC_CONTAINER_NAME( Function )<typename utility::InvocableTraits<FunctorType>::Signature>;
 
 
 

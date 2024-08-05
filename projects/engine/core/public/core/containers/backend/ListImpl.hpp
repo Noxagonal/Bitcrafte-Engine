@@ -686,22 +686,22 @@ public:
 	/// @brief
 	/// Erase value if callback return true.
 	///
-	///	Run for every element of the list and if callable returns true, that element is removed.
+	///	Run for every element of the list and if invocable returns true, that element is removed.
 	///
 	/// @note
 	/// This function goes through every element, it will not stop at the first occurrence.
 	/// 
-	/// @param callable
-	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
-	template<utility::InvocableWithReturn<bool, const ValueType&> CallableType>
+	/// @param invocable
+	///	Invocable object, typically a lambda, which is called per element. If the invocable returns true, that element is erased.
+	template<utility::InvocableWithReturn<bool, const ValueType&> InvocableType>
 	constexpr void																						EraseIf(
-		CallableType																					callable
+		InvocableType																					invocable
 	) BC_CONTAINER_NOEXCEPT
 	{
 		auto it = begin();
 		while( it != end() )
 		{
-			if( callable( *it ) )
+			if( invocable( *it ) )
 			{
 				it = Erase( it );
 			}
@@ -716,22 +716,22 @@ public:
 	/// @brief
 	/// Erase first value if callback return true.
 	///
-	///	Run for every element of the list and if callable returns true, that element is removed.
+	///	Run for every element of the list and if invocable returns true, that element is removed.
 	///
 	/// @note
 	/// This function only erases the first found element and returns as soon as it is erased.
 	/// 
-	/// @param callable
-	///	Callable object, typically a lambda, which is called per element. If the callable returns true, that element is erased.
-	template<utility::InvocableWithReturn<bool, const ValueType&> CallableType>
+	/// @param invocable
+	///	Invocable object, typically a lambda, which is called per element. If the invocable returns true, that element is erased.
+	template<utility::InvocableWithReturn<bool, const ValueType&> InvocableType>
 	constexpr void																						EraseFirstIf(
-		CallableType																					callable
+		InvocableType																					invocable
 	) BC_CONTAINER_NOEXCEPT
 	{
 		auto it = begin();
 		while( it != end() )
 		{
-			if( callable( *it ) )
+			if( invocable( *it ) )
 			{
 				Erase( it );
 				return;
