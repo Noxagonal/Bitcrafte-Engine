@@ -231,7 +231,7 @@ TEST( FunctionContainer, LambdaInit )
 		auto b = Function<void( u32 )>( []( u32 value ) {} );
 		EXPECT_FALSE( b.IsEmpty() );
 
-		auto c = Function<u32()>( []() { return 0; } );
+		auto c = Function<u32()>( []() { return u32( 0 ); } );
 		EXPECT_FALSE( c.IsEmpty() );
 
 		auto d = Function<u32( u32 )>( []( u32 value ) { return value; } );
@@ -244,7 +244,7 @@ TEST( FunctionContainer, LambdaInit )
 		Function<void( u32 )> b = []( u32 value ) {};
 		EXPECT_FALSE( b.IsEmpty() );
 
-		Function<u32()> c = []() { return 0; };
+		Function<u32()> c = []() { return u32( 0 ); };
 		EXPECT_FALSE( c.IsEmpty() );
 
 		Function<u32( u32 )> d = []( u32 value ) { return value; };

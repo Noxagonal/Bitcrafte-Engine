@@ -1,4 +1,5 @@
 
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/containers/backend/ContainerBase.hpp>
 #include <core/utility/template/CallableTraits.hpp>
 #include <core/utility/concepts/CallableConcepts.hpp>
@@ -92,9 +93,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Function )() noexcept
 	{
-		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-		memset( &storage, 0, sizeof( decltype( storage ) ) );
-		#endif
+		DebugZeroStorage();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,9 +101,7 @@ public:
 		const BC_CONTAINER_NAME( Function )							&	other
 	)
 	{
-		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-		memset( &storage, 0, sizeof( decltype( storage ) ) );
-		#endif
+		DebugZeroStorage();
 
 		Copy( other );
 	}
@@ -114,9 +111,7 @@ public:
 		BC_CONTAINER_NAME( Function )								&&	other
 	) noexcept
 	{
-		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-		memset( &storage, 0, sizeof( decltype( storage ) ) );
-		#endif
+		DebugZeroStorage();
 
 		Swap( other );
 	}
@@ -125,13 +120,24 @@ public:
 	template <typename FunctorType>
 	BC_CONTAINER_NAME( Function )(
 		FunctorType													&&	functor
-	) requires(
-		utility::CallableWithReturnAndParameters<FunctorType, ReturnType, ParameterTypes...> &&
-		!std::is_same_v<std::decay_t<FunctorType>, BC_CONTAINER_NAME(Function)>
+	) BC_CONTAINER_NOEXCEPT
+	requires(
+		!std::is_same_v<std::remove_reference_t<std::remove_pointer_t<std::decay_t<FunctorType>>>, BC_CONTAINER_NAME( Function )> &&
+		BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FunctorType> &&
+		std::is_nothrow_destructible_v<FunctorType> &&
+		utility::InvocableWithReturn<FunctorType, ReturnType, ParameterTypes...>
 	)
 	{
 		using FunctorBaseType = std::remove_reference_t<std::remove_pointer_t<std::decay_t<FunctorType>>>;
 		using FunctorTraits = ::bc::utility::CallableTraits<FunctorBaseType>;
+
+		#if BC_CONTAINER_IMPLEMENTATION_SIMPLE
+		// This might be too restrictive, but simple implementation should always be noexcept, this is one way to enforce it.
+		static_assert(
+			std::is_nothrow_invocable_v<FunctorType, ParameterTypes...>,
+			"FunctorType must be noexcept invocable when simple implementation is used."
+		);
+		#endif
 
 		static_assert( !std::is_pointer_v<FunctorBaseType>, "FunctorBaseType must not be a pointer." );
 		static_assert( !std::is_reference_v<FunctorBaseType>, "FunctorBaseType must not be a reference." );
@@ -145,15 +151,13 @@ public:
 			"Function must be constructible from the FunctorType"
 		);
 
-		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-		memset( &storage, 0, sizeof( decltype( storage ) ) );
-		#endif
+		DebugZeroStorage();
 
 		Store( std::forward<FunctorType>( functor ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	~BC_CONTAINER_NAME( Function )()
+	~BC_CONTAINER_NAME( Function )() noexcept
 	{
 		Clear();
 	}
@@ -161,7 +165,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	BC_CONTAINER_NAME( Function )									&	operator=(
 		const BC_CONTAINER_NAME( Function )							&	other
-	)
+	) BC_CONTAINER_NOEXCEPT
 	{
 		if( std::addressof( other ) != this )
 		{
@@ -191,34 +195,21 @@ public:
 	template<typename FunctorType>
 	BC_CONTAINER_NAME( Function )									&	operator=(
 		FunctorType													&&	functor
-	) requires(
-		utility::CallableWithReturnAndParameters<FunctorType, ReturnType, ParameterTypes...> &&
-		!std::is_same_v<std::decay_t<FunctorType>, BC_CONTAINER_NAME(Function)>
+	) BC_CONTAINER_NOEXCEPT
+	requires(
+	!std::is_same_v<std::remove_reference_t<std::remove_pointer_t<std::decay_t<FunctorType>>>, BC_CONTAINER_NAME( Function )> &&
+		BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FunctorType> &&
+		std::is_nothrow_destructible_v<FunctorType> &&
+		utility::InvocableWithReturn<FunctorType, ReturnType, ParameterTypes...>
 	)
 	{
-		using FunctorBaseType = std::remove_reference_t<std::remove_pointer_t<std::decay_t<FunctorType>>>;
-		using FunctorTraits = ::bc::utility::CallableTraits<FunctorBaseType>;
-
-		static_assert( !std::is_pointer_v<FunctorBaseType>, "FunctorBaseType must not be a pointer." );
-		static_assert( !std::is_reference_v<FunctorBaseType>, "FunctorBaseType must not be a reference." );
-
-		static_assert(
-			std::is_copy_constructible_v<std::decay_t<FunctorType>>,
-			"Functor must be copy constructible"
-		);
-		static_assert(
-			std::is_constructible_v<std::decay_t<FunctorType>, FunctorType>,
-			"bc::Function must be constructible from the FunctorType"
-		);
-
-		Clear();
-		Store( std::forward<FunctorType>( functor ) );
-
+		BC_CONTAINER_NAME( Function )( std::forward<FunctorType>( functor ) ).Swap( *this );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ReturnType operator()(
+	ReturnType															operator()(
 		ParameterTypes...												args
 	)
 	{
@@ -247,6 +238,7 @@ public:
 		}
 		this->is_stored_locally = false;
 		this->type = Type::NONE;
+		DebugZeroStorage();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,7 +265,7 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void																Copy(
 		const BC_CONTAINER_NAME( Function )							&	other
-	)
+	) BC_CONTAINER_NOEXCEPT
 	{
 		assert( this->type == Type::NONE && "Function already initialized." );
 
@@ -309,7 +301,7 @@ private:
 	template<typename FunctorType>
 	void																Store(
 		FunctorType													&&	functor
-	)
+	) BC_CONTAINER_NOEXCEPT
 	{
 		assert( this->type == Type::NONE && "Function already initialized." );
 
@@ -343,6 +335,14 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void																DebugZeroStorage() noexcept
+	{
+		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+		memset( &storage, 0, sizeof( decltype( storage ) ) );
+		#endif
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	bool																is_stored_locally		= false;
 	Type																type					= Type::NONE;
 	FunctorManagerStorage												functor_manager;
@@ -351,17 +351,16 @@ private:
 
 
 
-// Deduction guides.
+// Deduction guide for functions.
 template <typename ReturnType, typename... ParameterTypes>
-BC_CONTAINER_NAME( Function )(ReturnType (*)(ParameterTypes...))
-	-> BC_CONTAINER_NAME( Function )<ReturnType(ParameterTypes...)>;
+BC_CONTAINER_NAME( Function )( ReturnType ( * )( ParameterTypes... ) )
+	-> BC_CONTAINER_NAME( Function )<ReturnType( ParameterTypes... )>;
 
-template<
-	typename FunctorType,
-	typename FunctionSignature = typename utility::CallableTraits<FunctorType>::Signature
->
+// Deduction guide for invokeable objects.
+template<typename FunctorType>
+requires( !std::is_pointer_v<FunctorType> && !std::is_reference_v<FunctorType> && !std::is_same_v<FunctorType, void> && !std::is_lvalue_reference_v<FunctorType> && !std::is_rvalue_reference_v<FunctorType> && utility::CallableObject<FunctorType> )
 BC_CONTAINER_NAME( Function )(FunctorType)
-	-> BC_CONTAINER_NAME( Function )<FunctionSignature>;
+	-> BC_CONTAINER_NAME( Function )<typename utility::CallableTraits<FunctorType>::Signature>;
 
 
 
@@ -381,7 +380,7 @@ static_assert( std::is_copy_assignable_v<BC_CONTAINER_NAME( Function )<void()>> 
 static_assert( std::is_move_assignable_v<BC_CONTAINER_NAME( Function )<void()>> );
 static_assert( std::is_nothrow_move_assignable_v<BC_CONTAINER_NAME( Function )<void()>> );
 
-} // tests
+} // namespace tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 
 
