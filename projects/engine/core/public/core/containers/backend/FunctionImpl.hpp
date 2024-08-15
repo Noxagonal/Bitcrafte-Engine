@@ -3,6 +3,8 @@
 #include <core/containers/backend/ContainerBase.hpp>
 #include <core/utility/template/InvocableTraits.hpp>
 
+#include <cstring>
+
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/diagnostic/assertion/Assert.hpp>
 
@@ -542,7 +544,7 @@ private:
 		memory::FreeMemory<FunctorType>( reinterpret_cast<FunctorType*>( storage.heap_functor ), 1 );
 
 		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-		memset( &storage, 0, sizeof( LocalStorage ) );
+		std::memset( &storage, 0, sizeof( LocalStorage ) );
 		#endif
 	}
 
@@ -585,7 +587,7 @@ private:
 	void																DebugClearStorage() noexcept
 	{
 		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
-		memset( &storage, 0, sizeof( decltype( storage ) ) );
+		std::memset( &storage, 0, sizeof( decltype( storage ) ) );
 		#endif
 	}
 
