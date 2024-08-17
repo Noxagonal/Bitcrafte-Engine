@@ -1,6 +1,8 @@
 
 #include <core/containers/backend/ContainerBase.hpp>
 
+#include <algorithm>
+
 #if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/containers/backend/LinearContainerBaseNormal.hpp>
 #elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
@@ -120,7 +122,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		const CharacterType( &c_string )[ ArraySize ]
 	) noexcept requires( IsConst == true ) :
@@ -133,7 +135,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		const CharacterType																			*	ptr,
-		const u64																						size
+		const i64																						size
 	) noexcept requires( IsConst == true ) :
 		Base(
 			ptr,
@@ -154,7 +156,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
 		CharacterType																				*	ptr,
-		const u64																						size
+		const i64																						size
 	) noexcept requires( IsConst == false ) :
 		Base(
 			ptr,
@@ -169,7 +171,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( IsConst == true ) :
 		Base(
 			begin_ptr,
-			u64( end_ptr - begin_ptr )
+			i64( end_ptr - begin_ptr )
 		)
 	{
 		BC_ContainerAssert( begin_ptr <= end_ptr,
@@ -186,7 +188,7 @@ public:
 	) BC_CONTAINER_NOEXCEPT requires( IsConst == false ) :
 		Base(
 			begin_ptr,
-			u64( end_ptr - begin_ptr )
+			i64( end_ptr - begin_ptr )
 		)
 	{
 		BC_ContainerAssert( begin_ptr <= end_ptr,
@@ -287,7 +289,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator==(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -307,7 +309,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator!=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -327,7 +329,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator==(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -347,7 +349,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator!=(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -380,31 +382,37 @@ public:
 	/// @brief
 	/// Counts and returns the number of characters found on a range.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param character
-	///	Character to find and count.
+	///	Character to find and count occurances of.
 	/// 
-	/// @param start_position
-	///	Position of where to start searching from, default 0.
+	/// @param position
+	///	Position of where to start searching from, default 0. Range will be clamped between 0 and size of the text.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
-	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr u64																			CountCharacters(
+	/// Number of characters found.
+	[[nodiscard]] constexpr i64																			CountCharacters(
 		CharacterType																					character,
-		u64																								start_position					= 0,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		i64																								position						= 0,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
-		auto counter = u64 {};
+		if( this->data_size == 0 ) [[unlikely]] return 0;
+		if( search_length == 0 ) [[unlikely]] return 0;
 
-		auto my_size = this->data_size;
-		start_position = std::min( start_position, my_size );
-		search_length = std::min( search_length, my_size );
-		auto it = this->data_ptr + start_position;
-		auto it_end = this->data_ptr + search_length;
+		auto [ start, end ] = ClampSearchRange( position, search_length );
+
+		auto counter = i64 {};
+		auto it = this->data_ptr + start;
+		auto it_end = this->data_ptr + end;
 		while( it != it_end )
 		{
 			if( *it == character )
@@ -420,65 +428,79 @@ public:
 	/// @brief
 	/// Counts and returns the number of characters found on a range.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param character
 	///	Character to find and count.
 	/// 
-	/// @param start_position
+	/// @param position
 	///	Position of where to start searching from.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
-	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr u64																			CountCharacters(
+	/// Number of characters found.
+	[[nodiscard]] constexpr i64																			CountCharacters(
 		CharacterType																					character,
-		ConstIterator																					start_position,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		ConstIterator																					position,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( start_position.container == this, U"Wrong iterator used on this container" );
+		BC_ContainerAssert( position.container == this, U"Wrong iterator used on this container" );
 		BC_ContainerAssert(
-			start_position.data >= this->data_ptr &&
-			start_position.data < this->data_ptr + this->data_size,
+			position.data >= this->data_ptr &&
+			position.data < this->data_ptr + this->data_size,
 			U"Iterator out of range",
 			U"Container size", this->Size(),
-			U"Start position", start_position.GetIndex_NoCheck()
+			U"Start position", position.GetIndex_NoCheck()
 		);
-		u64 position = start_position.data - this->data_ptr;
-		return this->CountCharacters( character, position, search_length );
+		i64 p = position.data - this->data_ptr;
+		return this->CountCharacters( character, p, search_length );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Find the first occurrence of a character inside this text view.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param character
 	///	Character to find.
 	/// 
-	/// @param start_position
-	///	Position of where to start searching from, default 0.
+	/// @param position
+	///	Position of where to start searching from, default 0. Range will be clamped between 0 and size of the text.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
-		u64																								start_position					= 0,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		i64																								position						= 0,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
-		auto my_size = this->Size();
-		start_position = std::min( start_position, my_size );
-		search_length = std::min( search_length, my_size );
-		auto it = this->data_ptr + start_position;
-		auto it_end = this->data_ptr + search_length;
-		while( it < it_end ) {
-			if( *it == character ) {
+		if( this->data_size == 0 ) [[unlikely]] return 0;
+		if( search_length == 0 ) [[unlikely]] return 0;
+
+		auto [ start, end ] = ClampSearchRange( position, search_length );
+
+		auto it = this->data_ptr + start;
+		auto it_end = this->data_ptr + end;
+		while( it < it_end )
+		{
+			if( *it == character )
+			{
 				return ConstIterator( this, it );
 			}
 			++it;
@@ -490,64 +512,78 @@ public:
 	/// @brief
 	/// Find the first occurrence of a character inside this text view.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param character
 	///	Character to find.
 	/// 
-	/// @param start_position
+	/// @param position
 	///	Position of where to start searching from.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
-		ConstIterator																					start_position,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		ConstIterator																					position,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( start_position.container == this, U"Wrong iterator used on this container" );
+		BC_ContainerAssert( position.container == this, U"Wrong iterator used on this container" );
 		BC_ContainerAssert(
-			start_position.data >= this->data_ptr &&
-			start_position.data < this->data_ptr + this->data_size,
+			position.data >= this->data_ptr &&
+			position.data < this->data_ptr + this->data_size,
 			U"Iterator out of range",
 			U"Container size", this->Size(),
-			U"Start position", start_position.GetIndex_NoCheck()
+			U"Start position", position.GetIndex_NoCheck()
 		);
-		u64 position = start_position.data - this->data_ptr;
-		return this->FindCharacter( character, position, search_length );
+		i64 p = position.data - this->data_ptr;
+		return this->FindCharacter( character, p, search_length );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Find the first occurrence of a text inside this text view.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param text_to_find
 	///	Source text to find.
 	/// 
-	/// @param start_position
-	///	Position of where to start searching from, default 0.
+	/// @param position
+	///	Position of where to start searching from, default 0. Range will be clamped between 0 and size of the text.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																Find(
 		ThisViewType<true>																				text_to_find,
-		u64																								start_position					= 0,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		i64																								position						= 0,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
+		if( this->data_size == 0 ) [[unlikely]] return {};
+
 		auto my_size = this->Size();
 		auto other_size = text_to_find.Size();
-		start_position = std::min( start_position, my_size );
-		search_length = std::min( search_length, my_size );
-		auto max_search_position = i64( search_length ) - i64( other_size );
-		for( i64 outer = start_position; outer <= max_search_position; ++outer )
+
+		auto [ start, end ] = ClampSearchRange( position, search_length );
+		i64 max_end = my_size - other_size;
+		if( end > max_end ) end = max_end;
+
+		for( i64 outer = start; outer <= end; ++outer )
 		{
 			i64 inner;
 			for( inner = 0; inner < text_to_find.Size(); ++inner )
@@ -566,56 +602,69 @@ public:
 	/// @brief
 	/// Find the first occurrence of a text inside this text view.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param text_to_find
 	///	Source text to find.
 	/// 
-	/// @param start_position
+	/// @param position
 	///	Position of where to start searching from.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																Find(
 		ThisViewType<true>																				text_to_find,
-		ConstIterator																					start_position,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		ConstIterator																					position,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( start_position.container == this, U"Wrong iterator used on this container" );
+		BC_ContainerAssert( position.container == this, U"Wrong iterator used on this container" );
 		BC_ContainerAssert(
-			start_position.data >= this->data_ptr &&
-			start_position.data < this->data_ptr + this->data_size,
+			position.data >= this->data_ptr &&
+			position.data < this->data_ptr + this->data_size,
 			U"Iterator out of range",
 			U"Container size", this->Size(),
-			U"Start position", start_position.GetIndex_NoCheck()
+			U"Start position", position.GetIndex_NoCheck()
 		);
-		u64 position = start_position.data - this->data_ptr;
-		return this->Find( text_to_find, position, search_length );
+		i64 p = position.data - this->data_ptr;
+		return this->Find( text_to_find, p, search_length );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Get a sub-text from this text view.
 	/// 
-	/// @param start_position
+	/// @note
+	/// If ```size``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
+	/// @param position
 	///	Position from the start where to start including text.
 	/// 
 	/// @param size
-	///	Number of characters to include. Up to the end of this text view.
+	///	Number of characters to include. Default is ```std::numeric_limits<i64>::max()```. Positive numbers include text after
+	/// ```position```, negative numbers include text in front of ```position```.
 	/// 
 	/// @return
 	/// A new text view containing a range to data in this text view.
 	constexpr BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsConst>									SubText(
-		u64																								start_position,
-		u64																								size							= std::numeric_limits<u64>::max()
+		i64																								position,
+		i64																								size							= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
-		if( start_position >= this->data_size ) return {};
-		auto length = std::min( this->data_size - start_position, size );
-		return { this->data_ptr + start_position, length };
+		auto [ start, end ] = ClampSearchRange( position, size );
+		i64 length = end - start;
+
+		if( length <= 0 ) return {};
+
+		return { this->data_ptr + start, length };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -649,15 +698,10 @@ public:
 			U"End iterator container text", conversion::ToUTF32( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> { end_iterator.container->Data(), end_iterator.container->Size() } ),
 			U"End iterator points to index", end_iterator.GetIndex()
 		);
-		u64 begin_position = begin_iterator.GetAddress() - this->data_ptr;
-		u64 end_position = end_iterator.GetAddress() - this->data_ptr;
-		u64 length;
-		if( end_position < begin_position ) {
-			length = 0;
-		} else {
-			length = end_position - begin_position;
-		}
-
+		i64 begin_position = begin_iterator.GetAddress() - this->data_ptr;
+		i64 end_position = end_iterator.GetAddress() - this->data_ptr;
+		i64 length = end_position - begin_position;
+		if( length < 0 ) length = 0;
 		return { begin_iterator.GetAddress(), length };
 	}
 
@@ -732,6 +776,36 @@ public:
 	{
 		return this->end();
 	}
+
+private:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	struct ClampSearchRangeResult { i64 start, end; };
+	ClampSearchRangeResult																				ClampSearchRange(
+		i64																								position,
+		i64																								search_length
+	) const
+	{
+		i64 my_size = this->Size();
+		i64 start, end;
+		if( search_length > 0 )
+		{
+			// Positive search range
+			start = position;
+			end = position + search_length;
+		}
+		else
+		{
+			// Negative search range
+			start = position + search_length;
+			end = position;
+		}
+		start = std::clamp( start, i64( 0 ), my_size );
+		end = std::clamp( end, i64( 0 ), my_size );
+
+		return { start, end };
+	}
+
 };
 
 
@@ -830,7 +904,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )(
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
@@ -839,7 +913,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )(
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -850,7 +924,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextBase )(
 		CharacterType																					fill_with_character,
-		u64																								initialize_with_size			= 1
+		i64																								initialize_with_size			= 1
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->FillBack( fill_with_character, initialize_with_size );
@@ -909,7 +983,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
@@ -920,7 +994,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -1003,7 +1077,7 @@ public:
 	/// 
 	/// @return
 	/// New text object.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const BC_CONTAINER_NOEXCEPT
@@ -1024,7 +1098,7 @@ public:
 	/// 
 	/// @return
 	/// New text object.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
 		const char( &c_string )[ ArraySize ]
 	) const BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -1116,7 +1190,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT
@@ -1134,7 +1208,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
 		const char( &c_string )[ ArraySize ]
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
@@ -1294,7 +1368,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator==(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -1314,7 +1388,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator!=(
 		const CharacterType( &c_string )[ ArraySize ]
 	) const noexcept
@@ -1334,7 +1408,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator==(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -1354,7 +1428,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr bool																						operator!=(
 		const char( &c_string )[ ArraySize ]
 	) const noexcept requires( !std::is_same_v<char, CharacterType> )
@@ -1454,20 +1528,22 @@ public:
 	///
 	/// @param count
 	///	How many times should the new character be inserted. Eg. When inserting a character, 't' with count 4, you may consider it
-	/// as if "tttt" was inserted.
+	/// as if "tttt" was inserted. Must be positive number.
 	///
 	/// @param headroom
-	/// How much extra space is reserved if the capacity is expanded.
+	/// How much extra space is reserved if the capacity is expanded. You typically do not need this. Must be positive number.
 	///
 	/// @return
 	/// Iterator to the next character after inserted character.
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const CharacterType																			&	character,
-		u64																								count			= 1,
-		u64																								headroom		= 0
+		i64																								count			= 1,
+		i64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> )
 	{
+		BC_ContainerAssert( count >= 0, U"Count must be positive number" );
+		BC_ContainerAssert( headroom >= 0, U"Headroom must be positive number" );
 		BC_ContainerAssert( at.GetContainer() && at.Get(), U"Empty iterator" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
@@ -1494,11 +1570,11 @@ public:
 	///	Linear container view type to insert values from.
 	///
 	/// @param count
-	///	How many times should the other values be inserted. Eg. When inserting text, "sample" with count 2, you may consider it
-	/// as if "samplesample" was inserted.
+	///	How many times should the new character be inserted. Eg. When inserting a character, 't' with count 4, you may consider it
+	/// as if "tttt" was inserted. Must be positive number.
 	///
 	/// @param headroom
-	/// How much extra space is reserved if the capacity is expanded.
+	/// How much extra space is reserved if the capacity is expanded. You typically do not need this. Must be positive number.
 	///
 	/// @return
 	/// Iterator one past the the last inserted character. Or first original character after insertion.
@@ -1506,10 +1582,12 @@ public:
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const OtherContainerType																	&	other,
-		u64																								count			= 1,
-		u64																								headroom		= 0
+		i64																								count			= 1,
+		i64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> && std::is_same_v<CharacterType, typename OtherContainerType::ContainedValueType> )
 	{
+		BC_ContainerAssert( count >= 0, U"Count must be positive number" );
+		BC_ContainerAssert( headroom >= 0, U"Headroom must be positive number" );
 		BC_ContainerAssert( at.GetContainer() && at.Get(), U"Empty iterator" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
 		return Iterator {
@@ -1540,18 +1618,21 @@ public:
 	///	C-style string to insert.
 	///
 	/// @param count
-	///	How many times the C-style string should be inserted. Eg. if "text" was inserted with count 2, it is as if "texttext" was
-	/// inserted.
-	/// 
+	///	How many times should the new character be inserted. Eg. When inserting a character, 't' with count 4, you may consider it
+	/// as if "tttt" was inserted. Must be positive number.
+	///
+	/// @param headroom
+	/// How much extra space is reserved if the capacity is expanded. You typically do not need this. Must be positive number.
+	///
 	/// @return
 	/// Iterator to the first original character after insertion. Eg. If inserting "HH" at position <tt>begin() + 2</tt> then
 	/// returned iterator points to <tt>begin() + 4</tt>.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const CharacterType( &c_string )[ ArraySize ],
-		u64																								count							= 1,
-		u64																								headroom						= 0
+		i64																								count							= 1,
+		i64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
 		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> {c_string, ArraySize }, count, headroom );
@@ -1574,18 +1655,21 @@ public:
 	///	C-style string to insert.
 	///
 	/// @param count
-	///	How many times the C-style string should be inserted. Eg. if "text" was inserted with count 2, it is as if "texttext" was
-	/// inserted.
-	/// 
+	///	How many times should the new character be inserted. Eg. When inserting a character, 't' with count 4, you may consider it
+	/// as if "tttt" was inserted. Must be positive number.
+	///
+	/// @param headroom
+	/// How much extra space is reserved if the capacity is expanded. You typically do not need this. Must be positive number.
+	///
 	/// @return
 	/// Iterator to the first original character after insertion. Eg. If inserting "HH" at position <tt>begin() + 2</tt> then
 	/// returned iterator points to <tt>begin() + 4</tt>.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr Iterator																					Insert(
 		ConstIterator																					at,
 		const char( &c_string )[ ArraySize ],
-		u64																								count							= 1,
-		u64																								headroom						= 0
+		i64																								count							= 1,
+		i64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
 		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<char, true> {c_string, ArraySize }, count, headroom );
@@ -1595,22 +1679,26 @@ public:
 	template<utility::TextContainerCharacterType OtherT>
 	void																								Append(
 		const std::initializer_list<OtherT>															&	init_list,
-		u64																								count							= 1,
-		u64																								headroom						= 0
+		i64																								count							= 1,
+		i64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
 	{
 		// Cannot use this->Base::Append() because other element type is always allowed to be char which is not necessarily
 		// the same type as this element type. Base::Append() only handles inputs with same element types as this.
-		u64 old_size			= this->Size();
-		u64 other_size			= init_list.size();
-		u64 total_insert_size	= other_size * count;
+
+		BC_ContainerAssert( count >= 0, U"Count must be positive positive number" );
+		BC_ContainerAssert( headroom >= 0, U"Headroom must be positive number" );
+
+		i64 old_size			= this->Size();
+		i64 other_size			= init_list.size();
+		i64 total_insert_size	= other_size * count;
 
 		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
-		for( u64 c = 0; c < count; ++c ) {
+		for( i64 c = 0; c < count; ++c ) {
 			auto other_it			= init_list.begin();
 			auto write_location		= other_size * c + old_size;
-			for( u64 i = 0; i < other_size; ++i ) {
+			for( i64 i = 0; i < other_size; ++i ) {
 				new( &this->data_ptr[ write_location + i ] ) CharacterType( *other_it );
 				++other_it;
 			}
@@ -1621,22 +1709,26 @@ public:
 	template<utility::TextContainerView OtherContainerType>
 	void																								Append(
 		const OtherContainerType																	&	other,
-		u64																								count							= 1,
-		u64																								headroom						= 0
+		i64																								count							= 1,
+		i64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, typename OtherContainerType::ContainedCharacterType> || std::is_same_v<char, typename OtherContainerType::ContainedCharacterType> )
 	{
 		// Cannot use this->Base::Append() because other container element type is always allowed to be char which is not
 		// necessarily the same type as this element type. Base::Append() only handles inputs with same element types as this.
-		u64 old_size			= this->Size();
-		u64 other_size			= other.Size();
-		u64 total_insert_size	= other_size * count;
+
+		BC_ContainerAssert( count >= 0, U"Count must be positive positive number" );
+		BC_ContainerAssert( headroom >= 0, U"Headroom must be positive number" );
+
+		i64 old_size			= this->Size();
+		i64 other_size			= other.Size();
+		i64 total_insert_size	= other_size * count;
 
 		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
-		for( u64 c = 0; c < count; ++c ) {
+		for( i64 c = 0; c < count; ++c ) {
 			auto other_it			= other.begin();
 			auto write_location		= other_size * c + old_size;
-			for( u64 i = 0; i < other_size; ++i ) {
+			for( i64 i = 0; i < other_size; ++i ) {
 				new( &this->data_ptr[ write_location + i ] ) CharacterType( *other_it );
 				++other_it;
 			}
@@ -1649,11 +1741,11 @@ public:
 	///
 	/// @param c_string
 	///	Other text to append elements from.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr void																						Append(
 		const CharacterType( &c_string )[ ArraySize ],
-		u64																								count							= 1,
-		u64																								headroom						= 0
+		i64																								count							= 1,
+		i64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize }, count, headroom );
@@ -1668,11 +1760,11 @@ public:
 	///
 	/// @param c_string
 	/// Other text to append elements from.
-	template<u64 ArraySize>
+	template<i64 ArraySize>
 	constexpr void																						Append(
 		const char( &c_string )[ ArraySize ],
-		u64																								count							= 1,
-		u64																								headroom						= 0
+		i64																								count							= 1,
+		i64																								headroom						= 0
 	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
 	{
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize }, count, headroom );
@@ -1682,127 +1774,121 @@ public:
 	/// @brief
 	/// Counts and returns the number of characters found on a range.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param character
-	///	Character to find and count.
+	///	Character to find and count occurances of.
 	/// 
-	/// @param start_position
-	///	Position of where to start searching from, default 0.
+	/// @param position
+	///	Position of where to start searching from, default 0. Range will be clamped between 0 and size of the text.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
-	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr u64																			CountCharacters(
+	/// Number of characters found.
+	[[nodiscard]] constexpr i64																			CountCharacters(
 		CharacterType																					character,
-		u64																								start_position					= 0,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		i64																								position						= 0,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
-		return ThisViewType<true>( *this ).CountCharacters( character, start_position, search_length );
+		return ThisViewType<true>( *this ).CountCharacters( character, position, search_length );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Counts and returns the number of characters found on a range.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param character
 	///	Character to find and count.
 	/// 
-	/// @param start_position
+	/// @param position
 	///	Position of where to start searching from.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
-	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr u64																			CountCharacters(
+	/// Number of characters found.
+	[[nodiscard]] constexpr i64																			CountCharacters(
 		CharacterType																					character,
-		ConstIterator																					start_position,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		ConstIterator																					position,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
-		return ThisViewType<true>( *this ).CountCharacters( character, start_position, search_length );
+		return ThisViewType<true>( *this ).CountCharacters( character, position, search_length );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Find the first occurrance of a character inside this text.
+	/// Find the first occurrence of a character inside this text view.
+	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
 	///
 	/// @param character
 	///	Character to find.
 	/// 
-	/// @param start_position
-	///	Position of where to start searching from, default 0.
+	/// @param position
+	///	Position of where to start searching from, default 0. Range will be clamped between 0 and size of the text.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
-		u64																								start_position					= 0,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		i64																								position						= 0,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
-		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
+		auto result = ThisViewType<true>( *this ).FindCharacter( character, position, search_length );
 		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Find the first occurrance of a character inside this text.
+	/// Find the first occurrence of a character inside this text view.
+	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
 	///
 	/// @param character
 	///	Character to find.
-	///
-	/// @param start_position
+	/// 
+	/// @param position
 	///	Position of where to start searching from.
-	///
+	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding a character, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
-	///
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
+	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																FindCharacter(
 		CharacterType																					character,
-		ConstIterator																					start_position,
-		u64																								search_length					= std::numeric_limits<u64>::max()
+		ConstIterator																					position,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) const noexcept
 	{
-		auto result = ThisViewType<true>( *this ).FindCharacter( character, start_position, search_length );
-		return ConstIterator { this, result.GetAddress() };
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Find the first occurrance of a text inside this text view.
-	///
-	/// @param text_to_find
-	///	Source text to find.
-	/// 
-	/// @param start_position
-	///	Position of where to start searching from, default 0.
-	/// 
-	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
-	/// 
-	/// @return
-	/// Iterator to where other text matching this was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																Find(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_find,
-		u64																								start_position					= 0,
-		u64																								search_length					= std::numeric_limits<u64>::max()
-	) const noexcept
-	{
-		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
+		auto result = ThisViewType<true>( *this ).FindCharacter( character, position, search_length );
 		return ConstIterator { this, result.GetAddress() };
 	}
 
@@ -1810,92 +1896,153 @@ public:
 	/// @brief
 	/// Find the first occurrence of a text inside this text view.
 	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
 	/// @param text_to_find
 	///	Source text to find.
 	/// 
-	/// @param start_position
-	///	Position of where to start searching from.
+	/// @param position
+	///	Position of where to start searching from, default 0. Range will be clamped between 0 and size of the text.
 	/// 
 	/// @param search_length
-	///	Window of search, up to which point is the text searched to when finding text, default is
-	/// <tt>std::numeric_limits<u64>::max()</tt>.
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
 	[[nodiscard]] constexpr ConstIterator																Find(
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_find,
-		ConstIterator																					start_position,
-		u64																								search_length					= std::numeric_limits<u64>::max()
-	) const BC_CONTAINER_NOEXCEPT
+		i64																								position						= 0,
+		i64																								search_length					= std::numeric_limits<i64>::max()
+	) const noexcept
 	{
-		auto result = ThisViewType<true>( *this ).Find( text_to_find, start_position, search_length );
+		auto result = ThisViewType<true>( *this ).Find( text_to_find, position, search_length );
 		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Find the first occurrence of a text inside this text view.
+	///
+	/// @note
+	/// If ```search_length``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
+	///
+	/// @param text_to_find
+	///	Source text to find.
+	/// 
+	/// @param position
+	///	Position of where to start searching from.
+	/// 
+	/// @param search_length
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
+	/// 
+	/// @return
+	/// Iterator to where other text matching this was found, iterator points to the end if not found.
+	[[nodiscard]] constexpr ConstIterator																Find(
+		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_find,
+		ConstIterator																					position,
+		i64																								search_length					= std::numeric_limits<i64>::max()
+	) const BC_CONTAINER_NOEXCEPT
+	{
+		auto result = ThisViewType<true>( *this ).Find( text_to_find, position, search_length );
+		return ConstIterator { this, result.GetAddress() };
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Replace all occurences of a text inside this text view with another text.
+	///
+	/// @param text_to_replace
+	///	Source text to find.
+	/// 
+	/// @param replace_with
+	///	Text to replace with.
+	/// 
+	/// @param count
+	///	How many times should the ```replace_with``` be inserted in the position where ```text_to_replace``` was found.
+	/// Default is 1.
+	/// 
+	/// @param search_position
+	///	Position of where to start searching from, default 0. Range will be clamped between 0 and size of the text. Default is 0.
+	/// 
+	/// @param search_length
+	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
+	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
+	/// the text.
 	void																								Replace(
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_replace,
 		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											replace_with,
-		u64																								start_position					= 0,
-		u64																								count							= 1
+		i64																								count							= 1,
+		i64																								search_position					= 0,
+		i64																								search_length					= std::numeric_limits<i64>::max()
 	) BC_CONTAINER_NOEXCEPT
 	{
-		auto ReplaceRange = [this, replace_with]( u64 from, u64 replace_text_start, u64 amount )
-		{
-			for( u64 i = 0; i < amount; ++i ) {
-				this->data_ptr[ from + i ] = replace_with[ replace_text_start + i ];
-			}
-		};
-
+		if( this->IsEmpty() ) return;
 		if( text_to_replace.IsEmpty() ) return;
 
-		auto search_position = start_position;
-		for( u64 i = 0; i < count; ++i ) {
-			auto it = this->Find( text_to_replace, search_position );
-			if( it == this->end() ) {
-				return;
+		auto replace_position = this->Find( text_to_replace, search_position, search_length );
+		if( !replace_position ) return;
+
+		BC_ContainerAssert( count >= 0, U"Count must be positive" );
+
+		auto replace_start = replace_position.GetIndex();
+		auto replace_size = replace_with.Size() * count;
+		auto new_size = this->Size() - text_to_replace.Size() + replace_size;
+		if( new_size > this->Size() )
+		{
+			// move the remaining text to the end
+			this->Resize( new_size );
+			for( i64 i = this->Size() - 1; i >= replace_size; --i ) {
+				this->data_ptr[ i ] = this->data_ptr[ i - replace_size ];
 			}
-			u64 it_index = it.GetIndex();
-			i64 size_diff = i64( replace_with.Size() ) - i64( text_to_replace.Size() );
-			if( size_diff < 0 ) {
-				this->Erase( it, it + -size_diff );
-				ReplaceRange( it_index, 0, replace_with.Size() );
-			} else if( size_diff > 0 ) {
-				this->Insert( it, replace_with.SubText( 0, size_diff ) );
-				ReplaceRange( it_index + size_diff, size_diff, replace_with.Size() - size_diff );
-			} else {
-				ReplaceRange( it_index, 0, replace_with.Size() );
+		}
+		else if( new_size < this->Size() )
+		{
+			// move the remaining text closer to the start
+			for( i64 i = replace_start; i < replace_start + replace_size; ++i ) {
+				this->data_ptr[ i ] = this->data_ptr[ i + replace_size ];
 			}
-			search_position = it_index + replace_with.Size();
+			this->Resize( new_size );
+		}
+
+		for( i64 i = 0; i < count; ++i )
+		{
+			for( i64 j = 0; j < replace_with.Size(); ++j )
+			{
+				this->data_ptr[ replace_start + i * replace_with.Size() + j ] = replace_with[ j ];
+			}
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Get a sub text from this text.
+	/// Get a sub-text from this text view.
+	/// 
+	/// @note
+	/// If ```size``` is negative, the search will start in front of ```position``` and goes up to ```position``` but not
+	/// including ```position```.
 	///
-	/// @param start_position
-	///	Start copying from this position.
+	/// @param position
+	///	Position from the start where to start including text.
 	/// 
 	/// @param size
-	///	How many characters to copy, only copies up to the end of this string.
+	///	Number of characters to include. Default is ```std::numeric_limits<i64>::max()```. Positive numbers include text after
+	/// ```position```, negative numbers include text in front of ```position```.
 	/// 
 	/// @return
-	/// New text container instance.
+	/// A new text view containing a range to data in this text view.
 	constexpr BC_CONTAINER_NAME( TextBase )																SubText(
-		u64																								start_position,
-		u64																								size							= std::numeric_limits<u64>::max()
+		i64																								position,
+		i64																								size							= std::numeric_limits<i64>::max()
 	) const BC_CONTAINER_NOEXCEPT
 	{
-		if( start_position >= this->data_size ) return {};
-		auto length = std::min( this->data_size - start_position, size );
-		BC_CONTAINER_NAME( TextBase ) ret;
-		ret.Resize( length );
-		for( u64 i = 0; i < length; ++i ) {
-			ret[ i ] = this->data_ptr[ i + start_position ];
-		}
-
-		return ret;
+		return ThisType( ThisViewType( *this ).SubText( position, size ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1909,38 +2056,28 @@ public:
 	///	Iterator to the last position where copying will stop. (non-inclusive)
 	/// 
 	/// @return
-	/// New text container instance.
+	/// New text container object.
 	constexpr BC_CONTAINER_NAME( TextBase )																SubText(
 		ConstIterator																					begin_it,
 		ConstIterator																					end_it
 	)  const BC_CONTAINER_NOEXCEPT
 	{
-		BC_ContainerAssert( reinterpret_cast<void*>( begin_it.container ) == this, U"Wrong start iterator used on TextBase::SubText" );
-		BC_ContainerAssert( reinterpret_cast<void*>( end_it.container ) == this, U"Wrong end iterator used on TextBase::SubText" );
-		u64 begin_position	= begin_it.GetIndex();
-		u64 end_position	= end_it.GetIndex();
-		u64 length;
-		if( end_position < begin_position ) {
-			length = 0;
-		} else {
-			length = end_position - begin_position;
-		}
-
-		BC_CONTAINER_NAME( TextBase ) ret;
-		ret.Resize( length );
-		for( u64 i = 0; i < length; ++i ) {
-			ret[ i ] = this->data_ptr[ i + begin_position ];
-		}
-
-		return ret;
+		BC_ContainerAssert( reinterpret_cast<void*>( begin_it.container ) == this, U"Wrong start iterator" );
+		BC_ContainerAssert( reinterpret_cast<void*>( end_it.container ) == this, U"Wrong end iterator" );
+		i64 begin_position	= begin_it.GetIndex();
+		i64 end_position	= end_it.GetIndex();
+		return this->SubText( begin_position, end_position );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Converts this text into a null terminated C-style character string.
 	///
-	///	This operation is fast as underlaying container always reserves extra space for the null terminator at the end, however only
-	/// this function will add that null character at the end.
+	/// @note
+	/// If the container is empty, this function will return nullptr.
+	///
+	/// @note
+	/// This function will cannot be const because it makes sure the string is null terminated.
 	///
 	/// @warning
 	/// Always use this function to get a C-style string as using Data() will not return a null terminated character string.
