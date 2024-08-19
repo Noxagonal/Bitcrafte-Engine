@@ -787,23 +787,25 @@ private:
 	) const
 	{
 		i64 my_size = this->Size();
-		i64 start, end;
+
+		auto result = ClampSearchRangeResult {};
 		if( search_length > 0 )
 		{
 			// Positive search range
-			start = position;
-			end = position + search_length;
+			if( search_length > my_size ) search_length = my_size;
+			result.start	= position;
+			result.end		= position + search_length;
 		}
 		else
 		{
 			// Negative search range
-			start = position + search_length;
-			end = position;
+			if( search_length < -my_size ) search_length = -my_size;
+			result.start	= position + search_length;
+			result.end		= position;
 		}
-		start = std::clamp( start, i64( 0 ), my_size );
-		end = std::clamp( end, i64( 0 ), my_size );
-
-		return { start, end };
+		result.start = std::clamp( result.start, i64( 0 ), my_size );
+		result.end = std::clamp( result.end, i64( 0 ), my_size );
+		return result;
 	}
 
 };
@@ -1991,22 +1993,26 @@ public:
 
 		BC_ContainerAssert( count >= 0, U"Count must be positive" );
 
-		auto replace_start = replace_position.GetIndex();
-		auto replace_size = replace_with.Size() * count;
-		auto new_size = this->Size() - text_to_replace.Size() + replace_size;
-		if( new_size > this->Size() )
+		i64 replace_start = replace_position.GetIndex();
+		i64 replace_size = replace_with.Size() * count;
+		i64 new_size = this->Size() - text_to_replace.Size() + replace_size;
+		i64 diff = new_size - this->Size();
+		i64 remaining = this->Size() + diff;
+		if( diff > 0 )
 		{
 			// move the remaining text to the end
 			this->Resize( new_size );
-			for( i64 i = this->Size() - 1; i >= replace_size; --i ) {
-				this->data_ptr[ i ] = this->data_ptr[ i - replace_size ];
+			for( i64 i = this->Size() - 1; i >= replace_start + replace_size; --i )
+			{
+				this->data_ptr[ i ] = this->data_ptr[ i - diff ];
 			}
 		}
-		else if( new_size < this->Size() )
+		else if( diff < 0 )
 		{
 			// move the remaining text closer to the start
-			for( i64 i = replace_start; i < replace_start + replace_size; ++i ) {
-				this->data_ptr[ i ] = this->data_ptr[ i + replace_size ];
+			for( i64 i = replace_start + replace_size; i < this->Size() + diff; ++i )
+			{
+				this->data_ptr[ i ] = this->data_ptr[ i - diff ];
 			}
 			this->Resize( new_size );
 		}
