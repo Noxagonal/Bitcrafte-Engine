@@ -5,6 +5,7 @@
 #include <core/data_types/FundamentalTypes.hpp>
 #include <limits>
 #include <type_traits>
+#include <algorithm>
 
 
 
@@ -419,24 +420,6 @@ static_assert( IsEachParameterPackTypeDerivedFromType<IsEachParameterPackTypeDer
 
 
 
-namespace internal_ {
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<size_t CurrentMaxSize, typename ...InTypePack>
-struct FindMaxSizeTypeInParameterPack_Helper;
-
-// Specialization for when we reach the end of the parameter pack, or empty parameter pack.
-template<size_t CurrentMaxSize>
-struct FindMaxSizeTypeInParameterPack_Helper<CurrentMaxSize> : public std::integral_constant<size_t, CurrentMaxSize> {};
-
-// Specialization for when we still have not reached the end of the parameter pack.
-template<size_t CurrentMaxSize, typename CurrentType, typename ...InTypePack>
-struct FindMaxSizeTypeInParameterPack_Helper<CurrentMaxSize, CurrentType, InTypePack...> : public std::conditional_t<
-	( sizeof( CurrentType ) > CurrentMaxSize ),
-	FindMaxSizeTypeInParameterPack_Helper<sizeof( CurrentType ), InTypePack...>,
-	FindMaxSizeTypeInParameterPack_Helper<CurrentMaxSize, InTypePack...>>
-{};
-} // namespace internal_
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Finds the largest type in given template parameter pack.
@@ -452,7 +435,10 @@ struct FindMaxSizeTypeInParameterPack_Helper<CurrentMaxSize, CurrentType, InType
 /// @tparam ...InTypePack
 /// Template parameter pack of types to search.
 template<typename ...InTypePack>
-struct FindMaxSizeTypeInParameterPack : public internal_::FindMaxSizeTypeInParameterPack_Helper<0, InTypePack...> {};
+struct FindMaxSizeTypeInParameterPack : public std::integral_constant<size_t, std::max( { sizeof( InTypePack )... } )> {};
+
+template<>
+struct FindMaxSizeTypeInParameterPack<> : public std::integral_constant<size_t, 0> {};
 
 #ifdef BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 namespace tests {
