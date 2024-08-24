@@ -120,7 +120,7 @@ public:
 	/// Usage example:
 	/// @code
 	/// using TypeListSample = TypeList<i32, u8, f64, u16>;
-	/// constexpr u64 max_size = TypeListSample::template TypeMaxSize();
+	/// constexpr u64 max_size = TypeListSample::TypeMaxSize();
 	/// // max_size will be 8 because f64 is 8 bytes.
 	/// @endcode
 	///

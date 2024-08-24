@@ -444,7 +444,7 @@ protected:
 		}
 		else
 		{
-			// ValueType is not trivial, we need to do some extra work.
+			// ValueType is not trivial, we need to copy elements one by one.
 			if( this->IsInPlaceReallocateable( old_location, new_reserved_element_count ) )
 			{
 				auto new_location = this->InPlaceReallocateMemory( old_location, old_reserved_element_count, new_reserved_element_count );
