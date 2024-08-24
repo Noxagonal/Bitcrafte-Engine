@@ -3,7 +3,6 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <core/data_types/FundamentalTypes.hpp>
 #include <core/utility/template/TypeList.hpp>
-#include <core/message_bus/MessageBusMessage.hpp>
 #include <core/containers/UniquePtr.hpp>
 #include <core/containers/List.hpp>
 
@@ -33,42 +32,40 @@ public:
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template <typename MessageBusMessageType>
-	void AddMessage( UniquePtr<MessageBusMessageType> type )
+	struct alignas( MessageTypeList::TypeMaxAlignment() ) MessageStorage
+	{
+		u8 storage[ MessageTypeList::TypeMaxSize() ];
+	};
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<typename MessageBusMessageType>
+	void AddMessage( MessageBusMessageType && type )
 	{
 		static_assert( !std::is_abstract_v<MessageBusMessageType>, "Message type must not be abstract" );
-		static_assert( std::is_base_of_v<MessageBusMessage, MessageBusMessageType>, "Type must be derived from BaseType" );
 
-		message_index_list.PushBack( MessageTypeList::template TypeToIndex<MessageBusMessageType>() );
-		message_list.PushBack( std::move( type ) );
+		message_type_index_list.PushBack( MessageTypeList::template TypeToIndex<MessageBusMessageType>() );
+		message_storage_list.EmplaceBack();
+		auto storage = reinterpret_cast<MessageBusMessageType*>( message_storage_list.Back().storage );
+		new( storage ) MessageBusMessageType( std::forward<MessageBusMessageType>( type ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<typename MessageBusMessageReceiverType>
-	void ReceiveMessages( MessageBusMessageReceiverType& receiver )
+	const List<u64> & GetMessageTypeIndexList() const
 	{
-		receiver.ProcessMessages( this );
-		message_index_list.Clear();
-		message_list.Clear();
+		return message_type_index_list;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const List<u64> & GetMessageIndexList() const
+	const List<MessageStorage> & GetMessageList() const
 	{
-		return message_index_list;
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const List<UniquePtr<MessageBusMessage>> & GetMessageList() const
-	{
-		return message_list;
+		return message_storage_list;
 	}
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<u64>								message_index_list;
-	List<UniquePtr<MessageBusMessage>>		message_list;
+	List<u64>					message_type_index_list;
+	List<MessageStorage>		message_storage_list;
 };
 
 

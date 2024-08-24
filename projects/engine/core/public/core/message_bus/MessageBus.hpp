@@ -1,7 +1,6 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <core/message_bus/MessageBusMessage.hpp>
 #include <core/message_bus/MessageBusMessageHandler.hpp>
 #include <core/message_bus/MessageBusReceiver.hpp>
 #include <core/message_bus/MessageBusPacket.hpp>
@@ -15,6 +14,63 @@
 #include <core/event/Event.hpp>
 
 #include <mutex>
+
+
+
+// TODO: Performance considerations. A lot of the MessageBus behaviour relies on virtual classes. This is not very cache
+// friendly. It could probably be improved by using a std::variant kind of approach, where everything is stored locally.
+// A few ideas come to mind:
+// - Need a way to convert a base type to their derived types at runtime. We already have a way of getting type index.
+//   It needs a runtime check. This could be achieved by using a lot of switch statements which is fast.
+//   Idea is that input is runtime index, and output is an operation so, (number) -> (operation). The opration itself can be
+//   a template function as well so that we could use it all the different types. A type of lookup table, instead of double
+//   indirection caused by the virtual classes. This could be a generic operation.
+//
+// - This method cannot output anything because the type is erased, it can only modify data we give it.
+//   This may not be a problem however.
+//
+// Here's some test code:
+/*
+// Runtime index-based functor invocation
+template<template<typename> class F, typename... Ts>
+class CallFunctorWithType
+{
+	// List of functions to create the variant and run the functor
+	std::vector<std::function<void()>> functors = {
+		[]() { F<Ts>()(); }...
+	};
+public:
+	void Run(size_t index)
+	{
+		if (index < functors.size()) {
+			functors[index]();
+		} else {
+			std::cerr << "Index out of bounds!" << std::endl;
+		}
+	}
+};
+
+// Functor template
+template<typename T>
+struct Callable {
+	void operator()() {
+		std::cout << "Running functor with type: " << typeid(T).name() << std::endl;
+	}
+};
+
+// Usage example
+int main() {
+	// Run functor with different indices
+	auto test = CallFunctorWithType<Callable, int, double, std::string>();
+
+	test.Run(0); // Should run with int
+	test.Run(1); // Should run with double
+	test.Run(2); // Should run with std::string
+	test.Run(3); // Out of bounds
+
+	return 0;
+}
+*/
 
 
 
@@ -56,8 +112,14 @@ public:
 	template<typename MessageBusPacketType>
 	void SendPacket( UniquePtr<MessageBusPacketType> message_packet )
 	{
-		static_assert( std::is_base_of_v<MessageBusPacketBase, MessageBusPacketType>, "MessageBusPacketType must be derived from MessageBusPacketBase" );
-		static_assert( MessagePacketTypeList::template HasType<MessageBusPacketType>(), "MessageBusPacketType must have been introduced to the bus via template parameter pack argument, see MessageBus documentation" );
+		static_assert(
+			std::is_base_of_v<MessageBusPacketBase, MessageBusPacketType>,
+			"MessageBusPacketType must be derived from MessageBusPacketBase"
+		);
+		static_assert(
+			MessagePacketTypeList::template HasType<MessageBusPacketType>(),
+			"MessageBusPacketType must have been introduced to MessageBus via template parameter pack argument before it can be sent"
+		);
 
 		auto packet_id = [ this, &message_packet ]() -> u64
 			{
@@ -81,8 +143,14 @@ public:
 	[[nodiscard]]
 	UniquePtr<MessageBusPacketType> ClaimPacket( u64 packet_id )
 	{
-		static_assert( std::is_base_of_v<MessageBusPacketBase, MessageBusPacketType>, "MessageBusPacketType must be derived from MessagePacketBase" );
-		static_assert( MessagePacketTypeList::template HasType<MessageBusPacketType>(), "MessageBusPacketType must have been introduced to the bus via template parameter pack argument, see MessageBus documentation" );
+		static_assert(
+			std::is_base_of_v<MessageBusPacketBase, MessageBusPacketType>,
+			"MessageBusPacketType must be derived from MessagePacketBase"
+		);
+		static_assert(
+			MessagePacketTypeList::template HasType<MessageBusPacketType>(),
+			"MessageBusPacketType must have been introduced to MessageBus via template parameter pack argument before it can be claimed"
+		);
 
 		std::lock_guard lock( message_bus_mutex );
 
@@ -135,8 +203,6 @@ public:
 	/// @eventparam @ref u64
 	/// ID of the packet that was sent. Should be used to claim the packet.
 	Event<u64>									OnPacketSent;
-
-	// TODO: OnPacketReceived event must be made thread safe.
 
 private:
 
