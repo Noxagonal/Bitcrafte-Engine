@@ -3,6 +3,9 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 #include <cstdint>
 
+// TODO: Add float16_t, float32_t and float64_t as f16, f32 and f64 when all major compilers support it.
+//#include <stdfloat>
+
 
 
 namespace bc {
@@ -22,6 +25,9 @@ using c32	= char32_t;
 
 using f32	= float;
 using f64	= double;
+
+static_assert( sizeof( f32 ) == 4 );
+static_assert( sizeof( f64 ) == 8 );
 
 //using size	= size_t;
 
