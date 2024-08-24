@@ -94,7 +94,22 @@ public:
 	) = default;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<std::constructible_from<ValueType> ...ValueArgumentTypePack>
+	template<utility::ConstructibleFrom<ValueType> ...ValueArgumentTypePack>
+	constexpr BC_CONTAINER_NAME( Array )(
+		ValueArgumentTypePack																		&&	...values
+	)
+	{
+		static_assert( sizeof...( ValueArgumentTypePack ) <= ValueCount, "Too many values given to constructor" );
+		FillFromTemplateParameterPack<0>( std::forward<ValueArgumentTypePack>( values )... );
+		// Fill in the remaining values with default constructed values.
+		for( u64 i = sizeof...( ValueArgumentTypePack ); i < ValueCount; i++ )
+		{
+			data[ i ] = ValueType {};
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	template<utility::InvocableFunction ...ValueArgumentTypePack>
 	constexpr BC_CONTAINER_NAME( Array )(
 		ValueArgumentTypePack																		&&	...values
 	)
