@@ -475,5 +475,51 @@ static_assert( FindMaxSizeTypeInParameterPack<u8, u32, u64, u16>::value == 8 );
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Finds the type with the largest alignment in given template parameter pack.
+///
+/// @note
+/// If template parameter pack is empty, then this will result in 0.
+///
+/// Usage example:
+/// @code
+/// struct alignof( 8 ) A {};
+/// struct alignof( 16 ) B {};
+/// struct alignof( 4 ) C {};
+/// constexpr size_t max_alignment = FindMaxAlignmentTypeInParameterPack<A, B, C>::value; // This will result in 16.
+/// @endcode
+///
+/// @tparam ...InTypePack
+/// Template parameter pack of types to search.
+template<typename ...InTypePack>
+struct FindMaxAlignmentTypeInParameterPack : public std::integral_constant<size_t, std::max( { alignof( InTypePack )... } )> {};
+
+template<>
+struct FindMaxAlignmentTypeInParameterPack<> : public std::integral_constant<size_t, 0> {};
+
+#ifdef BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
+
+struct alignas( 8 ) FindMaxAlignmentTypeInParameterPack_Test_A {};
+struct alignas( 16 ) FindMaxAlignmentTypeInParameterPack_Test_B {};
+struct alignas( 4 ) FindMaxAlignmentTypeInParameterPack_Test_C {};
+
+static_assert( FindMaxAlignmentTypeInParameterPack<>::value == 0 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_A>::value == 8 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_A, FindMaxAlignmentTypeInParameterPack_Test_A>::value == 8 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_B>::value == 16 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_B, FindMaxAlignmentTypeInParameterPack_Test_B>::value == 16 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_C>::value == 4 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_C, FindMaxAlignmentTypeInParameterPack_Test_C>::value == 4 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_A, FindMaxAlignmentTypeInParameterPack_Test_B, FindMaxAlignmentTypeInParameterPack_Test_C>::value == 16 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_B, FindMaxAlignmentTypeInParameterPack_Test_C, FindMaxAlignmentTypeInParameterPack_Test_A>::value == 16 );
+static_assert( FindMaxAlignmentTypeInParameterPack<FindMaxAlignmentTypeInParameterPack_Test_C, FindMaxAlignmentTypeInParameterPack_Test_A, FindMaxAlignmentTypeInParameterPack_Test_B>::value == 16 );
+
+} // namespace tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+
+
+
 } // utility
 } // bc
