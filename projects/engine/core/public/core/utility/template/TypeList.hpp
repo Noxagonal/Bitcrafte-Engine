@@ -74,7 +74,7 @@ public:
 	/// If this TypeList contains multiple of the same type, only the index to the first occurrence of the type will be returned.
 	///
 	/// @note
-	/// If the type is not in the TypeList, this will cause a compile time error with message "Type not found".
+	/// If the type was not found, a compile time error will be generated with message "Type not found".
 	///
 	/// Usage example:
 	/// @code
@@ -88,7 +88,7 @@ public:
 	/// Type to find index for.
 	/// 
 	/// @return
-	/// Index to first occurance of TypeToFind in TypeList.
+	/// Index to first occurrence of TypeToFind in TypeList.
 	template<typename TypeToFind>
 	consteval static u64 TypeToIndex()
 	{
@@ -111,6 +111,46 @@ public:
 	consteval static u64 Size()
 	{
 		return sizeof...( TypePack );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get the size of the largest type in the TypeList.
+	/// 
+	/// Usage example:
+	/// @code
+	/// using TypeListSample = TypeList<i32, u8, f64, u16>;
+	/// constexpr u64 max_size = TypeListSample::TypeMaxSize();
+	/// // max_size will be 8 because f64 is 8 bytes.
+	/// @endcode
+	///
+	/// @return
+	/// Maximum size of the TypeList.
+	consteval static u64 TypeMaxSize()
+	{
+		return FindMaxSizeTypeInParameterPack<TypePack...>::value;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get the alignment of the type with the largest alignment in the TypeList.
+	/// 
+	/// Usage example:
+	/// @code
+	/// struct alignas( 8 ) A {};
+	/// struct alignas( 16 ) B {};
+	/// struct alignas( 4 ) C {};
+	///
+	/// using TypeListSample = TypeList<A, B, C>;
+	/// constexpr u64 max_alignment = TypeListSample::TypeMaxAlignment();
+	/// // max_alignment will be 16 because B is 16 byte aligned.
+	/// @endcode
+	///
+	/// @return
+	/// Maximum size of the TypeList.
+	consteval static u64 TypeMaxAlignment()
+	{
+		return FindMaxAlignmentTypeInParameterPack<TypePack...>::value;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,6 +417,7 @@ static_assert( sizeof( TypeList<> ) == 1 );
 static_assert( sizeof( TypeList<int, float, double> ) == 1 );
 
 static_assert( std::is_same_v<TypeList<int, float, double>::ApplyTo<TypeListTestTemplateClass>, TypeListTestTemplateClass<int, float, double>> );
+static_assert( !std::is_same_v<TypeList<int, float, double>::ApplyTo<TypeListTestTemplateClass>, TypeListTestTemplateClass<int, int, double>> );
 
 static_assert( std::is_same_v<TypeList<int, float, double>::template IndexToType<0>, int> );
 static_assert( std::is_same_v<TypeList<int, float, double>::template IndexToType<1>, float> );
@@ -403,41 +444,52 @@ static_assert( TypeList<int, float, double>::template CountType<float>() == 1 );
 static_assert( TypeList<int, float, double>::template CountType<double>() == 1 );
 static_assert( TypeList<int, float, double>::template CountType<unsigned int>() == 0 );
 
-static_assert( TypeList<>::HasDuplicates() == false );
-static_assert( TypeList<int>::HasDuplicates() == false );
-static_assert( TypeList<int, float, double>::HasDuplicates() == false );
-static_assert( TypeList<int, double, double>::HasDuplicates() == true );
-static_assert( TypeList<int, int, double>::HasDuplicates() == true );
-static_assert( TypeList<int, float, int, double>::HasDuplicates() == true );
+static_assert( TypeList<int, double, double>::HasDuplicates() );
+static_assert( TypeList<int, int, double>::HasDuplicates() );
+static_assert( TypeList<int, float, int, double>::HasDuplicates() );
 
-static_assert( TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestBase_1, TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() == true );
-static_assert( TypeList<TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_2>() == false );
-static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() == false );
-static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestDerived_1>() == false );
-static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2, TypeListTestDerived_3>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
+static_assert( !TypeList<>::HasDuplicates() );
+static_assert( !TypeList<int>::HasDuplicates() );
+static_assert( !TypeList<int, float, double>::HasDuplicates() );
 
-static_assert( TypeList<>::template Matches<TypeList<>>() == true );
-static_assert( TypeList<int>::template Matches<TypeList<int>>() == true );
-static_assert( TypeList<int, float, double>::template Matches<TypeList<int>>() == false );
-static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float>>() == false );
-static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float, double>>() == true );
+
+static_assert( TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestBase_1, TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() );
+static_assert( TypeList<TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2, TypeListTestDerived_3>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+
+static_assert( !TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_2>() );
+static_assert( !TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() );
+static_assert( !TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestDerived_1>() );
+
+
+static_assert( TypeList<>::template Matches<TypeList<>>() );
+static_assert( TypeList<int>::template Matches<TypeList<int>>() );
+static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float, double>>() );
+
+static_assert( !TypeList<int, float, double>::template Matches<TypeList<int>>() );
+static_assert( !TypeList<int, float, double>::template Matches<TypeList<int, float>>() );
+
 
 static auto type_list_sample = TypeList<int, float, double>();
-static auto other_type_list_sample = TypeList<int, float, double>();
-static_assert( type_list_sample == other_type_list_sample );
+static auto matching_type_list_sample = TypeList<int, float, double>();
+static auto differing_type_list_sample = TypeList<int, int, double>();
+static_assert( type_list_sample == matching_type_list_sample );
+static_assert( type_list_sample != differing_type_list_sample );
 
 // Tests for TypeListType concept.
-static_assert( TypeListType<TypeList<>> == true );
-static_assert( TypeListType<TypeList<int>> == true );
-static_assert( TypeListType<TypeList<int, float, double>> == true );
-static_assert( TypeListType<int> == false );
-static_assert( TypeListType<TypeListTestDerived_3> == false );
+static_assert( TypeListType<TypeList<>> );
+static_assert( TypeListType<TypeList<int>> );
+static_assert( TypeListType<TypeList<int, float, double>> );
+static_assert( TypeListType<TypeList<int, float, double>> );
+static_assert( TypeListType<TypeList<TypeList<>>> );
+
+static_assert( !TypeListType<int> );
+static_assert( !TypeListType<TypeListTestDerived_3> );
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
