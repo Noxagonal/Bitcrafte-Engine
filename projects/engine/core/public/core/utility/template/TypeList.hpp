@@ -133,6 +133,28 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
+	/// Get the alignment of the type with the largest alignment in the TypeList.
+	/// 
+	/// Usage example:
+	/// @code
+	/// struct alignas( 8 ) A {};
+	/// struct alignas( 16 ) B {};
+	/// struct alignas( 4 ) C {};
+	///
+	/// using TypeListSample = TypeList<A, B, C>;
+	/// constexpr u64 max_alignment = TypeListSample::TypeMaxAlignment();
+	/// // max_alignment will be 16 because B is 16 byte aligned.
+	/// @endcode
+	///
+	/// @return
+	/// Maximum size of the TypeList.
+	consteval static u64 TypeMaxAlignment()
+	{
+		return FindMaxAlignmentTypeInParameterPack<TypePack...>::value;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
 	/// Counts the number of instances of CountType in this TypeList.
 	/// 
 	/// Usage example:
