@@ -417,6 +417,7 @@ static_assert( sizeof( TypeList<> ) == 1 );
 static_assert( sizeof( TypeList<int, float, double> ) == 1 );
 
 static_assert( std::is_same_v<TypeList<int, float, double>::ApplyTo<TypeListTestTemplateClass>, TypeListTestTemplateClass<int, float, double>> );
+static_assert( !std::is_same_v<TypeList<int, float, double>::ApplyTo<TypeListTestTemplateClass>, TypeListTestTemplateClass<int, int, double>> );
 
 static_assert( std::is_same_v<TypeList<int, float, double>::template IndexToType<0>, int> );
 static_assert( std::is_same_v<TypeList<int, float, double>::template IndexToType<1>, float> );
@@ -443,41 +444,52 @@ static_assert( TypeList<int, float, double>::template CountType<float>() == 1 );
 static_assert( TypeList<int, float, double>::template CountType<double>() == 1 );
 static_assert( TypeList<int, float, double>::template CountType<unsigned int>() == 0 );
 
-static_assert( TypeList<>::HasDuplicates() == false );
-static_assert( TypeList<int>::HasDuplicates() == false );
-static_assert( TypeList<int, float, double>::HasDuplicates() == false );
-static_assert( TypeList<int, double, double>::HasDuplicates() == true );
-static_assert( TypeList<int, int, double>::HasDuplicates() == true );
-static_assert( TypeList<int, float, int, double>::HasDuplicates() == true );
+static_assert( TypeList<int, double, double>::HasDuplicates() );
+static_assert( TypeList<int, int, double>::HasDuplicates() );
+static_assert( TypeList<int, float, int, double>::HasDuplicates() );
 
-static_assert( TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestBase_1, TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() == true );
-static_assert( TypeList<TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_2>() == false );
-static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() == false );
-static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestDerived_1>() == false );
-static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
-static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2, TypeListTestDerived_3>::template IsEachDerivedFromBase<TypeListTestBase_1>() == true );
+static_assert( !TypeList<>::HasDuplicates() );
+static_assert( !TypeList<int>::HasDuplicates() );
+static_assert( !TypeList<int, float, double>::HasDuplicates() );
 
-static_assert( TypeList<>::template Matches<TypeList<>>() == true );
-static_assert( TypeList<int>::template Matches<TypeList<int>>() == true );
-static_assert( TypeList<int, float, double>::template Matches<TypeList<int>>() == false );
-static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float>>() == false );
-static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float, double>>() == true );
+
+static_assert( TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestBase_1, TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_1>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() );
+static_assert( TypeList<TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+static_assert( TypeList<TypeListTestDerived_2, TypeListTestBase_2, TypeListTestDerived_3>::template IsEachDerivedFromBase<TypeListTestBase_1>() );
+
+static_assert( !TypeList<TypeListTestBase_1>::template IsEachDerivedFromBase<TypeListTestBase_2>() );
+static_assert( !TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestBase_2>() );
+static_assert( !TypeList<TypeListTestDerived_1, TypeListTestBase_2>::template IsEachDerivedFromBase<TypeListTestDerived_1>() );
+
+
+static_assert( TypeList<>::template Matches<TypeList<>>() );
+static_assert( TypeList<int>::template Matches<TypeList<int>>() );
+static_assert( TypeList<int, float, double>::template Matches<TypeList<int, float, double>>() );
+
+static_assert( !TypeList<int, float, double>::template Matches<TypeList<int>>() );
+static_assert( !TypeList<int, float, double>::template Matches<TypeList<int, float>>() );
+
 
 static auto type_list_sample = TypeList<int, float, double>();
-static auto other_type_list_sample = TypeList<int, float, double>();
-static_assert( type_list_sample == other_type_list_sample );
+static auto matching_type_list_sample = TypeList<int, float, double>();
+static auto differing_type_list_sample = TypeList<int, int, double>();
+static_assert( type_list_sample == matching_type_list_sample );
+static_assert( type_list_sample != differing_type_list_sample );
 
 // Tests for TypeListType concept.
-static_assert( TypeListType<TypeList<>> == true );
-static_assert( TypeListType<TypeList<int>> == true );
-static_assert( TypeListType<TypeList<int, float, double>> == true );
-static_assert( TypeListType<int> == false );
-static_assert( TypeListType<TypeListTestDerived_3> == false );
+static_assert( TypeListType<TypeList<>> );
+static_assert( TypeListType<TypeList<int>> );
+static_assert( TypeListType<TypeList<int, float, double>> );
+static_assert( TypeListType<TypeList<int, float, double>> );
+static_assert( TypeListType<TypeList<TypeList<>>> );
+
+static_assert( !TypeListType<int> );
+static_assert( !TypeListType<TypeListTestDerived_3> );
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
