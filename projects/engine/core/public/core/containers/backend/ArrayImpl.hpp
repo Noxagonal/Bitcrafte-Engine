@@ -31,7 +31,7 @@ BC_CONTAINER_NAMESPACE_START;
 ///
 /// @tparam ValueType
 /// Type of the contained element.
-template<BC_CONTAINER_VALUE_TYPENAME ValueType, u64 ValueCount>
+template<BC_CONTAINER_VALUE_TYPENAME ValueType, i64 ValueCount>
 class BC_CONTAINER_NAME( Array ) :
 	public container_bases::ContainerResource
 {
@@ -42,7 +42,7 @@ public:
 	using ContainedValueType				= ValueType;
 	static constexpr bool IsDataConst		= false;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount>
 	using ThisContainerType					= BC_CONTAINER_NAME( Array )<OtherValueType, OtherValueCount>;
 	using ThisType							= ThisContainerType<ValueType, ValueCount>;
 
@@ -52,7 +52,7 @@ public:
 	template<bool IsOtherConst>
 	using ThisViewType						= void;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount>
 	using ThisContainerFullType				= BC_CONTAINER_NAME( Array )<OtherValueType, OtherValueCount>;
 	using ThisFullType						= ThisContainerFullType<ValueType, ValueCount>;
 
@@ -69,10 +69,10 @@ private:
 	//template<bool IsOtherConst>
 	//friend class IteratorBase;
 
-	//template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount, bool IsOtherConst>
+	//template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount, bool IsOtherConst>
 	//friend class BC_CONTAINER_NAME( ArrayViewBase );
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount>
 	friend class BC_CONTAINER_NAME( Array );
 
 	friend ConstIterator;
@@ -117,7 +117,7 @@ public:
 		static_assert( sizeof...( ValueArgumentTypePack ) <= ValueCount, "Too many values given to constructor" );
 		FillFromTemplateParameterPack<0>( std::forward<ValueArgumentTypePack>( values )... );
 		// Fill in the remaining values with default constructed values.
-		for( u64 i = sizeof...( ValueArgumentTypePack ); i < ValueCount; i++ )
+		for( i64 i = sizeof...( ValueArgumentTypePack ); i < ValueCount; i++ )
 		{
 			data[ i ] = ValueType {};
 		}
@@ -162,7 +162,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const ValueType																		&	operator[](
-		u64																								index
+		i64																								index
 	) const
 	{
 		return At( index );
@@ -170,7 +170,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType																				&	operator[](
-		u64																								index
+		i64																								index
 	)
 	{
 		return At( index );
@@ -328,7 +328,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const ValueType																		&	At(
-		u64																								index
+		i64																								index
 	) const
 	{
 		BC_ContainerAssert( index < ValueCount, U"Index out of range" );
@@ -337,7 +337,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType																				&	At(
-		u64																								index
+		i64																								index
 	)
 	{
 		BC_ContainerAssert( index < ValueCount, U"Index out of range" );
@@ -357,7 +357,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr u64																						Size() const noexcept
+	constexpr i64																						Size() const noexcept
 	{
 		return ValueCount;
 	}
@@ -461,7 +461,7 @@ private:
 	/// @param ...rest
 	/// Remaining elements in the parameter pack.
 	template<
-		u64																								Index,
+		i64																								Index,
 		std::constructible_from<ValueType>																FirstType,
 		std::constructible_from<ValueType>																...RestTypePack
 	>
@@ -502,7 +502,7 @@ public:
 	using ContainedValueType				= ValueType;
 	static constexpr bool IsDataConst		= false;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount>
 	using ThisContainerType					= BC_CONTAINER_NAME( Array )<OtherValueType, OtherValueCount>;
 	using ThisType							= ThisContainerType<ValueType, 0>;
 
@@ -512,7 +512,7 @@ public:
 	template<bool IsOtherConst>
 	using ThisViewType						= void;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount>
 	using ThisContainerFullType				= BC_CONTAINER_NAME( Array )<OtherValueType, OtherValueCount>;
 	using ThisFullType						= ThisContainerFullType<ValueType, 0>;
 
@@ -529,10 +529,10 @@ private:
 	//template<bool IsOtherConst>
 	//friend class IteratorBase;
 
-	//template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount, bool IsOtherConst>
+	//template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount, bool IsOtherConst>
 	//friend class BC_CONTAINER_NAME( ArrayViewBase );
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, u64 OtherValueCount>
+	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, i64 OtherValueCount>
 	friend class BC_CONTAINER_NAME( Array );
 
 	friend ConstIterator;
@@ -592,7 +592,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr const ValueType																		&	operator[](
-		u64																								index
+		i64																								index
 	) const
 	{
 		return At( index );
@@ -600,7 +600,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ValueType																				&	operator[](
-		u64																								index
+		i64																								index
 	)
 	{
 		return At( index );
@@ -759,7 +759,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[noreturn]]
 	constexpr const ValueType																		&	At(
-		u64
+		i64
 	) const
 	{
 		BC_ContainerThrowOrCrash( U"Index out of range, Array is empty" );
@@ -768,7 +768,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[noreturn]]
 	constexpr ValueType																				&	At(
-		u64
+		i64
 	)
 	{
 		BC_ContainerThrowOrCrash( U"Index out of range, Array is empty" );
@@ -787,7 +787,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr u64																						Size() const noexcept
+	constexpr i64																						Size() const noexcept
 	{
 		return 0;
 	}

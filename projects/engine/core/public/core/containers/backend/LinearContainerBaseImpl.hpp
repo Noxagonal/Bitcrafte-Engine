@@ -458,7 +458,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )(
 		const ValueType																				*	ptr,
-		u64																								size
+		i64																								size
 	) noexcept requires( IsDataConst == true )
 		:
 		data_ptr( const_cast<ValueType*>( ptr ) ),
@@ -468,7 +468,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )(
 		ValueType																					*	ptr,
-		u64																								size
+		i64																								size
 	) noexcept requires( IsDataConst == false )
 		:
 		data_ptr( ptr ),
@@ -478,7 +478,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
 	constexpr const ValueType																		&	operator[](
-		u64																								index
+		i64																								index
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		return this->At( index );
@@ -487,7 +487,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
 	constexpr ValueType																				&	operator[](
-		u64																								index
+		i64																								index
 	) BC_CONTAINER_NOEXCEPT requires( IsDataConst == false )
 	{
 		return this->At( index );
@@ -496,7 +496,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
 	constexpr const ValueType																		&	At(
-		u64																								index
+		i64																								index
 	) const BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( index < this->data_size,
@@ -510,7 +510,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
 	constexpr ValueType																				&	At(
-		u64																								index
+		i64																								index
 	) BC_CONTAINER_NOEXCEPT requires( IsDataConst == false )
 	{
 		BC_ContainerAssert( index < this->data_size,
@@ -611,7 +611,7 @@ public:
 	/// @return
 	/// Number of values space has been reserved for.
 	[[nodiscard]]
-	constexpr u64																						Size() const noexcept
+	constexpr i64																						Size() const noexcept
 	{
 		return this->data_size;
 	}
@@ -654,7 +654,7 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	ValueType																						*	data_ptr				= {};
-	u64																									data_size				= {};
+	i64																									data_size				= {};
 };
 
 
@@ -737,8 +737,8 @@ public:
 	/// @param headroom
 	/// How much extra space is reserved if the capacity is expanded.
 	constexpr void																						Reserve(
-		u64																								new_capacity,
-		u64																								headroom			= 0
+		i64																								new_capacity,
+		i64																								headroom			= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
 		if( this->data_capacity < new_capacity )
@@ -766,8 +766,8 @@ public:
 	/// @param headroom
 	/// How much extra space is reserved if the capacity is expanded.
 	constexpr void																						Resize(
-		u64																								new_size,
-		u64																								headroom			= 0
+		i64																								new_size,
+		i64																								headroom			= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
 		auto old_size = this->data_size;
@@ -797,21 +797,21 @@ public:
 	template<utility::ContainerView OtherContainerType>
 	constexpr void																						Append(
 		const OtherContainerType																	&	other,
-		u64																								count				= 1,
-		u64																								headroom			= 0
+		i64																								count				= 1,
+		i64																								headroom			= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
-		u64 old_size			= this->Size();
-		u64 other_size			= other.Size();
-		u64 total_insert_size	= other_size * count;
+		i64 old_size			= this->Size();
+		i64 other_size			= other.Size();
+		i64 total_insert_size	= other_size * count;
 
 		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
-		for( u64 c = 0; c < count; ++c )
+		for( i64 c = 0; c < count; ++c )
 		{
 			auto other_it			= other.begin();
 			auto write_location		= other_size * c + old_size;
-			for( u64 i = 0; i < other_size; ++i )
+			for( i64 i = 0; i < other_size; ++i )
 			{
 				new( &this->data_ptr[ write_location + i ] ) ValueType( *other_it );
 				++other_it;
@@ -834,21 +834,21 @@ public:
 	/// How much extra space is reserved if the capacity is expanded.
 	constexpr void																						Append(
 		const std::initializer_list<ValueType>														&	init_list,
-		u64																								count				= 1,
-		u64																								headroom			= 0
+		i64																								count				= 1,
+		i64																								headroom			= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
-		u64 old_size			= this->Size();
-		u64 other_size			= init_list.size();
-		u64 total_insert_size	= other_size * count;
+		i64 old_size			= this->Size();
+		i64 other_size			= init_list.size();
+		i64 total_insert_size	= other_size * count;
 
 		this->ResizeNoConstruct( old_size + total_insert_size, headroom );
 
-		for( u64 c = 0; c < count; ++c )
+		for( i64 c = 0; c < count; ++c )
 		{
 			auto other_it			= init_list.begin();
 			auto write_location		= other_size * c + old_size;
-			for( u64 i = 0; i < other_size; ++i )
+			for( i64 i = 0; i < other_size; ++i )
 			{
 				new( &this->data_ptr[ write_location + i ] ) ValueType( *other_it );
 				++other_it;
@@ -966,12 +966,12 @@ public:
 	/// How much extra space is reserved if the capacity is expanded.
 	constexpr void																						FillFront(
 		const ValueType																				&	value,
-		u64																								count,
-		u64																								headroom			= 0
+		i64																								count,
+		i64																								headroom			= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->ShiftRight( 0, count, headroom );
-		for( u64 i = 0; i < count; i++ )
+		for( i64 i = 0; i < count; i++ )
 		{
 			new( &this->data_ptr[ i ] ) ValueType( value );
 		}
@@ -991,14 +991,14 @@ public:
 	/// How much extra space is reserved if the capacity is expanded.
 	constexpr void																						FillBack(
 		const ValueType																				&	value,
-		u64																								count,
-		u64																								headroom			= 0
+		i64																								count,
+		i64																								headroom			= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto old_size = this->data_size;
 		auto reserve_space = this->data_size + count;
 		this->ResizeNoConstruct( reserve_space, headroom );
-		for( u64 i = 0; i < count; i++ )
+		for( i64 i = 0; i < count; i++ )
 		{
 			new( &this->data_ptr[ old_size + i ] ) ValueType( value );
 		}
@@ -1108,8 +1108,8 @@ protected:
 			U"'to' iterator out of range"
 		);
 
-		u64 from_to_range		= to - from;
-		u64 tail_range			= this->data_ptr + this->data_size - to;
+		i64 from_to_range		= to - from;
+		i64 tail_range			= this->data_ptr + this->data_size - to;
 		auto from_it			= &this->data_ptr[ from - this->data_ptr ];
 		auto to_it				= &this->data_ptr[ to - this->data_ptr ];
 		auto it_end				= this->data_ptr + this->data_size;
@@ -1136,8 +1136,8 @@ protected:
 	constexpr ValueType																				*	DoInsert(
 		const ValueType																				*	at,
 		const ValueType																				&	value,
-		u64																								count			= 1,
-		u64																								headroom		= 0
+		i64																								count			= 1,
+		i64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		BC_ContainerAssert(
@@ -1146,10 +1146,10 @@ protected:
 			U"Iterator out of range"
 		);
 
-		u64 at_index = at - this->data_ptr;
+		i64 at_index = at - this->data_ptr;
 		this->ShiftRight( at_index, count, headroom );
 
-		for( u64 i = 0; i < count; ++i )
+		for( i64 i = 0; i < count; ++i )
 		{
 			new( &this->data_ptr[ at_index + i ] ) ValueType( value );
 		}
@@ -1162,8 +1162,8 @@ protected:
 	constexpr ValueType																				*	DoInsert(
 		const ValueType																				*	at,
 		const OtherContainerType																	&	other,
-		u64																								count			= 1,
-		u64																								headroom		= 0
+		i64																								count			= 1,
+		i64																								headroom		= 0
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert(
@@ -1176,19 +1176,19 @@ protected:
 			auto & other
 		) -> ValueType*
 			{
-				u64 start_index			= at - this->data_ptr;
-				u64 other_size			= other.Size();
-				u64 total_insert_size	= other_size * count;
+				i64 start_index			= at - this->data_ptr;
+				i64 other_size			= other.Size();
+				i64 total_insert_size	= other_size * count;
 
 				this->ShiftRight( start_index, total_insert_size, headroom );
 
-				for( u64 c = 0; c < count; ++c )
+				for( i64 c = 0; c < count; ++c )
 				{
 					// Dirty SFINAE test to see if other container has Data() function.
 					if constexpr( std::is_same_v<decltype( other.Data() ), decltype( other.Data() )> )
 					{
 						auto it = other.Data();
-						for( u64 i = 0; i < other_size; ++i )
+						for( i64 i = 0; i < other_size; ++i )
 						{
 							auto count_start_pos = c * other_size + start_index;
 							new( &this->data_ptr[ count_start_pos + i ] ) ValueType( *it );
@@ -1198,7 +1198,7 @@ protected:
 					else
 					{
 						auto it = other.begin();
-						for( u64 i = 0; i < other_size; ++i )
+						for( i64 i = 0; i < other_size; ++i )
 						{
 							auto count_start_pos = c * other_size + start_index;
 							new( &this->data_ptr[ count_start_pos + i ] ) ValueType( *it );
@@ -1235,8 +1235,8 @@ protected:
 	/// @param headroom
 	/// How much extra space is reserved if the capacity is expanded.
 	constexpr void																						ResizeNoConstruct(
-		u64																								new_size,
-		u64																								headroom
+		i64																								new_size,
+		i64																								headroom
 	)
 	{
 		auto old_size = this->data_size;
@@ -1279,9 +1279,9 @@ protected:
 	/// @param headroom
 	/// How much extra space is reserved if the capacity is expanded.
 	constexpr void																						ShiftRight(
-		u64																								start_position,
-		u64																								amount,
-		u64																								headroom
+		i64																								start_position,
+		i64																								amount,
+		i64																								headroom
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		// TODO: Should combine shift and resize to the same copy-loop
@@ -1296,24 +1296,24 @@ protected:
 		// determine if new memory is needed or not. Or just let ResizeNoConstruct determine
 		// the need for allocation the second time.
 
-		auto old_size					= this->data_size;
-		auto new_size					= this->data_size + amount;
-		auto distance_to_end			= old_size - start_position;
+		i64 old_size					= this->data_size;
+		i64 new_size					= this->data_size + amount;
+		i64 distance_to_end				= old_size - start_position;
 
-		auto overlap_range_begin		= start_position + amount;
-		auto overlap_range_end			= old_size;
-		auto copy_range_begin			= ( distance_to_end < amount ) ? new_size - distance_to_end : old_size;
-		auto copy_range_end				= new_size;
+		i64 overlap_range_begin			= start_position + amount;
+		i64 overlap_range_end			= old_size;
+		i64 copy_range_begin			= ( distance_to_end < amount ) ? new_size - distance_to_end : old_size;
+		i64 copy_range_end				= new_size;
 
-		auto destruct_begin				= start_position;
-		auto destruct_size				= copy_range_end - copy_range_begin;
+		i64 destruct_begin				= start_position;
+		i64 destruct_size				= copy_range_end - copy_range_begin;
 
 		this->ResizeNoConstruct( new_size, headroom );
 
 		if( old_size > 0 )
 		{
 			// Construct the values assigned to a newly allocated memory from previous ones.
-			for( u64 i = copy_range_end - 1; i >= copy_range_begin; --i )
+			for( i64 i = copy_range_end - 1; i >= copy_range_begin; --i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
 				if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
@@ -1327,7 +1327,7 @@ protected:
 			}
 
 			// For overlapping portion we can assign or move the values.
-			for( u64 i = overlap_range_end - 1; i >= overlap_range_begin; --i )
+			for( i64 i = overlap_range_end - 1; i >= overlap_range_begin; --i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
 				if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
@@ -1352,8 +1352,8 @@ protected:
 	/// @brief
 	/// Shifts everything left (towards 0 index), destructs the leftmost value, shrinks the entire container.
 	constexpr void																						ShiftLeft(
-		// u64																								start_position,
-		// u64																								amount
+		// i64																								start_position,
+		// i64																								amount
 	) requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
 	{
 		// TODO: Implement start_position and amount parameters.
@@ -1374,7 +1374,7 @@ protected:
 				new( &this->data_ptr[ 0 ] ) ValueType( this->data_ptr[ 1 ] );
 			}
 			// For the rest we can assign.
-			for( u64 i = 1; i < this->data_size; ++i )
+			for( i64 i = 1; i < this->data_size; ++i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
 				if constexpr( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
@@ -1393,7 +1393,7 @@ protected:
 protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u64																									data_capacity				= {};
+	i64																									data_capacity				= {};
 };
 
 

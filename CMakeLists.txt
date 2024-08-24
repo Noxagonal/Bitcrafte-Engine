@@ -79,7 +79,7 @@ option(BITCRAFTE_BUILD_DOCUMENTATION
 )
 option(BITCRAFTE_BUILD_TESTS
 	"Build tests"
-	OFF
+	ON
 )
 option(BITCRAFTE_INSTALL_GAME_SHIPPING
 	"Enable installation for Game Shipping"
@@ -128,6 +128,7 @@ if(${BITCRAFTE_BUILD_DOCUMENTATION})
 endif()
 
 if(${BITCRAFTE_BUILD_TESTS})
+	enable_testing()
 	add_subdirectory("tests")
 endif()
 

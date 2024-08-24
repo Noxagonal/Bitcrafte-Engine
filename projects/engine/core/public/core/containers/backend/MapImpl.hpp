@@ -174,33 +174,42 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )													&	operator+=(
-		u64																								value
+		i64																								value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		for( u64 i = 0; i < value; ++i ) {
-			++( *this );
+		if( value == 0 ) return *this;
+		if( value > 0 ) {
+			for( i64 i = 0; i < value; ++i ) {
+				++( *this );
+			}
+			return *this;
 		}
-		return *this;
+		return this->operator-=( -value );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )													&	operator-=(
-		u64																								value
+		i64																								value
 	) BC_CONTAINER_NOEXCEPT
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
 		BC_ContainerAssert( !this->container->IsEmpty(), U"Container is empty, cannot iterate over nothing" );
-		for( u64 i = 0; i < value; ++i ) {
-			--( *this );
+		if( value == 0 ) return *this;
+		if( value > 0 )
+		{
+			for( i64 i = 0; i < value; ++i ) {
+				--( *this );
+			}
+			return *this;
 		}
-		return *this;
+		return this->operator+=( -value );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )														operator+(
-		u64																								value
+		i64																								value
 	) BC_CONTAINER_NOEXCEPT const
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -212,7 +221,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( MapIteratorBase )														operator-(
-		u64																								value
+		i64																								value
 	) BC_CONTAINER_NOEXCEPT const
 	{
 		BC_ContainerAssert( this->container, U"Tried using iterator that points to nothing" );
@@ -307,7 +316,8 @@ private:
 			( from_node->parent && from_node->parent->left == from_node ) || ( from_node->parent && from_node->parent->right == from_node ),
 			U"Node parent does not recognize child."
 		);
-		while( from_node->parent && from_node->parent->left == from_node ) {
+		while( from_node->parent && from_node->parent->left == from_node )
+		{
 			from_node = from_node->parent;
 		}
 		return from_node->parent;
@@ -414,7 +424,7 @@ protected:
 	using Node					= container_bases::BC_CONTAINER_NAME( MapNode )<KeyType, ValueType>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u64							size				= 0;
+	i64							size				= 0;
 	Node					*	root_node			= nullptr;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -714,7 +724,7 @@ public:
 	template<utility::ContainerView OtherContainerType>
 	constexpr void																						Append(
 		const OtherContainerType																	&	other,
-		u64																								count					= 1
+		i64																								count					= 1
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> && std::is_same_v<ContainedPairType, typename OtherContainerType::ContainedPairType> )
 	{
 		if constexpr( std::is_same_v<OtherContainerType, ThisType> ||
@@ -728,14 +738,16 @@ public:
 			}
 		}
 
-		u64 old_size				= this->Size();
-		u64 other_size				= other.Size();
-		u64 total_insert_size		= other_size * count;
+		BC_ContainerAssert( count > 0, U"Cannot append 0 or negative number of elements" );
 
-		for( u64 c = 0; c < count; ++c )
+		i64 old_size				= this->Size();
+		i64 other_size				= other.Size();
+		i64 total_insert_size		= other_size * count;
+
+		for( i64 c = 0; c < count; ++c )
 		{
 			auto other_it			= other.begin();
-			for( u64 i = 0; i < other_size; ++i )
+			for( i64 i = 0; i < other_size; ++i )
 			{
 				this->Insert( *other_it );
 				++other_it;
@@ -759,16 +771,20 @@ public:
 	///	How many times the other elements are added to this list.
 	constexpr void																						Append(
 		const std::initializer_list<ContainedPairType>												&	init_list,
-		u64																								count					= 1
+		i64																								count					= 1
 	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ContainedPairType> )
 	{
-		u64 old_size			= this->Size();
-		u64 other_size			= init_list.size();
-		u64 total_insert_size	= other_size * count;
+		i64 old_size			= this->Size();
+		i64 other_size			= init_list.size();
+		i64 total_insert_size	= other_size * count;
 
-		for( u64 c = 0; c < count; ++c ) {
+		BC_ContainerAssert( count > 0, U"Cannot append 0 or negative number of elements" );
+
+		for( i64 c = 0; c < count; ++c )
+		{
 			auto other_it			= init_list.begin();
-			for( u64 i = 0; i < other_size; ++i ) {
+			for( i64 i = 0; i < other_size; ++i )
+			{
 				this->Insert( *other_it );
 				++other_it;
 			}
@@ -1009,11 +1025,11 @@ public:
 			auto temp_node_list_size = this->size;
 			Node ** temp_node_list = this->AllocateMemory<Node*>( temp_node_list_size );
 			auto it = this->begin();
-			for( u64 i = 0; i < this->size; ++i ) {
+			for( i64 i = 0; i < this->size; ++i ) {
 				temp_node_list[ i ] = it.GetData();
 				++it;
 			}
-			for( u64 i = 0; i < this->size; ++i ) {
+			for( i64 i = 0; i < this->size; ++i ) {
 				Node * node = temp_node_list[ i ];
 				this->DestructNode( node );
 				this->DeallocateNode( node );
@@ -1030,7 +1046,7 @@ public:
 	/// 
 	/// @return
 	/// Current number of elements stored inside this map.
-	constexpr u64																						Size() const noexcept
+	constexpr i64																						Size() const noexcept
 	{
 		return this->size;
 	}

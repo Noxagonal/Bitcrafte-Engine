@@ -64,8 +64,8 @@ constexpr bool											CheckContainerContentsMatch(
 	using FirstValueType	= typename FirstContainerType::ContainedValueType;
 	using SecondValueType	= typename SecondContainerType::ContainedValueType;
 
-	auto first_size = first_container.Size();
-	auto second_size = second_container.Size();
+	i64 first_size = first_container.Size();
+	i64 second_size = second_container.Size();
 
 	if( first_size != second_size ) return false;
 
@@ -78,7 +78,7 @@ constexpr bool											CheckContainerContentsMatch(
 
 	auto first_it = first_container.begin();
 	auto second_it = second_container.begin();
-	for( u64 i = 0; i < first_size; ++i )
+	for( i64 i = 0; i < first_size; ++i )
 	{
 		if( *first_it != *second_it ) return false;
 		++first_it;
@@ -124,14 +124,14 @@ constexpr bool											CheckContainerContentsDiffer(
 	using FirstValueType	= typename FirstContainerType::ContainedValueType;
 	using SecondValueType	= typename SecondContainerType::ContainedValueType;
 
-	auto first_size = first_container.Size();
-	auto second_size = second_container.Size();
+	i64 first_size = first_container.Size();
+	i64 second_size = second_container.Size();
 
 	if( first_size != second_size ) return true;
 
 	auto first_it = first_container.begin();
 	auto second_it = second_container.begin();
-	for( u64 i = 0; i < first_size; ++i )
+	for( i64 i = 0; i < first_size; ++i )
 	{
 		if constexpr( !std::is_class_v<FirstValueType> && !std::is_class_v<SecondValueType> )
 		{
@@ -174,7 +174,7 @@ template<typename ValueType, bool IsConst>
 [[nodiscard]]
 constexpr std::conditional_t<IsConst, const ValueType, ValueType>								*	DoLinearSearch(
 	std::conditional_t<IsConst, const ValueType, ValueType>										*	data,
-	u64																								range,
+	i64																								range,
 	const ValueType																				&	value
 ) BC_CONTAINER_NOEXCEPT
 {
@@ -219,7 +219,7 @@ template<typename ValueType, bool IsConst, typename LambdaType>
 [[nodiscard]]
 constexpr std::conditional_t<IsConst, const ValueType, ValueType>								*	DoLinearSearchIf(
 	std::conditional_t<IsConst, const ValueType, ValueType>										*	data,
-	u64																								range,
+	i64																								range,
 	LambdaType																					&&	lambda
 ) BC_CONTAINER_NOEXCEPT
 {

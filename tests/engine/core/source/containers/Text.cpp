@@ -349,6 +349,7 @@ TEST( TextContainer, Append )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( TextContainer, Replace )
 {
+	using namespace bc;
 	using A = bc::Text32;
 
 	// Simple replacements.
@@ -382,8 +383,11 @@ TEST( TextContainer, Replace )
 		a.Replace( U"a new", U"another" );
 		EXPECT_EQ( a, U"place another test somewhere there" );
 
+		a.Replace( U"another", U"some" );
+		EXPECT_EQ( a, U"place some test somewhere there" );
+
 		a.Replace( U"should not find", U"should not replace" );
-		EXPECT_EQ( a, U"place another test somewhere there" );
+		EXPECT_EQ( a, U"place some test somewhere there" );
 	}
 
 	// Multiple replacements.
@@ -391,70 +395,58 @@ TEST( TextContainer, Replace )
 		{
 			A a = "multiple multiple multiple multiple";
 
-			a.Replace( U"multiple", U"1", 0, 2 );
-			EXPECT_EQ( a, U"1 1 multiple multiple" );
+			a.Replace( U"multiple", U"1", 0, 0 );
+			EXPECT_EQ( a, U" multiple multiple multiple" );
+		}
+		{
+			A a = "multiple multiple multiple multiple";
+
+			a.Replace( U"multiple", U"1", 1, 0 );
+			EXPECT_EQ( a, U"1 multiple multiple multiple" );
 		}
 		{
 			A a = "multiple multiple multiple multiple";
 
 			a.Replace( U"multiple", U"1", 1, 2 );
-			EXPECT_EQ( a, U"multiple 1 1 multiple" );
-		}
-		{
-			A a = "multiple multiple multiple multiple";
-
-			a.Replace( U"multiple", U"1", 2, 2 );
-			EXPECT_EQ( a, U"multiple 1 1 multiple" );
-		}
-		{
-			A a = "multiple multiple multiple multiple";
-
-			a.Replace( U"multiple", U"1", 9, 2 );
-			EXPECT_EQ( a, U"multiple 1 1 multiple" );
-		}
-		{
-			A a = "multiple multiple multiple multiple";
-
-			a.Replace( U"multiple", U"1", 10, 2 );
-			EXPECT_EQ( a, U"multiple multiple 1 1" );
-		}
-
-		{
-			A a = "multiple multiple multiple multiple";
-
-			a.Replace( U"multiple", U"1", 9 );
 			EXPECT_EQ( a, U"multiple 1 multiple multiple" );
 		}
 		{
 			A a = "multiple multiple multiple multiple";
 
-			a.Replace( U"multiple", U"1", 10 );
+			a.Replace( U"multiple", U"1", 2, 2 );
+			EXPECT_EQ( a, U"multiple 11 multiple multiple" );
+		}
+		{
+			A a = "multiple multiple multiple multiple";
+
+			a.Replace( U"multiple", U"1", 8, 2 );
+			EXPECT_EQ( a, U"multiple 11111111 multiple multiple" );
+		}
+
+		{
+			A a = "multiple multiple multiple multiple";
+
+			a.Replace( U"multiple", U"1", 1, 9 );
+			EXPECT_EQ( a, U"multiple 1 multiple multiple" );
+		}
+		{
+			A a = "multiple multiple multiple multiple";
+
+			a.Replace( U"multiple", U"1", 1, 10 );
 			EXPECT_EQ( a, U"multiple multiple 1 multiple" );
 		}
 
 		{
 			A a = "multiple multiple multiple multiple";
 
-			a.Replace( U"multiple", U"1", 0, SIZE_MAX );
-			EXPECT_EQ( a, U"1 1 1 1" );
+			a.Replace( U"multiple", U"1", 0, std::numeric_limits<i64>::max() );
+			EXPECT_EQ( a, U"multiple multiple multiple multiple" );
 		}
 		{
 			A a = "multiple multiple multiple multiple";
 
-			a.Replace( U"multiple", U"1", 1, SIZE_MAX );
-			EXPECT_EQ( a, U"multiple 1 1 1" );
-		}
-		{
-			A a = "multiple multiple multiple multiple";
-
-			a.Replace( U"multiple", U"1", 9, SIZE_MAX );
-			EXPECT_EQ( a, U"multiple 1 1 1" );
-		}
-		{
-			A a = "multiple multiple multiple multiple";
-
-			a.Replace( U"multiple", U"1", 10, SIZE_MAX );
-			EXPECT_EQ( a, U"multiple multiple 1 1" );
+			a.Replace( U"multiple", U"1", 1, std::numeric_limits<i64>::max() );
+			EXPECT_EQ( a, U"multiple multiple multiple multiple" );
 		}
 	}
 }
