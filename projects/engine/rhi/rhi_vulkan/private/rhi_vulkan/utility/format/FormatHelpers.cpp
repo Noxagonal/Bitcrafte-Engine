@@ -5,9 +5,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-VkImageAspectFlagBits bc::rhi::CreateAspectMaskFromFormat(
-	VkFormat format
-)
+auto bc::rhi::CreateAspectMaskFromFormat( VkFormat format ) -> VkImageAspectFlagBits
 {
 	switch( format )
 	{

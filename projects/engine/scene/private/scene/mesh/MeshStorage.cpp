@@ -15,25 +15,19 @@ bc::scene::MeshStorage::~MeshStorage()
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::scene::LODMesh & bc::scene::MeshStorage::CreateNewLODMesh(
-	u32 lod_level_count
-)
+auto bc::scene::MeshStorage::CreateNewLODMesh( u32 lod_level_count ) -> LODMesh&
 {
 	lod_mesh_list.PushBack( MakeUniquePtr<LODMesh>( lod_level_count ) );
 	return *lod_mesh_list.Back();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::scene::MeshStorage::DestroyLODMesh(
-	LODMesh & lod_mesh
-)
+void bc::scene::MeshStorage::DestroyLODMesh( LODMesh & lod_mesh )
 {
 	lod_mesh_list.EraseFirstIf( [ &lod_mesh ]( const UniquePtr<LODMesh> & comp ) { return comp.Get() == std::addressof( lod_mesh ); } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::scene::MeshStorage::FinalizeLODMesh(
-	LODMesh & lod_mesh
-)
+void bc::scene::MeshStorage::FinalizeLODMesh( LODMesh & lod_mesh )
 {
 }

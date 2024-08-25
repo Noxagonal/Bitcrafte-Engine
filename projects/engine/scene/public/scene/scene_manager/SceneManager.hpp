@@ -33,8 +33,8 @@ public:
 
 private:
 
-	UniquePtr<SceneDataManager>							scene_data_manager;
-	List<UniquePtr<SceneTree>>							scene_tree_list;
+	UniquePtr<SceneDataManager>	scene_data_manager;
+	List<UniquePtr<SceneTree>>	scene_tree_list;
 };
 
 

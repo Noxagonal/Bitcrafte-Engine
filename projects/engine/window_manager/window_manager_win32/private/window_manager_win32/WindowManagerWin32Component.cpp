@@ -6,9 +6,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::WindowManagerWin32Component::WindowManagerWin32Component(
-	const WindowManagerComponentCreateInfo & create_info
-) :
+bc::window_manager::WindowManagerWin32Component::WindowManagerWin32Component( const WindowManagerComponentCreateInfo & create_info )
+:
 	WindowManagerComponent( create_info )
 {
 	win32_manager = MakeUniquePtr<Win32Manager>( *this, create_info );
@@ -27,15 +26,13 @@ void bc::window_manager::WindowManagerWin32Component::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerWin32Component::CreateWindow(
-	const WindowCreateInfo & window_create_info
-)
+auto bc::window_manager::WindowManagerWin32Component::CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>
 {
 	return win32_manager->CreateWindow( window_create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::WindowManagerWin32Component::GetPlatformSpecificHandles() const
+auto bc::window_manager::WindowManagerWin32Component::GetPlatformSpecificHandles() const -> const WindowManagerPlatformHandlesBase*
 {
 	return win32_manager->GetPlatformSpecificHandles();
 }

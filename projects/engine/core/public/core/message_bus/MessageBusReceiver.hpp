@@ -84,7 +84,7 @@ public:
 	/// @param message_packet
 	/// Message packet to process.
 	template<typename MessageBusPacketType>
-	void ProcessMessages( const MessageBusPacketType & message_packet )
+	void ProcessMessages( const MessageBusPacketType& message_packet )
 	{
 		using MessageTypeList = typename MessageBusPacketType::MessageTypeList;
 		static_assert(
@@ -150,7 +150,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename HandlerType>
-	HandlerStorage		CreateHandlerStorageFromHandler( HandlerType && handler )
+	auto CreateHandlerStorageFromHandler( HandlerType && handler ) -> HandlerStorage
 	{
 		using HandlerMessageType = HandlerType::MessageType;
 		HandlerStorage storage;

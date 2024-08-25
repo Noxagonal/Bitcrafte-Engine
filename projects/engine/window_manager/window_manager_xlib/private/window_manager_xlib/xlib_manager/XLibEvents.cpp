@@ -10,9 +10,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::xlib::SetInputFocus(
-	const XLibWindow	&	window
-)
+void bc::window_manager::xlib::SetInputFocus( const XLibWindow& window )
 {
 	auto handles = window.GetXLibPlatformHandles();
 	XSetInputFocus(
@@ -25,8 +23,8 @@ void bc::window_manager::xlib::SetInputFocus(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::window_manager::xlib::ReplyToPing(
-	const XEvent		&	event,
-	const XLibWindow	&	window
+	const XEvent&		event,
+	const XLibWindow&	window
 )
 {
 	auto handles = window.GetXLibPlatformHandles();
@@ -43,9 +41,7 @@ void bc::window_manager::xlib::ReplyToPing(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::ModifierKeyFlags bc::window_manager::xlib::GetModifierKeyFlags(
-	uint32_t	state
-)
+auto bc::window_manager::xlib::GetModifierKeyFlags( uint32_t state ) -> ModifierKeyFlags
 {
 	auto modifier_key_flags = bc::window_manager::ModifierKeyFlags {};
 	if( state & ShiftMask ) modifier_key_flags |= bc::window_manager::ModifierKeyFlags::SHIFT;
@@ -58,9 +54,7 @@ bc::window_manager::ModifierKeyFlags bc::window_manager::xlib::GetModifierKeyFla
 	return modifier_key_flags;
 }
 
-bc::window_manager::MouseButton bc::window_manager::xlib::GetMouseButton(
-	uint32_t	button
-)
+auto bc::window_manager::xlib::GetMouseButton( uint32_t button ) -> MouseButton
 {
 	switch (button)
 	{
@@ -74,9 +68,7 @@ bc::window_manager::MouseButton bc::window_manager::xlib::GetMouseButton(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::KeyboardButton bc::window_manager::xlib::GetKeyboardButton(
-	KeySym		keysym
-)
+auto bc::window_manager::xlib::GetKeyboardButton( KeySym keysym ) -> KeyboardButton
 {
 	switch( keysym )
 	{

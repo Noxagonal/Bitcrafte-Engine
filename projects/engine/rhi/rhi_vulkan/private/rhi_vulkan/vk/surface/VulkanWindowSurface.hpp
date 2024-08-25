@@ -24,54 +24,46 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct Capabilities
 	{
-		VkSurfaceCapabilitiesKHR						vk_capabilities							= {};
-		VkImageUsageFlags								vk_shared_present_supported_usage_flags	= {};
-		VkBool32										physical_device_surface_support			= {};
+		VkSurfaceCapabilitiesKHR	vk_capabilities							= {};
+		VkImageUsageFlags			vk_shared_present_supported_usage_flags	= {};
+		VkBool32					physical_device_surface_support			= {};
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VulkanWindowSurface(
-		RHIVulkanImpl								&	rhi_vulkan_impl,
-		window_manager::Window						*	window
+		RHIVulkanImpl&				rhi_vulkan_impl,
+		window_manager::Window*		window
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanWindowSurface(
-		const VulkanWindowSurface					&	other
-	) = delete;
+	VulkanWindowSurface( const VulkanWindowSurface& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanWindowSurface(
-		VulkanWindowSurface							&&	other
-	) = delete;
+	VulkanWindowSurface( VulkanWindowSurface&& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~VulkanWindowSurface();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanWindowSurface								&	operator=(
-		const VulkanWindowSurface						&	other
-	) = delete;
+	auto operator=( const VulkanWindowSurface& other ) -> VulkanWindowSurface& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanWindowSurface								&	operator=(
-		VulkanWindowSurface							&&	other
-	) = delete;
+	auto operator=( VulkanWindowSurface&& other ) -> VulkanWindowSurface& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const Capabilities						&	GetCapabilities() const { return capabilities; };
+	inline auto GetCapabilities() const -> const Capabilities& { return capabilities; };
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const List<VkSurfaceFormatKHR>			&	GetSurfaceFormatList() const { return surface_format_list; };
+	inline auto GetSurfaceFormatList() const -> const List<VkSurfaceFormatKHR>& { return surface_format_list; };
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline VkSurfaceFormatKHR							GetPreferredSurfaceFormat() const { return preferred_surface_format; };
+	inline auto GetPreferredSurfaceFormat() const -> VkSurfaceFormatKHR { return preferred_surface_format; };
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline VkBool32										GetPhysicalDeviceSurfaceSupport() const { return physical_device_surface_support; };
+	inline auto GetPhysicalDeviceSurfaceSupport() const -> VkBool32 { return physical_device_surface_support; };
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline VkBool32										GetSupportForColorOutput() const { return supports_color_output; };
+	inline auto GetSupportForColorOutput() const -> VkBool32 { return supports_color_output; };
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline operator VkSurfaceKHR() { return vk_surface; }
@@ -79,15 +71,15 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkSurfaceKHR										vk_surface						= VK_NULL_HANDLE;
-	RHIVulkanImpl									&	rhi_vulkan_impl;
-	window_manager::Window							*	window							= nullptr;
+	VkSurfaceKHR				vk_surface						= VK_NULL_HANDLE;
+	RHIVulkanImpl&				rhi_vulkan_impl;
+	window_manager::Window*		window							= nullptr;
 
-	Capabilities										capabilities					= {};
-	List<VkSurfaceFormatKHR>							surface_format_list;
-	VkSurfaceFormatKHR									preferred_surface_format		= {};
-	VkBool32											physical_device_surface_support	= {};
-	VkBool32											supports_color_output			= {};
+	Capabilities				capabilities					= {};
+	List<VkSurfaceFormatKHR>	surface_format_list;
+	VkSurfaceFormatKHR			preferred_surface_format		= {};
+	VkBool32					physical_device_surface_support	= {};
+	VkBool32					supports_color_output			= {};
 };
 
 

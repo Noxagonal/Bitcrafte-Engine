@@ -31,10 +31,11 @@ namespace bc {
 ///
 /// @return
 /// A new unique pointer with its contained value constructed.
-template<typename ValueType, typename ...ConstructorArgumentTypePack>
-UniquePtr<ValueType>									MakeUniquePtr(
-	ConstructorArgumentTypePack						&&	...constructor_arguments
-)
+template<
+	typename ValueType,
+	typename ...ConstructorArgumentTypePack
+>
+auto MakeUniquePtr( ConstructorArgumentTypePack&& ...constructor_arguments ) -> UniquePtr<ValueType>
 {
 	auto result = UniquePtr<ValueType> {};
 	result.Emplace( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );

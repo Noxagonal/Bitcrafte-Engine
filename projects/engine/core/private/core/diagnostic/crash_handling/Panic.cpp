@@ -7,7 +7,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::internal_::PanicInternal [[noreturn]] (
-	const char32_t					*	message_ptr,
+	const char32_t*						message_ptr,
 	u64									message_length,
 	bc::diagnostic::SourceLocation		source_location
 )
@@ -18,7 +18,7 @@ void bc::diagnostic::internal_::PanicInternal [[noreturn]] (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::Panic [[noreturn]] (
-	const PrintRecord	&	message,
+	const PrintRecord&		message,
 	SourceLocation			source_location
 )
 {

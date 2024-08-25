@@ -25,10 +25,11 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline constexpr Version(
-		u32						major,
-		u32						minor,
-		u32						patch
-	) noexcept :
+		u32	major,
+		u32	minor,
+		u32	patch
+	) noexcept
+	:
 		major( major ),
 		minor( minor ),
 		patch( patch )
@@ -44,7 +45,7 @@ public:
 	/// @return
 	/// Packed version info where the 3 highest bits are the variant number, next 7 highest bits are major, next 10 bits are minor,
 	/// and the last 12 bits are the patch number.
-	inline constexpr u32			ToVulkanPacked() const noexcept
+	inline constexpr auto ToVulkanPacked() const noexcept -> u32
 	{
 		return ( ( ( (u32)( major ) & 0x7FU ) << 22U ) ) | ( ( (u32)( minor ) & 0x3FFU ) << 12U ) | ( (u32)( patch ) & 0xFFFU );
 	}
@@ -56,9 +57,7 @@ public:
 	/// @param packed
 	/// Packed version info where the 3 highest bits are the variant number, next 7 highest bits are major, next 10 bits are minor,
 	/// and the last 12 bits are the patch number.
-	inline constexpr void				FromVulkanPacked(
-		u32						packed
-	) noexcept
+	inline constexpr void FromVulkanPacked( u32 packed ) noexcept
 	{
 		major = ( ( (u32)( packed ) >> 22U ) & 0x7FU );
 		minor = ( ( (u32)( packed ) >> 12U ) & 0x3FFU );
@@ -66,9 +65,9 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u32					major				= {};
-	u32					minor				= {};
-	u32					patch				= {};
+	u32	major = {};
+	u32	minor = {};
+	u32	patch = {};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

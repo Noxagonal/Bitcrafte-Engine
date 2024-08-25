@@ -9,8 +9,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanSemaphore::VulkanSemaphore(
-	RHIVulkanImpl		&	rhi_vulkan_impl,
-	bool					crate_timeline_semaphore
+	RHIVulkanImpl&	rhi_vulkan_impl,
+	bool			crate_timeline_semaphore
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
@@ -39,11 +39,9 @@ bc::rhi::VulkanSemaphore::~VulkanSemaphore()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::VulkanSemaphore & bc::rhi::VulkanSemaphore::operator=(
-	VulkanSemaphore && other
-) noexcept
+auto bc::rhi::VulkanSemaphore::operator=( VulkanSemaphore&& other ) noexcept -> VulkanSemaphore&
 {
-	MoveOther( std::move( other ) );
+	Move( other );
 	return *this;
 }
 
@@ -60,9 +58,7 @@ void bc::rhi::VulkanSemaphore::Clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::VulkanSemaphore::MoveOther(
-	VulkanSemaphore && other
-)
+void bc::rhi::VulkanSemaphore::Move( VulkanSemaphore& other )
 {
 	std::swap( vk_semaphore, other.vk_semaphore );
 }

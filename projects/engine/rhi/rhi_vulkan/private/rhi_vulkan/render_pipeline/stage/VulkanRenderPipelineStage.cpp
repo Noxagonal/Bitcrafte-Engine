@@ -6,9 +6,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanRenderPipelineStage::VulkanRenderPipelineStage(
-	RHIVulkanImpl											&	rhi_vulkan_impl,
-	const RenderPipelineStageCreateInfo						&	create_info
-) :
+	RHIVulkanImpl&							rhi_vulkan_impl,
+	const RenderPipelineStageCreateInfo&	create_info
+)
+	:
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 }

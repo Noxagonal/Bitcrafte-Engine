@@ -11,9 +11,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::XLibWindow::XLibWindow(
-	XLibManager				&	xlib_manager,
-	const WindowCreateInfo	&	window_create_info
-) :
+	XLibManager&				xlib_manager,
+	const WindowCreateInfo&		window_create_info
+)
+:
 	::bc::window_manager::Window( window_create_info ),
 	xlib_manager( xlib_manager ),
 	platform_handles( *xlib_manager.GetPlatformSpecificHandles() )
@@ -94,31 +95,27 @@ void bc::window_manager::XLibWindow::CleanupHandles()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::XLibWindow::GetDecorated()
+auto bc::window_manager::XLibWindow::GetDecorated() const -> bool
 {
 	// TODO
 	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XLibWindow::SetDecorated(
-	bool is_decorated
-)
+void bc::window_manager::XLibWindow::SetDecorated( bool is_decorated )
 {
 	// TODO:
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::XLibWindow::GetResizeable()
+auto bc::window_manager::XLibWindow::GetResizeable() const -> bool
 {
 	// TODO
 	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XLibWindow::SetResizeable(
-	bool is_decorated
-)
+void bc::window_manager::XLibWindow::SetResizeable( bool is_resizeable )
 {
 	// TODO
 }
@@ -130,13 +127,13 @@ void bc::window_manager::XLibWindow::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::XLibWindow::GetPlatformSpecificHandles() const
+auto bc::window_manager::XLibWindow::GetPlatformSpecificHandles() const -> const WindowManagerPlatformHandlesBase*
 {
 	return GetXLibPlatformHandles();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerXLibPlatformHandles * bc::window_manager::XLibWindow::GetXLibPlatformHandles() const
+auto bc::window_manager::XLibWindow::GetXLibPlatformHandles() const -> const WindowManagerXLibPlatformHandles*
 {
 	return &platform_handles;
 }

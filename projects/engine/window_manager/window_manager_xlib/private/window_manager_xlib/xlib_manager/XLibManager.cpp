@@ -18,8 +18,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::XLibManager::XLibManager(
-	WindowManagerXLibComponent				&	window_manager_xlib_component,
-	const WindowManagerComponentCreateInfo	&	window_manager_component_create_info
+	WindowManagerXLibComponent&					window_manager_xlib_component,
+	const WindowManagerComponentCreateInfo&		window_manager_component_create_info
 ) :
 	window_manager_xlib_component( window_manager_xlib_component )
 {
@@ -114,9 +114,7 @@ void bc::window_manager::XLibManager::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::Window> bc::window_manager::XLibManager::CreateWindow(
-	const WindowCreateInfo  & window_create_info
-)
+auto bc::window_manager::XLibManager::CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>
 {
 	auto new_window = MakeUniquePtr<XLibWindow>( *this, window_create_info );
 	active_window_list.PushBack( new_window.Get() );
@@ -126,9 +124,7 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::XLibManager::Creat
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XLibManager::NotifyWindowBeingDestroyed(
-	bc::window_manager::XLibWindow * window_ptr
-)
+void bc::window_manager::XLibManager::NotifyWindowBeingDestroyed( bc::window_manager::XLibWindow* window_ptr )
 {
 	XFlush( platform_handles.display );
 
@@ -148,9 +144,7 @@ void bc::window_manager::XLibManager::ProcessMessages()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::XLibManager::ProcessEvent(
-	XEvent & event
-)
+void bc::window_manager::XLibManager::ProcessEvent( XEvent& event )
 {
 	std::cout << "Event type: " << event.type << std::endl;
 
@@ -500,7 +494,7 @@ void bc::window_manager::XLibManager::ProcessEvent(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::Optional<bc::Text32> bc::window_manager::XLibManager::PopulateX11Atoms()
+auto bc::window_manager::XLibManager::PopulateX11Atoms() -> bc::Optional<bc::Text32>
 {
 	platform_handles.window_user_pointer_atom = XInternAtom( platform_handles.display, "_BITCRAFTE_XLIB_WINDOW_POINTER", false );
 	if( platform_handles.window_user_pointer_atom == None ) return { "Failed to get _BITCRAFTE_XLIB_WINDOW_POINTER atom" };

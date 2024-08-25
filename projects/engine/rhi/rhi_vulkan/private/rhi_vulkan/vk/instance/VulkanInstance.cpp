@@ -75,9 +75,8 @@ VkBool32 VKAPI_PTR VulkanDebugUtilsMessengerCallback(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::VulkanInstance::VulkanInstance(
-	RHIVulkanImpl & rhi_vulkan_impl
-) :
+bc::rhi::VulkanInstance::VulkanInstance( RHIVulkanImpl& rhi_vulkan_impl )
+:
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 	enabled_extension_names.PushBack( VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME );
@@ -219,7 +218,7 @@ bc::rhi::VulkanInstance::~VulkanInstance()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::List<bc::rhi::VulkanPhysicalDevice> bc::rhi::VulkanInstance::FetchPhysicalDevices() const
+auto bc::rhi::VulkanInstance::FetchPhysicalDevices() const -> List<VulkanPhysicalDevice>
 {
 	auto physical_device_count = u32 {};
 	BAssertVkResult( vkEnumeratePhysicalDevices( vk_instance, &physical_device_count, nullptr ) );

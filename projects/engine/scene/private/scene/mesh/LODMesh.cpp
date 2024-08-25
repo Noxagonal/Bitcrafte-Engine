@@ -5,9 +5,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::scene::LODMesh::LODMesh(
-	u32 lod_level_count
-)
+bc::scene::LODMesh::LODMesh( u32 lod_level_count )
 {
 	lod_list.Resize( lod_level_count );
 }
@@ -17,9 +15,7 @@ bc::scene::LODMesh::~LODMesh()
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::scene::LODMesh::LODLevel & bc::scene::LODMesh::GetLODLevel(
-	u32 lod_level
-)
+auto bc::scene::LODMesh::GetLODLevel( u32 lod_level ) -> LODLevel&
 {
 	return lod_list[ lod_level ];
 }

@@ -26,30 +26,26 @@ public:
 	struct LODLevel
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		Mesh												mesh;
+		Mesh			mesh;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// @brief
 		/// Viewport coverage, once we fall under this coverage, we switch to the next lod level.
-		f32													viewport_coverage				= 0.0f;
+		f32				viewport_coverage	= 0.0f;
 
 		// TODO: LODLevel extra information that could be implemented in the future. Below are a few examples.
-		//BlendMode											blend_mode						= BlendMode::NONE;		// Blending mode to the next level.
-		//MaterialInfo										material_info					= {};					// Material override info for this level.
+		//BlendMode		blend_mode			= BlendMode::NONE;		// Blending mode to the next level.
+		//MaterialInfo	material_info		= {};					// Material override info for this level.
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	LODMesh(
-		u32													lod_level_count
-	);
+	LODMesh( u32 lod_level_count );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~LODMesh();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	LODLevel											&	GetLODLevel(
-		u32													lod_level
-	);
+	auto GetLODLevel( u32 lod_level ) -> LODLevel&;
 
 private:
 
@@ -58,10 +54,10 @@ private:
 	/// LOD level list.
 	///
 	/// Index 0 is the highest quality LOD level.
-	List<LODLevel>											lod_list;
+	List<LODLevel>	lod_list;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	math::AABB3f64											aabb							= {};
+	math::AABB3f64	aabb = {};
 };
 
 

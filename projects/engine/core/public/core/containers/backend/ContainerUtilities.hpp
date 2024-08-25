@@ -56,10 +56,10 @@ template<
 	::bc::utility::ContainerView	SecondContainerType
 >
 [[nodiscard]]
-constexpr bool											CheckContainerContentsMatch(
-	const FirstContainerType						&	first_container,
-	const SecondContainerType						&	second_container
-) noexcept
+constexpr auto CheckContainerContentsMatch(
+	const FirstContainerType&		first_container,
+	const SecondContainerType&		second_container
+) noexcept -> bool
 {
 	using FirstValueType	= typename FirstContainerType::ContainedValueType;
 	using SecondValueType	= typename SecondContainerType::ContainedValueType;
@@ -116,10 +116,10 @@ template<
 	::bc::utility::ContainerView	SecondContainerType
 >
 [[nodiscard]]
-constexpr bool											CheckContainerContentsDiffer(
-	const FirstContainerType						&	first_container,
-	const SecondContainerType						&	second_container
-) noexcept
+constexpr auto CheckContainerContentsDiffer(
+	const FirstContainerType&		first_container,
+	const SecondContainerType&		second_container
+) noexcept -> bool
 {
 	using FirstValueType	= typename FirstContainerType::ContainedValueType;
 	using SecondValueType	= typename SecondContainerType::ContainedValueType;
@@ -172,11 +172,11 @@ constexpr bool											CheckContainerContentsDiffer(
 /// Pointer to value position where value was found.
 template<typename ValueType, bool IsConst>
 [[nodiscard]]
-constexpr std::conditional_t<IsConst, const ValueType, ValueType>								*	DoLinearSearch(
-	std::conditional_t<IsConst, const ValueType, ValueType>										*	data,
-	i64																								range,
-	const ValueType																				&	value
-) BC_CONTAINER_NOEXCEPT
+constexpr auto DoLinearSearch(
+	std::conditional_t<IsConst, const ValueType, ValueType>*	data,
+	i64															range,
+	const ValueType&											value
+) BC_CONTAINER_NOEXCEPT -> std::conditional_t<IsConst, const ValueType, ValueType>*
 {
 	auto it = data;
 	auto it_end = data + range;
@@ -217,11 +217,11 @@ constexpr std::conditional_t<IsConst, const ValueType, ValueType>								*	DoLin
 /// Pointer to value position where value was found.
 template<typename ValueType, bool IsConst, typename LambdaType>
 [[nodiscard]]
-constexpr std::conditional_t<IsConst, const ValueType, ValueType>								*	DoLinearSearchIf(
-	std::conditional_t<IsConst, const ValueType, ValueType>										*	data,
-	i64																								range,
-	LambdaType																					&&	lambda
-) BC_CONTAINER_NOEXCEPT
+constexpr auto DoLinearSearchIf(
+	std::conditional_t<IsConst, const ValueType, ValueType>*	data,
+	i64															range,
+	LambdaType&&												lambda
+) BC_CONTAINER_NOEXCEPT -> std::conditional_t<IsConst, const ValueType, ValueType>*
 {
 	auto it = data;
 	auto it_end = data + range;

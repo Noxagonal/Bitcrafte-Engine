@@ -15,15 +15,11 @@ namespace diagnostic {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-bc::internal_::SimpleTextView32			LogReportSeverityToText(
-	LogReportSeverity					e
-);
+auto LogReportSeverityToText( LogReportSeverity e ) -> bc::internal_::SimpleTextView32;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-PrintRecordTheme						LogReportSeverityToPrintRecordTheme(
-	LogReportSeverity					e
-);
+auto LogReportSeverityToPrintRecordTheme( LogReportSeverity e ) -> PrintRecordTheme;
 
 
 

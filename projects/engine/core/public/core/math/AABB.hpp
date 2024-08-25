@@ -30,24 +30,29 @@ namespace math {
 ///
 /// @tparam ValueType
 /// Value type of this bounding box.
-template<u64 AABBDimensionCount, utility::FundamentalValue ValueType>
+template<
+	u64							AABBDimensionCount,
+	utility::FundamentalValue	ValueType
+>
 class AABBBase
 {
 	static_assert( AABBDimensionCount >= 2 && AABBDimensionCount <= 4, "Invalid number of dimensions" );
 
 public:
 
+	using VectorType = VectorBase<AABBDimensionCount, ValueType>;
+
 	static constexpr u64 DimensionCount = AABBDimensionCount;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// First corner of the AABB, should contain lower values.
-	VectorBase<DimensionCount, ValueType>									begin			= {};
+	/// First corner of the AABB, contains low values.
+	VectorType		begin			= {};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Second corner of the AABB, should contain higher values.
-	VectorBase<DimensionCount, ValueType>									end				= {};
+	/// Second corner of the AABB, contains high values.
+	VectorType		end				= {};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr AABBBase() noexcept = default;
@@ -58,9 +63,8 @@ public:
 	///
 	/// @param initial_value
 	/// Initial value everything is initialized to.
-	constexpr AABBBase(
-		ValueType															initial_value
-	) noexcept :
+	constexpr AABBBase( ValueType initial_value ) noexcept
+	:
 		begin( initial_value ),
 		end( initial_value )
 	{}
@@ -75,19 +79,18 @@ public:
 	/// @param end
 	/// The corner containing higher values.
 	constexpr AABBBase(
-		VectorBase<DimensionCount, ValueType>								begin,
-		VectorBase<DimensionCount, ValueType>								end
-	) noexcept :
+		VectorType	begin,
+		VectorType	end
+	) noexcept
+	:
 		begin( begin ),
 		end( end )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr AABBBase													&	operator=(
-		const AABBBase													&	other
-	) noexcept
+	constexpr auto operator=( const AABBBase& other ) noexcept -> AABBBase&
 	{
-		CopyOther( other );
+		Copy( other );
 		return *this;
 	}
 
@@ -103,9 +106,7 @@ public:
 	///
 	/// @return
 	/// True if AABBs match or in case of floating point value types, matches closely. False otherwise.
-	constexpr bool															operator==(
-		const AABBBase													&	other
-	) const
+	constexpr auto operator==( const AABBBase& other ) const -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -130,9 +131,7 @@ public:
 	/// @return
 	/// True if AABBs do not match or in case of floating point value types, differ more than rounding error threshold. False if
 	/// AABBs match, or match closely enough to be within rounding errors.
-	constexpr bool															operator!=(
-		const AABBBase													&	other
-	) const
+	constexpr auto operator!=( const AABBBase& other ) const -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -153,9 +152,7 @@ public:
 	///
 	/// @return
 	/// Reference to the vector which contains the coordinates to AABB corner.
-	constexpr const VectorBase<DimensionCount, ValueType>				&	operator[](
-		u64																	index
-	) const
+	constexpr auto operator[]( u64 index ) const -> const VectorType&
 	{
 		if( std::is_constant_evaluated() )
 		{
@@ -183,9 +180,7 @@ public:
 	///
 	/// @return
 	/// Reference to the vector which contains the coordinates to AABB corner.
-	constexpr VectorBase<DimensionCount, ValueType>						&	operator[](
-		u64																	index
-	)
+	constexpr auto operator[]( u64 index ) -> VectorType&
 	{
 		if( std::is_constant_evaluated() )
 		{
@@ -210,7 +205,7 @@ public:
 	///
 	/// @return
 	/// Area, Volume, or Hypervolume of the AABB.
-	constexpr ValueType														GetVolume() const noexcept
+	constexpr auto GetVolume() const noexcept -> ValueType
 	{
 		if constexpr( DimensionCount == 2 )
 		{
@@ -239,9 +234,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void															CopyOther(
-		const AABBBase													&	other
-	) noexcept
+	constexpr void Copy( const AABBBase& other ) noexcept
 	{
 		begin = other.begin;
 		end = other.end;

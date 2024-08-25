@@ -26,10 +26,8 @@ namespace conversion {
 /// Memory backed text container type similar to input type. Eg. If input type is bc::Text32, then return type is also
 /// bc::Text32, if input type is bc::TextView32 or bc::EditableTextView32, then return type is still also bc::Text32.
 /// Other text container types work in similar manner.
-template<utility::TextContainerView				TextContainerType>
-auto											ToUTF8(
-	const TextContainerType					&	text
-)
+template<utility::TextContainerView TextContainerType>
+auto ToUTF8(const TextContainerType& text )
 {
 	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<char8_t>;
 	using OutTextCharacterType = typename TextContainerType::ContainedCharacterType;
@@ -99,10 +97,8 @@ auto											ToUTF8(
 /// Memory backed text container type similar to input type. Eg. If input type is bc::Text32, then return type is also
 /// bc::Text32, if input type is bc::TextView32 or bc::EditableTextView32, then return type is still also bc::Text32.
 /// Other text container types work in similar manner.
-template<utility::TextContainerView				TextContainerType>
-auto											ToUTF16(
-	const TextContainerType					&	text
-)
+template<utility::TextContainerView TextContainerType>
+auto ToUTF16( const TextContainerType& text )
 {
 	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<char16_t>;
 	using OutTextCharacterType = typename TextContainerType::ContainedCharacterType;
@@ -160,10 +156,8 @@ auto											ToUTF16(
 /// Memory backed text container type similar to input type. Eg. If input type is bc::Text32, then return type is also
 /// bc::Text32, if input type is bc::TextView32 or bc::EditableTextView32, then return type is still also bc::Text32.
 /// Other text container types work in similar manner.
-template<utility::TextContainerView				TextContainerType>
-auto											ToUTF32(
-	const TextContainerType					&	text
-)
+template<utility::TextContainerView TextContainerType>
+auto ToUTF32( const TextContainerType& text )
 {
 	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<char32_t>;
 	using OutTextCharacterType = typename TextContainerType::ContainedCharacterType;

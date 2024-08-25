@@ -27,24 +27,24 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	WindowContext(
-		RHIVulkanImpl										&	rhi_vulkan_impl,
-		window_manager::Window								*	window,
-		const WindowContextCreateInfo						&	create_info
+		RHIVulkanImpl&					rhi_vulkan_impl,
+		window_manager::Window*			window,
+		const WindowContextCreateInfo&	create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~WindowContext();
 
-	inline window_manager::Window							*	GetWindow() { return window; }
+	inline auto GetWindow() -> window_manager::Window* { return window; }
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIVulkanImpl											&	rhi_vulkan_impl;
-	window_manager::Window									*	window;
+	RHIVulkanImpl&					rhi_vulkan_impl;
+	window_manager::Window*			window;
 
-	UniquePtr<VulkanWindowSurface>								window_surface;
-	UniquePtr<VulkanSwapchain>									swapchain;
+	UniquePtr<VulkanWindowSurface>	window_surface;
+	UniquePtr<VulkanSwapchain>		swapchain;
 };
 
 

@@ -13,11 +13,12 @@
 
 
 bc::rhi::VulkanSwapchain::VulkanSwapchain(
-	RHIVulkanImpl						&	rhi_vulkan_impl,
-	VulkanWindowSurface					&	window_surface,
-	const VulkanSwapchainCreateInfo		&	swapchain_create_info,
-	VulkanSwapchain						*	old_swapchain
-) :
+	RHIVulkanImpl&						rhi_vulkan_impl,
+	VulkanWindowSurface&				window_surface,
+	const VulkanSwapchainCreateInfo&	swapchain_create_info,
+	VulkanSwapchain*					old_swapchain
+)
+:
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 	// Get new surface capabilities as window extent might have changed

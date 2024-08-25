@@ -13,9 +13,9 @@ namespace text {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView				OutTextContainerType,
-	typename								FirstType,
-	typename								SecondType
+	utility::TextContainerView	OutTextContainerType,
+	typename					FirstType,
+	typename					SecondType
 >
 class TextFormatter<OutTextContainerType, Pair<FirstType, SecondType>>
 {

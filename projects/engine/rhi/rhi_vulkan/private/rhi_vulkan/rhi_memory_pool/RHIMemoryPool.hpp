@@ -23,19 +23,19 @@ struct RHIMemoryPoolChunk
 	// Block is a single virtual allocation from the Chunk. Aka, assignment from a single pool.
 	struct Block
 	{
-		u64												id									= std::numeric_limits<u64>::max();
-		VkDeviceSize									offset								= 0;
-		VkDeviceSize									size								= 0;
-		VkDeviceSize									alignment							= 1;
+		u64				id			= std::numeric_limits<u64>::max();
+		VkDeviceSize	offset		= 0;
+		VkDeviceSize	size		= 0;
+		VkDeviceSize	alignment	= 1;
 	};
 
-	u64													id									= std::numeric_limits<u64>::max();
-	VkDeviceMemory										memory								= VK_NULL_HANDLE;
-	VkDeviceSize										size								= 0;
-	List<RHIMemoryPoolChunk::Block>						blocks;
-	VkResult											result								= VK_RESULT_MAX_ENUM;
+	u64								id					= std::numeric_limits<u64>::max();
+	VkDeviceMemory					memory				= VK_NULL_HANDLE;
+	VkDeviceSize					size				= 0;
+	List<RHIMemoryPoolChunk::Block>	blocks;
+	VkResult						result				= VK_RESULT_MAX_ENUM;
 
-	u64													block_id_counter					= 0;
+	u64								block_id_counter	= 0;
 };
 
 
@@ -43,9 +43,9 @@ struct RHIMemoryPoolChunk
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct RHIPoolMemoryRequirements
 {
-	VkMemoryRequirements								memory_requirements						= {};
-	bool												prefers_dedicated_allocation			= {};
-	bool												requires_dedicated_allocation			= {};
+	VkMemoryRequirements	memory_requirements				= {};
+	bool					prefers_dedicated_allocation	= {};
+	bool					requires_dedicated_allocation	= {};
 };
 
 
@@ -64,8 +64,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIMemoryPool(
-		RHIVulkanImpl								&	rhi_vulkan_impl,
-		const RHIMemoryPoolCreateInfo				&	create_info
+		RHIVulkanImpl&					rhi_vulkan_impl,
+		const RHIMemoryPoolCreateInfo&	create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,10 +88,10 @@ public:
 	/// 
 	/// @return
 	/// Handle to pool memory.
-	RHIPoolMemoryHandle									AllocateBufferMemory(
-		VkBuffer										buffer,
-		VkMemoryPropertyFlagBits						property_flags
-	);
+	auto AllocateBufferMemory(
+		VkBuffer					buffer,
+		VkMemoryPropertyFlagBits	property_flags
+	) -> RHIPoolMemoryHandle;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -108,87 +108,79 @@ public:
 	/// 
 	/// @return
 	/// Handle to pool memory.
-	RHIPoolMemoryHandle									AllocateImageMemory(
-		VkImage											image,
-		VkImageTiling									image_tiling_info,
-		VkMemoryPropertyFlagBits						property_flags
-	);
+	auto AllocateImageMemory(
+		VkImage						image,
+		VkImageTiling				image_tiling_info,
+		VkMemoryPropertyFlagBits	property_flags
+	) -> RHIPoolMemoryHandle;
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIPoolMemoryHandle									AllocateMemory(
-		bool											is_linear,
-		internal_::RHIPoolMemoryRequirements		&	memory_requirements,
-		VkMemoryPropertyFlagBits						property_flags
+	auto AllocateMemory(
+		bool									is_linear,
+		internal_::RHIPoolMemoryRequirements&	memory_requirements,
+		VkMemoryPropertyFlagBits				property_flags
+	) -> RHIPoolMemoryHandle;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void FreePoolMemory( RHIPoolMemoryHandle& memory );
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	auto AllocateBlock(
+		internal_::RHIMemoryPoolChunk&			chunk,
+		internal_::RHIPoolMemoryRequirements&	memory_requirements
+	) -> internal_::RHIMemoryPoolChunk::Block*;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	auto AllocateChunk(
+		List<internal_::RHIMemoryPoolChunk>*	chunk_group,
+		VkDeviceSize							size,
+		u32										memory_type_index
+	) -> Pair<VkResult, internal_::RHIMemoryPoolChunk*>;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void FreeBlock(
+		u32		memory_type_index,
+		bool	is_linear,
+		u64		chunk_id,
+		u64		block_id
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void												FreePoolMemory(
-		RHIPoolMemoryHandle							&	memory
+	void FreeChunk(
+		List<internal_::RHIMemoryPoolChunk>&	chunk_group,
+		internal_::RHIMemoryPoolChunk&			chunk
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	internal_::RHIMemoryPoolChunk::Block			*	AllocateBlock(
-		internal_::RHIMemoryPoolChunk				&	chunk,
-		internal_::RHIPoolMemoryRequirements		&	memory_requirements
-	);
+	void FreeChunkMemory( internal_::RHIMemoryPoolChunk& chunk );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Pair<VkResult, internal_::RHIMemoryPoolChunk*>		AllocateChunk(
-		List<internal_::RHIMemoryPoolChunk>			*	chunk_group,
-		VkDeviceSize									size,
-		u32												memory_type_index
-	);
+	auto GetBufferMemoryRequirements( VkBuffer buffer ) -> internal_::RHIPoolMemoryRequirements;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void												FreeBlock(
-		u32												memory_type_index,
-		bool											is_linear,
-		u64												chunk_id,
-		u64												block_id
-	);
+	auto GetImageMemoryRequirements( VkImage image ) -> internal_::RHIPoolMemoryRequirements;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void												FreeChunk(
-		List<internal_::RHIMemoryPoolChunk>			&	chunk_group,
-		internal_::RHIMemoryPoolChunk				&	chunk
-	);
+	auto FindMemoryTypeIndex(
+		internal_::RHIPoolMemoryRequirements&	memory_requirements,
+		VkMemoryPropertyFlags					property_flags
+	) -> u32;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void												FreeChunkMemory(
-		internal_::RHIMemoryPoolChunk				&	chunk
-	);
+	RHIVulkanImpl&								rhi_vulkan_impl;
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	internal_::RHIPoolMemoryRequirements				GetBufferMemoryRequirements(
-		VkBuffer										buffer
-	);
+	VkPhysicalDeviceMemoryProperties			physical_device_memory_properties	= {};
+	VkPhysicalDeviceProperties					physical_device_properties			= {};
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	internal_::RHIPoolMemoryRequirements				GetImageMemoryRequirements(
-		VkImage											image
-	);
+	u64											chunk_id_counter					= {};
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u32													FindMemoryTypeIndex(
-		internal_::RHIPoolMemoryRequirements		&	memory_requirements,
-		VkMemoryPropertyFlags							property_flags
-	);
+	VkDeviceSize								linear_chunk_size					= {};
+	VkDeviceSize								non_linear_chunk_size				= {};
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIVulkanImpl									&	rhi_vulkan_impl;
-
-	VkPhysicalDeviceMemoryProperties					physical_device_memory_properties			= {};
-	VkPhysicalDeviceProperties							physical_device_properties					= {};
-
-	u64													chunk_id_counter							= {};
-
-	VkDeviceSize										linear_chunk_size							= {};
-	VkDeviceSize										non_linear_chunk_size						= {};
-
-	List<List<internal_::RHIMemoryPoolChunk>>			linear_chunks;								// buffers and linear images
-	List<List<internal_::RHIMemoryPoolChunk>>			non_linear_chunks;							// optimal images
+	List<List<internal_::RHIMemoryPoolChunk>>	linear_chunks;						// buffers and linear images
+	List<List<internal_::RHIMemoryPoolChunk>>	non_linear_chunks;					// optimal images
 
 };
 

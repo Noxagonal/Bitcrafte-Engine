@@ -73,19 +73,16 @@ public:
 	constexpr BC_CONTAINER_NAME( UniquePtr )( ) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )( std::nullptr_t ) noexcept :
+	constexpr BC_CONTAINER_NAME( UniquePtr )( std::nullptr_t ) noexcept
+		:
 		data_ptr( nullptr )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )(
-		const BC_CONTAINER_NAME( UniquePtr )														&	other
-	) noexcept = delete;
+	constexpr BC_CONTAINER_NAME( UniquePtr )( const ThisType& other ) noexcept = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )(
-		BC_CONTAINER_NAME( UniquePtr )																&&	other
-	) noexcept
+	constexpr BC_CONTAINER_NAME( UniquePtr )( ThisType&& other ) noexcept
 	{
 		this->Swap( other );
 	}
@@ -105,9 +102,8 @@ public:
 	/// @return
 	/// Reference to this.
 	template<typename OtherValueType>
-	constexpr BC_CONTAINER_NAME( UniquePtr )(
-		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
-	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
+	constexpr BC_CONTAINER_NAME( UniquePtr )( ThisContainerType<OtherValueType>&& other ) noexcept
+		requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
 	{
 		this->data_ptr = other.data_ptr;
 		other.data_ptr = nullptr;
@@ -120,23 +116,17 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		const BC_CONTAINER_NAME( UniquePtr )														&	other
-	) noexcept = delete;
+	constexpr auto operator=( const ThisType& other ) noexcept -> ThisType& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		std::nullptr_t
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator=( std::nullptr_t ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		this->Clear();
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		BC_CONTAINER_NAME( UniquePtr )																&&	other
-	) noexcept
+	constexpr auto operator=( ThisType&& other ) noexcept -> ThisType&
 	{
 		if( this == std::addressof( other ) ) return *this;
 
@@ -159,9 +149,8 @@ public:
 	/// @return
 	/// Reference to this.
 	template<typename OtherValueType>
-	constexpr BC_CONTAINER_NAME( UniquePtr )														&	operator=(
-		BC_CONTAINER_NAME( UniquePtr )<OtherValueType>												&&	other
-	) noexcept requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
+	constexpr auto operator=( ThisContainerType<OtherValueType>&& other ) noexcept -> ThisType&
+		requires( std::is_base_of_v<ValueType, OtherValueType> && !std::is_same_v<OtherValueType, ValueType> )
 	{
 		this->Clear();
 
@@ -171,26 +160,26 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	operator->() noexcept
+	constexpr auto operator->() const noexcept -> const ValueType*
 	{
 		return this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	operator->() const noexcept
+	constexpr auto operator->() noexcept -> ValueType*
 	{
 		return this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	operator*() noexcept
+	constexpr auto operator*() noexcept -> ValueType&
 	{
 		BC_ContainerAssert( this->Get(), U"Container is empty" );
 		return *this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	operator*() const noexcept
+	constexpr auto operator*() const noexcept -> const ValueType&
 	{
 		BC_ContainerAssert( this->Get(), U"Container is empty" );
 		return *this->Get();
@@ -210,9 +199,7 @@ public:
 	/// @param ...constructor_arguments
 	/// Arguments passed to the contained value constructor.
 	template<typename ...ConstructorArgumentTypePack>
-	constexpr void																						Emplace(
-		ConstructorArgumentTypePack																	&&	...constructor_arguments
-	)
+	constexpr void Emplace( ConstructorArgumentTypePack&& ...constructor_arguments )
 	{
 		if( this->data_ptr ) this->TryDestructHeapElement( this->data_ptr );
 		if( this->data_ptr == nullptr ) this->AllocateContainedMemory();
@@ -220,13 +207,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	Get() noexcept
+	constexpr auto Get() const noexcept -> const ValueType*
 	{
 		return this->data_ptr;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	Get() const noexcept
+	constexpr auto Get() noexcept -> ValueType*
 	{
 		return this->data_ptr;
 	}
@@ -255,7 +242,7 @@ public:
 	/// @return
 	/// New unique pointer which is taking ownership of this UniquePtr.
 	template<typename CastToValueType>
-	constexpr BC_CONTAINER_NAME( UniquePtr )<CastToValueType>											CastTo()
+	constexpr auto CastTo() -> ThisContainerType<CastToValueType>
 	{
 		static_assert(
 			std::is_base_of_v<ValueType, CastToValueType> || std::is_base_of_v<CastToValueType, ValueType>,
@@ -281,7 +268,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void																						Clear() BC_CONTAINER_NOEXCEPT
+	constexpr void Clear() BC_CONTAINER_NOEXCEPT
 	{
 		if( this->data_ptr == nullptr ) return;
 		this->TryDestructHeapElement( this->data_ptr );
@@ -289,7 +276,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool																						IsEmpty() const noexcept
+	constexpr auto IsEmpty() const noexcept -> bool
 	{
 		return !Get();
 	}
@@ -297,14 +284,14 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void																						AllocateContainedMemory() noexcept
+	constexpr void AllocateContainedMemory() noexcept
 	{
 		assert( this->data_ptr == nullptr && "This function should not be called on an occupied container" );
 		this->data_ptr = memory::AllocateMemory<ValueType>( 1, alignof( ValueType ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void																						FreeContainedMemory() noexcept
+	constexpr void FreeContainedMemory() noexcept
 	{
 		assert( this->data_ptr && "This function should not be called on an empty container" );
 		memory::FreeMemory( this->data_ptr, 1 );
@@ -312,15 +299,13 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																								Swap(
-		BC_CONTAINER_NAME( UniquePtr )																&	other
-	) noexcept
+	constexpr void Swap( ThisType& other ) noexcept
 	{
 		std::swap( this->data_ptr, other.data_ptr );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ValueType																						*	data_ptr			= nullptr;
+	ValueType*	data_ptr	= nullptr;
 };
 
 

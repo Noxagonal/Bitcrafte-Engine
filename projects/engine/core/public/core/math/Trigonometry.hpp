@@ -14,28 +14,19 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
-constexpr ValueType				Sin(
-	ValueType					value
-)
+constexpr auto Sin( utility::FloatingPointValue auto value )
 {
 	return std::sin( value );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
-constexpr ValueType				Cos(
-	ValueType					value
-)
+constexpr auto Cos( utility::FloatingPointValue auto value )
 {
 	return std::cos( value );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
-constexpr ValueType				Tan(
-	ValueType					value
-)
+constexpr auto Tan( utility::FloatingPointValue auto value )
 {
 	return std::tan( value );
 }

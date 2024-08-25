@@ -8,8 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::Win32Window::Win32Window(
-	Win32Manager			&	win32_manager,
-	const WindowCreateInfo	&	window_create_info
+	Win32Manager&				win32_manager,
+	const WindowCreateInfo&		window_create_info
 ) :
 	Window( window_create_info ),
 	win32_manager( win32_manager )
@@ -17,7 +17,6 @@ bc::window_manager::Win32Window::Win32Window(
 	platform_handles.hWnd		= NULL;
 	platform_handles.hInstance	= win32_manager.GetWindowClass().hInstance;
 
-	settings = MakeSettingsFromCreateInfo( window_create_info );
 	style = MakeWindowStyleFromSettings( settings );
 
 	// Create a window
@@ -52,15 +51,13 @@ bc::window_manager::Win32Window::~Win32Window()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::Win32Window::GetDecorated()
+auto bc::window_manager::Win32Window::GetDecorated() const -> bool
 {
 	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::Win32Window::SetDecorated(
-	bool is_decorated
-)
+void bc::window_manager::Win32Window::SetDecorated( bool is_decorated )
 {
 	if( is_decorated )
 	{
@@ -74,16 +71,14 @@ void bc::window_manager::Win32Window::SetDecorated(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::Win32Window::GetResizeable()
+auto bc::window_manager::Win32Window::GetResizeable() const -> bool
 {
 	// TODO
 	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::Win32Window::SetResizeable(
-	bool is_decorated
-)
+void bc::window_manager::Win32Window::SetResizeable( bool is_resizeable )
 {
 	// TODO
 }
@@ -95,34 +90,13 @@ void bc::window_manager::Win32Window::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::Win32Window::GetPlatformSpecificHandles() const
+auto bc::window_manager::Win32Window::GetPlatformSpecificHandles() const -> const WindowManagerPlatformHandlesBase*
 {
 	return &platform_handles;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::Win32Window::Settings bc::window_manager::Win32Window::MakeSettingsFromCreateInfo(
-	const WindowCreateInfo & window_create_info
-) const
-{
-	static_assert( sizeof( WindowCreateInfo ) == 24, "If this is not true, this function needs to be updated" );
-
-	Settings settings;
-	settings.is_decorated					= window_create_info.decorated;
-	settings.is_visible						= window_create_info.initially_visible;
-	settings.show_minimize_button			= window_create_info.has_minimize_button;
-	settings.show_maximize_button			= window_create_info.has_maximize_button;
-	settings.is_minimized					= window_create_info.initially_minimized;
-	settings.is_maximized					= window_create_info.initially_maximized;
-	settings.allow_drag_resize				= window_create_info.allow_drag_resize;
-	settings.allow_file_drop				= window_create_info.allow_file_drop;
-	return settings;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DWORD bc::window_manager::Win32Window::MakeWindowStyleFromSettings(
-	const Settings & from_settings
-) const
+auto bc::window_manager::Win32Window::MakeWindowStyleFromSettings( const Settings& from_settings ) const -> DWORD
 {
 	static_assert( sizeof( Settings ) == 8, "If this is not true, this function needs to be updated" );
 

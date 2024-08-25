@@ -13,7 +13,7 @@ namespace engine {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct EngineComponentStartInfo
 {
-	rhi::RHIComponentStartInfo									rhi_start_info				= {};
+	rhi::RHIComponentStartInfo			rhi_start_info		= {};
 };
 
 

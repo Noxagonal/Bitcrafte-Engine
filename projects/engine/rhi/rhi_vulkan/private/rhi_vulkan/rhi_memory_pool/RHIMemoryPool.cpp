@@ -10,10 +10,10 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-VkDeviceSize CalculateAlignmentForBuffer(
-	VkDeviceSize							unaligned_size,
-	const VkPhysicalDeviceLimits		&	physical_device_limits
-)
+auto CalculateAlignmentForBuffer(
+	VkDeviceSize					unaligned_size,
+	const VkPhysicalDeviceLimits&	physical_device_limits
+) -> VkDeviceSize
 {
 	VkDeviceSize buffer_alignment = std::max(
 		physical_device_limits.minUniformBufferOffsetAlignment,
@@ -31,8 +31,8 @@ VkDeviceSize CalculateAlignmentForBuffer(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIMemoryPool::RHIMemoryPool(
-	RHIVulkanImpl						&	rhi_vulkan_impl,
-	const RHIMemoryPoolCreateInfo		&	create_info
+	RHIVulkanImpl&					rhi_vulkan_impl,
+	const RHIMemoryPoolCreateInfo&	create_info
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
@@ -68,12 +68,12 @@ bc::rhi::RHIMemoryPool::~RHIMemoryPool()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateBufferMemory(
-	VkBuffer						buffer,
-	VkMemoryPropertyFlagBits		property_flags
-)
+auto bc::rhi::RHIMemoryPool::AllocateBufferMemory(
+	VkBuffer					buffer,
+	VkMemoryPropertyFlagBits	property_flags
+) -> RHIPoolMemoryHandle
 {
-	auto memory_requirements		= GetBufferMemoryRequirements( buffer );
+	auto memory_requirements = GetBufferMemoryRequirements( buffer );
 
 	return AllocateMemory(
 		true,
@@ -83,13 +83,13 @@ bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateBufferMemory(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateImageMemory(
-	VkImage							image,
-	VkImageTiling					image_tiling_info,
-	VkMemoryPropertyFlagBits		property_flags
-)
+auto bc::rhi::RHIMemoryPool::AllocateImageMemory(
+	VkImage						image,
+	VkImageTiling				image_tiling_info,
+	VkMemoryPropertyFlagBits	property_flags
+) -> RHIPoolMemoryHandle
 {
-	auto memory_requirements		= GetImageMemoryRequirements( image );
+	auto memory_requirements = GetImageMemoryRequirements( image );
 
 	return AllocateMemory(
 		image_tiling_info == VK_IMAGE_TILING_LINEAR,
@@ -99,11 +99,11 @@ bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateImageMemory(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateMemory(
-	bool										is_linear,
-	internal_::RHIPoolMemoryRequirements	&	memory_requirements,
-	VkMemoryPropertyFlagBits					property_flags
-)
+auto bc::rhi::RHIMemoryPool::AllocateMemory(
+	bool									is_linear,
+	internal_::RHIPoolMemoryRequirements&	memory_requirements,
+	VkMemoryPropertyFlagBits				property_flags
+) -> RHIPoolMemoryHandle
 {
 	// TODO: add tests and error reports
 	auto memory_type_index = FindMemoryTypeIndex( memory_requirements, property_flags );
@@ -171,9 +171,7 @@ bc::rhi::RHIPoolMemoryHandle bc::rhi::RHIMemoryPool::AllocateMemory(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::RHIMemoryPool::FreePoolMemory(
-	RHIPoolMemoryHandle & memory
-)
+void bc::rhi::RHIMemoryPool::FreePoolMemory( RHIPoolMemoryHandle & memory )
 {
 	if( memory.is_allocated )
 	{
@@ -183,13 +181,13 @@ void bc::rhi::RHIMemoryPool::FreePoolMemory(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::internal_::RHIMemoryPoolChunk::Block * bc::rhi::RHIMemoryPool::AllocateBlock(
-	internal_::RHIMemoryPoolChunk			&	chunk,
-	internal_::RHIPoolMemoryRequirements	&	memory_requirements
-)
+auto bc::rhi::RHIMemoryPool::AllocateBlock(
+	internal_::RHIMemoryPoolChunk&			chunk,
+	internal_::RHIPoolMemoryRequirements&	memory_requirements
+) -> internal_::RHIMemoryPoolChunk::Block*
 {
-	auto alignment				= memory_requirements.memory_requirements.alignment;
-	auto size					= memory_requirements.memory_requirements.size;
+	auto alignment	= memory_requirements.memory_requirements.alignment;
+	auto size		= memory_requirements.memory_requirements.size;
 
 	auto InsertChunkBlock = [ &chunk ](
 		List<internal_::RHIMemoryPoolChunk::Block>::Iterator	where,
@@ -247,11 +245,11 @@ bc::rhi::internal_::RHIMemoryPoolChunk::Block * bc::rhi::RHIMemoryPool::Allocate
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::Pair<VkResult, bc::rhi::internal_::RHIMemoryPoolChunk*> bc::rhi::RHIMemoryPool::AllocateChunk(
-	bc::List<bc::rhi::internal_::RHIMemoryPoolChunk>	*	chunk_group,
-	VkDeviceSize											size,
-	u32														memory_type_index
-)
+auto bc::rhi::RHIMemoryPool::AllocateChunk(
+	List<internal_::RHIMemoryPoolChunk>*	chunk_group,
+	VkDeviceSize							size,
+	u32										memory_type_index
+) -> Pair<VkResult, internal_::RHIMemoryPoolChunk*>
 {
 	assert( chunk_group );
 
@@ -334,8 +332,8 @@ void bc::rhi::RHIMemoryPool::FreeBlock(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::RHIMemoryPool::FreeChunk(
-	List<internal_::RHIMemoryPoolChunk>	&	chunk_group,
-	internal_::RHIMemoryPoolChunk		&	chunk
+	List<internal_::RHIMemoryPoolChunk>&	chunk_group,
+	internal_::RHIMemoryPoolChunk&			chunk
 )
 {
 	FreeChunkMemory( chunk );
@@ -346,17 +344,13 @@ void bc::rhi::RHIMemoryPool::FreeChunk(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::RHIMemoryPool::FreeChunkMemory(
-	internal_::RHIMemoryPoolChunk	&	chunk
-)
+void bc::rhi::RHIMemoryPool::FreeChunkMemory( internal_::RHIMemoryPoolChunk& chunk )
 {
 	vkFreeMemory( rhi_vulkan_impl.GetVulkanDevice(), chunk.memory, rhi_vulkan_impl.GetMainThreadAllocationCallbacks() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::internal_::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetBufferMemoryRequirements(
-	VkBuffer buffer
-)
+auto bc::rhi::RHIMemoryPool::GetBufferMemoryRequirements( VkBuffer buffer ) -> internal_::RHIPoolMemoryRequirements
 {
 	auto dedicated_buffer_memory_requirements = VkBufferMemoryRequirementsInfo2 {};
 	dedicated_buffer_memory_requirements.sType	= VK_STRUCTURE_TYPE_BUFFER_MEMORY_REQUIREMENTS_INFO_2;
@@ -385,9 +379,7 @@ bc::rhi::internal_::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetBufferM
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::internal_::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetImageMemoryRequirements(
-	VkImage image
-)
+auto bc::rhi::RHIMemoryPool::GetImageMemoryRequirements( VkImage image ) -> internal_::RHIPoolMemoryRequirements
 {
 	auto dedicated_image_memory_requirements = VkImageMemoryRequirementsInfo2 {};
 	dedicated_image_memory_requirements.sType	= VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2;
@@ -416,10 +408,10 @@ bc::rhi::internal_::RHIPoolMemoryRequirements bc::rhi::RHIMemoryPool::GetImageMe
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::u32 bc::rhi::RHIMemoryPool::FindMemoryTypeIndex(
-	internal_::RHIPoolMemoryRequirements		&	memory_requirements,
-	VkMemoryPropertyFlags						propertyFlags
-)
+auto bc::rhi::RHIMemoryPool::FindMemoryTypeIndex(
+	internal_::RHIPoolMemoryRequirements&	memory_requirements,
+	VkMemoryPropertyFlags					propertyFlags
+) -> u32
 {
 	for( u32 i=0; i < physical_device_memory_properties.memoryTypeCount; ++i )
 	{

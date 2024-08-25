@@ -24,8 +24,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VulkanBuffer(
-		RHIVulkanImpl						&	rhi_vulkan_impl,
-		const VulkanBufferCreateInfo		&	create_info
+		RHIVulkanImpl&					rhi_vulkan_impl,
+		const VulkanBufferCreateInfo&	create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,18 +37,18 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkBuffer									vk_buffer								= VK_NULL_HANDLE;
-	VkBufferView								vk_image_view							= VK_NULL_HANDLE;
+	VkBuffer				vk_buffer				= VK_NULL_HANDLE;
+	VkBufferView			vk_image_view			= VK_NULL_HANDLE;
 
-	RHIPoolMemoryHandle							buffer_memory_handle;
+	RHIPoolMemoryHandle		buffer_memory_handle;
 
-	RHIVulkanImpl							&	rhi_vulkan_impl;
+	RHIVulkanImpl&			rhi_vulkan_impl;
 
-	VkDeviceSize								size									= {};
-	VkFormat									format									= {};
+	VkDeviceSize			size					= {};
+	VkFormat				format					= {};
 
-	bool										is_sparse								= {};
-	bool										is_host_visible							= {};
+	bool					is_sparse				= {};
+	bool					is_host_visible			= {};
 };
 
 

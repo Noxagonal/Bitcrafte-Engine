@@ -7,64 +7,49 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::Logger::Logger(
-	const LoggerCreateInfo & logger_create_info
-) :
+bc::diagnostic::Logger::Logger( const LoggerCreateInfo & logger_create_info )
+	:
 	create_info( logger_create_info )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::LogVerbose(
-	const PrintRecord	&	message
-)
+void bc::diagnostic::Logger::LogVerbose( const PrintRecord& message )
 {
 	Log( LogReportSeverity::VERBOSE, message );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::LogInfo(
-	const PrintRecord	&	message
-)
+void bc::diagnostic::Logger::LogInfo( const PrintRecord& message )
 {
 	Log( LogReportSeverity::INFO, message );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::LogPerformanceWarning(
-	const PrintRecord	&	message
-)
+void bc::diagnostic::Logger::LogPerformanceWarning( const PrintRecord& message )
 {
 	Log( LogReportSeverity::PERFORMANCE_WARNING, message );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::LogWarning(
-	const PrintRecord	&	message
-)
+void bc::diagnostic::Logger::LogWarning( const PrintRecord& message )
 {
 	Log( LogReportSeverity::WARNING, message );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::LogError(
-	const PrintRecord	&	message
-)
+void bc::diagnostic::Logger::LogError( const PrintRecord& message )
 {
 	Log( LogReportSeverity::ERROR, message );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::LogCriticalError(
-	const PrintRecord	&	message
-)
+void bc::diagnostic::Logger::LogCriticalError( const PrintRecord& message )
 {
 	Log( LogReportSeverity::CRITICAL_ERROR, message );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::LogDebug(
-	const PrintRecord	&	message
-)
+void bc::diagnostic::Logger::LogDebug( const PrintRecord& message )
 {
 	Log( LogReportSeverity::DEBUG, message );
 }
@@ -120,15 +105,13 @@ void bc::diagnostic::Logger::Log(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::diagnostic::Logger::LogEntryList & bc::diagnostic::Logger::GetLogHistory()
+auto bc::diagnostic::Logger::GetLogHistory() -> const bc::diagnostic::Logger::LogEntryList&
 {
 	return log_history;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::Logger::PushLogEntry(
-	const LogEntry		&	log_entry
-)
+void bc::diagnostic::Logger::PushLogEntry( const LogEntry& log_entry )
 {
 #if !BITCRAFTE_GAME_DEVELOPMENT_BUILD
 	if( log_entry.severity == LogReportSeverity::DEBUG ) return;

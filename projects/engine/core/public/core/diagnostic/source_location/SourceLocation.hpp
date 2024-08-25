@@ -19,32 +19,24 @@ public:
 	inline constexpr SourceLocation() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr SourceLocation(
-		const SourceLocation							&	other
-	) noexcept = default;
+	inline constexpr SourceLocation( const SourceLocation& other ) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr SourceLocation(
-		SourceLocation									&&	other
-	) noexcept = default;
+	inline constexpr SourceLocation( SourceLocation&& other ) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr SourceLocation						&	operator=(
-		const SourceLocation							&	other
-	) noexcept = default;
+	inline constexpr auto operator=( const SourceLocation& other ) noexcept -> SourceLocation& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr SourceLocation						&	operator=(
-		SourceLocation									&&	other
-	) noexcept = default;
+	inline constexpr auto operator=( SourceLocation&& other ) noexcept -> SourceLocation& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static inline constexpr SourceLocation					Current(
-		u64													line			= __builtin_LINE(),
-		u64													column			= __builtin_COLUMN(),
-		const char										*	file			= __builtin_FILE(),
-		const char										*	function		= __builtin_FUNCTION()
-	) noexcept
+	static inline constexpr auto Current(
+		i64				line		= i64( __builtin_LINE() ),
+		i64				column		= i64( __builtin_COLUMN() ),
+		const char*		file		= __builtin_FILE(),
+		const char*		function	= __builtin_FUNCTION()
+	) noexcept -> SourceLocation
 	{
 		SourceLocation source_location;
 		source_location.line		= line;
@@ -55,25 +47,25 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr u64 									GetLine() const noexcept
+	inline constexpr auto GetLine() const noexcept -> i64
 	{
 		return line;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr u64	 								GetColumn() const noexcept
+	inline constexpr auto GetColumn() const noexcept -> i64
 	{
 		return column;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr const char							*	GetFile() const noexcept
+	inline constexpr auto GetFile() const noexcept -> const char*
 	{
 		return file;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline constexpr const char							*	GetFunction() const noexcept
+	inline constexpr auto GetFunction() const noexcept -> const char*
 	{
 		return function;
 	}
@@ -81,8 +73,8 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u64														line			= {};
-	u64														column			= {};
+	i64														line			= {};
+	i64														column			= {};
 	const char											*	file			= {};
 	const char											*	function		= {};
 };

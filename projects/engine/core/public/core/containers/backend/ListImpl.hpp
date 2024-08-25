@@ -32,8 +32,7 @@ class BC_CONTAINER_NAME( List );
 /// @tparam ValueType
 ///	Type of individual value.
 template<BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst>
-class BC_CONTAINER_NAME( ListViewBase ) :
-	public container_bases::BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsConst>
+class BC_CONTAINER_NAME( ListViewBase ) : public container_bases::BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, IsConst>
 {
 public:
 
@@ -45,6 +44,9 @@ public:
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerType					= BC_CONTAINER_NAME( ListViewBase )<OtherValueType, IsOtherConst>;
 	using ThisType							= ThisContainerType<ValueType, IsDataConst>;
+
+	template<bool IsOtherConst>
+	using ThisTypeOtherConst				= ThisContainerType<ValueType, IsOtherConst>;
 
 	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( ListViewBase )<OtherValueType, IsOtherConst>;
@@ -85,9 +87,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( ListViewBase )(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) noexcept requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
+	constexpr BC_CONTAINER_NAME( ListViewBase )( ThisTypeOtherConst<IsOtherConst> other ) noexcept
+		requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
 		:
 		Base(
 			other.Data(),
@@ -97,8 +98,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
-		const ValueType																				*	from_data,
-		i64																								size
+		const ValueType*	from_data,
+		i64					size
 	) noexcept requires( IsDataConst == true )
 		:
 		Base(
@@ -109,8 +110,8 @@ public:
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( ListViewBase )(
-		ValueType																					*	from_data,
-		i64																								size
+		ValueType*	from_data,
+		i64			size
 	) noexcept requires( IsDataConst == false )
 		:
 		Base(
@@ -121,9 +122,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( ListViewBase )														&	operator=(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) noexcept requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
+	constexpr auto operator=( ThisTypeOtherConst<IsOtherConst> other ) noexcept -> ThisType&
+		requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
 	{
 		this->data_ptr = other.Data();
 		this->data_size = other.Size();
@@ -140,9 +140,7 @@ public:
 	/// @return
 	/// true if every value of this list matches the other, false otherwise.
 	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) const noexcept
+	constexpr auto operator==( ThisTypeOtherConst<IsOtherConst> other ) const noexcept -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
@@ -159,9 +157,7 @@ public:
 	/// @return
 	/// true if any value differs from the other list, false if contents match.
 	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) const noexcept
+	constexpr auto operator!=( ThisTypeOtherConst<IsOtherConst> other ) const noexcept -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
@@ -178,9 +174,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr ConstIterator																				Find(
-		const ValueType																				&	value
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearch<ValueType, true>( this->data_ptr, this->data_size, value ) );
 	}
@@ -195,9 +189,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr IteratorBase<IsConst>																		Find(
-		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) BC_CONTAINER_NOEXCEPT -> IteratorBase<IsConst>
 	{
 		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearch<ValueType, IsConst>( this->data_ptr, this->data_size, value ) );
 	}
@@ -216,9 +208,7 @@ public:
 	/// Iterator to value position where value was found.
 	template<typename LambdaType>
 	[[nodiscard]]
-	constexpr ConstIterator																				FindIf(
-		LambdaType																					&&	lambda
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( LambdaType&& lambda ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearchIf<ValueType, true>( this->data_ptr, this->data_size, lambda ) );
 	}
@@ -237,9 +227,7 @@ public:
 	/// Iterator to value position where value was found.
 	template<typename LambdaType>
 	[[nodiscard]]
-	constexpr IteratorBase<IsConst>																		FindIf(
-		LambdaType																					&&	lambda
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( LambdaType&& lambda ) BC_CONTAINER_NOEXCEPT -> IteratorBase<IsConst>
 	{
 		return IteratorBase<IsConst>( this, container_bases::internal_::DoLinearSearchIf<ValueType, IsConst>( this->data_ptr, this->data_size, lambda ) );
 	}
@@ -251,7 +239,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	constexpr auto begin() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
 	}
@@ -263,7 +251,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				begin() const noexcept
+	constexpr auto begin() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ 0 ] };
 	}
@@ -275,7 +263,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cbegin() const noexcept
+	constexpr auto cbegin() const noexcept -> ConstIterator
 	{
 		return this->begin();
 	}
@@ -287,7 +275,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	constexpr auto end() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -299,7 +287,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				end() const noexcept
+	constexpr auto end() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -311,7 +299,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cend() const noexcept
+	constexpr auto cend() const noexcept -> ConstIterator
 	{
 		return this->end();
 	}
@@ -332,8 +320,7 @@ private:
 /// @tparam ValueType
 /// Type of the contained element.
 template<BC_CONTAINER_VALUE_TYPENAME ValueType>
-class BC_CONTAINER_NAME( List ) :
-	public container_bases::BC_CONTAINER_NAME( LinearContainerBase )<ValueType>
+class BC_CONTAINER_NAME( List ) : public container_bases::BC_CONTAINER_NAME( LinearContainerBase )<ValueType>
 {
 public:
 
@@ -384,61 +371,51 @@ public:
 	constexpr BC_CONTAINER_NAME( List )() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( List )(
-		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr BC_CONTAINER_NAME( List )( const ThisType& other ) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( List )(
-		BC_CONTAINER_NAME( List )																	&&	other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr BC_CONTAINER_NAME( List )( ThisType&& other ) BC_CONTAINER_NOEXCEPT
 	{
 		this->Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( List )(
-		std::initializer_list<ValueType>																init_list
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr BC_CONTAINER_NAME( List )( std::initializer_list<ValueType> init_list ) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( init_list );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( List )(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr BC_CONTAINER_NAME( List )( ThisViewType<IsOtherConst> other ) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Append( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr explicit BC_CONTAINER_NAME( List )(
-		i64																								initial_size
-	) BC_CONTAINER_NOEXCEPT
+	constexpr explicit BC_CONTAINER_NAME( List )( i64 initial_size ) BC_CONTAINER_NOEXCEPT
 	{
 		this->Resize( initial_size );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( List )																&	operator=(
-		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr auto operator=( const ThisType& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		if( std::addressof( other ) == this ) return *this;
 
-		BC_CONTAINER_NAME( List ) { other }.Swap( *this );
+		ThisType { other }.Swap( *this );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( List )																&	operator=(
-		BC_CONTAINER_NAME( List )																	&&	other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator=( ThisType&& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		if( std::addressof( other ) == this ) return *this;
 
@@ -448,9 +425,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( List )																&	operator=(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr auto operator=( ThisViewType<IsOtherConst> other ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		if( other.Data() >= this->Data() && other.Data() < this->Data() + this->Size() )
 		{
@@ -466,9 +442,8 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( List )																&	operator=(
-		std::initializer_list<ValueType>																init_list
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr auto operator=( std::initializer_list<ValueType> init_list ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		this->Clear();
 		this->Append( init_list );
@@ -484,9 +459,8 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
-		const BC_CONTAINER_NAME( List )																&	other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr auto operator+=( const ThisType& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + other.Size();
 		this->Append( other, 1, reserve_space );
@@ -503,9 +477,8 @@ public:
 	/// @return
 	/// Reference to this.
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr auto operator+=( ThisViewType<IsOtherConst> other ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + other.Size();
 		this->Append( other, 1, reserve_space );
@@ -521,9 +494,8 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	constexpr BC_CONTAINER_NAME( List )																&	operator+=(
-		const std::initializer_list<ValueType>														&	init_list
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr auto operator+=( std::initializer_list<ValueType> init_list ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		auto reserve_space = this->data_size + init_list.size();
 		this->Append( init_list, 1, reserve_space );
@@ -540,9 +512,7 @@ public:
 	/// @return
 	/// true if every value of this list matches the other, false otherwise.
 	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator==( ThisViewType<IsOtherConst> other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
@@ -559,9 +529,7 @@ public:
 	/// @return
 	/// true if any value differs from the other list, false if contents match.
 	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( ListViewBase )<ValueType, IsOtherConst>										other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator!=( ThisViewType<IsOtherConst> other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
@@ -577,9 +545,7 @@ public:
 	/// 
 	/// @return
 	/// true if every value of this list matches the other, false otherwise.
-	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( List )																&	other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator==( const ThisType& other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( std::addressof( other ) == this ) return true;
 
@@ -595,9 +561,7 @@ public:
 	/// 
 	/// @return
 	/// true if any value differs from the other list, false if contents match.
-	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( List )																&	other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator!=( const ThisType& other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( std::addressof( other ) == this ) return false;
 
@@ -615,9 +579,7 @@ public:
 	/// 
 	/// @return
 	/// Iterator to the next value which replaced the erased value or end if not found.
-	constexpr Iterator																					Erase(
-		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Erase( const ValueType& value ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		return Iterator {
 			this,
@@ -637,9 +599,7 @@ public:
 	/// @return
 	/// Iterator to the next value which replaced the erased value, if erased last value then returned iterator points to
 	/// the end.
-	constexpr Iterator																					Erase(
-		ConstIterator																					at
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Erase( ConstIterator at ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		BC_ContainerAssert( at.GetContainer() == this,
 			U"Cannot erase using iterator that doesn't point to the container we're erasing from"
@@ -665,10 +625,10 @@ public:
 	/// 
 	/// @return
 	/// Iterator to the the first value which was not erased.
-	constexpr Iterator																					Erase(
-		ConstIterator																					from,
-		ConstIterator																					to
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Erase(
+		ConstIterator	from,
+		ConstIterator	to
+	) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		BC_ContainerAssert( from.GetContainer() == this,
 			U"Cannot erase using 'from' iterator that doesn't point to the container we're erasing from"
@@ -694,9 +654,7 @@ public:
 	/// @param invocable
 	///	Invocable object, typically a lambda, which is called per element. If the invocable returns true, that element is erased.
 	template<utility::InvocableWithReturn<bool, const ValueType&> InvocableType>
-	constexpr void																						EraseIf(
-		InvocableType																					invocable
-	) BC_CONTAINER_NOEXCEPT
+	constexpr void EraseIf( InvocableType&& invocable ) BC_CONTAINER_NOEXCEPT
 	{
 		auto it = begin();
 		while( it != end() )
@@ -724,9 +682,7 @@ public:
 	/// @param invocable
 	///	Invocable object, typically a lambda, which is called per element. If the invocable returns true, that element is erased.
 	template<utility::InvocableWithReturn<bool, const ValueType&> InvocableType>
-	constexpr void																						EraseFirstIf(
-		InvocableType																					invocable
-	) BC_CONTAINER_NOEXCEPT
+	constexpr void EraseFirstIf( InvocableType&& invocable ) BC_CONTAINER_NOEXCEPT
 	{
 		auto it = begin();
 		while( it != end() )
@@ -762,12 +718,13 @@ public:
 	/// @return
 	/// Iterator to the next value after inserted value, which is the original value that was occupying the spot that we inserted
 	/// into.
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const ValueType																				&	value,
-		i64																								count			= 1,
-		i64																								headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr auto Insert( 
+		ConstIterator		at,
+		const ValueType&	value,
+		i64					count			= 1,
+		i64					headroom		= 0
+	) BC_CONTAINER_NOEXCEPT -> Iterator
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
@@ -805,12 +762,13 @@ public:
 	/// Iterator to the next value after inserted value, which is the original value that was occupying the spot that we inserted
 	/// into.
 	template<utility::ContainerView OtherContainerType>
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const OtherContainerType																	&	other,
-		i64																								count			= 1,
-		i64																								headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	constexpr auto Insert(
+		ConstIterator				at,
+		const OtherContainerType&	other,
+		i64							count			= 1,
+		i64							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT -> Iterator
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert( at.GetContainer(), U"Iterator points to nothing" );
 		BC_ContainerAssert( at.GetContainer() == this, U"Iterator points to a wrong container" );
@@ -835,9 +793,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr ConstIterator																				Find(
-		const ValueType																				&	value
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		auto result = ThisViewType<true>( *this ).Find( value );
 		return ConstIterator { this, result.GetAddress() };
@@ -853,9 +809,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr Iterator																					Find(
-		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		auto result = ThisViewType<false>( *this ).Find( value );
 		return Iterator { this, result.GetAddress() };
@@ -863,45 +817,43 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Find the first occurance of a specific value in this container if lambda returns true.
+	/// Find the first occurrence of a specific value in this container if lambda returns true.
 	///
-	/// @tparam LambdaType
-	/// Type of the lambda which is used to search.
+	/// @tparam InvokableType
+	/// Type of the invokable which is used to search.
 	///
-	/// @param lambda
-	///	Lambda function that is invoked to test if we found what we're looking for.
+	/// @param invokable
+	///	Invokable object or function that is called to test if we found what we're looking for. If the invokable returns true, then
+	/// we found what we're looking for.
 	/// 
 	/// @return
 	/// Iterator to value position where value was found.
-	template<typename LambdaType>
+	template<typename InvokableType>
 	[[nodiscard]]
-	constexpr ConstIterator																				FindIf(
-		LambdaType																					&&	lambda
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( InvokableType&& invokable ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
-		auto result = ThisViewType<true>( *this ).FindIf( lambda );
+		auto result = ThisViewType<true>( *this ).FindIf( invokable );
 		return ConstIterator { this, result.GetAddress() };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Find the first occurance of a specific value in this container if lambda returns true.
+	/// Find the first occurrence of a specific value in this container if lambda returns true.
 	///
-	/// @tparam LambdaType
-	/// Type of the lambda which is used to search.
+	/// @tparam InvokableType
+	/// Type of the invokable which is used to search.
 	///
-	/// @param lambda
-	///	Lambda function that is invoked to test if we found what we're looking for.
+	/// @param invokable
+	///	Invokable object or function that is called to test if we found what we're looking for. If the invokable returns true, then
+	/// we found what we're looking for.
 	/// 
 	/// @return
 	/// Iterator to value position where value was found.
-	template<typename LambdaType>
+	template<typename InvokableType>
 	[[nodiscard]]
-	constexpr Iterator																					FindIf(
-		LambdaType																					&&	lambda
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( InvokableType&& invokable ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
-		auto result = ThisViewType<false>( *this ).FindIf( lambda );
+		auto result = ThisViewType<false>( *this ).FindIf( invokable );
 		return Iterator { this, result.GetAddress() };
 	}
 
@@ -912,7 +864,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	constexpr auto begin() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
 	}
@@ -924,7 +876,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				begin() const noexcept
+	constexpr auto begin() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ 0 ] };
 	}
@@ -936,7 +888,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cbegin() const noexcept
+	constexpr auto cbegin() const noexcept -> ConstIterator
 	{
 		return this->begin();
 	}
@@ -948,7 +900,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	constexpr auto end() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -960,7 +912,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				end() const noexcept
+	constexpr auto end() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -972,21 +924,21 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cend() const noexcept
+	constexpr auto cend() const noexcept -> ConstIterator
 	{
 		return this->end();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr operator BC_CONTAINER_NAME( ListViewBase )<ValueType, true>() const BC_CONTAINER_NOEXCEPT
+	constexpr operator ThisViewType<true>() const BC_CONTAINER_NOEXCEPT
 	{
-		return BC_CONTAINER_NAME( ListViewBase )<ValueType, true> { this->data_ptr, this->data_size };
+		return ThisViewType<true> { this->data_ptr, this->data_size };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr operator BC_CONTAINER_NAME( ListViewBase )<ValueType, false>() BC_CONTAINER_NOEXCEPT
+	constexpr operator ThisViewType<false>() BC_CONTAINER_NOEXCEPT
 	{
-		return BC_CONTAINER_NAME( ListViewBase )<ValueType, false> { this->data_ptr, this->data_size };
+		return ThisViewType<false> { this->data_ptr, this->data_size };
 	}
 };
 

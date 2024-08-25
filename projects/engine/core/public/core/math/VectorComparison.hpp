@@ -17,9 +17,6 @@ namespace math {
 /// @brief
 /// Checks if 2 vectors are within range of each other component vise.
 ///
-/// @tparam ValueType
-/// Value type.
-///
 /// @param v1
 /// First vector.
 ///
@@ -29,15 +26,22 @@ namespace math {
 /// @param range
 /// Maximum distance between values for them to still be considered within range.
 template<
-	u64																VectorLength,
-	utility::FundamentalValue										VectorValueType
+	u64							VectorLength,
+	utility::FundamentalValue	VectorValueType,
+	utility::FundamentalValue	RangeValueType
 >
-constexpr bool														AreValuesWithinRange(
-	const math::VectorBase<VectorLength, VectorValueType>		&	v1,
-	const math::VectorBase<VectorLength, VectorValueType>		&	v2,
-	VectorValueType													range
-) requires( VectorLength >= 2 && VectorLength <= 4 )
+constexpr auto AreValuesWithinRange(
+	const math::VectorBase<VectorLength, VectorValueType>&	v1,
+	const math::VectorBase<VectorLength, VectorValueType>&	v2,
+	RangeValueType											range
+) -> bool
+	requires( VectorLength >= 2 && VectorLength <= 4 )
 {
+	static_assert(
+		std::same_as<VectorValueType, RangeValueType>,
+		"Range value type must be the same as the vector value type, you must explicitly ensure that the types are the same"
+	);
+
 	if constexpr( VectorLength == 2 )
 	{
 		return
@@ -79,13 +83,13 @@ constexpr bool														AreValuesWithinRange(
 /// @param v2
 /// Value to test against v1 if it is close enough to it.
 template<
-	u64																VectorLength,
-	utility::FundamentalValue										VectorValueType
+	u64							VectorLength,
+	utility::FundamentalValue	VectorValueType
 >
-constexpr bool														IsFloatEqual(
-	const math::VectorBase<VectorLength, VectorValueType>		&	v1,
-	const math::VectorBase<VectorLength, VectorValueType>		&	v2
-) noexcept
+constexpr auto IsFloatEqual(
+	const math::VectorBase<VectorLength, VectorValueType>&	v1,
+	const math::VectorBase<VectorLength, VectorValueType>&	v2
+) noexcept -> bool
 {
 	return AreValuesWithinRange( v1, v2, GetSmallValue<VectorValueType>() );
 }

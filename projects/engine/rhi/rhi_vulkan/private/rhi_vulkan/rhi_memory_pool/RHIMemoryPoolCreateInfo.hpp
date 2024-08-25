@@ -12,8 +12,8 @@ namespace rhi {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct RHIMemoryPoolCreateInfo
 {
-	VkDeviceSize									linear_allocation_chunk_size						= {};
-	VkDeviceSize									non_linear_allocation_chunk_size					= {};
+	VkDeviceSize	linear_allocation_chunk_size		= {};
+	VkDeviceSize	non_linear_allocation_chunk_size	= {};
 };
 
 

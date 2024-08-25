@@ -83,9 +83,9 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )(
-		const BC_CONTAINER_NAME( Optional )															&	other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> ) :
+	constexpr BC_CONTAINER_NAME( Optional )( const ThisType& other ) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	:
 		dummy_value( {} ),
 		has_data( false )
 	{
@@ -95,9 +95,9 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )(
-		BC_CONTAINER_NAME( Optional )																&&	other
-	) noexcept requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> ) :
+	constexpr BC_CONTAINER_NAME( Optional )( ThisType&& other ) noexcept
+		requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+	:
 		dummy_value( {} ),
 		has_data( false )
 	{
@@ -108,9 +108,9 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )(
-		const ValueType																				&	other_value
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> ) :
+	constexpr BC_CONTAINER_NAME( Optional )( const ValueType& other_value ) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	:
 		dummy_value( {} ),
 		has_data( false )
 	{
@@ -119,9 +119,9 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )(
-		ValueType																					&&	other_value
-	) noexcept requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> ) :
+	constexpr BC_CONTAINER_NAME( Optional )( ValueType&& other_value ) noexcept
+		requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+	:
 		dummy_value( {} ),
 		has_data( false )
 	{
@@ -137,45 +137,39 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
-		std::nullptr_t
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator=( std::nullptr_t ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		this->Clear();
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
-		const BC_CONTAINER_NAME( Optional )															&	other
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
+	constexpr auto operator=( const ThisType& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		this->CopyOther( other );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
-		BC_CONTAINER_NAME( Optional )																&&	other
-	) noexcept requires( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
+	constexpr auto operator=( ThisType&& other ) noexcept -> ThisType&
+		requires( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
 	{
 		this->SwapOther( std::move( other ) );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
-		const ValueType																				&	other_value
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
+	constexpr auto operator=( const ValueType& other_value ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		this->Emplace( other_value );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Optional )															&	operator=(
-		ValueType																					&&	other_value
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> && BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
+	constexpr auto operator=( ValueType&& other_value ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> && BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
 	{
 		if( this->has_data )
 		{
@@ -190,25 +184,25 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	operator->() noexcept
+	constexpr auto operator->() const noexcept -> const ValueType*
 	{
 		return &this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	operator->() const noexcept
+	constexpr auto operator->() noexcept -> ValueType*
 	{
 		return &this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	operator*() noexcept
+	constexpr auto operator*() const noexcept -> const ValueType&
 	{
 		return this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	operator*() const noexcept
+	constexpr auto operator*() noexcept -> ValueType&
 	{
 		return this->Get();
 	}
@@ -231,9 +225,7 @@ public:
 	/// @param ...constructor_arguments
 	/// Arguments passed to the contained value constructor.
 	template<typename ...ConstructorArgumentTypePack>
-	constexpr void																						Emplace(
-		ConstructorArgumentTypePack																	&&	...constructor_arguments
-	) BC_CONTAINER_NOEXCEPT
+	constexpr void Emplace( ConstructorArgumentTypePack&& ...constructor_arguments ) BC_CONTAINER_NOEXCEPT
 	{
 		this->Clear();
 		this->ConstructStackElement( this->data, std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );
@@ -241,21 +233,21 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	Get() BC_CONTAINER_NOEXCEPT
+	constexpr auto Get() const BC_CONTAINER_NOEXCEPT -> const ValueType&
 	{
 		BC_ContainerAssert( this->has_data, U"Container is empty" );
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	Get() const BC_CONTAINER_NOEXCEPT
+	constexpr auto Get() BC_CONTAINER_NOEXCEPT -> ValueType&
 	{
 		BC_ContainerAssert( this->has_data, U"Container is empty" );
 		return this->data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void																						Clear() BC_CONTAINER_NOEXCEPT
+	constexpr void Clear() BC_CONTAINER_NOEXCEPT
 	{
 		if( !this->has_data ) return;
 		this->DestructStackElement( this->data );
@@ -263,7 +255,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool																						IsEmpty() const noexcept
+	constexpr auto IsEmpty() const noexcept -> bool
 	{
 		return !this->has_data;
 	}
@@ -277,9 +269,8 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																								CopyOther(
-		const BC_CONTAINER_NAME( Optional )															&	other
-	) noexcept requires( BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
+	void CopyOther( const ThisType& other ) noexcept
+		requires( BC_CONTAINER_IS_COPY_ASSIGNABLE<ValueType> )
 	{
 		if( std::addressof( other ) == this ) return;
 		this->Clear();
@@ -288,9 +279,8 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																								SwapOther(
-		BC_CONTAINER_NAME( Optional )																&&	other
-	) noexcept requires( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
+	void SwapOther( ThisType&& other ) noexcept
+		requires( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
 	{
 		if( std::addressof( other ) == this ) return;
 		std::swap( this->has_data, other.has_data );
@@ -300,10 +290,10 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	union
 	{
-		NonTrivialType																					dummy_value			= {};
-		ValueType																						data;
+		NonTrivialType	dummy_value			= {};
+		ValueType		data;
 	};
-	bool																								has_data			= false;
+	bool				has_data			= false;
 };
 
 

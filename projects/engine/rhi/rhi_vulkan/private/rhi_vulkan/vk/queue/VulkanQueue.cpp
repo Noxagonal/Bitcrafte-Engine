@@ -6,9 +6,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::VulkanQueue::Submit(
-	const bc::List<VkCommandBuffer>							&	command_buffers,
-	const bc::List<Pair<VkSemaphore, VkPipelineStageFlags>>	&	wait_semaphores,
-	const bc::List<VkSemaphore>								&	signal_semaphores,
+	const bc::List<VkCommandBuffer>&							command_buffers,
+	const bc::List<Pair<VkSemaphore, VkPipelineStageFlags>>&	wait_semaphores,
+	const bc::List<VkSemaphore>&								signal_semaphores,
 	VkFence														fence
 )
 {
@@ -42,8 +42,9 @@ void bc::rhi::VulkanQueue::Submit(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::VulkanQueue::Submit(
-	const bc::List<SubmitInfo>		&	submit_infos,
-	VkFence								fence )
+	const bc::List<SubmitInfo>&	submit_infos,
+	VkFence						fence
+)
 {
 	List<List<VkSemaphore>>				wait_sem( submit_infos.Size() );
 	List<List<VkPipelineStageFlags>>	wait_flags( submit_infos.Size() );
@@ -83,8 +84,8 @@ void bc::rhi::VulkanQueue::Submit(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::rhi::VulkanQueue::Present(
-	const bc::List<VkSemaphore>				&	wait_semaphores,
-	const bc::List<SwapchainPresentInfo>		&	swapchains
+	const bc::List<VkSemaphore>&			wait_semaphores,
+	const bc::List<SwapchainPresentInfo>&	swapchains
 )
 {
 	List<VkSwapchainKHR> vk_swapchains( swapchains.Size() );
@@ -121,31 +122,31 @@ void bc::rhi::VulkanQueue::Present(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-VkQueue bc::rhi::VulkanQueue::GetQueue() const
+auto bc::rhi::VulkanQueue::GetQueue() const -> VkQueue
 {
 	return queue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::u32 bc::rhi::VulkanQueue::GetQueueFamilyIndex() const
+auto bc::rhi::VulkanQueue::GetQueueFamilyIndex() const -> u32
 {
 	return queue_family_index;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-VkBool32 bc::rhi::VulkanQueue::SupportsPresentation() const
+auto bc::rhi::VulkanQueue::SupportsPresentation() const -> VkBool32
 {
 	return supports_presentation;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const VkQueueFamilyProperties & bc::rhi::VulkanQueue::GetQueueFamilyProperties() const
+auto bc::rhi::VulkanQueue::GetQueueFamilyProperties() const -> const VkQueueFamilyProperties&
 {
 	return queue_family_properties;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::u32 bc::rhi::VulkanQueue::GetBasedOn() const
+auto bc::rhi::VulkanQueue::GetBasedOn() const -> u32
 {
 	return based_on;
 }

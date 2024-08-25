@@ -31,7 +31,7 @@ public:
 
 private:
 
-	UniquePtr<MeshManager>								mesh_manager;
+	UniquePtr<MeshManager>	mesh_manager;
 };
 
 

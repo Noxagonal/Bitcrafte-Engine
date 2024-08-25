@@ -54,33 +54,33 @@ enum class ModifierKeyFlags : i32
 	ALT_GR					= 0x0040,	///< Alt Gr key
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline ModifierKeyFlags		operator|(
-	ModifierKeyFlags		f1,
-	ModifierKeyFlags		f2
-)
+inline auto operator|(
+	ModifierKeyFlags	f1,
+	ModifierKeyFlags	f2
+) -> ModifierKeyFlags
 {
 	return ModifierKeyFlags( std::to_underlying( f1 ) | std::to_underlying( f2 ) );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline ModifierKeyFlags		operator|=(
-	ModifierKeyFlags	&	f1,
-	ModifierKeyFlags		f2
-)
+inline auto operator|=(
+	ModifierKeyFlags&	f1,
+	ModifierKeyFlags	f2
+) -> ModifierKeyFlags&
 {
 	return f1 = f1 | f2;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline ModifierKeyFlags		operator&(
-	ModifierKeyFlags		f1,
-	ModifierKeyFlags		f2
+inline auto operator&(
+	ModifierKeyFlags	f1,
+	ModifierKeyFlags	f2
 )
 {
 	return ModifierKeyFlags( std::to_underlying( f1 ) & std::to_underlying( f2 ) );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline ModifierKeyFlags		operator&=(
-	ModifierKeyFlags	&	f1,
-	ModifierKeyFlags		f2
+inline auto operator&=(
+	ModifierKeyFlags&	f1,
+	ModifierKeyFlags	f2
 )
 {
 	return f1 = f1 & f2;

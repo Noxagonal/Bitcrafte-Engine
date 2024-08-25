@@ -9,18 +9,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIPoolMemoryHandle::RHIPoolMemoryHandle(
-	RHIVulkanImpl				*	rhi_vulkan_impl,
-	RHIMemoryPool				*	rhi_memory_pool,
-	VkDeviceMemory					memory,
-	VkDeviceSize					offset,
-	VkDeviceSize					size,
-	VkDeviceSize					alignment,
-	u64								chunk_id,
-	u64								block_id,
-	u32								memory_type_index,
-	VkMemoryPropertyFlagBits		property_flags,
-	bool							is_linear
-) :
+	RHIVulkanImpl*				rhi_vulkan_impl,
+	RHIMemoryPool*				rhi_memory_pool,
+	VkDeviceMemory				memory,
+	VkDeviceSize				offset,
+	VkDeviceSize				size,
+	VkDeviceSize				alignment,
+	u64							chunk_id,
+	u64							block_id,
+	u32							memory_type_index,
+	VkMemoryPropertyFlagBits	property_flags,
+	bool						is_linear
+)
+:
 	rhi_vulkan_impl( rhi_vulkan_impl ),
 	rhi_memory_pool( rhi_memory_pool ),
 	memory( memory ),
@@ -49,11 +50,9 @@ bc::rhi::RHIPoolMemoryHandle::RHIPoolMemoryHandle(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemoryHandle::RHIPoolMemoryHandle(
-	RHIPoolMemoryHandle && other
-)
+bc::rhi::RHIPoolMemoryHandle::RHIPoolMemoryHandle( RHIPoolMemoryHandle&& other )
 {
-	MoveOther( std::move( other ) );
+	Move( other );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,18 +62,14 @@ bc::rhi::RHIPoolMemoryHandle::~RHIPoolMemoryHandle()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemoryHandle & bc::rhi::RHIPoolMemoryHandle::operator=(
-	RHIPoolMemoryHandle && other
-)
+auto bc::rhi::RHIPoolMemoryHandle::operator=( RHIPoolMemoryHandle&& other ) -> RHIPoolMemoryHandle&
 {
-	MoveOther( std::move( other ) );
+	Move( other );
 	return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIPoolMemoryHandle & bc::rhi::RHIPoolMemoryHandle::operator=(
-	std::nullptr_t
-)
+auto bc::rhi::RHIPoolMemoryHandle::operator=( std::nullptr_t ) -> RHIPoolMemoryHandle&
 {
 	Clear();
 	return *this;
@@ -102,9 +97,7 @@ void bc::rhi::RHIPoolMemoryHandle::Clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::RHIPoolMemoryHandle::MoveOther(
-	RHIPoolMemoryHandle && other
-)
+void bc::rhi::RHIPoolMemoryHandle::Move( RHIPoolMemoryHandle& other )
 {
 	std::swap( mapped_memory, other.mapped_memory );
 	std::swap( rhi_vulkan_impl, other.rhi_vulkan_impl );

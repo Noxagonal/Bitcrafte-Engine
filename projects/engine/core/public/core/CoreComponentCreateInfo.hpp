@@ -13,8 +13,8 @@ namespace bc {
 
 struct CoreComponentCreateInfo
 {
-	diagnostic::LoggerCreateInfo					logger_create_info;
-	thread::ThreadPoolCreateInfo					thread_pool_create_info;
+	diagnostic::LoggerCreateInfo	logger_create_info;
+	thread::ThreadPoolCreateInfo	thread_pool_create_info;
 };
 
 

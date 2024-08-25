@@ -13,48 +13,48 @@
 
 
 
-void* VKAPI_PTR VulkanMemoryAllocationFunction(
-	void*										pUserData,
-	bc::u64										size,
-	bc::u64										alignment,
-	VkSystemAllocationScope						allocationScope
-)
+auto VKAPI_PTR VulkanMemoryAllocationFunction(
+	void*					pUserData,
+	bc::u64					size,
+	bc::u64					alignment,
+	VkSystemAllocationScope	allocationScope
+) -> void*
 {
 	return bc::memory::internal_::AllocateRawMemory_Runtime( size, alignment );
 }
 
-void* VKAPI_PTR VulkanMemoryReallocationFunction(
-	void*										pUserData,
-	void*										pOriginal,
-	bc::u64										size,
-	bc::u64										alignment,
-	VkSystemAllocationScope						allocationScope
-)
+auto VKAPI_PTR VulkanMemoryReallocationFunction(
+	void*					pUserData,
+	void*					pOriginal,
+	bc::u64					size,
+	bc::u64					alignment,
+	VkSystemAllocationScope	allocationScope
+) -> void*
 {
 	return bc::memory::internal_::ReallocateRawMemory_Runtime( pOriginal, size );
 }
 
 void VKAPI_PTR VulkanMemoryFreeFunction(
-	void*										pUserData,
-	void*										pMemory
+	void*	pUserData,
+	void*	pMemory
 )
 {
 	bc::memory::internal_::FreeRawMemory_Runtime( pMemory );
 }
 
 void VKAPI_PTR VulkanMemoryInternalAllocationNotification(
-	void*										pUserData,
-	bc::u64										size,
-	VkInternalAllocationType					allocationType,
-	VkSystemAllocationScope						allocationScope
+	void*						pUserData,
+	bc::u64						size,
+	VkInternalAllocationType	allocationType,
+	VkSystemAllocationScope		allocationScope
 )
 {}
 
 void VKAPI_PTR VulkanMemoryInternalFreeNotification(
-	void*										pUserData,
-	bc::u64										size,
-	VkInternalAllocationType					allocationType,
-	VkSystemAllocationScope						allocationScope
+	void*						pUserData,
+	bc::u64						size,
+	VkInternalAllocationType	allocationType,
+	VkSystemAllocationScope		allocationScope
 )
 {}
 
@@ -62,9 +62,10 @@ void VKAPI_PTR VulkanMemoryInternalFreeNotification(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanImpl::RHIVulkanImpl(
-	window_manager::WindowManagerComponent		&	window_manager_component,
-	const RHIComponentCreateInfo				&	create_info
-) :
+	window_manager::WindowManagerComponent&	window_manager_component,
+	const RHIComponentCreateInfo&			create_info
+)
+:
 	window_manager_component( window_manager_component )
 {
 	main_thread_allocation_callbacks.pUserData				= this;
@@ -75,12 +76,12 @@ bc::rhi::RHIVulkanImpl::RHIVulkanImpl(
 	main_thread_allocation_callbacks.pfnInternalFree		= VulkanMemoryInternalFreeNotification;
 
 	// Fill out application info
-	application_info.application_name			= create_info.application_name;
-	application_info.application_version		= create_info.application_version;
+	application_info.application_name		= create_info.application_name;
+	application_info.application_version	= create_info.application_version;
 
 	// Fill out debug settings
-	debug_settings.debug_enabled				= create_info.enable_debug;
-	debug_settings.minimum_debug_level			= create_info.minimum_debug_level;
+	debug_settings.debug_enabled		= create_info.enable_debug;
+	debug_settings.minimum_debug_level	= create_info.minimum_debug_level;
 
 	vulkan_instance		= MakeUniquePtr<VulkanInstance>( *this );
 }
@@ -88,14 +89,12 @@ bc::rhi::RHIVulkanImpl::RHIVulkanImpl(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::RHIVulkanImpl::~RHIVulkanImpl()
 {
-	vulkan_device		= nullptr;
-	vulkan_instance		= nullptr;
+	vulkan_device	= nullptr;
+	vulkan_instance	= nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::RHIVulkanImpl::Start(
-	const RHIComponentStartInfo & rhi_start_info
-)
+void bc::rhi::RHIVulkanImpl::Start( const RHIComponentStartInfo& rhi_start_info )
 {
 	if( rhi_start_info.use_device >= vulkan_instance->GetPhysicalDeviceList().Size() )
 	{
@@ -142,7 +141,7 @@ void bc::rhi::RHIVulkanImpl::Start(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::i64 bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice()
+auto bc::rhi::RHIVulkanImpl::GetBestPhysicalDevice() -> i64
 {
 	auto & physical_device_list = vulkan_instance->GetPhysicalDeviceList();
 

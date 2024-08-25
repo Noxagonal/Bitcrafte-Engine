@@ -48,73 +48,69 @@ public:
 	constexpr BC_CONTAINER_NAME( Pair )() BC_CONTAINER_NOEXCEPT = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Pair )(
-		const BC_CONTAINER_NAME( Pair )																&	other
-	) BC_CONTAINER_NOEXCEPT = default;
+	constexpr BC_CONTAINER_NAME( Pair )( const ThisType& other ) BC_CONTAINER_NOEXCEPT = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr BC_CONTAINER_NAME( Pair )( ThisType&&	other ) noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Pair )(
-		BC_CONTAINER_NAME( Pair )																	&&	other
-	) noexcept = default;
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Pair )(
-		const FirstType																				&	first,
-		const SecondType																			&	second
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<SecondType> ) :
+		const FirstType&	first,
+		const SecondType&	second
+	) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<SecondType> )
+	:
 		first( first ),
 		second( second )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Pair )(
-		const FirstType																				&	first,
-		SecondType																					&&	second
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<SecondType> ) :
+		const FirstType&	first,
+		SecondType&&		second
+	) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<SecondType> )
+	:
 		first( first ),
 		second( std::move( second ) )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Pair )(
-		FirstType																					&&	first,
-		const SecondType																			&	second
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<SecondType> ) :
+		FirstType&&			first,
+		const SecondType&	second
+	) BC_CONTAINER_NOEXCEPT
+		requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<SecondType> )
+	:
 		first( std::move( first ) ),
 		second( second )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( Pair )(
-		FirstType																					&&	first,
-		SecondType																					&&	second
-	) noexcept requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<SecondType> ) :
+		FirstType&&			first,
+		SecondType&&		second
+	) noexcept
+		requires( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<FirstType> && BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<SecondType> )
+	:
 		first( std::move( first ) ),
 		second( std::move( second ) )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Pair )																&	operator=(
-		const BC_CONTAINER_NAME( Pair )																&	other
-	) BC_CONTAINER_NOEXCEPT = default;
+	constexpr auto operator=( const ThisType& other ) BC_CONTAINER_NOEXCEPT -> ThisType& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Pair )																&	operator=(
-		BC_CONTAINER_NAME( Pair )																	&&	other
-	) noexcept = default;
+	constexpr auto operator=( ThisType&& other ) noexcept -> ThisType& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( Pair )																&	other
-	) const noexcept
+	constexpr auto operator==( const ThisType& other ) const noexcept -> bool
 	{
 		return this->first == other.first && this->second == other.second;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( Pair )																&	other
-	) const noexcept
+	constexpr auto operator!=( const ThisType& other ) const noexcept -> bool
 	{
 		return this->first != other.first || this->second != other.second;
 	}

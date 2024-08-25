@@ -40,51 +40,47 @@ public:
 	static constexpr u64 DimensionCount = 2;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ValueType																x				= {};
-	ValueType																y				= {};
+	ValueType	x = {};
+	ValueType	y = {};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase() noexcept = default;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase(
-		ValueType															initial_value
-	) noexcept :
+	constexpr VectorBase( ValueType initial_value ) noexcept
+	:
 		x( initial_value ),
 		y( initial_value )
 	{}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase(
-		ValueType															x,
-		ValueType															y
-	) noexcept :
+		ValueType	x,
+		ValueType	y
+	) noexcept
+	:
 		x( x ),
 		y( y )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr VectorBase(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr VectorBase( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
-		CopyOther( other );
+		Copy( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr VectorBase												&	operator=(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr auto operator=( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
-		CopyOther( other );
+		Copy( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator+=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator+=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x += other.x;
 		y += other.y;
@@ -92,9 +88,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator-=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator-=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x -= other.x;
 		y -= other.y;
@@ -102,9 +96,7 @@ public:
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator*=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator*=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x *= other.x;
 		y *= other.y;
@@ -112,9 +104,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator*=(
-		ValueType															scalar
-	) noexcept
+	constexpr auto operator*=( ValueType scalar ) noexcept -> VectorBase&
 	{
 		x *= scalar;
 		y *= scalar;
@@ -122,9 +112,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator/=(
-		const VectorBase												&	other
-	)
+	constexpr auto operator/=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x /= other.x;
 		y /= other.y;
@@ -132,9 +120,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator/=(
-		ValueType															scalar
-	)
+	constexpr auto operator/=( ValueType scalar ) noexcept -> VectorBase&
 	{
 		x /= scalar;
 		y /= scalar;
@@ -142,9 +128,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator+(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator+( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result += other;
@@ -152,9 +136,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator-(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator-( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result -= other;
@@ -162,9 +144,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator*(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator*( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result *= other;
@@ -172,9 +152,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator*(
-		ValueType															scalar
-	) const noexcept
+	constexpr auto operator*( ValueType scalar ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result *= scalar;
@@ -182,9 +160,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator/(
-		const VectorBase												&	other
-	) const
+	constexpr auto operator/( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result /= other;
@@ -192,9 +168,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator/(
-		ValueType															scalar
-	) const
+	constexpr auto operator/( ValueType scalar ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result /= scalar;
@@ -202,9 +176,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator==(
-		VectorBase															other
-	) const
+	constexpr auto operator==( VectorBase other ) const noexcept -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -217,9 +189,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator!=(
-		VectorBase															other
-	) const
+	constexpr auto operator!=( VectorBase other ) const noexcept -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -232,9 +202,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType											&	operator[](
-		u64																	index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const ValueType&
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
@@ -242,9 +210,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType													&	operator[](
-		u64																	index
-	)
+	constexpr auto operator[]( i64 index ) -> ValueType&
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
@@ -252,7 +218,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType														Magnitude() const noexcept
+	constexpr auto Magnitude() const noexcept -> ValueType
 	{
 		return std::sqrt(
 			x * x +
@@ -261,13 +227,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType														Length() const noexcept
+	constexpr auto Length() const noexcept -> ValueType
 	{
 		return Magnitude();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													Normalized() const noexcept
+	constexpr auto Normalized() const noexcept -> VectorBase
 	{
 		auto magnitude = Magnitude();
 		if( magnitude <= SmallValue<ValueType> ) return VectorBase::UnitVector();
@@ -275,7 +241,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static constexpr VectorBase												UnitVector() noexcept
+	static constexpr auto UnitVector() noexcept -> VectorBase
 	{
 		return VectorBase { 1.0, 0.0 };
 	}
@@ -284,9 +250,8 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr void															CopyOther(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr void Copy( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
 		if constexpr( OtherDimensionCount == 2 )
 		{
@@ -307,17 +272,16 @@ public:
 	static constexpr u64 DimensionCount = 3;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ValueType																x				= {};
-	ValueType																y				= {};
-	ValueType																z				= {};
+	ValueType	x = {};
+	ValueType	y = {};
+	ValueType	z = {};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase(
-		ValueType															initial_value
-	) noexcept :
+	constexpr VectorBase( ValueType initial_value ) noexcept
+	:
 		x( initial_value ),
 		y( initial_value ),
 		z( initial_value )
@@ -325,10 +289,11 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase(
-		ValueType															x,
-		ValueType															y,
-		ValueType															z
-	) noexcept :
+		ValueType	x,
+		ValueType	y,
+		ValueType	z
+	) noexcept
+	:
 		x( x ),
 		y( y ),
 		z( z )
@@ -336,26 +301,22 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr VectorBase(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr VectorBase( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
-		CopyOther( other );
+		Copy( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr VectorBase												&	operator=(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr auto operator=( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
-		CopyOther( other );
+		Copy( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator+=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator+=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x += other.x;
 		y += other.y;
@@ -364,9 +325,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator-=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator-=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x -= other.x;
 		y -= other.y;
@@ -375,9 +334,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator*=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator*=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x *= other.x;
 		y *= other.y;
@@ -386,9 +343,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator*=(
-		ValueType															scalar
-	) noexcept
+	constexpr auto operator*=( ValueType scalar ) noexcept -> VectorBase&
 	{
 		x *= scalar;
 		y *= scalar;
@@ -397,9 +352,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator/=(
-		const VectorBase												&	other
-	)
+	constexpr auto operator/=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x /= other.x;
 		y /= other.y;
@@ -408,9 +361,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator/=(
-		ValueType															scalar
-	)
+	constexpr auto operator/=( ValueType scalar ) noexcept -> VectorBase&
 	{
 		x /= scalar;
 		y /= scalar;
@@ -419,9 +370,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator+(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator+( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result += other;
@@ -429,9 +378,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator-(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator-( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result -= other;
@@ -439,9 +386,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator*(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator*( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result *= other;
@@ -449,9 +394,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator*(
-		ValueType															scalar
-	) const noexcept
+	constexpr auto operator*( ValueType scalar ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result *= scalar;
@@ -459,9 +402,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator/(
-		const VectorBase												&	other
-	) const
+	constexpr auto operator/( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result /= other;
@@ -469,9 +410,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator/(
-		ValueType															scalar
-	) const
+	constexpr auto operator/( ValueType scalar ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result /= scalar;
@@ -479,9 +418,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator==(
-		VectorBase															other
-	) const
+	constexpr auto operator==( VectorBase other ) const noexcept -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -494,9 +431,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator!=(
-		VectorBase															other
-	) const
+	constexpr auto operator!=( VectorBase other ) const noexcept -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -509,9 +444,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType											&	operator[](
-		u64																	index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const ValueType&
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
@@ -520,9 +453,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType													&	operator[](
-		u64																	index
-	)
+	constexpr auto operator[]( i64 index ) -> ValueType&
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
@@ -531,7 +462,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType														Magnitude() const noexcept
+	constexpr auto Magnitude() const noexcept -> ValueType
 	{
 		return std::sqrt(
 			x * x +
@@ -541,13 +472,13 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType														Length() const noexcept
+	constexpr auto Length() const noexcept -> ValueType
 	{
 		return Magnitude();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													Normalized() const noexcept
+	constexpr auto Normalized() const noexcept -> VectorBase
 	{
 		auto magnitude = Magnitude();
 		if( magnitude <= SmallValue<ValueType> ) return VectorBase::UnitVector();
@@ -555,7 +486,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static constexpr VectorBase												UnitVector() noexcept
+	static constexpr auto UnitVector() noexcept -> VectorBase
 	{
 		return VectorBase { 1.0, 0.0, 0.0 };
 	}
@@ -564,9 +495,8 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr void															CopyOther(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) requires( OtherDimensionCount <= DimensionCount )
+	constexpr void Copy( const VectorBase<OtherDimensionCount, ValueType>& other )
+		requires( OtherDimensionCount <= DimensionCount )
 	{
 		if constexpr( OtherDimensionCount == 2 )
 		{
@@ -594,18 +524,17 @@ public:
 	static constexpr u64 DimensionCount = 4;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ValueType																x					= {};
-	ValueType																y					= {};
-	ValueType																z					= {};
-	ValueType																w					= {};
+	ValueType	x = {};
+	ValueType	y = {};
+	ValueType	z = {};
+	ValueType	w = {};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr VectorBase() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase(
-		ValueType															initial_value
-	) noexcept :
+	constexpr VectorBase( ValueType initial_value ) noexcept
+	:
 		x( initial_value ),
 		y( initial_value ),
 		z( initial_value ),
@@ -613,12 +542,13 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase(
-		ValueType															x,
-		ValueType															y,
-		ValueType															z,
-		ValueType															w
-	) noexcept :
+	constexpr VectorBase( 
+		ValueType	x,
+		ValueType	y,
+		ValueType	z,
+		ValueType	w
+	) noexcept
+	:
 		x( x ),
 		y( y ),
 		z( z ),
@@ -627,26 +557,22 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr VectorBase(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr VectorBase( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
-		CopyOther( other );
+		Copy( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr VectorBase												&	operator=(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr auto operator=( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
-		CopyOther( other );
+		Copy( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator+=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator+=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x += other.x;
 		y += other.y;
@@ -656,9 +582,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator-=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator-=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x -= other.x;
 		y -= other.y;
@@ -668,9 +592,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator*=(
-		const VectorBase												&	other
-	) noexcept
+	constexpr auto operator*=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x *= other.x;
 		y *= other.y;
@@ -680,9 +602,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator*=(
-		ValueType															scalar
-	) noexcept
+	constexpr auto operator*=( ValueType scalar ) noexcept -> VectorBase&
 	{
 		x *= scalar;
 		y *= scalar;
@@ -692,9 +612,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator/=(
-		const VectorBase												&	other
-	)
+	constexpr auto operator/=( const VectorBase& other ) noexcept -> VectorBase&
 	{
 		x /= other.x;
 		y /= other.y;
@@ -704,9 +622,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase												&	operator/=(
-		ValueType															scalar
-	)
+	constexpr auto operator/=( ValueType scalar ) noexcept -> VectorBase&
 	{
 		x /= scalar;
 		y /= scalar;
@@ -716,9 +632,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator+(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator+( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result += other;
@@ -726,9 +640,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator-(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator-( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result -= other;
@@ -736,9 +648,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator*(
-		const VectorBase												&	other
-	) const noexcept
+	constexpr auto operator*( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result *= other;
@@ -746,9 +656,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator*(
-		ValueType															scalar
-	) const noexcept
+	constexpr auto operator*( ValueType scalar	) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result *= scalar;
@@ -756,9 +664,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator/(
-		const VectorBase												&	other
-	) const
+	constexpr auto operator/( const VectorBase& other ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result /= other;
@@ -766,9 +672,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													operator/(
-		ValueType															scalar
-	) const
+	constexpr auto operator/( ValueType scalar ) const noexcept -> VectorBase
 	{
 		VectorBase result = *this;
 		result /= scalar;
@@ -776,9 +680,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator==(
-		VectorBase															other
-		) const
+	constexpr auto operator==( VectorBase other ) const noexcept -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -791,9 +693,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator!=(
-		VectorBase															other
-		) const
+	constexpr auto operator!=( VectorBase other ) const noexcept -> bool
 	{
 		if constexpr( utility::FloatingPointValue<ValueType> )
 		{
@@ -806,9 +706,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType											&	operator[](
-		u64																	index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const ValueType&
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
@@ -818,9 +716,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType													&	operator[](
-		u64																	index
-	)
+	constexpr auto operator[]( i64 index ) -> ValueType&
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
@@ -830,7 +726,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType														Magnitude() const noexcept
+	constexpr auto Magnitude() const noexcept -> ValueType
 	{
 		return std::sqrt(
 			x * x +
@@ -841,13 +737,13 @@ public:
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType														Length() const noexcept
+	constexpr auto Length() const noexcept -> ValueType
 	{
 		return Magnitude();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase													Normalized() const noexcept
+	constexpr auto Normalized() const noexcept -> VectorBase
 	{
 		auto magnitude = Magnitude();
 		if( magnitude <= SmallValue<ValueType> ) return VectorBase::UnitVector();
@@ -855,7 +751,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static constexpr VectorBase												UnitVector() noexcept
+	static constexpr auto UnitVector() noexcept -> VectorBase
 	{
 		return VectorBase { 1.0, 0.0, 0.0, 0.0 };
 	}
@@ -864,9 +760,8 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<u64 OtherDimensionCount>
-	constexpr void															CopyOther(
-		const VectorBase<OtherDimensionCount, ValueType>				&	other
-	) noexcept requires( OtherDimensionCount <= DimensionCount )
+	constexpr void Copy( const VectorBase<OtherDimensionCount, ValueType>& other ) noexcept
+		requires( OtherDimensionCount <= DimensionCount )
 	{
 		if constexpr( OtherDimensionCount == 2 )
 		{

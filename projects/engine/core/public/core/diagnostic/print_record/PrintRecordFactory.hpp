@@ -17,46 +17,46 @@ namespace diagnostic {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-PrintRecord													MakePrintRecord(
-	bc::internal_::SimpleTextView32							text,
-	PrintRecordTheme										theme
-);
+auto MakePrintRecord(
+	bc::internal_::SimpleTextView32		text,
+	PrintRecordTheme					theme
+) -> PrintRecord;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-PrintRecord													MakePrintRecord(
-	bc::internal_::SimpleTextView32							text
-);
+auto MakePrintRecord( bc::internal_::SimpleTextView32 text ) -> PrintRecord;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::TextContainer								TextContainerType>
-PrintRecord													MakePrintRecord(
-	TextContainerType										text,
-	PrintRecordTheme										theme
-) requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleText32> )
+template<utility::TextContainer TextContainerType>
+auto MakePrintRecord(
+	TextContainerType	text,
+	PrintRecordTheme	theme
+) -> PrintRecord
+	requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleText32> )
 {
 	static_assert( !std::is_same_v<TextContainerType, bc::internal_::SimpleTextView32> );
+	// TODO: Get rid of all text::TextFormat calls in this file. It causes a cyclic dependency. Print record should not use any higher level utilities.
 	return MakePrintRecord( text::TextFormat( bc::internal_::SimpleTextView32( U"{}" ), text ), theme );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::TextContainer								TextContainerType>
-PrintRecord													MakePrintRecord(
-	TextContainerType										text
-) requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleText32> )
+template<utility::TextContainer TextContainerType>
+auto MakePrintRecord( TextContainerType text ) -> PrintRecord
+	requires ( !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleTextView32> && !std::is_same_v<std::decay_t<TextContainerType>, bc::internal_::SimpleText32> )
 {
 	return MakePrintRecord( text::TextFormat( bc::internal_::SimpleTextView32( U"{}" ), text ), PrintRecordTheme::DEFAULT );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	typename												ArgumentDescriptionType,
-	typename												ArgumentValueType
+	typename ArgumentDescriptionType,
+	typename ArgumentValueType
 >
-PrintRecord													MakePrintRecord_Argument(
-	const ArgumentDescriptionType						&	argument_description,
-	const ArgumentValueType								&	argument_value
-) requires( !std::is_same_v<ArgumentValueType, PrintRecordTheme> ) // Prevent PrintRecordTheme from being used as argument
+auto MakePrintRecord_Argument(
+	const ArgumentDescriptionType&	argument_description,
+	const ArgumentValueType&		argument_value
+) -> PrintRecord
+	requires( !std::is_same_v<ArgumentValueType, PrintRecordTheme> ) // Prevent PrintRecordTheme from being used as argument
 {
 	auto record = MakePrintRecord( text::TextFormat( U"{}", argument_description ) );
 	record += MakePrintRecord( U": \"" );
@@ -69,15 +69,15 @@ namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	typename												ArgumentDescriptionType,
-	typename												ArgumentValueType,
-	typename												...RestTypePack
+	typename ArgumentDescriptionType,
+	typename ArgumentValueType,
+	typename ...RestTypePack
 >
-void														MakePrintRecord_ArgumentList_Collector(
-	PrintRecord											&	out_buffer,
-	const ArgumentDescriptionType						&	argument_description,
-	const ArgumentValueType								&	argument_value,
-	const RestTypePack									&	...argument_pack
+void MakePrintRecord_ArgumentList_Collector(
+	PrintRecord&					out_buffer,
+	const ArgumentDescriptionType&	argument_description,
+	const ArgumentValueType&		argument_value,
+	const RestTypePack&				...argument_pack
 )
 {
 	out_buffer += MakePrintRecord( U"\n" );
@@ -88,12 +88,8 @@ void														MakePrintRecord_ArgumentList_Collector(
 } // internal_
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<
-	typename												...ArgumentTypePack
->
-PrintRecord													MakePrintRecord_ArgumentList(
-	const ArgumentTypePack								&	...argument_pack
-)
+template<typename ...ArgumentTypePack>
+auto MakePrintRecord_ArgumentList( const ArgumentTypePack& ...argument_pack ) -> PrintRecord
 {
 	static_assert( sizeof...( argument_pack ) > 0, "No arguments given" );
 	static_assert( sizeof...( argument_pack ) % 2 == 0, "Argument list must be a pair of values, 'text' : 'value', argument pack size was odd" );
@@ -104,13 +100,11 @@ PrintRecord													MakePrintRecord_ArgumentList(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<
-	typename												...ArgumentTypePack
->
-PrintRecord													MakePrintRecord_AssertText(
-	bc::internal_::SimpleTextView32							title,
-	const ArgumentTypePack								&	...argument_pack
-)
+template<typename ...ArgumentTypePack>
+auto MakePrintRecord_AssertText(
+	bc::internal_::SimpleTextView32		title,
+	const ArgumentTypePack&				...argument_pack
+) -> PrintRecord
 {
 	static_assert( sizeof...( argument_pack ) % 2 == 0, "Argument list must be a pair of values, 'text' : 'value', argument pack size was odd" );
 
@@ -124,9 +118,7 @@ PrintRecord													MakePrintRecord_AssertText(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-PrintRecord													MakePrintRecord_SourceLocation(
-	const SourceLocation								&	source_location
-);
+auto MakePrintRecord_SourceLocation( const SourceLocation& source_location ) -> PrintRecord;
 
 
 

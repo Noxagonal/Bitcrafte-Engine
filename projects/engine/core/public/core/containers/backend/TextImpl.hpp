@@ -32,8 +32,7 @@ class BC_CONTAINER_NAME( TextBase );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainerCharacterType CharacterType, bool IsConst>
-class BC_CONTAINER_NAME( TextViewBase ):
-	public container_bases::BC_CONTAINER_NAME( LinearContainerViewBase )<CharacterType, IsConst>
+class BC_CONTAINER_NAME( TextViewBase ) : public container_bases::BC_CONTAINER_NAME( LinearContainerViewBase )<CharacterType, IsConst>
 {
 public:
 
@@ -46,6 +45,9 @@ public:
 	template<utility::TextContainerCharacterType OtherValueType, bool IsOtherConst>
 	using ThisContainerType					= BC_CONTAINER_NAME( TextViewBase )<OtherValueType, IsOtherConst>;
 	using ThisType							= ThisContainerType<CharacterType, IsConst>;
+
+	template<bool IsOtherConst>
+	using ThisTypeOtherConst				= ThisContainerType<CharacterType, IsOtherConst>;
 
 	template<utility::TextContainerCharacterType OtherValueType, bool IsOtherConst>
 	using ThisContainerViewType				= BC_CONTAINER_NAME( TextViewBase )<OtherValueType, IsOtherConst>;
@@ -86,9 +88,9 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( TextViewBase )(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
+	constexpr BC_CONTAINER_NAME( TextViewBase )( ThisTypeOtherConst<IsOtherConst> other ) noexcept
+		requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
+	:
 		Base(
 			other.Data(),
 			other.Size()
@@ -98,9 +100,11 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
-		IteratorBase<IsOtherConst>																		begin_iterator,
-		IteratorBase<IsOtherConst>																		end_iterator
-	) BC_CONTAINER_NOEXCEPT requires( utility::IsConstConvertible<IsConst, IsOtherConst> ) :
+		IteratorBase<IsOtherConst>	begin_iterator,
+		IteratorBase<IsOtherConst>	end_iterator
+	) BC_CONTAINER_NOEXCEPT
+		requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
+	:
 		Base(
 			begin_iterator.GetAddress(),
 			end_iterator.GetAddress() - begin_iterator.GetAddress()
@@ -108,14 +112,14 @@ public:
 	{
 		BC_ContainerAssert( begin_iterator.GetContainer() == end_iterator.GetContainer(),
 			U"Incompatible begin and end iterators, begin and end iterators should point to the same container",
-			U"Begin iterator points to text", conversion::ToUTF32( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> { begin_iterator.container->Data(), begin_iterator.container->Size() } ),
+			U"Begin iterator points to text", conversion::ToUTF32( ThisTypeOtherConst<true> { begin_iterator.container->Data(), begin_iterator.container->Size() } ),
 			U"Begin iterator starts at index", begin_iterator.GetIndex(),
-			U"End iterator points to text", conversion::ToUTF32( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> { end_iterator.container->Data(), end_iterator.container->Size() } ),
+			U"End iterator points to text", conversion::ToUTF32( ThisTypeOtherConst<true> { end_iterator.container->Data(), end_iterator.container->Size() } ),
 			U"End iterator starts at index", end_iterator.GetIndex()
 		);
 		BC_ContainerAssert( begin_iterator.GetIndex() <= end_iterator.GetIndex(),
 			U"Begin iterator is after end iterator, begin must appear before end iterator",
-			U"Text", conversion::ToUTF32( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> { begin_iterator.container->Data(), begin_iterator.container->Size() } ),
+			U"Text", conversion::ToUTF32( ThisTypeOtherConst<true> { begin_iterator.container->Data(), begin_iterator.container->Size() } ),
 			U"Begin iterator starts at index", begin_iterator.GetIndex(),
 			U"End iterator starts at index", end_iterator.GetIndex()
 		);
@@ -123,9 +127,9 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<i64 ArraySize>
-	constexpr BC_CONTAINER_NAME( TextViewBase )(
-		const CharacterType( &c_string )[ ArraySize ]
-	) noexcept requires( IsConst == true ) :
+	constexpr BC_CONTAINER_NAME( TextViewBase )( const CharacterType( &c_string )[ ArraySize ] ) noexcept
+		requires( IsConst == true )
+	:
 		Base(
 			c_string,
 			ArraySize ? ( c_string[ ArraySize - 1 ] == '\0' ? ArraySize - 1 : ArraySize ) : 0
@@ -134,9 +138,10 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
-		const CharacterType																			*	ptr,
-		const i64																						size
-	) noexcept requires( IsConst == true ) :
+		const CharacterType*	ptr,
+		const i64				size
+	) noexcept requires( IsConst == true )
+	:
 		Base(
 			ptr,
 			size ? ( ptr[ size - 1 ] == '\0' ? size - 1 : size ) : 0
@@ -144,9 +149,9 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	explicit constexpr BC_CONTAINER_NAME( TextViewBase )(
-		const CharacterType																			*	ptr
-	) noexcept requires( IsConst == true ) :
+	explicit constexpr BC_CONTAINER_NAME( TextViewBase )( const CharacterType* ptr ) noexcept
+		requires( IsConst == true )
+	:
 		Base(
 			ptr,
 			std::char_traits<CharacterType>::length( ptr )
@@ -155,9 +160,11 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
-		CharacterType																				*	ptr,
-		const i64																						size
-	) noexcept requires( IsConst == false ) :
+		CharacterType*	ptr,
+		i64				size
+	) noexcept
+		requires( IsConst == false )
+	:
 		Base(
 			ptr,
 			size ? ( ptr[ size - 1 ] == '\0' ? size - 1 : size ) : 0
@@ -166,9 +173,11 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
-		const CharacterType																			*	begin_ptr,
-		const CharacterType																			*	end_ptr
-	) BC_CONTAINER_NOEXCEPT requires( IsConst == true ) :
+		const CharacterType*	begin_ptr,
+		const CharacterType*	end_ptr
+	) BC_CONTAINER_NOEXCEPT
+		requires( IsConst == true )
+	:
 		Base(
 			begin_ptr,
 			i64( end_ptr - begin_ptr )
@@ -183,9 +192,11 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextViewBase )(
-		CharacterType																				*	begin_ptr,
-		CharacterType																				*	end_ptr
-	) BC_CONTAINER_NOEXCEPT requires( IsConst == false ) :
+		CharacterType*	begin_ptr,
+		CharacterType*	end_ptr
+	) BC_CONTAINER_NOEXCEPT
+		requires( IsConst == false )
+	:
 		Base(
 			begin_ptr,
 			i64( end_ptr - begin_ptr )
@@ -200,9 +211,8 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( TextViewBase )														&	operator=(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst> other
-	) noexcept requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
+	constexpr auto operator=( ThisTypeOtherConst<IsOtherConst> other ) noexcept -> ThisType&
+		requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
 	{
 		this->data_ptr	= other.Data();
 		this->data_size	= other.Size();
@@ -219,9 +229,7 @@ public:
 	/// @return
 	/// true if this text matches the other, false otherwise.
 	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) const noexcept
+	constexpr auto operator==( ThisTypeOtherConst<IsOtherConst> other ) const noexcept -> bool
 	{
 		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
@@ -236,43 +244,7 @@ public:
 	/// @return
 	/// true if text differs from the other, false if they match.
 	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) const noexcept
-	{
-		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if text matches another.
-	/// 
-	/// @param other
-	///	Other text to compare with.
-	/// 
-	/// @return
-	/// true if this text matches the other, false otherwise.
-	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
-	) const noexcept requires( !std::is_same_v<CharacterType, char> )
-	{
-		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if text differs from another.
-	/// 
-	/// @param other
-	///	Other text to compare with.
-	/// 
-	/// @return
-	/// true if text differs from the other, false if they match.
-	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
-	) const noexcept requires( !std::is_same_v<CharacterType, char> )
+	constexpr auto operator!=( ThisTypeOtherConst<IsOtherConst> other ) const noexcept -> bool
 	{
 		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
@@ -290,11 +262,9 @@ public:
 	/// @return
 	/// true if this text matches the other, false otherwise.
 	template<i64 ArraySize>
-	constexpr bool																						operator==(
-		const CharacterType( &c_string )[ ArraySize ]
-	) const noexcept
+	constexpr auto operator==( const CharacterType( &c_string )[ ArraySize ] ) const noexcept -> bool
 	{
-		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsMatch( *this, ThisTypeOtherConst<true> { c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,51 +280,9 @@ public:
 	/// @return
 	/// true if text differs from the other, false if they match.
 	template<i64 ArraySize>
-	constexpr bool																						operator!=(
-		const CharacterType( &c_string )[ ArraySize ]
-	) const noexcept
+	constexpr auto operator!=( const CharacterType( &c_string )[ ArraySize ] ) const noexcept -> bool
 	{
-		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if text match with C-style sting literal.
-	///
-	/// @tparam InputStringSize
-	///	Tells the input string size.
-	/// 
-	/// @param c_string
-	/// C-style text to compare with.
-	/// 
-	/// @return
-	/// true if this text matches the other, false otherwise.
-	template<i64 ArraySize>
-	constexpr bool																						operator==(
-		const char( &c_string )[ ArraySize ]
-	) const noexcept requires( !std::is_same_v<char, CharacterType> )
-	{
-		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if text differs from C-style sting.
-	/// 
-	/// @tparam InputStringSize
-	/// Tells the input string size.
-	/// 
-	/// @param c_string
-	///	C-style text to compare with.
-	/// 
-	/// @return
-	/// true if text differs from the other, false if they match.
-	template<i64 ArraySize>
-	constexpr bool																						operator!=(
-		const char( &c_string )[ ArraySize ]
-	) const noexcept requires( !std::is_same_v<char, CharacterType> )
-	{
-		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
+		return container_bases::internal_::CheckContainerContentsDiffer( *this, ThisTypeOtherConst<true> { c_string, ArraySize } );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -368,9 +296,7 @@ public:
 	/// 
 	/// @return
 	/// True if this text is lexicographically less than the other. False if the other text equal or greater.
-	constexpr bool																						operator<(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator<( ThisTypeOtherConst<true> other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		return std::lexicographical_compare<ConstIterator, ConstIterator>(
 			this->begin(), this->end(),
@@ -399,11 +325,12 @@ public:
 	/// 
 	/// @return
 	/// Number of characters found.
-	[[nodiscard]] constexpr i64																			CountCharacters(
-		CharacterType																					character,
-		i64																								position						= 0,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto CountCharacters(
+		CharacterType	character,
+		i64				position			= 0,
+		i64				search_length		= std::numeric_limits<i64>::max()
+	) const noexcept -> i64
 	{
 		if( this->data_size == 0 ) [[unlikely]] return 0;
 		if( search_length == 0 ) [[unlikely]] return 0;
@@ -445,11 +372,12 @@ public:
 	/// 
 	/// @return
 	/// Number of characters found.
-	[[nodiscard]] constexpr i64																			CountCharacters(
-		CharacterType																					character,
-		ConstIterator																					position,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const BC_CONTAINER_NOEXCEPT
+	[[nodiscard]]
+	constexpr auto CountCharacters(
+		CharacterType	character,
+		ConstIterator	position,
+		i64				search_length		= std::numeric_limits<i64>::max()
+	) const BC_CONTAINER_NOEXCEPT -> i64
 	{
 		BC_ContainerAssert( position.container == this, U"Wrong iterator used on this container" );
 		BC_ContainerAssert(
@@ -484,11 +412,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																FindCharacter(
-		CharacterType																					character,
-		i64																								position						= 0,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto FindCharacter(
+		CharacterType	character,
+		i64				position			= 0,
+		i64				search_length		= std::numeric_limits<i64>::max()
+	) const noexcept -> ConstIterator
 	{
 		if( this->data_size == 0 ) [[unlikely]] return 0;
 		if( search_length == 0 ) [[unlikely]] return 0;
@@ -529,11 +458,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																FindCharacter(
-		CharacterType																					character,
-		ConstIterator																					position,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const BC_CONTAINER_NOEXCEPT
+	[[nodiscard]]
+	constexpr auto FindCharacter(
+		CharacterType	character,
+		ConstIterator	position,
+		i64				search_length		= std::numeric_limits<i64>::max()
+	) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		BC_ContainerAssert( position.container == this, U"Wrong iterator used on this container" );
 		BC_ContainerAssert(
@@ -568,11 +498,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																Find(
-		ThisViewType<true>																				text_to_find,
-		i64																								position						= 0,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto Find(
+		ThisViewType<true>	text_to_find,
+		i64					position			= 0,
+		i64					search_length		= std::numeric_limits<i64>::max()
+	) const noexcept -> ConstIterator
 	{
 		if( this->data_size == 0 ) [[unlikely]] return {};
 
@@ -619,11 +550,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																Find(
-		ThisViewType<true>																				text_to_find,
-		ConstIterator																					position,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const BC_CONTAINER_NOEXCEPT
+	[[nodiscard]]
+	constexpr auto Find(
+		ThisViewType<true>	text_to_find,
+		ConstIterator		position,
+		i64					search_length		= std::numeric_limits<i64>::max()
+	) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		BC_ContainerAssert( position.container == this, U"Wrong iterator used on this container" );
 		BC_ContainerAssert(
@@ -654,10 +586,10 @@ public:
 	/// 
 	/// @return
 	/// A new text view containing a range to data in this text view.
-	constexpr BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsConst>									SubText(
-		i64																								position,
-		i64																								size							= std::numeric_limits<i64>::max()
-	) const noexcept
+	constexpr auto SubText(
+		i64	position,
+		i64	size		= std::numeric_limits<i64>::max()
+	) const noexcept -> ThisType
 	{
 		auto [ start, end ] = ClampSearchRange( position, size );
 		i64 length = end - start;
@@ -679,10 +611,10 @@ public:
 	/// 
 	/// @return
 	/// A new text view containing a range to data in this text view.
-	constexpr BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsConst>									SubText(
-		ConstIterator																					begin_iterator,
-		ConstIterator																					end_iterator
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto SubText(
+		ConstIterator begin_iterator,
+		ConstIterator end_iterator
+	) const BC_CONTAINER_NOEXCEPT -> ThisType
 	{
 		BC_ContainerAssert(
 			reinterpret_cast<const void*>( begin_iterator.GetContainer() ) == this,
@@ -712,7 +644,7 @@ public:
 	/// @return
 	/// Iterator that points to the first character.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	constexpr auto begin() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
 	}
@@ -724,7 +656,7 @@ public:
 	/// @return
 	/// Iterator that points to the first character.
 	[[nodiscard]]
-	constexpr ConstIterator																				begin() const noexcept
+	constexpr auto begin() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ 0 ] };
 	}
@@ -736,7 +668,7 @@ public:
 	/// @return
 	/// Iterator that points to the first character.
 	[[nodiscard]]
-	constexpr ConstIterator																				cbegin() const noexcept
+	constexpr auto cbegin() const noexcept -> ConstIterator
 	{
 		return this->begin();
 	}
@@ -748,7 +680,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last character.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	constexpr auto end() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -760,7 +692,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last character.
 	[[nodiscard]]
-	constexpr ConstIterator																				end() const noexcept
+	constexpr auto end() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -772,7 +704,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last character.
 	[[nodiscard]]
-	constexpr ConstIterator																				cend() const noexcept
+	constexpr auto cend() const noexcept -> ConstIterator
 	{
 		return this->end();
 	}
@@ -781,10 +713,10 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct ClampSearchRangeResult { i64 start, end; };
-	ClampSearchRangeResult																				ClampSearchRange(
-		i64																								position,
-		i64																								search_length
-	) const
+	auto ClampSearchRange(
+		i64	position,
+		i64	search_length
+	) const -> ClampSearchRangeResult
 	{
 		i64 my_size = this->Size();
 
@@ -819,8 +751,7 @@ private:
 /// @tparam CharacterType
 /// Data type of single character.
 template<utility::TextContainerCharacterType CharacterType>
-class BC_CONTAINER_NAME( TextBase ) :
-	public container_bases::BC_CONTAINER_NAME( LinearContainerBase )<CharacterType>
+class BC_CONTAINER_NAME( TextBase ) : public container_bases::BC_CONTAINER_NAME( LinearContainerBase )<CharacterType>
 {
 public:
 
@@ -872,81 +803,67 @@ public:
 	constexpr BC_CONTAINER_NAME( TextBase )() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( TextBase )(
-		const BC_CONTAINER_NAME( TextBase )															&	other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr BC_CONTAINER_NAME( TextBase )( const ThisType& other ) BC_CONTAINER_NOEXCEPT
 	{
 		this->Append( other, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( TextBase )(
-		BC_CONTAINER_NAME( TextBase )																&&	other
-	) noexcept
+	constexpr BC_CONTAINER_NAME( TextBase )( ThisType&& other ) noexcept
 	{
 		this->Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<utility::TextContainerCharacterType OtherT>
-	constexpr BC_CONTAINER_NAME( TextBase )(
-		const std::initializer_list<OtherT>															&	init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
+	constexpr BC_CONTAINER_NAME( TextBase )( const std::initializer_list<CharacterType>& init_list ) BC_CONTAINER_NOEXCEPT
 	{
 		this->Append( init_list, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( TextBase )(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr BC_CONTAINER_NAME( TextBase )( ThisViewType<IsOtherConst> other ) BC_CONTAINER_NOEXCEPT
 	{
+		// TODO: Consider removing implicit conversion from view types as this may be accidental leading to performance degradation. It would be better to be explixit about text view to text conversions.
 		this->Append( other, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<i64 ArraySize>
-	constexpr BC_CONTAINER_NAME( TextBase )(
-		const CharacterType( &c_string )[ ArraySize ]
-	) BC_CONTAINER_NOEXCEPT
+	constexpr BC_CONTAINER_NAME( TextBase )( const CharacterType( &c_string )[ ArraySize ] ) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ), 1, 0 );
+		this->Append( ThisViewType<true> { c_string, ArraySize }, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<i64 ArraySize>
-	constexpr BC_CONTAINER_NAME( TextBase )(
-		const char( &c_string )[ ArraySize ]
-	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
+	constexpr BC_CONTAINER_NAME( TextBase )( const char( &c_string )[ ArraySize ] ) BC_CONTAINER_NOEXCEPT
+		requires( !std::is_same_v<CharacterType, char> )
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ), 1, 0 );
+		// TODO: Consider removing construction from plain c style char strings as this may be confusing. Instead, create conversion functions to handle construction from plain c style char strings. Then again, this is convenient.
+		this->Append( ThisContainerViewType<char, true> { c_string, ArraySize }, 1, 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr BC_CONTAINER_NAME( TextBase )(
-		CharacterType																					fill_with_character,
-		i64																								initialize_with_size			= 1
+		CharacterType	fill_with_character,
+		i64				initialize_with_size	= 1
 	) BC_CONTAINER_NOEXCEPT
 	{
 		this->FillBack( fill_with_character, initialize_with_size );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
-		const BC_CONTAINER_NAME( TextBase )															&	other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator=( const ThisType& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		if( &other == this ) return *this;
 
-		BC_CONTAINER_NAME( TextBase ) { other }.Swap( *this );
+		ThisType { other }.Swap( *this );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
-		BC_CONTAINER_NAME( TextBase )																&&	other
-	) noexcept
+	constexpr auto operator=( ThisType&& other ) noexcept -> ThisType&
 	{
 		if( &other == this ) return *this;
 
@@ -955,10 +872,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<utility::TextContainerCharacterType OtherT>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
-		const std::initializer_list<OtherT>															&	init_list
-	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
+	constexpr auto operator=( const std::initializer_list<CharacterType>& init_list ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		this->Clear();
 		this->Append( init_list, 1, 0 );
@@ -967,9 +881,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator=( ThisViewType<IsOtherConst> other ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		if( other.Data() >= this->Data() && other.Data() < this->Data() + this->Size() )
 		{
@@ -986,23 +898,21 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<i64 ArraySize>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
-		const CharacterType( &c_string )[ ArraySize ]
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator=( const CharacterType( &c_string )[ ArraySize ] ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		this->Clear();
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ), 1, 0 );
+		this->Append( ThisViewType<true> { c_string, ArraySize }, 1, 0 );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<i64 ArraySize>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator=(
-		const char( &c_string )[ ArraySize ]
-	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
+	constexpr auto operator=( const char( &c_string )[ ArraySize ] ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( !std::is_same_v<CharacterType, char> )
 	{
+		// TODO: Consider removing assigning from plain c style char strings as this may be confusing. Instead, create conversion functions to handle construction from plain c style char strings. Then again, this is convenient.
 		this->Clear();
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ), 1, 0 );
+		this->Append( ThisContainerViewType<char, true> { c_string, ArraySize }, 1, 0 );
 		return *this;
 	}
 
@@ -1018,9 +928,7 @@ public:
 	/// @return
 	/// True if this text is lexicographically less than the other. False if the other text equal or greater.
 	template<bool IsOtherConst>
-	constexpr bool																						operator<(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator<(ThisViewType<IsOtherConst> other) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		return std::lexicographical_compare(
 			this->begin(), this->end(),
@@ -1039,9 +947,7 @@ public:
 	/// 
 	/// @return
 	/// True if this text is lexicographically less than the other. False if the other text equal or greater.
-	constexpr bool																						operator<(
-		const BC_CONTAINER_NAME( TextBase )															&	other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator<( const ThisType& other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		return std::lexicographical_compare(
 			this->begin(), this->end(),
@@ -1059,10 +965,10 @@ public:
 	/// @return
 	/// New text object.
 	template<utility::ContainerView OtherContainerType>
-	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
-		const OtherContainerType																	&	other
-	) const BC_CONTAINER_NOEXCEPT
+	[[nodiscard]]
+	constexpr auto operator+( const OtherContainerType& other ) const BC_CONTAINER_NOEXCEPT -> ThisType
 	{
+		// TODO: Consider removing this function. It currently accepts any container view type which may be confusing. If removed, add operator+ for the string view instead.
 		auto result = BC_CONTAINER_NAME( TextBase ) {};
 		result.Reserve( this->data_size + other.Size() );
 		result.Append( *this, 1, 0 );
@@ -1080,9 +986,8 @@ public:
 	/// @return
 	/// New text object.
 	template<i64 ArraySize>
-	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
-		const CharacterType( &c_string )[ ArraySize ]
-	) const BC_CONTAINER_NOEXCEPT
+	[[nodiscard]]
+	constexpr auto operator+( const CharacterType( &c_string )[ ArraySize ] ) const BC_CONTAINER_NOEXCEPT -> ThisType
 	{
 		auto result = BC_CONTAINER_NAME( TextBase ) {};
 		result.Reserve( this->data_size + ArraySize );
@@ -1101,10 +1006,11 @@ public:
 	/// @return
 	/// New text object.
 	template<i64 ArraySize>
-	[[nodiscard]] constexpr BC_CONTAINER_NAME( TextBase )												operator+(
-		const char( &c_string )[ ArraySize ]
-	) const BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
+	[[nodiscard]]
+	constexpr auto operator+( const char( &c_string )[ ArraySize ] ) const BC_CONTAINER_NOEXCEPT -> ThisType
+		requires( !std::is_same_v<CharacterType, char> )
 	{
+		// TODO: Consider removing this function, it allows extending any unicode style string with a C style char string.
 		auto result = BC_CONTAINER_NAME( TextBase ) {};
 		result.Reserve( this->data_size + ArraySize );
 		result.Append( *this, 1, 0 );
@@ -1121,9 +1027,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
-		const BC_CONTAINER_NAME( TextBase )															&	other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator+=( const ThisType& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		this->Append( other, 1, this->data_size + other.Size() );
 		return *this;
@@ -1139,9 +1043,7 @@ public:
 	/// @return
 	/// Reference to this.
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator+=( ThisViewType<IsOtherConst> other ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		this->Append( other, 1, this->data_size + other.Size() );
 		return *this;
@@ -1156,10 +1058,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to this.
-	template<utility::TextContainerCharacterType OtherT>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
-		const std::initializer_list<OtherT>															&	other
-	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
+	constexpr auto operator+=( const std::initializer_list<CharacterType>& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
 		this->Append( other, 1, this->data_size + other.size() );
 		return *this;
@@ -1175,10 +1074,9 @@ public:
 	/// @return
 	/// Reference to this.
 	template<utility::ContainerView OtherContainerType>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
-		const OtherContainerType																	&	other
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator+=( const OtherContainerType& other ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
+		// TODO: Consider removing this function. It currently accepts any container view type which may be confusing. If removed, add operator+ for the string view instead.
 		this->Append( other, 1, this->data_size + other.Size() );
 		return *this;
 	}
@@ -1193,11 +1091,9 @@ public:
 	/// @return
 	/// Reference to this.
 	template<i64 ArraySize>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
-		const CharacterType( &c_string )[ ArraySize ]
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto operator+=( const CharacterType( &c_string )[ ArraySize ] ) BC_CONTAINER_NOEXCEPT -> ThisType&
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>( c_string, ArraySize ), 1, this->data_size + ArraySize );
+		this->Append( ThisViewType<true> { c_string, ArraySize }, 1, this->data_size + ArraySize );
 		return *this;
 	}
 
@@ -1211,10 +1107,10 @@ public:
 	/// @return
 	/// Reference to this.
 	template<i64 ArraySize>
-	constexpr BC_CONTAINER_NAME( TextBase )															&	operator+=(
-		const char( &c_string )[ ArraySize ]
-	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
+	constexpr auto operator+=( const char( &c_string )[ ArraySize ] ) BC_CONTAINER_NOEXCEPT -> ThisType&
+		requires( !std::is_same_v<CharacterType, char> )
 	{
+		// TODO: Consider removing this function, it allows extending any unicode style string with a C style char string.
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>( c_string, ArraySize ), 1, this->data_size + ArraySize );
 		return *this;
 	}
@@ -1228,9 +1124,7 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( TextBase )															&	other
-	) const noexcept
+	constexpr auto operator==( const ThisType& other ) const noexcept -> bool
 	{
 		if( &other == this ) return true;
 
@@ -1246,9 +1140,7 @@ public:
 	/// 
 	/// @return
 	/// true if text differs from the other, false if they match.
-	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( TextBase )															&	other
-	) const noexcept
+	constexpr auto operator!=( const ThisType& other ) const noexcept -> bool
 	{
 		if( &other == this ) return false;
 
@@ -1264,42 +1156,8 @@ public:
 	/// 
 	/// @return
 	/// true if this text matches the other, false otherwise.
-	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( TextBase )<char>													&	other
-	) const noexcept requires( !std::is_same_v<CharacterType, char> )
-	{
-		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if text differs from another.
-	/// 
-	/// @param other
-	///	Other text to compare with.
-	/// 
-	/// @return
-	/// true if text differs from the other, false if they match.
-	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( TextBase )<char>													&	other
-	) const noexcept requires( !std::is_same_v<CharacterType, char> )
-	{
-		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if text matches another.
-	/// 
-	/// @param other
-	///	Other text to compare with.
-	/// 
-	/// @return
-	/// true if this text matches the other, false otherwise.
 	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) const noexcept
+	constexpr auto operator==( ThisViewType<IsOtherConst> other ) const noexcept -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
@@ -1315,9 +1173,7 @@ public:
 	/// @return
 	/// true if text differs from the other, false if they match.
 	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, IsOtherConst>									other
-	) const noexcept
+	constexpr auto operator!=( ThisViewType<IsOtherConst> other ) const noexcept -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
@@ -1334,10 +1190,10 @@ public:
 	/// @return
 	/// true if this text matches the other, false otherwise.
 	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
-	) const noexcept requires( !std::is_same_v<CharacterType, char> )
+	constexpr auto operator==( ThisContainerViewType<char, IsOtherConst> other ) const noexcept -> bool
+		requires( !std::is_same_v<CharacterType, char> )
 	{
+		// TODO: Consider removing this function as it allows testing string equality with a text view of type char. This may be confusing.
 		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
 	}
 
@@ -1351,9 +1207,8 @@ public:
 	/// @return
 	/// true if text differs from the other, false if they match.
 	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( TextViewBase )<char, IsOtherConst>											other
-	) const noexcept requires( !std::is_same_v<CharacterType, char> )
+	constexpr auto operator!=( ThisContainerViewType<char, IsOtherConst> other ) const noexcept -> bool
+		requires( !std::is_same_v<CharacterType, char> )
 	{
 		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
 	}
@@ -1371,9 +1226,7 @@ public:
 	/// @return
 	/// true if this text matches the other, false otherwise.
 	template<i64 ArraySize>
-	constexpr bool																						operator==(
-		const CharacterType( &c_string )[ ArraySize ]
-	) const noexcept
+	constexpr auto operator==( const CharacterType( &c_string )[ ArraySize ] ) const noexcept -> bool
 	{
 		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
 	}
@@ -1391,9 +1244,7 @@ public:
 	/// @return
 	/// true if text differs from the other, false if they match.
 	template<i64 ArraySize>
-	constexpr bool																						operator!=(
-		const CharacterType( &c_string )[ ArraySize ]
-	) const noexcept
+	constexpr auto operator!=( const CharacterType( &c_string )[ ArraySize ] ) const noexcept -> bool
 	{
 		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize } );
 	}
@@ -1411,10 +1262,10 @@ public:
 	/// @return
 	/// true if this text matches the other, false otherwise.
 	template<i64 ArraySize>
-	constexpr bool																						operator==(
-		const char( &c_string )[ ArraySize ]
-	) const noexcept requires( !std::is_same_v<char, CharacterType> )
+	constexpr auto operator==( const char( &c_string )[ ArraySize ] ) const noexcept -> bool
+		requires( !std::is_same_v<char, CharacterType> )
 	{
+		// TODO: Consider removing this function as it allows testing string equality with C style char strings. This may be confusing.
 		return container_bases::internal_::CheckContainerContentsMatch( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
 	}
 
@@ -1431,10 +1282,10 @@ public:
 	/// @return
 	/// true if text differs from the other, false if they match.
 	template<i64 ArraySize>
-	constexpr bool																						operator!=(
-		const char( &c_string )[ ArraySize ]
-	) const noexcept requires( !std::is_same_v<char, CharacterType> )
+	constexpr auto operator!=( const char( &c_string )[ ArraySize ] ) const noexcept -> bool
+		requires( !std::is_same_v<char, CharacterType> )
 	{
+		// TODO: Consider removing this function as it allows testing string in-equality with C style char strings. This may be confusing.
 		return container_bases::internal_::CheckContainerContentsDiffer( *this, BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize } );
 	}
 
@@ -1449,9 +1300,7 @@ public:
 	/// 
 	/// @return
 	/// Iterator to the next character which replaced the erased character or end if not found.
-	constexpr Iterator																					Erase(
-		const CharacterType																			&	character
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Erase( const CharacterType& character ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		return Iterator {
 			this,
@@ -1471,9 +1320,7 @@ public:
 	/// @return
 	/// Iterator to the next character which replaced the erased character, if erased last character then returned iterator points
 	/// to the end.
-	constexpr Iterator																					Erase(
-		ConstIterator																					at
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Erase( ConstIterator at ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		BC_ContainerAssert( at.GetContainer() == this,
 			U"Cannot erase using iterator that doesn't point to the container we're erasing from"
@@ -1499,10 +1346,10 @@ public:
 	/// 
 	/// @return
 	/// Iterator to the the first character which was not erased.
-	constexpr Iterator																					Erase(
+	constexpr auto Erase(
 		ConstIterator																					from,
 		ConstIterator																					to
-	) BC_CONTAINER_NOEXCEPT
+	) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		BC_ContainerAssert( from.GetContainer() == this,
 			U"Cannot erase using 'from' iterator that doesn't point to the container we're erasing from"
@@ -1537,12 +1384,13 @@ public:
 	///
 	/// @return
 	/// Iterator to the next character after inserted character.
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const CharacterType																			&	character,
-		i64																								count			= 1,
-		i64																								headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> )
+	constexpr auto Insert(
+		ConstIterator			at,
+		const CharacterType&	character,
+		i64						count			= 1,
+		i64						headroom		= 0
+	) BC_CONTAINER_NOEXCEPT -> Iterator
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> )
 	{
 		BC_ContainerAssert( count >= 0, U"Count must be positive number" );
 		BC_ContainerAssert( headroom >= 0, U"Headroom must be positive number" );
@@ -1581,12 +1429,13 @@ public:
 	/// @return
 	/// Iterator one past the the last inserted character. Or first original character after insertion.
 	template<utility::ContainerView OtherContainerType>
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const OtherContainerType																	&	other,
-		i64																								count			= 1,
-		i64																								headroom		= 0
-	) BC_CONTAINER_NOEXCEPT requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> && std::is_same_v<CharacterType, typename OtherContainerType::ContainedValueType> )
+	constexpr auto Insert(
+		ConstIterator				at,
+		const OtherContainerType&	other,
+		i64							count			= 1,
+		i64							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT -> Iterator
+		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<CharacterType> && std::is_same_v<CharacterType, typename OtherContainerType::ContainedValueType> )
 	{
 		BC_ContainerAssert( count >= 0, U"Count must be positive number" );
 		BC_ContainerAssert( headroom >= 0, U"Headroom must be positive number" );
@@ -1630,14 +1479,14 @@ public:
 	/// Iterator to the first original character after insertion. Eg. If inserting "HH" at position <tt>begin() + 2</tt> then
 	/// returned iterator points to <tt>begin() + 4</tt>.
 	template<i64 ArraySize>
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const CharacterType( &c_string )[ ArraySize ],
-		i64																								count							= 1,
-		i64																								headroom						= 0
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Insert(
+		ConstIterator			at,
+		const CharacterType		( &c_string )[ ArraySize ],
+		i64						count							= 1,
+		i64						headroom						= 0
+	) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
-		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> {c_string, ArraySize }, count, headroom );
+		return this->Insert( at, ThisViewType<CharacterType, true> { c_string, ArraySize }, count, headroom );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1667,23 +1516,24 @@ public:
 	/// Iterator to the first original character after insertion. Eg. If inserting "HH" at position <tt>begin() + 2</tt> then
 	/// returned iterator points to <tt>begin() + 4</tt>.
 	template<i64 ArraySize>
-	constexpr Iterator																					Insert(
-		ConstIterator																					at,
-		const char( &c_string )[ ArraySize ],
-		i64																								count							= 1,
-		i64																								headroom						= 0
-	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
+	constexpr auto Insert(
+		ConstIterator	at,
+		const char		( &c_string )[ ArraySize ],
+		i64				count							= 1,
+		i64				headroom						= 0
+	) BC_CONTAINER_NOEXCEPT -> Iterator
+		requires( !std::is_same_v<CharacterType, char> )
 	{
-		return this->Insert( at, BC_CONTAINER_NAME( TextViewBase )<char, true> {c_string, ArraySize }, count, headroom );
+		// TODO: Consider removing this function. It accepts char strings, which may be confusing.
+		return this->Insert( at, ThisContainerViewType<char, true> { c_string, ArraySize }, count, headroom );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<utility::TextContainerCharacterType OtherT>
-	void																								Append(
-		const std::initializer_list<OtherT>															&	init_list,
-		i64																								count							= 1,
-		i64																								headroom						= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, OtherT> || std::is_same_v<char, OtherT> )
+	void Append(
+		const std::initializer_list<CharacterType>&	init_list,
+		i64											count			= 1,
+		i64											headroom		= 0
+	) BC_CONTAINER_NOEXCEPT
 	{
 		// Cannot use this->Base::Append() because other element type is always allowed to be char which is not necessarily
 		// the same type as this element type. Base::Append() only handles inputs with same element types as this.
@@ -1709,12 +1559,15 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<utility::TextContainerView OtherContainerType>
-	void																								Append(
-		const OtherContainerType																	&	other,
-		i64																								count							= 1,
-		i64																								headroom						= 0
-	) BC_CONTAINER_NOEXCEPT requires( std::is_same_v<CharacterType, typename OtherContainerType::ContainedCharacterType> || std::is_same_v<char, typename OtherContainerType::ContainedCharacterType> )
+	void Append(
+		const OtherContainerType&	other,
+		i64							count			= 1,
+		i64							headroom		= 0
+	) BC_CONTAINER_NOEXCEPT
+		requires( std::is_same_v<CharacterType, typename OtherContainerType::ContainedCharacterType> || std::is_same_v<char, typename OtherContainerType::ContainedCharacterType> )
 	{
+		// TODO: Consider preventing appending from a container which character type is not the same as this. It is confusing to mix text types with char.
+
 		// Cannot use this->Base::Append() because other container element type is always allowed to be char which is not
 		// necessarily the same type as this element type. Base::Append() only handles inputs with same element types as this.
 
@@ -1744,13 +1597,13 @@ public:
 	/// @param c_string
 	///	Other text to append elements from.
 	template<i64 ArraySize>
-	constexpr void																						Append(
+	constexpr void Append(
 		const CharacterType( &c_string )[ ArraySize ],
-		i64																								count							= 1,
-		i64																								headroom						= 0
+		i64						count							= 1,
+		i64						headroom						= 0
 	) BC_CONTAINER_NOEXCEPT
 	{
-		this->Append( BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>{ c_string, ArraySize }, count, headroom );
+		this->Append( ThisViewType<true>{ c_string, ArraySize }, count, headroom );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1763,12 +1616,14 @@ public:
 	/// @param c_string
 	/// Other text to append elements from.
 	template<i64 ArraySize>
-	constexpr void																						Append(
+	constexpr void Append(
 		const char( &c_string )[ ArraySize ],
-		i64																								count							= 1,
-		i64																								headroom						= 0
-	) BC_CONTAINER_NOEXCEPT requires( !std::is_same_v<CharacterType, char> )
+		i64			count							= 1,
+		i64			headroom						= 0
+	) BC_CONTAINER_NOEXCEPT
+		requires( !std::is_same_v<CharacterType, char> )
 	{
+		// TODO: Consider removing this function, it allows appending unicode text with a C style char string. Mixing text types may be confusing.
 		this->Append( BC_CONTAINER_NAME( TextViewBase )<char, true>{ c_string, ArraySize }, count, headroom );
 	}
 
@@ -1793,11 +1648,12 @@ public:
 	/// 
 	/// @return
 	/// Number of characters found.
-	[[nodiscard]] constexpr i64																			CountCharacters(
-		CharacterType																					character,
-		i64																								position						= 0,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto CountCharacters(
+		CharacterType	character,
+		i64				position			= 0,
+		i64				search_length		= std::numeric_limits<i64>::max()
+	) const noexcept -> i64
 	{
 		return ThisViewType<true>( *this ).CountCharacters( character, position, search_length );
 	}
@@ -1823,11 +1679,12 @@ public:
 	/// 
 	/// @return
 	/// Number of characters found.
-	[[nodiscard]] constexpr i64																			CountCharacters(
-		CharacterType																					character,
-		ConstIterator																					position,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto CountCharacters(
+		CharacterType	character,
+		ConstIterator	position,
+		i64				search_length	= std::numeric_limits<i64>::max()
+	) const noexcept -> i64
 	{
 		return ThisViewType<true>( *this ).CountCharacters( character, position, search_length );
 	}
@@ -1853,11 +1710,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																FindCharacter(
-		CharacterType																					character,
-		i64																								position						= 0,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto FindCharacter(
+		CharacterType	character,
+		i64				position		= 0,
+		i64				search_length	= std::numeric_limits<i64>::max()
+	) const noexcept -> ConstIterator
 	{
 		auto result = ThisViewType<true>( *this ).FindCharacter( character, position, search_length );
 		return ConstIterator { this, result.GetAddress() };
@@ -1884,11 +1742,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where matching character was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																FindCharacter(
-		CharacterType																					character,
-		ConstIterator																					position,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto FindCharacter(
+		CharacterType	character,
+		ConstIterator	position,
+		i64				search_length	= std::numeric_limits<i64>::max()
+	) const noexcept -> ConstIterator
 	{
 		auto result = ThisViewType<true>( *this ).FindCharacter( character, position, search_length );
 		return ConstIterator { this, result.GetAddress() };
@@ -1915,11 +1774,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																Find(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_find,
-		i64																								position						= 0,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const noexcept
+	[[nodiscard]]
+	constexpr auto Find(
+		ThisViewType<true>	text_to_find,
+		i64					position		= 0,
+		i64					search_length	= std::numeric_limits<i64>::max()
+	) const noexcept -> ConstIterator
 	{
 		auto result = ThisViewType<true>( *this ).Find( text_to_find, position, search_length );
 		return ConstIterator { this, result.GetAddress() };
@@ -1946,11 +1806,12 @@ public:
 	/// 
 	/// @return
 	/// Iterator to where other text matching this was found, iterator points to the end if not found.
-	[[nodiscard]] constexpr ConstIterator																Find(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_find,
-		ConstIterator																					position,
-		i64																								search_length					= std::numeric_limits<i64>::max()
-	) const BC_CONTAINER_NOEXCEPT
+	[[nodiscard]]
+	constexpr auto Find(
+		ThisViewType<true>	text_to_find,
+		ConstIterator		position,
+		i64					search_length	= std::numeric_limits<i64>::max()
+	) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		auto result = ThisViewType<true>( *this ).Find( text_to_find, position, search_length );
 		return ConstIterator { this, result.GetAddress() };
@@ -1977,12 +1838,12 @@ public:
 	///	How many characters are included in the search, default is ```std::numeric_limits<i64>::max()```. Positive numbers search
 	/// after ```position```, negative numbers search in front of ```position```. Search range will be clamped between 0 and size of
 	/// the text.
-	void																								Replace(
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											text_to_replace,
-		BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>											replace_with,
-		i64																								count							= 1,
-		i64																								search_position					= 0,
-		i64																								search_length					= std::numeric_limits<i64>::max()
+	void Replace(
+		ThisViewType<true>	text_to_replace,
+		ThisViewType<true>	replace_with,
+		i64					count				= 1,
+		i64					search_position		= 0,
+		i64					search_length		= std::numeric_limits<i64>::max()
 	) BC_CONTAINER_NOEXCEPT
 	{
 		if( this->IsEmpty() ) return;
@@ -2043,10 +1904,10 @@ public:
 	/// 
 	/// @return
 	/// A new text view containing a range to data in this text view.
-	constexpr BC_CONTAINER_NAME( TextBase )																SubText(
-		i64																								position,
-		i64																								size							= std::numeric_limits<i64>::max()
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto SubText(
+		i64	position,
+		i64	size		= std::numeric_limits<i64>::max()
+	) const BC_CONTAINER_NOEXCEPT -> ThisType
 	{
 		return ThisType( ThisViewType( *this ).SubText( position, size ) );
 	}
@@ -2063,10 +1924,10 @@ public:
 	/// 
 	/// @return
 	/// New text container object.
-	constexpr BC_CONTAINER_NAME( TextBase )																SubText(
-		ConstIterator																					begin_it,
-		ConstIterator																					end_it
-	)  const BC_CONTAINER_NOEXCEPT
+	constexpr auto SubText(
+		ConstIterator	begin_it,
+		ConstIterator	end_it
+	)  const BC_CONTAINER_NOEXCEPT -> ThisType
 	{
 		BC_ContainerAssert( reinterpret_cast<void*>( begin_it.container ) == this, U"Wrong start iterator" );
 		BC_ContainerAssert( reinterpret_cast<void*>( end_it.container ) == this, U"Wrong end iterator" );
@@ -2090,7 +1951,7 @@ public:
 	///
 	/// @return
 	/// C-style, null-terminated character string with same character type as this text.
-	constexpr const CharacterType																	*	ToCStr() BC_CONTAINER_NOEXCEPT
+	constexpr auto ToCStr() BC_CONTAINER_NOEXCEPT -> const CharacterType*
 	{
 		if( !this->data_ptr ) return nullptr;
 		this->Reserve( this->data_size + 1 );
@@ -2105,7 +1966,7 @@ public:
 	/// @return
 	/// Iterator that points to the first character.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	constexpr auto begin() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ 0 ] };
 	}
@@ -2117,7 +1978,7 @@ public:
 	/// @return
 	/// Iterator that points to the first character.
 	[[nodiscard]]
-	constexpr ConstIterator																				begin() const noexcept
+	constexpr auto begin() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ 0 ] };
 	}
@@ -2129,7 +1990,7 @@ public:
 	/// @return
 	/// Iterator that points to the first character.
 	[[nodiscard]]
-	constexpr ConstIterator																				cbegin() const noexcept
+	constexpr auto cbegin() const noexcept -> ConstIterator
 	{
 		return this->begin();
 	}
@@ -2141,7 +2002,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last character.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	constexpr auto end() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -2153,7 +2014,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last character.
 	[[nodiscard]]
-	constexpr ConstIterator																				end() const noexcept
+	constexpr auto end() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data_ptr[ this->data_size ] };
 	}
@@ -2165,19 +2026,21 @@ public:
 	/// @return
 	/// Iterator that points to one over the last character.
 	[[nodiscard]]
-	constexpr ConstIterator																				cend() const noexcept
+	constexpr auto cend() const noexcept -> ConstIterator
 	{
 		return this->end();
 	}
 
-	operator BC_CONTAINER_NAME( TextViewBase )<CharacterType, true>() const noexcept
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	operator ThisViewType<true>() const noexcept
 	{
-		return BC_CONTAINER_NAME( TextViewBase )<CharacterType, true> { this->data_ptr, this->data_size };
+		return ThisViewType<true> { this->data_ptr, this->data_size };
 	}
 
-	operator BC_CONTAINER_NAME( TextViewBase )<CharacterType, false>() noexcept
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	operator ThisViewType<false>() noexcept
 	{
-		return BC_CONTAINER_NAME( TextViewBase )<CharacterType, false> { this->data_ptr, this->data_size };
+		return ThisViewType<false> { this->data_ptr, this->data_size };
 	}
 };
 

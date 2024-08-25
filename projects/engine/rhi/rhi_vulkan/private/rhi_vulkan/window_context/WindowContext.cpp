@@ -9,15 +9,15 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::WindowContext::WindowContext(
-	RHIVulkanImpl					&	rhi_vulkan_impl,
-	window_manager::Window			*	window,
-	const WindowContextCreateInfo	&	create_info
+	RHIVulkanImpl&					rhi_vulkan_impl,
+	window_manager::Window*			window,
+	const WindowContextCreateInfo&	create_info
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl ),
 	window( window )
 {
-	window_surface		= MakeUniquePtr<VulkanWindowSurface>( rhi_vulkan_impl, window );
-	swapchain			= MakeUniquePtr<VulkanSwapchain>( rhi_vulkan_impl, *window_surface, create_info.swapchain_create_info, nullptr );
+	window_surface	= MakeUniquePtr<VulkanWindowSurface>( rhi_vulkan_impl, window );
+	swapchain		= MakeUniquePtr<VulkanSwapchain>( rhi_vulkan_impl, *window_surface, create_info.swapchain_create_info, nullptr );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

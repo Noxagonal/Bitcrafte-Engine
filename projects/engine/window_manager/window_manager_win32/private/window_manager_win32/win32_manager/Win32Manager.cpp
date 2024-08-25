@@ -13,12 +13,12 @@ namespace window_manager {
 
 
 
-LRESULT CALLBACK WndProc(
-	HWND		window_handle,
-	UINT		message,
-	WPARAM		w_param,
-	LPARAM		l_param
-)
+auto CALLBACK WndProc(
+	HWND	window_handle,
+	UINT	message,
+	WPARAM	w_param,
+	LPARAM	l_param
+) -> LRESULT
 {
 	auto win32_window = reinterpret_cast<bc::window_manager::Win32Window*>( GetWindowLongPtr( window_handle, GWLP_USERDATA ) );
 
@@ -426,8 +426,8 @@ LRESULT CALLBACK WndProc(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::Win32Manager::Win32Manager(
-	WindowManagerWin32Component				&	window_manager_win32_component,
-	const WindowManagerComponentCreateInfo	&	window_manager_component_create_info
+	WindowManagerWin32Component&				window_manager_win32_component,
+	const WindowManagerComponentCreateInfo&		window_manager_component_create_info
 ) :
 	window_manager_win32_component( window_manager_win32_component )
 {
@@ -465,9 +465,7 @@ void bc::window_manager::Win32Manager::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::Window> bc::window_manager::Win32Manager::CreateWindow(
-	const WindowCreateInfo  & window_create_info
-)
+auto bc::window_manager::Win32Manager::CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>
 {
 	auto new_window = MakeUniquePtr<Win32Window>( *this, window_create_info );
 	active_window_list.PushBack( new_window.Get() );
@@ -476,9 +474,7 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::Win32Manager::Crea
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::Win32Manager::NotifyWindowBeingDestroyed(
-	bc::window_manager::Win32Window * window_ptr
-)
+void bc::window_manager::Win32Manager::NotifyWindowBeingDestroyed( bc::window_manager::Win32Window* window_ptr )
 {
 	window_manager_win32_component.events.OnWindowBeingDestroyed.Signal( window_ptr );
 	active_window_list.Erase( window_ptr );

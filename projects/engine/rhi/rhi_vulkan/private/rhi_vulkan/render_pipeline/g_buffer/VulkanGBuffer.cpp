@@ -8,9 +8,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanGBuffer::VulkanGBuffer(
-	RHIVulkanImpl											&	rhi_vulkan_impl,
-	const GBufferCreateInfo									&	create_info
-) :
+	RHIVulkanImpl&				rhi_vulkan_impl,
+	const GBufferCreateInfo&	create_info
+)
+	:
 	GBuffer( create_info ),
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {

@@ -30,7 +30,7 @@ class Thread
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline virtual									~Thread() {};
+	inline virtual ~Thread() {};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -39,7 +39,7 @@ public:
 	/// @note
 	/// If an exception is thrown in this function, the whole thread pool will be evacuated and an exception is forwarded in the
 	/// main thread. ThreadEnd() is always called so you may use that to do any potential cleanup first.
-	virtual	void									ThreadBegin()					= 0;
+	virtual	void ThreadBegin() = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -49,8 +49,8 @@ public:
 	///	This function is run even if ThreadBegin() throws. You can rely on this function for cleanup.
 	///
 	/// @note
-	/// This is a cleanup function and should not throw, any major errors can be left to the OS to deal with.
-	virtual void									ThreadEnd() noexcept			= 0;
+	/// This is a cleanup function and must not throw, any major errors can be left to the OS to deal with.
+	virtual void ThreadEnd() noexcept = 0;
 };
 
 

@@ -32,46 +32,42 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Win32Manager(
-		WindowManagerWin32Component								&	window_manager_win32_component,
-		const WindowManagerComponentCreateInfo					&	window_manager_component_create_info
+		WindowManagerWin32Component&				window_manager_win32_component,
+		const WindowManagerComponentCreateInfo&		window_manager_component_create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~Win32Manager();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void															Run();
+	void Run();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	UniquePtr<Window>												CreateWindow(
-		const WindowCreateInfo									&	window_create_info
-	);
+	auto CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void															NotifyWindowBeingDestroyed(
-		Win32Window												*	window_ptr
-	);
+	void NotifyWindowBeingDestroyed( Win32Window* window_ptr );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const WindowManagerWin32PlatformHandles				*	GetPlatformSpecificHandles() const { return &platform_handles; }
+	inline auto GetPlatformSpecificHandles() const -> const WindowManagerWin32PlatformHandles* { return &platform_handles; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const WNDCLASSW										&	GetWindowClass() { return window_class; }
+	inline auto GetWindowClass() const -> const WNDCLASSW& { return window_class; }
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void															ProcessMessages();
+	void ProcessMessages();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	WindowManagerWin32Component									&	window_manager_win32_component;
+	WindowManagerWin32Component&		window_manager_win32_component;
 
-	Text16															window_class_name			= "BitCrafteEngineWindowClass";
-	WNDCLASSW														window_class				= {};
+	Text16								window_class_name					= "BitCrafteEngineWindowClass";
+	WNDCLASSW							window_class						= {};
 
-	List<Win32Window*>												active_window_list;
+	List<Win32Window*>					active_window_list;
 
-	WindowManagerWin32PlatformHandles								platform_handles = {};
+	WindowManagerWin32PlatformHandles	platform_handles = {};
 };
 
 

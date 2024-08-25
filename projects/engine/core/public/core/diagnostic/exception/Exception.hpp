@@ -37,9 +37,9 @@ public:
 	/// This reports the source location where this function was called. If left as default, stack trace will point to the function
 	/// where this function was called.
 	inline Exception(
-		const PrintRecord		&	print_record			= PrintRecord{},
-		const SourceLocation	&	source_location			= SourceLocation::Current(),
-		const StackTrace		&	stack_trace 			= StackTrace::Current()
+		const PrintRecord&		print_record		= PrintRecord{},
+		const SourceLocation&	source_location		= SourceLocation::Current(),
+		const StackTrace&		stack_trace 		= StackTrace::Current()
 	) noexcept :
 		message{ print_record },
 		source_location{ source_location },
@@ -48,52 +48,44 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline Exception(
-		const Exception									&	other
-	)
+	inline Exception( const Exception& other )
 	{
-		this->CopyOther( other );
+		this->Copy( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline Exception(
-		Exception										&&	other
-	) = default;
+	inline Exception( Exception&& other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline Exception									&	operator=(
-		const Exception									&	other
-	)
+	inline auto operator=( const Exception&	other ) -> Exception&
 	{
-		this->CopyOther( other );
+		this->Copy( other );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline Exception									&	operator=(
-		Exception										&&	other
-	) = default;
+	inline auto operator=( Exception&& other ) -> Exception& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const PrintRecord							&	GetMessage() const noexcept
+	inline auto GetMessage() const noexcept -> const PrintRecord&
 	{
 		return this->message;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const SourceLocation							&	GetSourceLocation() const noexcept
+	inline auto GetSourceLocation() const noexcept -> const SourceLocation&
 	{
 		return this->source_location;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const StackTrace								&	GetStackTrace() const noexcept
+	inline auto GetStackTrace() const noexcept -> const StackTrace&
 	{
 		return this->stack_trace;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const Exception								*	GetNextException() const noexcept
+	inline auto GetNextException() const noexcept -> const Exception*
 	{
 		return this->next.Get();
 	}
@@ -107,9 +99,7 @@ public:
 	///
 	/// @param next_exception
 	/// Exception we wish to store inside this exception.
-	inline void												SetNextException(
-		const Exception									&	next_exception
-	)
+	inline void SetNextException( const Exception& next_exception )
 	{
 		assert( std::addressof( next_exception ) != this && "next_exception was this exception" );
 		if( std::addressof( next_exception ) == this ) return;
@@ -117,7 +107,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline bool												IsEmpty() const noexcept
+	inline auto IsEmpty() const noexcept -> bool
 	{
 		return this->message.IsEmpty();
 	}
@@ -125,9 +115,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline void												CopyOther(
-		const Exception									&	other
-	)
+	inline void Copy( const Exception& other )
 	{
 		this->message			= other.message;
 		this->source_location	= other.source_location;
@@ -138,9 +126,9 @@ private:
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PrintRecord												message;
-	SourceLocation											source_location;
-	StackTrace												stack_trace;
+	PrintRecord		message;
+	SourceLocation	source_location;
+	StackTrace		stack_trace;
 
 private:
 
@@ -150,7 +138,7 @@ private:
 	///
 	/// This is used when an exception is caught by something which will then throw its own exception with additional information.
 	/// The original exception may be stored here.
-	bc::internal_::SimpleUniquePtr<Exception>				next;
+	bc::internal_::SimpleUniquePtr<Exception>	next;
 };
 
 
@@ -171,9 +159,9 @@ private:
 /// @param exception
 ///	Exception to throw.
 BITCRAFTE_ENGINE_API
-void													Throw [[noreturn]] (
-	const Exception									&	exception,
-	SourceLocation										source_location					= SourceLocation::Current()
+void Throw [[noreturn]] (
+	const Exception&	exception,
+	SourceLocation		source_location		= SourceLocation::Current()
 );
 
 
@@ -213,9 +201,9 @@ void													Throw [[noreturn]] (
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
 BITCRAFTE_ENGINE_API
-void													Throw [[noreturn]] (
-	const PrintRecord								&	print_record,
-	const SourceLocation							&	source_location				= SourceLocation::Current()
+void Throw [[noreturn]] (
+	const PrintRecord&		print_record,
+	const SourceLocation&	source_location		= SourceLocation::Current()
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,9 +241,9 @@ void													Throw [[noreturn]] (
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
 BITCRAFTE_ENGINE_API
-void													Throw [[noreturn]] (
-	const bc::internal_::SimpleTextView32				message,
-	const SourceLocation							&	source_location				= SourceLocation::Current()
+void Throw [[noreturn]] (
+	const bc::internal_::SimpleTextView32	message,
+	const SourceLocation&					source_location		= SourceLocation::Current()
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -292,10 +280,13 @@ void													Throw [[noreturn]] (
 ///
 /// @param source_location
 /// Please leave this as default. This reports the source location where this function was called.
-template<utility::TextContainerCharacterType CharacterType, u64 StringArraySize>
-void													Throw [[noreturn]] (
-	const CharacterType( &message )[ StringArraySize ],
-	const SourceLocation							&	source_location				= SourceLocation::Current()
+template<
+	utility::TextContainerCharacterType		CharacterType,
+	i64										StringArraySize
+>
+void Throw [[noreturn]] (
+	const CharacterType		( &message )[ StringArraySize ],
+	const SourceLocation&	source_location						= SourceLocation::Current()
 )
 {
 	Throw(

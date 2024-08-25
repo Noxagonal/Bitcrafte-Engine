@@ -16,9 +16,9 @@ namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static void xdg_surface_configure(
-	void				*	data,
-	xdg_surface			*	xdg_surface,
-	uint32_t				serial
+	void*			data,
+	xdg_surface*	xdg_surface,
+	uint32_t		serial
 )
 {
 	xdg_surface_ack_configure( xdg_surface, serial );
@@ -31,11 +31,11 @@ static const struct xdg_surface_listener xdg_surface_listener
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static void xdg_toplevel_configure(
-	void				*	data,
-	xdg_toplevel		*	xdg_toplevel,
-	int32_t					width,
-	int32_t					height,
-	wl_array			*	states
+	void*			data,
+	xdg_toplevel*	xdg_toplevel,
+	int32_t			width,
+	int32_t			height,
+	wl_array*		states
 )
 {
 	// Handle toplevel configuration (resize, maximize, etc.)
@@ -43,8 +43,8 @@ static void xdg_toplevel_configure(
 }
 
 static void xdg_toplevel_close(
-	void				*	data,
-	xdg_toplevel		*	xdg_toplevel
+	void*			data,
+	xdg_toplevel*	xdg_toplevel
 )
 {
 	// Handle window close event
@@ -67,9 +67,10 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::WaylandWindow::WaylandWindow(
-	WaylandManager			&	wayland_manager,
-	const WindowCreateInfo	&	window_create_info
-) :
+	WaylandManager&				wayland_manager,
+	const WindowCreateInfo&		window_create_info
+)
+:
 	Window( window_create_info ),
 	wayland_manager( wayland_manager ),
 	platform_handles( *wayland_manager.GetPlatformSpecificHandles() )
@@ -86,7 +87,7 @@ bc::window_manager::WaylandWindow::~WaylandWindow()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::WaylandWindow::GetDecorated()
+auto bc::window_manager::WaylandWindow::GetDecorated() const -> bool
 {
 	// TODO: Get window decorations
 
@@ -94,9 +95,7 @@ bool bc::window_manager::WaylandWindow::GetDecorated()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::WaylandWindow::SetDecorated(
-	bool is_decorated
-)
+void bc::window_manager::WaylandWindow::SetDecorated( bool is_decorated )
 {
 	// TODO: Set window decorations
 
@@ -111,16 +110,14 @@ void bc::window_manager::WaylandWindow::SetDecorated(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::WaylandWindow::GetResizeable()
+auto bc::window_manager::WaylandWindow::GetResizeable() const -> bool
 {
 	// TODO: Get window resizeable
 	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::WaylandWindow::SetResizeable(
-	bool is_decorated
-)
+void bc::window_manager::WaylandWindow::SetResizeable( bool is_resizeable )
 {
 	// TODO
 }
@@ -132,7 +129,7 @@ void bc::window_manager::WaylandWindow::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::WaylandWindow::GetPlatformSpecificHandles() const
+auto bc::window_manager::WaylandWindow::GetPlatformSpecificHandles() const -> const WindowManagerPlatformHandlesBase*
 {
 	return &platform_handles;
 }

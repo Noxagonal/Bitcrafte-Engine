@@ -60,14 +60,10 @@ public:
 	Event() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Event(
-		const Event<EventSignalTypePack...>						&	other
-	) = delete;
+	Event( const Event& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Event(
-		Event<EventSignalTypePack...>							&&	other
-	) = default;
+	Event( Event&& other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~Event()
@@ -81,14 +77,10 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Event														&	operator=(
-		const Event<EventSignalTypePack...>						&	other
-	) = delete;
+	auto operator=( const Event& other ) -> Event& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Event														&	operator=(
-		Event<EventSignalTypePack...>							&&	other
-	) = default;
+	auto operator=( Event&& other ) -> Event& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -96,9 +88,7 @@ public:
 	/// 
 	/// @param event
 	///	Event to signal when this event is signalled.
-	void															RegisterObserver(
-		Event<EventSignalTypePack...>							*	event
-	)
+	void RegisterObserver( Event* event )
 	{
 		BAssert( listeners.Find( event ) == listeners.end(), "tried registering same observer twice to the same event" );
 		#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
@@ -152,9 +142,7 @@ public:
 	/// 
 	/// @return
 	/// returns callback id which can be used to unregister this callback.
-	u64																RegisterCallback(
-		const Function<void( EventSignalTypePack... )>			&	callback
-	)
+	auto RegisterCallback( const Function<void( EventSignalTypePack... )>& callback ) -> u64
 	{
 		++callback_counter;
 		callbacks.Emplace( callback_counter, callback );
@@ -167,9 +155,7 @@ public:
 	/// 
 	/// @param event
 	///	Previously registered event.
-	void															UnRegisterObserver(
-		Event<EventSignalTypePack...>							*	event
-	)
+	void UnRegisterObserver( Event* event )
 	{
 		auto it = listeners.Find( event );
 		if( it != listeners.end() ) {
@@ -184,9 +170,7 @@ public:
 	/// 
 	/// @param callback_id
 	///	Previously registered id you got from Event::RegisterCallback().
-	void															UnRegisterCallback(
-		u64															callback_id
-	)
+	void UnRegisterCallback( u64 callback_id )
 	{
 		auto it = callbacks.Find( callback_id );
 		if( it != callbacks.end() ) {
@@ -206,10 +190,8 @@ public:
 	///
 	/// @param ...signal_arguments
 	///	Arguments passed along to all listeners and callbacks as parameters.
-	template<typename												...SignalTypePack>
-	void															Signal(
-		SignalTypePack											&&	...signal_arguments
-	)
+	template<typename ...SignalTypePack>
+	void Signal( SignalTypePack&& ...signal_arguments )
 	{
 		for( auto & c : callbacks ) {
 			c.second( std::forward<SignalTypePack>( signal_arguments )... );
@@ -225,7 +207,7 @@ public:
 	///
 	/// @return
 	/// Number of listeners
-	u64																GetObserverCount()
+	auto GetObserverCount() -> u64
 	{
 		return listeners.Size();
 	}
@@ -236,7 +218,7 @@ public:
 	///
 	/// @return
 	/// Number of listening_to events.
-	u64																GetObservingCount()
+	auto GetObservingCount() -> u64
 	{
 		return listening_to.Size();
 	}
@@ -244,10 +226,10 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<Event<EventSignalTypePack...>*>							listeners;
-	List<Event<EventSignalTypePack...>*>							listening_to;
-	Map<u64, Function<void( EventSignalTypePack... )>>				callbacks;
-	u64																callback_counter		= 0;
+	List<Event<EventSignalTypePack...>*>				listeners;
+	List<Event<EventSignalTypePack...>*>				listening_to;
+	Map<u64, Function<void( EventSignalTypePack... )>>	callbacks; // TODO: Replace Map with a List when possible.
+	u64													callback_counter		= 0;
 };
 
 

@@ -90,7 +90,7 @@ public:
 	/// @return
 	/// Index to first occurrence of TypeToFind in TypeList.
 	template<typename TypeToFind>
-	consteval static u64 TypeToIndex()
+	consteval static auto TypeToIndex()
 	{
 		return GetTemplateParameterPackIndexFromType<TypeToFind, TypePack...>::value;
 	}
@@ -108,7 +108,7 @@ public:
 	///
 	/// @return
 	/// Number of template parameters in the TypeList.
-	consteval static u64 Size()
+	consteval static auto Size()
 	{
 		return sizeof...( TypePack );
 	}
@@ -126,7 +126,7 @@ public:
 	///
 	/// @return
 	/// Maximum size of the TypeList.
-	consteval static u64 TypeMaxSize()
+	consteval static auto TypeMaxSize()
 	{
 		return FindMaxSizeTypeInParameterPack<TypePack...>::value;
 	}
@@ -148,7 +148,7 @@ public:
 	///
 	/// @return
 	/// Maximum size of the TypeList.
-	consteval static u64 TypeMaxAlignment()
+	consteval static auto TypeMaxAlignment()
 	{
 		return FindMaxAlignmentTypeInParameterPack<TypePack...>::value;
 	}
@@ -170,7 +170,7 @@ public:
 	/// @return
 	/// Number of instances of CountType in this TypeList.
 	template<typename TypeToCount>
-	consteval static u64 CountType()
+	consteval static auto CountType()
 	{
 		return CountTypeInParameterPack<TypeToCount, TypePack...>::value;
 	}
@@ -193,7 +193,7 @@ public:
 	/// @tparam TypeToCheck
 	/// Type to check if it exists in this TypeList.
 	template<typename TypeToCheck>
-	consteval static bool HasType()
+	consteval static auto HasType() -> bool
 	{
 		return IsTypeInParameterPack<TypeToCheck, TypePack...>::value;
 	}
@@ -220,7 +220,7 @@ public:
 	/// @return
 	/// True if TypeToCheck is found once in TypeList. False if Check type was not found in TypeList or if it was found multiple times.
 	template<typename TypeToCheck>
-	consteval static u64 IsTypeUnique()
+	consteval static auto IsTypeUnique() -> bool
 	{
 		return IsTypeUniqueInParameterPack<TypeToCheck, TypePack...>::value;
 	}
@@ -240,7 +240,7 @@ public:
 	///
 	/// @return
 	/// True if TypeList has any duplicate types.
-	consteval static bool HasDuplicates()
+	consteval static auto HasDuplicates() -> bool
 	{
 		return HasTemplateParameterPackDuplicates<TypePack...>::value;
 	}
@@ -273,7 +273,7 @@ public:
 	/// True if each type in TypeList is derived from BaseType. False if any type in TypeList is not derived from BaseType, or if
 	/// TypeList is empty.
 	template<typename BaseType>
-	consteval static bool IsEachDerivedFromBase()
+	consteval static auto IsEachDerivedFromBase() -> bool
 	{
 		return IsEachParameterPackTypeDerivedFromType<BaseType, TypePack...>::value;
 	}
@@ -301,7 +301,7 @@ public:
 	/// @return
 	/// True if this TypeList types matches the other TypeList types.
 	template<TypeListType OtherTypeList>
-	consteval static bool Matches()
+	consteval static auto Matches() -> bool
 	{
 		if constexpr( OtherTypeList::Size() != Size() ) return false;
 		else return EqualityTest( TypeList {}, OtherTypeList {} );
@@ -333,9 +333,7 @@ public:
 	/// @return
 	/// True if this TypeList types matches the other TypeList types.
 	template<TypeListType OtherTypeList>
-	consteval bool operator==(
-		OtherTypeList&
-	)
+	consteval auto operator==( OtherTypeList& ) -> bool
 	{
 		return Matches<OtherTypeList>();
 	}
@@ -357,7 +355,7 @@ private:
 	template <typename Type, typename... ParameterPack>
 	struct MatchCheckHelper
 	{
-		consteval static bool EqualityTest()
+		consteval static auto EqualityTest() -> bool
 		{
 			return true;
 		}
@@ -367,7 +365,7 @@ private:
 	template <typename T, typename... Ts, typename U, typename... Us>
 	struct MatchCheckHelper<TypeList<T, Ts...>, TypeList<U, Us...>>
 	{
-		consteval static bool EqualityTest()
+		consteval static auto EqualityTest() -> bool
 		{
 			// Return as soon as we find a mismatch, skipping the remaining types.
 			if constexpr( !std::is_same_v<T, U> ) return false;
@@ -390,10 +388,10 @@ private:
 	/// @return
 	/// True if the two TypeLists contain the same types and their order is equal.
 	template <typename... TypeListTypeParamaterPack, typename... OtherTypeListTypeParamaterPack>
-	consteval static bool EqualityTest(
+	consteval static auto EqualityTest(
 		TypeList<TypeListTypeParamaterPack...>,
 		TypeList<OtherTypeListTypeParamaterPack...>
-	)
+	) -> bool
 	{
 		return MatchCheckHelper<TypeList<TypeListTypeParamaterPack...>, TypeList<OtherTypeListTypeParamaterPack...>>::EqualityTest();
 	}

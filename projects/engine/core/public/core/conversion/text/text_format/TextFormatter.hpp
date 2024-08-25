@@ -53,10 +53,10 @@ class TextFormatter {};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename TextFormatterSpecialization, typename TextContainerType, typename ValueType>
 concept TextFormatAble = requires(
-	TextFormatterSpecialization											formatter_specialization,
-	typename TextContainerType::ThisFullType						&	out_buffer,
-	typename TextContainerType::template ThisViewType<true>				parse_text,
-	ValueType														&	input_value
+	TextFormatterSpecialization									formatter_specialization,
+	typename TextContainerType::ThisFullType&					out_buffer,
+	typename TextContainerType::template ThisViewType<true>		parse_text,
+	ValueType&													input_value
 )
 {
 	formatter_specialization.Parse( parse_text );

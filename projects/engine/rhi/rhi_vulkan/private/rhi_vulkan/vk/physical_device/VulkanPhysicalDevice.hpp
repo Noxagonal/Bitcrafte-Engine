@@ -25,50 +25,42 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct QueueFamilyInfo
 	{
-		List<VkQueueFamilyProperties2>						queue_family_properties;
-		List<bool>											can_present;
+		List<VkQueueFamilyProperties2>	queue_family_properties;
+		List<bool>						can_present;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VulkanPhysicalDevice(
-		RHIVulkanImpl									&	rhi_vulkan_impl,
-		VkPhysicalDevice									vk_physical_device
+		RHIVulkanImpl&		rhi_vulkan_impl,
+		VkPhysicalDevice	vk_physical_device
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanPhysicalDevice(
-		const VulkanPhysicalDevice						&	other
-	) = delete;
+	VulkanPhysicalDevice( const VulkanPhysicalDevice& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanPhysicalDevice(
-		VulkanPhysicalDevice							&&	other
-	) = default;
+	VulkanPhysicalDevice( VulkanPhysicalDevice&& other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~VulkanPhysicalDevice();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanPhysicalDevice								&	operator=(
-		const VulkanPhysicalDevice						&	other
-	) = delete;
+	auto operator=( const VulkanPhysicalDevice& other ) -> VulkanPhysicalDevice& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanPhysicalDevice								&	operator=(
-		VulkanPhysicalDevice							&&	other
-	) = default;
+	auto operator=( VulkanPhysicalDevice&& other ) -> VulkanPhysicalDevice& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const VkPhysicalDeviceMemoryProperties2		&	GetMemoryProperties() const { return vk_memory_properties; }
+	inline auto GetMemoryProperties() const -> const VkPhysicalDeviceMemoryProperties2& { return vk_memory_properties; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const VkPhysicalDeviceProperties2			&	GetProperties() const { return vk_properties; }
+	inline auto GetProperties() const -> const VkPhysicalDeviceProperties2& { return vk_properties; }
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const VkPhysicalDeviceFeatures2				&	GetFeatures() const { return vk_features; }
+	inline auto GetFeatures() const -> const VkPhysicalDeviceFeatures2& { return vk_features; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const QueueFamilyInfo						&	GetQueueFamilyProperties() const { return queue_family_properties; }
+	inline auto GetQueueFamilyProperties() const -> const QueueFamilyInfo& { return queue_family_properties; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline operator VkPhysicalDevice() const { return vk_physical_device; }
@@ -76,19 +68,17 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<bool>												GetPhysicalDeviceQueuePresentationSupport(
-		ListView<VkQueueFamilyProperties2>					queue_family_properties
-	) const;
+	auto GetPhysicalDeviceQueuePresentationSupport( ListView<VkQueueFamilyProperties2> queue_family_properties ) const -> List<bool>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkPhysicalDevice										vk_physical_device					= VK_NULL_HANDLE;
+	VkPhysicalDevice					vk_physical_device			= VK_NULL_HANDLE;
 
-	VkPhysicalDeviceMemoryProperties2						vk_memory_properties;
-	VkPhysicalDeviceProperties2								vk_properties;
-	VkPhysicalDeviceFeatures2								vk_features;
-	QueueFamilyInfo											queue_family_properties;
+	VkPhysicalDeviceMemoryProperties2	vk_memory_properties;
+	VkPhysicalDeviceProperties2			vk_properties;
+	VkPhysicalDeviceFeatures2			vk_features;
+	QueueFamilyInfo						queue_family_properties;
 
-	RHIVulkanImpl										*	rhi_vulkan_impl;
+	RHIVulkanImpl*						rhi_vulkan_impl;
 };
 
 

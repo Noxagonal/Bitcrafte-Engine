@@ -29,10 +29,11 @@ namespace bc {
 ///
 /// @return
 /// A new optional container with its contained value constructed.
-template<typename ValueType, typename ...ConstructorArgumentTypePack>
-Optional<ValueType>										MakeOptional(
-	ConstructorArgumentTypePack						&&	...constructor_arguments
-)
+template<
+	typename ValueType,
+	typename ...ConstructorArgumentTypePack
+>
+auto MakeOptional( ConstructorArgumentTypePack&& ...constructor_arguments ) -> Optional<ValueType>
 {
 	auto result = Optional<ValueType> {};
 	result.Emplace( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );

@@ -14,9 +14,9 @@ namespace engine {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct EngineComponentCreateInfo
 {
-	window_manager::WindowManagerComponentCreateInfo		window_manager_create_info		= {};
+	window_manager::WindowManagerComponentCreateInfo	window_manager_create_info	= {};
 
-	rhi::RHIComponentCreateInfo								rhi_create_info					= {};
+	rhi::RHIComponentCreateInfo							rhi_create_info				= {};
 };
 
 

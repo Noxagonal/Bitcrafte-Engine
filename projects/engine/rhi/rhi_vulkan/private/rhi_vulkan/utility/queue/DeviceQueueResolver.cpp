@@ -9,10 +9,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::DeviceQueueResolver::DeviceQueueResolver(
-	RHIVulkanImpl								&	rhi_vulkan_impl,
-	const VulkanPhysicalDevice					&	physical_device,
-	bc::List<bc::Pair<VkQueueFlags, f32>>			queue_types
-) :
+	RHIVulkanImpl&					rhi_vulkan_impl,
+	const VulkanPhysicalDevice&		physical_device,
+	List<Pair<VkQueueFlags, f32>>	queue_types
+)
+:
 	rhi_vulkan_impl( rhi_vulkan_impl ),
 	physical_device( physical_device ),
 	vk_instance( rhi_vulkan_impl.GetVulkanInstance() ),
@@ -153,15 +154,13 @@ bc::rhi::DeviceQueueResolver::~DeviceQueueResolver()
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::List<VkDeviceQueueCreateInfo> & bc::rhi::DeviceQueueResolver::GetDeviceQueueCreateInfos()
+auto bc::rhi::DeviceQueueResolver::GetDeviceQueueCreateInfos() -> const List<VkDeviceQueueCreateInfo>&
 {
 	return queue_create_infos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::List<bc::rhi::VulkanQueue> bc::rhi::DeviceQueueResolver::GetVulkanQueues(
-	VkDevice device
-)
+auto bc::rhi::DeviceQueueResolver::GetVulkanQueues( VkDevice device ) -> List<VulkanQueue>
 {
 	List<VulkanQueue> ret( queue_get_info.Size() );
 	for( u32 i=0; i < ret.Size(); ++i )

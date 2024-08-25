@@ -16,15 +16,9 @@ namespace math {
 /// @brief
 /// Rounds a floating point value up to the next integral value.
 ///
-/// @tparam ValueType
-/// Floating point type.
-///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointValue ValueType>
-constexpr ValueType					RoundToCeiling(
-	ValueType						value
-)
+constexpr auto RoundToCeiling( utility::FloatingPointValue auto value )
 {
 	return std::ceil( value );
 }
@@ -33,15 +27,9 @@ constexpr ValueType					RoundToCeiling(
 /// @brief
 /// Rounds a floating point value down to base integral value.
 ///
-/// @tparam ValueType
-/// Floating point type.
-///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointValue ValueType>
-constexpr ValueType					RoundToFloor(
-	ValueType						value
-)
+constexpr auto RoundToFloor( utility::FloatingPointValue auto value )
 {
 	return std::floor( value );
 }
@@ -50,15 +38,9 @@ constexpr ValueType					RoundToFloor(
 /// @brief
 /// Rounds a floating point value to the closest integral value.
 ///
-/// @tparam ValueType
-/// Floating point type.
-///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointValue ValueType>
-constexpr ValueType					RoundToClosest(
-	ValueType						value
-)
+constexpr auto RoundToClosest( utility::FloatingPointValue auto value )
 {
 	return std::round( value );
 }
@@ -67,15 +49,9 @@ constexpr ValueType					RoundToClosest(
 /// @brief
 /// Rounds a floating point value towards zero whole integral value.
 ///
-/// @tparam ValueType
-/// Floating point type.
-///
 /// @param value
 /// Value to round.
-template<utility::FloatingPointValue ValueType>
-constexpr ValueType					Truncate(
-	ValueType						value
-)
+constexpr auto Truncate( utility::FloatingPointValue auto value )
 {
 	return std::trunc( value );
 }

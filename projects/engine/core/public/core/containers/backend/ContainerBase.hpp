@@ -30,27 +30,21 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	static ValueType								*	MakeObjectPointerUndead(
-		ValueType									*	location
-	)
+	static auto MakeObjectPointerUndead( ValueType* location ) -> ValueType*
 	{
 		return reinterpret_cast<ValueType*>( reinterpret_cast<uintptr_t>( location ) | UndeadObjectPointerBitMask );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	static ValueType								*	MakeObjectPointerAlive(
-		ValueType									*	location
-	)
+	static auto MakeObjectPointerAlive( ValueType* location ) -> ValueType*
 	{
 		return reinterpret_cast<ValueType*>( reinterpret_cast<uintptr_t>( location ) & ~UndeadObjectPointerBitMask );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	static bool											IsObjectPointerUndead(
-		ValueType									*	location
-	)
+	static auto IsObjectPointerUndead( const ValueType* location ) -> bool
 	{
 		return ( reinterpret_cast<uintptr_t>( location ) & UndeadObjectPointerBitMask ) == UndeadObjectPointerBitMask;
 	}
@@ -76,10 +70,10 @@ private:
 	/// @return
 	/// Pointer to memory location where the object was constructed.
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	static constexpr ValueType						*	DoTryConstructHeapElement(
-		ValueType									*	location,
-		ConstructorArgumentTypePack					&&	...constructor_arguments
-	)
+	static constexpr auto DoTryConstructHeapElement(
+		ValueType*						location,
+		ConstructorArgumentTypePack&&	...constructor_arguments
+	) -> ValueType*
 	{
 		if( std::is_constant_evaluated() )
 		{
@@ -117,9 +111,7 @@ private:
 	/// @return
 	/// Pointer to the object location in memory when it was alive.
 	template<typename ValueType>
-	static constexpr ValueType						*	DoTryDestructHeapElement(
-		ValueType									*	location
-	)
+	static constexpr auto DoTryDestructHeapElement( ValueType* location ) -> ValueType*
 	{
 		if( std::is_constant_evaluated() )
 		{
@@ -167,10 +159,10 @@ protected:
 	/// @param ...constructor_arguments
 	/// Constructor arguments as parameter pack sent to the constructor of the element.
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	static constexpr void								TryConstructHeapElement(
-		ValueType									*&	location,
-		ConstructorArgumentTypePack					&&	...constructor_arguments
-	)
+	static constexpr auto TryConstructHeapElement(
+		ValueType*&						location,
+		ConstructorArgumentTypePack&&	...constructor_arguments
+	) -> void
 	{
 		if( std::is_constant_evaluated() )
 		{
@@ -212,9 +204,7 @@ protected:
 	/// @return
 	/// Pointer to the object location in memory when it was alive.
 	template<typename ValueType>
-	static constexpr void								TryDestructHeapElement(
-		ValueType									*&	location
-	)
+	static constexpr void TryDestructHeapElement( ValueType*& location )
 	{
 		location = DoTryDestructHeapElement( location );
 	}
@@ -237,9 +227,9 @@ protected:
 	/// @param ...constructor_arguments
 	/// Constructor arguments as parameter pack sent to the constructor of the element.
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	static constexpr void								ConstructStackElement(
-		ValueType									&	object,
-		ConstructorArgumentTypePack					&&	...constructor_arguments
+	static constexpr void ConstructStackElement(
+		ValueType&						object,
+		ConstructorArgumentTypePack&&	...constructor_arguments
 	)
 	{
 		new( &object ) ValueType{ std::forward<ConstructorArgumentTypePack>( constructor_arguments )... };
@@ -257,19 +247,17 @@ protected:
 	/// @param object
 	/// Reference to object to destruct.
 	template<typename ValueType>
-	static constexpr void								DestructStackElement(
-		ValueType									&	object
-	)
+	static constexpr void DestructStackElement( ValueType& object )
 	{
 		object.~ValueType();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType, typename ...ConstructorArgumentTypePack>
-	constexpr void										ConstructRange(
-		ValueType									*	destination,
-		i64												element_count,
-		ConstructorArgumentTypePack					&&	...constructor_arguments
+	constexpr void ConstructRange(
+		ValueType*						destination,
+		i64								element_count,
+		ConstructorArgumentTypePack&&	...constructor_arguments
 	) const
 	{
 		if( !std::is_constant_evaluated() )
@@ -295,10 +283,10 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	constexpr void										CopyConstructRange(
-		ValueType									*	destination,
-		const ValueType								*	source,
-		i64												element_count
+	constexpr void CopyConstructRange(
+		ValueType*			destination,
+		const ValueType*	source,
+		i64					element_count
 	) const requires( std::is_copy_constructible_v<ValueType> )
 	{
 		if( !std::is_constant_evaluated() )
@@ -331,10 +319,10 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	constexpr void										MoveConstructRange(
-		ValueType									*	destination,
-		ValueType									*	source,
-		i64												element_count
+	constexpr void MoveConstructRange(
+		ValueType*	destination,
+		ValueType*	source,
+		i64			element_count
 	) const requires( std::is_move_constructible_v<ValueType> )
 	{
 		if( !std::is_constant_evaluated() )
@@ -366,9 +354,9 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	constexpr void										DestructRange(
-		ValueType									*	location,
-		i64												element_count
+	constexpr void DestructRange(
+		ValueType*	location,
+		i64			element_count
 	) const noexcept
 	{
 		if( location == nullptr ) return;
@@ -403,12 +391,13 @@ protected:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
 	[[nodiscard]]
-	constexpr ValueType								*	ResizeRange(
-		ValueType									*	old_location,
-		i64												old_element_count,
-		i64												old_reserved_element_count,
-		i64												new_reserved_element_count
-	) const noexcept requires ( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
+	constexpr auto ResizeRange(
+		ValueType*	old_location,
+		i64			old_element_count,
+		i64			old_reserved_element_count,
+		i64			new_reserved_element_count
+	) const noexcept -> ValueType*
+		requires ( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		if( !std::is_constant_evaluated() )
 		{
@@ -466,9 +455,7 @@ protected:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
 	[[nodiscard]]
-	constexpr ValueType								*	AllocateMemory(
-		i64												new_element_count
-	) const noexcept
+	constexpr auto AllocateMemory( i64 new_element_count ) const noexcept -> ValueType*
 	{
 		return memory::AllocateMemory<ValueType>( new_element_count, alignof( ValueType ) );
 	}
@@ -476,11 +463,11 @@ protected:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
 	[[nodiscard]]
-	constexpr ValueType								*	ReallocateMemory(
-		ValueType									*	old_location,
-		i64												old_element_count,
-		i64												new_element_count
-	) const noexcept
+	constexpr auto ReallocateMemory(
+		ValueType*	old_location,
+		i64			old_element_count,
+		i64			new_element_count
+	) const noexcept -> ValueType*
 	{
 		static_assert( std::is_trivial_v<ValueType>, "ValueType must be trivial for it to be reallocated via this function" );
 
@@ -489,9 +476,9 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	constexpr void										FreeMemory(
-		ValueType									*	location,
-		i64												element_count
+	constexpr void FreeMemory(
+		ValueType*	location,
+		i64			element_count
 	) const noexcept
 	{
 		if( location == nullptr ) return;
@@ -501,21 +488,21 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	constexpr bool										IsInPlaceReallocateable(
-		const ValueType								*	location,
-		i64												new_reserved_element_count
-	) const
+	constexpr auto IsInPlaceReallocateable(
+		const ValueType*	location,
+		i64					new_reserved_element_count
+	) const -> bool
 	{
 		return memory::IsInPlaceReallocateable<ValueType>( location, new_reserved_element_count );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ValueType>
-	constexpr ValueType								*	InPlaceReallocateMemory(
-		ValueType									*	old_location,
-		i64												old_reserved_element_count,
-		i64												new_reserved_element_count
-	) const
+	constexpr auto InPlaceReallocateMemory(
+		ValueType*	old_location,
+		i64			old_reserved_element_count,
+		i64			new_reserved_element_count
+	) const -> ValueType*
 	{
 		return memory::InPlaceReallocateMemory<ValueType>( old_location, old_reserved_element_count, new_reserved_element_count );
 	}

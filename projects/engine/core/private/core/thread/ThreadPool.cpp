@@ -18,8 +18,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static void ThreadPoolWorker(
-	bc::thread::ThreadDescription	*	thread_description,
-	bc::thread::ThreadSharedData	*	thread_shared_data
+	bc::thread::ThreadDescription*	thread_description,
+	bc::thread::ThreadSharedData*	thread_shared_data
 )
 {
 	using namespace bc::thread;
@@ -176,9 +176,7 @@ static void ThreadPoolWorker(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::thread::ThreadPool::ThreadPool(
-	const bc::thread::ThreadPoolCreateInfo & create_info
-)
+bc::thread::ThreadPool::ThreadPool( const bc::thread::ThreadPoolCreateInfo & create_info )
 {
 	main_thread_id = std::this_thread::get_id();
 
@@ -247,15 +245,13 @@ bc::thread::ThreadPool::~ThreadPool()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::thread::ThreadPool::RemoveThread(
-	ThreadIdentifier thread_id
-)
+void bc::thread::ThreadPool::RemoveThread( ThreadIdentifier thread_id )
 {
 	DoRemoveThread( thread_id );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::u64 bc::thread::ThreadPool::GetTaskQueueCount() const
+auto bc::thread::ThreadPool::GetTaskQueueCount() const -> u64
 {
 	auto lock_guard = std::lock_guard( thread_shared_data->task_list_mutex );
 
@@ -263,7 +259,7 @@ bc::u64 bc::thread::ThreadPool::GetTaskQueueCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::u64 bc::thread::ThreadPool::GetTaskRunningCount() const
+auto bc::thread::ThreadPool::GetTaskRunningCount() const -> u64
 {
 	auto lock_guard = std::lock_guard( thread_shared_data->task_list_mutex );
 
@@ -277,9 +273,7 @@ bc::u64 bc::thread::ThreadPool::GetTaskRunningCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::thread::id bc::thread::ThreadPool::GetThreadSystemID(
-	ThreadIdentifier thread_id
-) const
+auto bc::thread::ThreadPool::GetThreadSystemID( ThreadIdentifier thread_id ) const -> std::thread::id
 {
 	auto thread_description = std::find_if( thread_description_list.begin(), thread_description_list.end(), [ thread_id ]( auto & t ) { return t->thread_id == thread_id; } );
 	if( thread_description == thread_description_list.end() ) return {};
@@ -316,9 +310,7 @@ void bc::thread::ThreadPool::WaitIdle()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::u64 bc::thread::ThreadPool::DoAddTask(
-	UniquePtr<Task>	&&	new_task
-)
+auto bc::thread::ThreadPool::DoAddTask( UniquePtr<Task>&& new_task ) -> u64
 {
 	BHardAssert( !shutting_down, "Failed to schedule task, trying to add tasks while shutting down the thread pool" );
 	if( thread_shared_data->thread_exception_raised )
@@ -335,9 +327,7 @@ bc::u64 bc::thread::ThreadPool::DoAddTask(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::thread::ThreadIdentifier bc::thread::ThreadPool::DoAddThread(
-	UniquePtr<ThreadDescription> && thread_description
-)
+auto bc::thread::ThreadPool::DoAddThread( UniquePtr<ThreadDescription>&& thread_description ) -> ThreadIdentifier
 {
 	BHardAssert( !shutting_down, "Cannot add thread, trying to add threads while shutting down the thread pool" );
 	BHardAssert( GetTaskQueueCount() == 0, "Cannot remove thread, threads cannot be removed when there are any tasks queued" );
@@ -373,9 +363,7 @@ bc::thread::ThreadIdentifier bc::thread::ThreadPool::DoAddThread(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::thread::ThreadPool::DoRemoveThread(
-	ThreadIdentifier thread_id
-)
+void bc::thread::ThreadPool::DoRemoveThread( ThreadIdentifier thread_id )
 {
 	BHardAssert( !shutting_down, "Cannot remove thread, trying to remove threads while shutting down the thread pool" );
 	BHardAssert( GetTaskQueueCount() == 0, "Cannot remove thread, threads cannot be removed when there are any tasks queued" );

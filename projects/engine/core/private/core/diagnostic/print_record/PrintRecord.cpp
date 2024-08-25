@@ -5,9 +5,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord::PrintRecord(
-	const bc::internal_::SimpleTextView32				simple_text_view
-)
+bc::diagnostic::PrintRecord::PrintRecord( const bc::internal_::SimpleTextView32 simple_text_view )
 {
 	auto new_section = PrintRecordSection {};
 	new_section.text = simple_text_view;
@@ -15,27 +13,21 @@ bc::diagnostic::PrintRecord::PrintRecord(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::operator+=(
-	const PrintRecord & other
-)
+auto bc::diagnostic::PrintRecord::operator+=( const PrintRecord & other ) -> PrintRecord&
 {
 	Append( other );
 	return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::operator+=(
-	const bc::diagnostic::PrintRecordSection & section
-)
+auto bc::diagnostic::PrintRecord::operator+=( const bc::diagnostic::PrintRecordSection & section ) -> PrintRecord&
 {
 	AddSection( section );
 	return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord bc::diagnostic::PrintRecord::operator+(
-	const bc::diagnostic::PrintRecord & other
-) const
+auto bc::diagnostic::PrintRecord::operator+( const bc::diagnostic::PrintRecord & other ) const -> PrintRecord
 {
 	auto result = *this;
 	result += other;
@@ -43,13 +35,13 @@ bc::diagnostic::PrintRecord bc::diagnostic::PrintRecord::operator+(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::diagnostic::PrintRecord::PrintRecordSectionList & bc::diagnostic::PrintRecord::GetSections() const
+auto bc::diagnostic::PrintRecord::GetSections() const -> const PrintRecordSectionList&
 {
 	return section_list;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::u32 bc::diagnostic::PrintRecord::CalculateLineCount() const
+auto bc::diagnostic::PrintRecord::CalculateLineCount() const -> u32
 {
 	auto character_count = u32 { 1 };
 	for( auto & section : section_list )
@@ -61,9 +53,7 @@ const bc::u32 bc::diagnostic::PrintRecord::CalculateLineCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::Append(
-	const PrintRecord & other
-)
+auto bc::diagnostic::PrintRecord::Append( const PrintRecord & other ) -> PrintRecord&
 {
 	section_list.Append( other.section_list );
 
@@ -71,9 +61,7 @@ bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::Append(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::AddSection(
-	const PrintRecordSection & section
-)
+auto bc::diagnostic::PrintRecord::AddSection( const PrintRecordSection & section ) -> PrintRecord&
 {
 	section_list.PushBack( section );
 
@@ -81,9 +69,7 @@ bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::AddSection(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::AddIndent(
-	i32 add_indentation_level
-)
+auto bc::diagnostic::PrintRecord::AddIndent( u32 add_indentation_level ) -> PrintRecord&
 {
 	for( auto & s : section_list )
 	{
@@ -94,9 +80,7 @@ bc::diagnostic::PrintRecord & bc::diagnostic::PrintRecord::AddIndent(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecord bc::diagnostic::PrintRecord::GetFinalized(
-	u32 indentation_size
-) const
+auto bc::diagnostic::PrintRecord::GetFinalized( u32 indentation_size ) const -> PrintRecord
 {
 	auto result = *this;
 
@@ -106,15 +90,13 @@ bc::diagnostic::PrintRecord bc::diagnostic::PrintRecord::GetFinalized(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::diagnostic::PrintRecord::IsEmpty() const noexcept
+auto bc::diagnostic::PrintRecord::IsEmpty() const noexcept -> bool
 {
 	return section_list.IsEmpty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::PrintRecord::Finalize_ApplyIndents(
-	u32		indentation_size
-)
+void bc::diagnostic::PrintRecord::Finalize_ApplyIndents( u32 indentation_size )
 {
 	auto new_section_list = PrintRecordSectionList {};
 	auto indent_next = true;

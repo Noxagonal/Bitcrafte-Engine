@@ -9,10 +9,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanDevice::VulkanDevice(
-	RHIVulkanImpl						&	rhi_vulkan_impl,
-	VulkanPhysicalDevice				&	physical_device,
-	const RHIComponentStartInfo			&	rhi_start_info
-) :
+	RHIVulkanImpl&					rhi_vulkan_impl,
+	VulkanPhysicalDevice&			physical_device,
+	const RHIComponentStartInfo&	rhi_start_info
+)
+:
 	rhi_vulkan_impl( rhi_vulkan_impl ),
 	physical_device( physical_device )
 {

@@ -14,19 +14,19 @@ namespace scene {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct Vertex
 {
-	math::Vec4f32											position;
-	math::Vec4f32											normal;
-	math::Vec4f32											color;
-	math::Vec2f32											uv;
+	math::Vec4f32	position;
+	math::Vec4f32	normal;
+	math::Vec4f32	color;
+	math::Vec2f32	uv;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Vertex														MakeVertex(
-	math::Vec4f32											position,
-	math::Vec4f32											normal,
-	math::Vec4f32											color,
-	math::Vec2f32											uv
-) noexcept;
+auto MakeVertex(
+	math::Vec4f32	position,
+	math::Vec4f32	normal,
+	math::Vec4f32	color,
+	math::Vec2f32	uv
+) noexcept -> Vertex;
 
 
 

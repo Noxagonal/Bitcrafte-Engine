@@ -47,12 +47,11 @@ static_assert( sizeof( WindowManagerPlatformHandlesStructureType ) == 4 );
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct WindowManagerPlatformHandlesBase
 {
-	inline WindowManagerPlatformHandlesBase(
-		WindowManagerPlatformHandlesStructureType	structure_type
-	) :
+	inline WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType structure_type )
+	:
 		structure_type( structure_type )
 	{}
-	WindowManagerPlatformHandlesStructureType		structure_type;
+	WindowManagerPlatformHandlesStructureType structure_type;
 };
 static_assert( sizeof( WindowManagerPlatformHandlesBase ) == 4 );
 static_assert( offsetof( WindowManagerPlatformHandlesBase, structure_type ) == 0 );
@@ -63,9 +62,12 @@ static_assert( offsetof( WindowManagerPlatformHandlesBase, structure_type ) == 0
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct WindowManagerWin32PlatformHandles : public WindowManagerPlatformHandlesBase
 {
-	inline WindowManagerWin32PlatformHandles() : WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WIN32 ) {}
-	HINSTANCE										hInstance								= {};
-	HWND											hWnd									= {};
+	inline WindowManagerWin32PlatformHandles()
+	:
+		WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WIN32 )
+	{}
+	HINSTANCE	hInstance	= {};
+	HWND		hWnd		= {};
 };
 #endif
 
@@ -74,18 +76,18 @@ struct WindowManagerWin32PlatformHandles : public WindowManagerPlatformHandlesBa
 struct WindowManagerXLibPlatformHandles : public WindowManagerPlatformHandlesBase
 {
 	inline WindowManagerXLibPlatformHandles() : WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XLIB ) {}
-	::Display									*	display									= {};
-	int32_t											default_screen							= {};
-	::Visual									*	default_visual							= {};
-	::VisualID										default_visual_id						= {};
-	::XIM											xim										= {};
-	::XIC											xic										= {};
-	::Window										window									= {};
-	::Atom											window_user_pointer_atom				= {};
-	::Atom											window_protocol_atom					= {};
-	::Atom											window_protocol_close_atom				= {};
-	::Atom											window_protocol_take_focus_atom			= {};
-	::Atom											window_protocol_ping_atom				= {};
+	::Display*	display							= {};
+	int32_t		default_screen					= {};
+	::Visual*	default_visual					= {};
+	::VisualID	default_visual_id				= {};
+	::XIM		xim								= {};
+	::XIC		xic								= {};
+	::Window	window							= {};
+	::Atom		window_user_pointer_atom		= {};
+	::Atom		window_protocol_atom			= {};
+	::Atom		window_protocol_close_atom		= {};
+	::Atom		window_protocol_take_focus_atom	= {};
+	::Atom		window_protocol_ping_atom		= {};
 };
 #endif
 
@@ -94,15 +96,15 @@ struct WindowManagerXLibPlatformHandles : public WindowManagerPlatformHandlesBas
 struct WindowManagerXCBPlatformHandles : public WindowManagerPlatformHandlesBase
 {
 	inline WindowManagerXCBPlatformHandles() : WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_XCB ) {}
-	xcb_connection_t							*	connection								= {};
-	xcb_screen_t								*	screen									= {};
-	xcb_window_t									window									= {};
-	xcb_key_symbols_t							*	key_symbols								= {};
-	xcb_atom_t										window_user_pointer_atom				= {};
-	xcb_atom_t										window_protocol_atom					= {};
-	xcb_atom_t										window_protocol_close_atom				= {};
-	xcb_atom_t										window_protocol_take_focus_atom			= {};
-	xcb_atom_t										window_protocol_ping_atom				= {};
+	xcb_connection_t*	connection						= {};
+	xcb_screen_t*		screen							= {};
+	xcb_window_t		window							= {};
+	xcb_key_symbols_t*	key_symbols						= {};
+	xcb_atom_t			window_user_pointer_atom		= {};
+	xcb_atom_t			window_protocol_atom			= {};
+	xcb_atom_t			window_protocol_close_atom		= {};
+	xcb_atom_t			window_protocol_take_focus_atom	= {};
+	xcb_atom_t			window_protocol_ping_atom		= {};
 };
 #endif
 
@@ -111,12 +113,12 @@ struct WindowManagerXCBPlatformHandles : public WindowManagerPlatformHandlesBase
 struct WindowManagerWaylandPlatformHandles : public WindowManagerPlatformHandlesBase
 {
 	inline WindowManagerWaylandPlatformHandles() : WindowManagerPlatformHandlesBase( WindowManagerPlatformHandlesStructureType::WINDOW_MANAGER_WAYLAND ) {}
-	wl_display									*	display									= {};
-	wl_compositor								*	compositor								= {};
-	xdg_wm_base									*	wm_base_xdg								= {};
-	wl_surface									*	surface									= {};
-	xdg_surface									*	surface_xdg								= {};
-	xdg_toplevel								*	toplevel_xdg							= {};
+	wl_display*		display			= {};
+	wl_compositor*	compositor		= {};
+	xdg_wm_base*	wm_base_xdg		= {};
+	wl_surface*		surface			= {};
+	xdg_surface*	surface_xdg		= {};
+	xdg_toplevel*	toplevel_xdg	= {};
 };
 #endif
 

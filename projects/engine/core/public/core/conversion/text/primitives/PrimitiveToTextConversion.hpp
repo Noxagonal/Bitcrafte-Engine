@@ -76,13 +76,13 @@ internal_::FloatingToTextConvertible<ValueType>;
 /// @param value
 ///	Value to convert into text.
 template<
-	utility::TextContainer						TextContainerType,
-	internal_::BoolToTextConvertible			ValueType
+	utility::TextContainer				TextContainerType,
+	internal_::BoolToTextConvertible	ValueType
 >
-constexpr u64									PrimitiveToText(
-	TextContainerType						&	append_to,
-	const ValueType								value
-)
+constexpr auto PrimitiveToText(
+	TextContainerType&	append_to,
+	const ValueType		value
+) -> i64
 {
 	if( value ) {
 		append_to.Append( "true" );
@@ -126,19 +126,19 @@ enum class IntegerToTextConversionFormat
 ///	Number base to convert the number into. See IntegerToTextConversionFormat for more info. You can also use other types. For
 /// example if you want Base-5 you can just give this parameter static_cast<IntegerToTextConversionFormat>( 5 ).
 template<
-	utility::TextContainer						TextContainerType,
-	internal_::IntegerToTextConvertible			ValueType
+	utility::TextContainer					TextContainerType,
+	internal_::IntegerToTextConvertible		ValueType
 >
-constexpr u64									PrimitiveToText(
-	TextContainerType						&	append_to,
-	const ValueType								value,
-	IntegerToTextConversionFormat				text_format		= IntegerToTextConversionFormat::DECIMAL
-)
+constexpr auto PrimitiveToText(
+	TextContainerType&				append_to,
+	const ValueType					value,
+	IntegerToTextConversionFormat	text_format		= IntegerToTextConversionFormat::DECIMAL
+) -> i64
 {
 	using ContainerBaseCharType = typename TextContainerType::template ThisContainerFullType<char>;
 	using TextContainerCharacterType = typename TextContainerType::ContainedCharacterType;
 
-	u64 write_length;
+	i64 write_length;
 
 	if constexpr( std::is_same_v<TextContainerCharacterType, char> ) {
 		auto original_size	= append_to.Size();
@@ -193,7 +193,7 @@ enum class FloatToTextConversionFormat : u32
 {
 	GENERAL			= static_cast<u32>( std::chars_format::general ),		///< Uses fixed format for smaller values and scientific format for larger values. (Default)
 	SCIENTIFIC		= static_cast<u32>( std::chars_format::scientific ),	///< Output scientific notation, use mantissa/exponent.
-	FIXED			= static_cast<u32>( std::chars_format::fixed ),		///< Always use fixed format, regardless how big the value is.
+	FIXED			= static_cast<u32>( std::chars_format::fixed ),			///< Always use fixed format, regardless how big the value is.
 	HEX				= static_cast<u32>( std::chars_format::hex ),			///< Output as hexadecimal floating point. (lowercase hexadecimal letters, does not append "0x")
 };
 inline FloatToTextConversionFormat operator|( FloatToTextConversionFormat a, FloatToTextConversionFormat b )
@@ -232,19 +232,19 @@ inline FloatToTextConversionFormat operator&( FloatToTextConversionFormat a, Flo
 /// @param text_format
 ///	Value text representation. See FloatToTextConversionFormat.
 template<
-	utility::TextContainer						TextContainerType,
-	internal_::FloatingToTextConvertible		ValueType
+	utility::TextContainer					TextContainerType,
+	internal_::FloatingToTextConvertible	ValueType
 >
-constexpr u64									PrimitiveToText(
-	TextContainerType						&	append_to,
-	const ValueType								value,
-	FloatToTextConversionFormat					text_format		= FloatToTextConversionFormat::GENERAL
-)
+constexpr auto PrimitiveToText(
+	TextContainerType&				append_to,
+	const ValueType					value,
+	FloatToTextConversionFormat		text_format		= FloatToTextConversionFormat::GENERAL
+) -> i64
 {
 	using ContainerBaseCharType = typename TextContainerType::template ThisContainerFullType<char>;
 	using TextContainerCharacterType = typename TextContainerType::ContainedCharacterType;
 
-	u64 write_length = 0;
+	i64 write_length = 0;
 	auto original_size	= append_to.Size();
 
 	auto Convert = [original_size, value, text_format]( ContainerBaseCharType & append_to, u64 reserve_space ) -> std::to_chars_result

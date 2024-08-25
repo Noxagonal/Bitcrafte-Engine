@@ -9,9 +9,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanRenderPass::VulkanRenderPass(
-	RHIVulkanImpl						&	rhi_vulkan_impl,
-	const VulkanRenderPassCreateInfo	&	create_info
-) :
+	RHIVulkanImpl&						rhi_vulkan_impl,
+	const VulkanRenderPassCreateInfo&	create_info
+)
+:
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 	// TODO

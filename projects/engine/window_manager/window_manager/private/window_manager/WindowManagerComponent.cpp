@@ -25,9 +25,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::WindowManagerComponent::WindowManagerComponent(
-	const WindowManagerComponentCreateInfo & create_info
-)
+bc::window_manager::WindowManagerComponent::WindowManagerComponent( const WindowManagerComponentCreateInfo& create_info )
 {
 }
 
@@ -44,9 +42,7 @@ void bc::window_manager::WindowManagerComponent::Run()
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::WindowManagerComponent> bc::window_manager::CreateWindowManagerComponent(
-	const WindowManagerComponentCreateInfo & create_info
-)
+auto bc::window_manager::CreateWindowManagerComponent( const WindowManagerComponentCreateInfo& create_info ) -> UniquePtr<WindowManagerComponent>
 {
 	#if BITCRAFTE_WINDOW_MANAGER_WIN32
 	return MakeUniquePtr<window_manager::WindowManagerWin32Component>( create_info );

@@ -28,7 +28,7 @@ public:
 
 private:
 
-	UniquePtr<MeshStorage>								mesh_storage;
+	UniquePtr<MeshStorage>	mesh_storage;
 };
 
 

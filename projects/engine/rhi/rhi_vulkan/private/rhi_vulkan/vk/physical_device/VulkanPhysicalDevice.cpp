@@ -22,8 +22,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanPhysicalDevice::VulkanPhysicalDevice(
-	RHIVulkanImpl		&	rhi_vulkan_impl,
-	VkPhysicalDevice		vk_physical_device
+	RHIVulkanImpl&		rhi_vulkan_impl,
+	VkPhysicalDevice	vk_physical_device
 ) :
 	rhi_vulkan_impl( &rhi_vulkan_impl ),
 	vk_physical_device( vk_physical_device )
@@ -56,9 +56,7 @@ bc::rhi::VulkanPhysicalDevice::~VulkanPhysicalDevice()
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::List<bool> bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentationSupport(
-	ListView<VkQueueFamilyProperties2>		family_properties
-) const
+auto bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentationSupport( ListView<VkQueueFamilyProperties2> family_properties ) const -> List<bool>
 {
 	auto result = List<bool>( family_properties.Size() );
 

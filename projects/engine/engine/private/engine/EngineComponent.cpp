@@ -18,9 +18,8 @@ bc::engine::EngineComponent * global_engine = nullptr;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::engine::EngineComponent::EngineComponent(
-	const EngineComponentCreateInfo & create_info
-) :
+bc::engine::EngineComponent::EngineComponent( const EngineComponentCreateInfo & create_info )
+	:
 	create_info_copy( create_info )
 {
 	global_engine = this;
@@ -39,9 +38,7 @@ bc::engine::EngineComponent::~EngineComponent()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::engine::EngineComponent::Start(
-	const EngineComponentStartInfo & engine_start_info
-)
+void bc::engine::EngineComponent::Start( const EngineComponentStartInfo & engine_start_info )
 {
 	rhi_component->Start( engine_start_info.rhi_start_info );
 }
@@ -53,20 +50,20 @@ void bc::engine::EngineComponent::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::WindowManagerComponent * bc::engine::EngineComponent::GetWindowManagerComponent()
+auto bc::engine::EngineComponent::GetWindowManagerComponent() -> window_manager::WindowManagerComponent*
 {
 	return window_manager_component.Get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIComponent * bc::engine::EngineComponent::GetRHIComponent()
+auto bc::engine::EngineComponent::GetRHIComponent() -> rhi::RHIComponent*
 {
 	return rhi_component.Get();
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::engine::EngineComponent * bc::engine::GetEngine()
+auto bc::engine::GetEngine() -> bc::engine::EngineComponent*
 {
 	return global_engine;
 }

@@ -24,9 +24,7 @@ enum class TaskState : u32
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::TextView								TaskStateToText(
-	const TaskState						&	task_state
-);
+auto TaskStateToText( const TaskState& task_state ) noexcept -> TextView;
 
 
 

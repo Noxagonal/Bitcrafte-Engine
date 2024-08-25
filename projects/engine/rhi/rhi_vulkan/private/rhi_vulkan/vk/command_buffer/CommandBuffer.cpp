@@ -10,9 +10,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanCommandBuffer::VulkanCommandBuffer(
-	RHIVulkanImpl			&	rhi_vulkan_impl,
-	VulkanCommandPool		&	vulkan_command_pool,
-	bool						is_secondary
+	RHIVulkanImpl&		rhi_vulkan_impl,
+	VulkanCommandPool&	vulkan_command_pool,
+	bool				is_secondary
 ) :
 	rhi_vulkan_impl( &rhi_vulkan_impl ),
 	vulkan_command_pool( &vulkan_command_pool )

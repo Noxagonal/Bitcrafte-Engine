@@ -526,7 +526,7 @@ TEST( TextContainer, SelfAssignment )
 		using A = bc::Text32;
 		using AView = A::ThisViewType<true>;
 
-		A original { char( 5 ), char( 10 ), char( 20 ), char( 50 ), char( 200 ) };
+		A original { char( 5 ), char( 10 ), char( 20 ), char( 50 ), char( 127 ) };
 		{
 			A a = original;
 			a = a;
@@ -551,7 +551,7 @@ TEST( TextContainer, SelfAssignment )
 			A a = original;
 			a.Append( a );
 
-			A comp { char( 5 ), char( 10 ), char( 20 ), char( 50 ), char( 200 ), char( 5 ), char( 10 ), char( 20 ), char( 50 ), char( 200 ) };
+			A comp { char( 5 ), char( 10 ), char( 20 ), char( 50 ), char( 127 ), char( 5 ), char( 10 ), char( 20 ), char( 50 ), char( 127 ) };
 			EXPECT_EQ( a.Size(), 10 );
 			EXPECT_EQ( a, comp );
 		}

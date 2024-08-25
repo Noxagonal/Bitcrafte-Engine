@@ -29,25 +29,20 @@ public:
 	constexpr PrintRecord() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr PrintRecord(
-		const PrintRecord								&	other
-	) = default;
+	constexpr PrintRecord( const PrintRecord& other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr PrintRecord(
-		PrintRecord										&&	other
-	) = default;
+	constexpr PrintRecord( PrintRecord&& other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PrintRecord(
-		const bc::internal_::SimpleTextView32				simple_text_view
-	);
+	PrintRecord( const bc::internal_::SimpleTextView32 simple_text_view );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	template<typename CharacterType, u64 StringArraySize>
-	PrintRecord(
-		const CharacterType( &c_string )[ StringArraySize ]
-	)
+	template<
+		typename	CharacterType,
+		i64			StringArraySize
+	>
+	PrintRecord( const CharacterType( &c_string )[ StringArraySize ] )
 	{
 		auto new_section = PrintRecordSection {};
 		new_section.text.Append( c_string );
@@ -55,14 +50,10 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PrintRecord											&	operator=(
-		const PrintRecord								&	other
-	) = default;
+	auto operator=( const PrintRecord& other ) -> PrintRecord& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PrintRecord											&	operator=(
-		PrintRecord										&&	other
-	) = default;
+	auto operator=( PrintRecord&& other ) -> PrintRecord& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -76,9 +67,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	PrintRecord											&	operator+=(
-		const PrintRecord								&	other
-	);
+	auto operator+=( const PrintRecord& other ) -> PrintRecord&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -92,9 +81,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	PrintRecord											&	operator+=(
-		const PrintRecordSection						&	section
-	);
+	auto operator+=( const PrintRecordSection& section ) -> PrintRecord&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -105,12 +92,10 @@ public:
 	///
 	/// @return
 	/// A new PrintRecord with combined texts.
-	PrintRecord												operator+(
-		const PrintRecord								&	other
-	) const;
+	auto operator+( const PrintRecord& other ) const -> PrintRecord;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const PrintRecordSectionList						&	GetSections() const;
+	auto GetSections() const -> const PrintRecordSectionList&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -118,7 +103,7 @@ public:
 	///
 	/// @return
 	/// Number of lines taken by this print record.
-	const u32												CalculateLineCount() const;
+	auto CalculateLineCount() const -> u32;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -132,9 +117,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	PrintRecord											&	Append(
-		const PrintRecord								&	other
-	);
+	auto Append( const PrintRecord& other ) -> PrintRecord&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -148,9 +131,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	PrintRecord											&	AddSection(
-		const PrintRecordSection						&	section
-	);
+	auto AddSection( const PrintRecordSection& section ) -> PrintRecord&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -168,9 +149,7 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	PrintRecord											&	AddIndent(
-		i32													add_indentation_level			= 1
-	);
+	auto AddIndent( u32 add_indentation_level = 1 ) -> PrintRecord&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -189,12 +168,10 @@ public:
 	///
 	/// @return
 	/// Reference to this.
-	PrintRecord												GetFinalized(
-		u32													indentation_size				= 4
-	) const;
+	auto GetFinalized( u32 indentation_size = 4 ) const -> PrintRecord;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	bool													IsEmpty() const noexcept;
+	auto IsEmpty() const noexcept -> bool;
 
 private:
 
@@ -207,12 +184,10 @@ private:
 	///
 	/// @return
 	/// New section list with applied indents.
-	void													Finalize_ApplyIndents(
-		u32													indentation_size				= 4
-	);
+	void Finalize_ApplyIndents( u32 indentation_size = 4 );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PrintRecordSectionList									section_list;
+	PrintRecordSectionList	section_list;
 };
 
 

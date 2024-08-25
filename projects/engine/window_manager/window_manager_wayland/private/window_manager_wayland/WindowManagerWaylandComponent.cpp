@@ -6,9 +6,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::WindowManagerWaylandComponent::WindowManagerWaylandComponent(
-	const WindowManagerComponentCreateInfo & create_info
-) :
+bc::window_manager::WindowManagerWaylandComponent::WindowManagerWaylandComponent( const WindowManagerComponentCreateInfo& create_info )
+:
 	WindowManagerComponent( create_info )
 {
 	wayland_manager = MakeUniquePtr<WaylandManager>( *this, create_info );
@@ -27,15 +26,13 @@ void bc::window_manager::WindowManagerWaylandComponent::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerWaylandComponent::CreateWindow(
-	const WindowCreateInfo & window_create_info
-)
+auto bc::window_manager::WindowManagerWaylandComponent::CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>
 {
 	return wayland_manager->CreateWindow( window_create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::WindowManagerWaylandComponent::GetPlatformSpecificHandles() const
+auto bc::window_manager::WindowManagerWaylandComponent::GetPlatformSpecificHandles() const -> const WindowManagerPlatformHandlesBase*
 {
 	return wayland_manager->GetPlatformSpecificHandles();
 }

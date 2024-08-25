@@ -6,10 +6,10 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::scene::Meshlet bc::scene::MakeMeshlet(
-	const bc::List<Vertex>		&	vertex_list,
-	bc::ListView<u32>				vertex_index_list
-)
+auto bc::scene::MakeMeshlet(
+	const bc::List<Vertex>	&	vertex_list,
+	bc::ListView<u32>			vertex_index_list
+) -> Meshlet
 {
 	BAssert( !vertex_index_list.IsEmpty(), U"Cannot create meshlet, vertex index list was empty" );
 	BAssert( vertex_index_list.Size() <= internal_::MESHLET_MAX_INDICES, U"Cannot create meshlet, vertex index list was too large" );

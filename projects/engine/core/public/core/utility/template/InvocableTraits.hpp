@@ -31,15 +31,15 @@ public:
 	using ReturnType			= InvocableReturnType;
 	using ParameterTypeList		= TypeList<InvocableParameterTypePack...>;
 
-	static consteval u64 ParameterCount() noexcept { return ParameterTypeList::Size(); }
+	static consteval auto ParameterCount() noexcept { return ParameterTypeList::Size(); }
 
-	static consteval bool IsPlainFunction() { return IsPlainFunctionInvocable; }
-	static consteval bool IsMemberFunction() { return IsMemberInvocable; }
-	static consteval bool IsConst() { return IsConstInvocable; }
-	static consteval bool IsVolatile() { return IsVolatileInvocable; }
-	static consteval bool IsLValueOnly() { return IsLValueOnlyInvocable; }
-	static consteval bool IsRValueOnly() { return IsRValueOnlyInvocable; }
-	static consteval bool IsNoexcept() { return IsNoexceptInvocable; }
+	static consteval auto IsPlainFunction() { return IsPlainFunctionInvocable; }
+	static consteval auto IsMemberFunction() { return IsMemberInvocable; }
+	static consteval auto IsConst() { return IsConstInvocable; }
+	static consteval auto IsVolatile() { return IsVolatileInvocable; }
+	static consteval auto IsLValueOnly() { return IsLValueOnlyInvocable; }
+	static consteval auto IsRValueOnly() { return IsRValueOnlyInvocable; }
+	static consteval auto IsNoexcept() { return IsNoexceptInvocable; }
 };
 
 

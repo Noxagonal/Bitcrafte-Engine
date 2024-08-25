@@ -6,9 +6,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::window_manager::WindowManagerXLibComponent::WindowManagerXLibComponent(
-	const WindowManagerComponentCreateInfo & create_info
-) :
+bc::window_manager::WindowManagerXLibComponent::WindowManagerXLibComponent( const WindowManagerComponentCreateInfo& create_info )
+:
 	WindowManagerComponent( create_info )
 {
 	xlib_manager = MakeUniquePtr<XLibManager>( *this, create_info );
@@ -27,15 +26,13 @@ void bc::window_manager::WindowManagerXLibComponent::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WindowManagerXLibComponent::CreateWindow(
-	const WindowCreateInfo & window_create_info
-)
+auto bc::window_manager::WindowManagerXLibComponent::CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>
 {
 	return xlib_manager->CreateWindow( window_create_info );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const bc::window_manager::WindowManagerPlatformHandlesBase * bc::window_manager::WindowManagerXLibComponent::GetPlatformSpecificHandles() const
+auto bc::window_manager::WindowManagerXLibComponent::GetPlatformSpecificHandles() const -> const WindowManagerPlatformHandlesBase*
 {
 	return xlib_manager->GetPlatformSpecificHandles();
 }

@@ -44,28 +44,20 @@ public:
 	ThreadDescription() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ThreadDescription(
-		const ThreadDescription				&	other
-	) = delete;
+	ThreadDescription( const ThreadDescription& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline ThreadDescription(
-		ThreadDescription					&&	other
-	)
+	inline ThreadDescription( ThreadDescription&& other )
 	{
 		auto lock_guard = std::lock_guard( other.modify_mutex );
 		Swap( other );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ThreadDescription						&	operator=(
-		const ThreadDescription				&	other
-	) = delete;
+	auto operator=( const ThreadDescription& other ) -> ThreadDescription& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ThreadDescription						&	operator=(
-		ThreadDescription					&&	other
-	)
+	auto operator=( ThreadDescription&& other ) -> ThreadDescription&
 	{
 		std::lock( modify_mutex, other.modify_mutex );
 		auto my_lock_guard = std::lock_guard( modify_mutex, std::adopt_lock );
@@ -76,22 +68,20 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	UniquePtr<Thread>							pool_thread;
-	std::thread									stl_thread;
-	std::atomic<WorkerThreadState>				state					= WorkerThreadState::UNINITIALIZED;
-	std::atomic_bool							should_exit				= false;
-	std::atomic_bool							ready_to_join			= false;
-	ThreadIdentifier							thread_id				= 0;
+	UniquePtr<Thread>				pool_thread;
+	std::thread						stl_thread;
+	std::atomic<WorkerThreadState>	state			= WorkerThreadState::UNINITIALIZED;
+	std::atomic_bool				should_exit		= false;
+	std::atomic_bool				ready_to_join	= false;
+	ThreadIdentifier				thread_id		= 0;
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::mutex									modify_mutex;
+	std::mutex						modify_mutex;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline void									Swap(
-		ThreadDescription					&	other
-	)
+	inline void Swap( ThreadDescription& other ) noexcept
 	{
 		std::swap( this->pool_thread, other.pool_thread );
 		std::swap( this->stl_thread, other.stl_thread );
@@ -105,12 +95,12 @@ private:
 	/// Swaps two atomic values.
 	///
 	/// @warning
-	/// Internal use only. Assumes that the mutexes are locked.
+	/// Internal use only. Assumes that the mutexes are locked and does not verify that atomic exhanges are actually atomic.
 	template<typename Type>
-	void										AtomicSwap(
-		std::atomic<Type>					&	left,
-		std::atomic<Type>					&	right
-	)
+	void AtomicSwap(
+		std::atomic<Type>&	left,
+		std::atomic<Type>&	right
+	) noexcept
 	{
 		auto left_value = left.load();
 		auto right_value = right.load();

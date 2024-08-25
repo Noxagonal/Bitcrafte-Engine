@@ -5,9 +5,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::internal_::SimpleTextView32 bc::diagnostic::LogReportSeverityToText(
-	bc::diagnostic::LogReportSeverity e
-)
+auto bc::diagnostic::LogReportSeverityToText( bc::diagnostic::LogReportSeverity e ) -> bc::internal_::SimpleTextView32
 {
 	switch( e )
 	{
@@ -34,9 +32,8 @@ bc::internal_::SimpleTextView32 bc::diagnostic::LogReportSeverityToText(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BITCRAFTE_ENGINE_API bc::diagnostic::PrintRecordTheme bc::diagnostic::LogReportSeverityToPrintRecordTheme(
-	LogReportSeverity e
-)
+BITCRAFTE_ENGINE_API
+auto bc::diagnostic::LogReportSeverityToPrintRecordTheme( LogReportSeverity e ) -> PrintRecordTheme
 {
 	switch( e )
 	{

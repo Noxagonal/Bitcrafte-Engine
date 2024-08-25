@@ -73,8 +73,8 @@ enum class PrintRecordTheme : u32
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct PrintRecordThemeColors
 {
-	PrintRecordColor						foreground_color					= PrintRecordColor::DEFAULT;
-	PrintRecordColor						background_color					= PrintRecordColor::DEFAULT;
+	PrintRecordColor	foreground_color	= PrintRecordColor::DEFAULT;
+	PrintRecordColor	background_color	= PrintRecordColor::DEFAULT;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,9 +84,7 @@ struct PrintRecordThemeColors
 /// @return
 /// Console colors representing the theme. Foreground color is first, then background color.
 BITCRAFTE_ENGINE_API
-PrintRecordThemeColors						GetPrintRecordThemeColors(
-	PrintRecordTheme						theme
-);
+auto GetPrintRecordThemeColors( PrintRecordTheme theme ) -> PrintRecordThemeColors;
 
 
 

@@ -30,72 +30,101 @@ public:
 
 	static constexpr u64 MatrixDimensions = 2;
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VectorBase<MatrixDimensions, ValueType>									column_1;
-	VectorBase<MatrixDimensions, ValueType>									column_2;
+	using VectorType = VectorBase<MatrixDimensions, ValueType>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase() noexcept :
-		column_1( {} ),
-		column_2( {} )
-	{};
-	
+	VectorType	column_1;
+	VectorType	column_2;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase(
-		const VectorBase<MatrixDimensions, ValueType>					&	column_1,
-		const VectorBase<MatrixDimensions, ValueType>					&	column_2
-	) noexcept :
-		column_1( column_1 ),
-		column_2( column_2 )
-	{}
-	
+	/// @brief
+	/// Constructs an unitialized matrix.
+	constexpr MatrixBase() noexcept = default;
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase(
-		ValueType															identity_value
-	) noexcept
+	constexpr MatrixBase( const MatrixBase& other ) noexcept
+	{
+		Copy( other );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs an identity matrix.
+	///
+	/// @param identity_value
+	/// Value to use for the identity matrix diagonal elements.
+	constexpr MatrixBase( ValueType identity_value ) noexcept
 	{
 		*this = MakeIdentity( identity_value );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs a matrix directly from column vectors.
 	constexpr MatrixBase(
-		ValueType m11, ValueType m12,
-		ValueType m21, ValueType m22
+		const VectorType&	column_1,
+		const VectorType&	column_2
+	) noexcept
+	:
+		column_1( column_1 ),
+		column_2( column_2 )
+	{}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs a matrix directly from values.
+	///
+	/// Parameters are interepreted as ```m<column><row>```. The column number comes first and row number comes second.
+	/// m11 is the first value of column 1, m21 is the first value of column 2, m42 is the second value of column 4, etc.
+	/// This allows us to write code like this:
+	/// @code
+	/// auto m = Matrix2f32 {
+	///		1.0f, 2.0f,
+	///		3.0f, 4.0f
+	/// };
+	/// // 1.0f, 3.0f make up the first column.
+	/// // 2.0f, 4.0f make up the second column.
+	/// @endcode
+	constexpr MatrixBase(
+		ValueType m11,	ValueType m21,
+		ValueType m12,	ValueType m22
 	) noexcept :
 		column_1( m11, m12 ),
 		column_2( m21, m22 )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase(
-		const MatrixBase												&	other
-	) noexcept
+	constexpr auto operator=( const MatrixBase& other ) noexcept -> MatrixBase&
 	{
-		CopyOther( other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase												&	operator=(
-		const MatrixBase												&	other
-	) noexcept
-	{
-		CopyOther( other );
+		Copy( other );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase												&	operator*=(
-		const MatrixBase												&	other
-	) noexcept
+	/// @brief
+	/// Multiplies this matrix with another matrix and stores the result in this matrix.
+	///
+	/// @param other
+	/// Matrix to multiply with this matrix.
+	///
+	/// @returns
+	/// Reference to this matrix.
+	constexpr auto operator*=( const MatrixBase& other ) noexcept -> MatrixBase&
 	{
 		*this = *this * other;
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase													operator*(
-		const MatrixBase												&	other
-	) const noexcept
+	/// @brief
+	/// Multiplies this matrix with another matrix.
+	///
+	/// @param other
+	/// Matrix to multiply with this matrix.
+	///
+	/// @returns
+	/// New matrix result of the multiplication.
+	constexpr auto operator*( const MatrixBase& other ) const noexcept -> MatrixBase
 	{
 		auto & m11 = column_1[ 0 ], & m12 = column_1[ 1 ];
 		auto & m21 = column_2[ 0 ], & m22 = column_2[ 1 ];
@@ -110,9 +139,15 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase<MatrixDimensions, ValueType>						operator*(
-		const VectorBase<MatrixDimensions, ValueType>					&	other
-	) const noexcept
+	/// @brief
+	/// Multiplies this matrix with a vector, transforming it.
+	///
+	/// @param other
+	/// Vector to multiply with this matrix.
+	///
+	/// @returns
+	/// New vector result of the multiplication.
+	constexpr auto operator*( const VectorType& other ) const noexcept -> VectorType
 	{
 		auto & m11 = column_1[ 0 ], & m12 = column_1[ 1 ];
 		auto & m21 = column_2[ 0 ], & m22 = column_2[ 1 ];
@@ -126,25 +161,19 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator==(
-		const MatrixBase												&	other
-	) const noexcept
+	constexpr auto operator==( const MatrixBase& other ) const noexcept -> bool
 	{
 		return column_1 == other.column_1 && column_2 == other.column_2;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator!=(
-		const MatrixBase												&	other
-	) const noexcept
+	constexpr auto operator!=( const MatrixBase& other ) const noexcept -> bool
 	{
 		return column_1 != other.column_1 || column_2 != other.column_2;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const VectorBase<MatrixDimensions, ValueType>				&	operator[](
-		u64																	index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const VectorType&
 	{
 		if( index == 0 ) return column_1;
 		if( index == 1 ) return column_2;
@@ -156,9 +185,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase<MatrixDimensions, ValueType>					&	operator[](
-		u64																	index
-	)
+	constexpr auto operator[]( i64 index ) -> VectorType&
 	{
 		if( index == 0 ) return column_1;
 		if( index == 1 ) return column_2;
@@ -170,7 +197,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static consteval MatrixBase												Identity() noexcept
+	static consteval auto Identity() noexcept -> MatrixBase
 	{
 		return MakeIdentity( static_cast<ValueType>( 1 ) );
 	}
@@ -178,18 +205,14 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void															CopyOther(
-		const MatrixBase												&	other
-	) noexcept
+	constexpr void Copy( const MatrixBase& other ) noexcept
 	{
 		column_1 = other.column_1;
 		column_2 = other.column_2;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static constexpr MatrixBase												MakeIdentity(
-		ValueType															identity_value
-	)
+	static constexpr auto MakeIdentity( ValueType identity_value ) noexcept -> MatrixBase
 	{
 		return MatrixBase {
 			identity_value, {},
@@ -208,78 +231,109 @@ public:
 
 	static constexpr u64 MatrixDimensions = 3;
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VectorBase<MatrixDimensions, ValueType>									column_1;
-	VectorBase<MatrixDimensions, ValueType>									column_2;
-	VectorBase<MatrixDimensions, ValueType>									column_3;
+	using VectorType = VectorBase<MatrixDimensions, ValueType>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase() noexcept :
-		column_1( {} ),
-		column_2( {} ),
-		column_3( {} )
-	{};
+	VectorType	column_1;
+	VectorType	column_2;
+	VectorType	column_3;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs an unitialized matrix.
+	constexpr MatrixBase() noexcept = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr MatrixBase( const MatrixBase& other ) noexcept
+	{
+		Copy( other );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs an identity matrix.
+	///
+	/// @param identity_value
+	/// Value to use for the identity matrix diagonal elements.
+	constexpr MatrixBase( ValueType identity_value ) noexcept
+	{
+		*this = MakeIdentity( identity_value );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs a matrix directly from column vectors.
 	constexpr MatrixBase(
-		const VectorBase<MatrixDimensions, ValueType>					&	column_1,
-		const VectorBase<MatrixDimensions, ValueType>					&	column_2,
-		const VectorBase<MatrixDimensions, ValueType>					&	column_3
-	) noexcept :
+		const VectorType&	column_1,
+		const VectorType&	column_2,
+		const VectorType&	column_3
+	) noexcept
+	:
 		column_1( column_1 ),
 		column_2( column_2 ),
 		column_3( column_3 )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs a matrix directly from values.
+	///
+	/// Parameters are interepreted as ```m<column><row>```. The column number comes first and row number comes second.
+	/// m11 is the first value of column 1, m21 is the first value of column 2, m42 is the second value of column 4, etc.
+	/// This allows us to write code like this:
+	/// @code
+	/// auto m = Matrix3f32 {
+	///		1.0f, 2.0f, 3.0f,
+	///		4.0f, 5.0f, 6.0f,
+	///		7.0f, 8.0f, 9.0f
+	/// };
+	/// // 1.0f, 4.0f, 7.0f make up the first column.
+	/// // 2.0f, 5.0f, 8.0f make up the second column.
+	/// // 3.0f, 6.0f, 9.0f make up the second column.
+	/// @endcode
 	constexpr MatrixBase(
-		ValueType															identity_value
+		ValueType m11, ValueType m21, ValueType m31,
+		ValueType m12, ValueType m22, ValueType m32,
+		ValueType m13, ValueType m23, ValueType m33
 	) noexcept
-	{
-		*this = MakeIdentity( identity_value );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase(
-		ValueType m11, ValueType m12, ValueType m13,
-		ValueType m21, ValueType m22, ValueType m23,
-		ValueType m31, ValueType m32, ValueType m33
-	) noexcept :
+	:
 		column_1( m11, m12, m13 ),
 		column_2( m21, m22, m23 ),
 		column_3( m31, m32, m33 )
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase(
-		const MatrixBase												&	other
-	) noexcept
+	constexpr operator=( const MatrixBase& other ) noexcept -> MatrixBase&
 	{
-		CopyOther( other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase												&	operator=(
-		const MatrixBase												&	other
-	) noexcept
-	{
-		CopyOther( other );
+		Copy( other );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase												&	operator*=(
-		const MatrixBase												&	other
-	) noexcept
+	/// @brief
+	/// Multiplies this matrix with another matrix and stores the result in this matrix.
+	///
+	/// @param other
+	/// Matrix to multiply with this matrix.
+	///
+	/// @returns
+	/// Reference to this matrix.
+	constexpr auto operator*=( const MatrixBase& other ) noexcept -> MatrixBase&
 	{
 		*this = *this * other;
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase													operator*(
-		const MatrixBase												&	other
-		) const noexcept
+	/// @brief
+	/// Multiplies this matrix with another matrix.
+	///
+	/// @param other
+	/// Matrix to multiply with this matrix.
+	///
+	/// @returns
+	/// New matrix result of the multiplication.
+	constexpr auto operator*( const MatrixBase& other ) const noexcept -> MatrixBase
 	{
 		auto & m11 = column_1[ 0 ], & m12 = column_1[ 1 ], & m13 = column_1[ 2 ];
 		auto & m21 = column_2[ 0 ], & m22 = column_2[ 1 ], & m23 = column_2[ 2 ];
@@ -297,9 +351,15 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase<MatrixDimensions, ValueType>						operator*(
-		const VectorBase<MatrixDimensions, ValueType>					&	other
-	) const noexcept
+	/// @brief
+	/// Multiplies this matrix with a vector, transforming it.
+	///
+	/// @param other
+	/// Vector to multiply with this matrix.
+	///
+	/// @returns
+	/// New vector result of the multiplication.
+	constexpr auto operator*( const VectorType& other ) const noexcept -> VectorType
 	{
 		auto & m11 = column_1[ 0 ], & m12 = column_1[ 1 ], & m13 = column_1[ 2 ];
 		auto & m21 = column_2[ 0 ], & m22 = column_2[ 1 ], & m23 = column_2[ 2 ];
@@ -315,25 +375,19 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator==(
-		const MatrixBase												&	other
-	) const noexcept
+	constexpr auto operator==( const MatrixBase& other ) const noexcept -> bool
 	{
 		return column_1 == other.column_1 && column_2 == other.column_2 && column_3 == other.column_3;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator!=(
-		const MatrixBase												&	other
-	) const noexcept
+	constexpr auto operator!=( const MatrixBase& other ) const noexcept -> bool
 	{
 		return column_1 != other.column_1 || column_2 != other.column_2 || column_3 != other.column_3;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const VectorBase<MatrixDimensions, ValueType>				&	operator[](
-		u64																	index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const VectorType&
 	{
 		if( index == 0 ) return column_1;
 		if( index == 1 ) return column_2;
@@ -346,9 +400,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase<MatrixDimensions, ValueType>					&	operator[](
-		u64																	index
-	)
+	constexpr auto operator[]( i64 index ) -> VectorType&
 	{
 		if( index == 0 ) return column_1;
 		if( index == 1 ) return column_2;
@@ -361,7 +413,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static constexpr MatrixBase												Identity() noexcept
+	static constexpr auto Identity() noexcept -> MatrixBase
 	{
 		return MakeIdentity( static_cast<ValueType>( 1 ) );
 	}
@@ -369,9 +421,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void															CopyOther(
-		const MatrixBase												&	other
-	) noexcept
+	constexpr void Copy( const MatrixBase& other ) noexcept
 	{
 		column_1 = other.column_1;
 		column_2 = other.column_2;
@@ -379,9 +429,7 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static constexpr MatrixBase												MakeIdentity(
-		ValueType															identity_value
-	)
+	static constexpr auto MakeIdentity( ValueType identity_value ) noexcept -> MatrixBase
 	{
 		return {
 			identity_value, {}, {},
@@ -401,27 +449,46 @@ public:
 
 	static constexpr u64 MatrixDimensions = 4;
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VectorBase<MatrixDimensions, ValueType>									column_1;
-	VectorBase<MatrixDimensions, ValueType>									column_2;
-	VectorBase<MatrixDimensions, ValueType>									column_3;
-	VectorBase<MatrixDimensions, ValueType>									column_4;
+	using VectorType = VectorBase<MatrixDimensions, ValueType>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase() noexcept :
-		column_1( {} ),
-		column_2( {} ),
-		column_3( {} ),
-		column_4( {} )
-	{};
+	VectorType	column_1;
+	VectorType	column_2;
+	VectorType	column_3;
+	VectorType	column_4;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs an unitialized matrix.
+	constexpr MatrixBase() noexcept = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr MatrixBase( const MatrixBase& other ) noexcept
+	{
+		Copy( other );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs an identity matrix.
+	///
+	/// @param identity_value
+	/// Value to use for the identity matrix diagonal elements.
+	constexpr MatrixBase( ValueType identity_value ) noexcept
+	{
+		*this = MakeIdentity( identity_value );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs a matrix directly from column vectors.
 	constexpr MatrixBase(
-		const VectorBase<MatrixDimensions, ValueType>					&	column_1,
-		const VectorBase<MatrixDimensions, ValueType>					&	column_2,
-		const VectorBase<MatrixDimensions, ValueType>					&	column_3,
-		const VectorBase<MatrixDimensions, ValueType>					&	column_4
-	) noexcept :
+		const VectorType&	column_1,
+		const VectorType&	column_2,
+		const VectorType&	column_3,
+		const VectorType&	column_4
+	) noexcept
+	:
 		column_1( column_1 ),
 		column_2( column_2 ),
 		column_3( column_3 ),
@@ -429,20 +496,31 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Constructs a matrix directly from values.
+	///
+	/// Parameters are interepreted as ```m<column><row>```. The column number comes first and row number comes second.
+	/// m11 is the first value of column 1, m21 is the first value of column 2, m42 is the second value of column 4, etc.
+	/// This allows us to write code like this:
+	/// @code
+	/// auto m = Matrix4f32 {
+	///		1.0f,  2.0f,  3.0f,  4.0f,
+	/// 	5.0f,  6.0f,  7.0f,  8.0f,
+	///		9.0f,  10.0f, 11.0f, 12.0f,
+	/// 	13.0f, 14.0f, 15.0f, 16.0f
+	/// };
+	/// // 1.0f, 5.0f, 9.0f, 13.0f make up the first column.
+	/// // 2.0f, 6.0f, 10.0f, 14.0f make up the second column.
+	/// // 3.0f, 7.0f, 11.0f, 15.0f make up the third column.
+	/// // 4.0f, 8.0f, 12.0f, 16.0f make up the fourth column.
+	/// @endcode
 	constexpr MatrixBase(
-		ValueType															identity_value
+		ValueType m11, ValueType m21, ValueType m31, ValueType m41,
+		ValueType m12, ValueType m22, ValueType m32, ValueType m42,
+		ValueType m13, ValueType m23, ValueType m33, ValueType m43,
+		ValueType m14, ValueType m24, ValueType m34, ValueType m44
 	) noexcept
-	{
-		*this = MakeIdentity( identity_value );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase(
-		ValueType m11, ValueType m12, ValueType m13, ValueType m14,
-		ValueType m21, ValueType m22, ValueType m23, ValueType m24,
-		ValueType m31, ValueType m32, ValueType m33, ValueType m34,
-		ValueType m41, ValueType m42, ValueType m43, ValueType m44
-	) noexcept :
+	:
 		column_1( m11, m12, m13, m14 ),
 		column_2( m21, m22, m23, m24 ),
 		column_3( m31, m32, m33, m34 ),
@@ -450,35 +528,37 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase(
-		const MatrixBase												&	other
-	) noexcept
+	constexpr auto operator=( const MatrixBase& other ) noexcept -> MatrixBase&
 	{
-		CopyOther( other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase												&	operator=(
-		const MatrixBase												&	other
-	) noexcept
-	{
-		CopyOther( other );
+		Copy( other );
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase												&	operator*=(
-		const MatrixBase												&	other
-	) noexcept
+	/// @brief
+	/// Multiplies this matrix with another matrix and stores the result in this matrix.
+	///
+	/// @param other
+	/// Matrix to multiply with this matrix.
+	///
+	/// @returns
+	/// Reference to this matrix.
+	constexpr auto operator*=( const MatrixBase& other ) noexcept -> MatrixBase&
 	{
 		*this = *this * other;
 		return *this;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr MatrixBase													operator*(
-		const MatrixBase												&	other
-	) const noexcept
+	/// @brief
+	/// Multiplies this matrix with another matrix.
+	///
+	/// @param other
+	/// Matrix to multiply with this matrix.
+	///
+	/// @returns
+	/// New matrix result of the multiplication.
+	constexpr auto operator*( const MatrixBase& other ) const noexcept -> MatrixBase
 	{
 		auto & m11 = column_1[ 0 ], & m12 = column_1[ 1 ], & m13 = column_1[ 2 ], & m14 = column_1[ 3 ];
 		auto & m21 = column_2[ 0 ], & m22 = column_2[ 1 ], & m23 = column_2[ 2 ], & m24 = column_2[ 3 ];
@@ -499,9 +579,15 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase<MatrixDimensions, ValueType>						operator*(
-		const VectorBase<MatrixDimensions, ValueType>					&	other
-	) const noexcept
+	/// @brief
+	/// Multiplies this matrix with a vector, transforming it.
+	///
+	/// @param other
+	/// Vector to multiply with this matrix.
+	///
+	/// @returns
+	/// New vector result of the multiplication.
+	constexpr auto operator*( const VectorType& other ) const noexcept -> VectorType
 	{
 		auto & m11 = column_1[ 0 ], & m12 = column_1[ 1 ], & m13 = column_1[ 2 ], & m14 = column_1[ 3 ];
 		auto & m21 = column_2[ 0 ], & m22 = column_2[ 1 ], & m23 = column_2[ 2 ], & m24 = column_2[ 3 ];
@@ -519,25 +605,19 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator==(
-		const MatrixBase												&	other
-	) const noexcept
+	constexpr auto operator==( const MatrixBase& other ) const noexcept -> bool
 	{
 		return column_1 == other.column_1 && column_2 == other.column_2 && column_3 == other.column_3 && column_4 == other.column_4;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool															operator!=(
-		const MatrixBase												&	other
-	) const noexcept
+	constexpr auto operator!=( const MatrixBase& other ) const noexcept -> bool
 	{
 		return column_1 != other.column_1 || column_2 != other.column_2 || column_3 != other.column_3 || column_4 != other.column_4;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const VectorBase<MatrixDimensions, ValueType>				&	operator[](
-		u64																	index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const VectorType&
 	{
 		if( index == 0 ) return column_1;
 		if( index == 1 ) return column_2;
@@ -551,9 +631,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr VectorBase<MatrixDimensions, ValueType>					&	operator[](
-		u64																	index
-	)
+	constexpr auto operator[]( i64 index ) -> VectorType&
 	{
 		if( index == 0 ) return column_1;
 		if( index == 1 ) return column_2;
@@ -567,7 +645,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static consteval MatrixBase												Identity() noexcept
+	static consteval auto Identity() noexcept -> MatrixBase
 	{
 		return MakeIdentity( static_cast<ValueType>( 1 ) );
 	}
@@ -575,9 +653,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void															CopyOther(
-		const MatrixBase												&	other
-	) noexcept
+	constexpr void Copy( const MatrixBase& other ) noexcept
 	{
 		column_1 = other.column_1;
 		column_2 = other.column_2;
@@ -586,9 +662,7 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	static constexpr MatrixBase												MakeIdentity(
-		ValueType															identity_value
-	)
+	static constexpr auto MakeIdentity( ValueType identity_value ) noexcept -> MatrixBase
 	{
 		return {
 			identity_value, {}, {}, {},
@@ -602,44 +676,44 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using Matrix2f = MatrixBase<2, f32>;
-using Matrix2d = MatrixBase<2, f64>;
-using Matrix2i = MatrixBase<2, i64>;
+using Matrix2f32 = MatrixBase<2, f32>;
+using Matrix2f64 = MatrixBase<2, f64>;
+using Matrix2i64 = MatrixBase<2, i64>;
 
-using Matrix3f = MatrixBase<3, f32>;
-using Matrix3d = MatrixBase<3, f64>;
-using Matrix3i = MatrixBase<3, i64>;
+using Matrix3f32 = MatrixBase<3, f32>;
+using Matrix3f64 = MatrixBase<3, f64>;
+using Matrix3i64 = MatrixBase<3, i64>;
 
-using Matrix4f = MatrixBase<4, f32>;
-using Matrix4d = MatrixBase<4, f64>;
-using Matrix4i = MatrixBase<4, i64>;
+using Matrix4f32 = MatrixBase<4, f32>;
+using Matrix4f64 = MatrixBase<4, f64>;
+using Matrix4i64 = MatrixBase<4, i64>;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static_assert( sizeof( Matrix2f ) == sizeof( f32 ) * 2 * 2 );
-static_assert( sizeof( Matrix2d ) == sizeof( f64 ) * 2 * 2 );
-static_assert( sizeof( Matrix2i ) == sizeof( i64 ) * 2 * 2 );
+static_assert( sizeof( Matrix2f32 ) == sizeof( f32 ) * 2 * 2 );
+static_assert( sizeof( Matrix2f64 ) == sizeof( f64 ) * 2 * 2 );
+static_assert( sizeof( Matrix2i64 ) == sizeof( i64 ) * 2 * 2 );
 
-static_assert( sizeof( Matrix3f ) == sizeof( f32 ) * 3 * 3 );
-static_assert( sizeof( Matrix3d ) == sizeof( f64 ) * 3 * 3 );
-static_assert( sizeof( Matrix3i ) == sizeof( i64 ) * 3 * 3 );
+static_assert( sizeof( Matrix3f32 ) == sizeof( f32 ) * 3 * 3 );
+static_assert( sizeof( Matrix3f64 ) == sizeof( f64 ) * 3 * 3 );
+static_assert( sizeof( Matrix3i64 ) == sizeof( i64 ) * 3 * 3 );
 
-static_assert( sizeof( Matrix4f ) == sizeof( f32 ) * 4 * 4 );
-static_assert( sizeof( Matrix4d ) == sizeof( f64 ) * 4 * 4 );
-static_assert( sizeof( Matrix4i ) == sizeof( i64 ) * 4 * 4 );
+static_assert( sizeof( Matrix4f32 ) == sizeof( f32 ) * 4 * 4 );
+static_assert( sizeof( Matrix4f64 ) == sizeof( f64 ) * 4 * 4 );
+static_assert( sizeof( Matrix4i64 ) == sizeof( i64 ) * 4 * 4 );
 
-static_assert( alignof( Matrix2f ) == alignof( f32 ) * 4 );
-static_assert( alignof( Matrix2d ) == alignof( f64 ) * 4 );
-static_assert( alignof( Matrix2i ) == alignof( i64 ) * 4 );
+static_assert( alignof( Matrix2f32 ) == alignof( f32 ) * 4 );
+static_assert( alignof( Matrix2f64 ) == alignof( f64 ) * 4 );
+static_assert( alignof( Matrix2i64 ) == alignof( i64 ) * 4 );
 
-static_assert( alignof( Matrix3f ) == alignof( f32 ) );
-static_assert( alignof( Matrix3d ) == alignof( f64 ) );
-static_assert( alignof( Matrix3i ) == alignof( i64 ) );
+static_assert( alignof( Matrix3f32 ) == alignof( f32 ) );
+static_assert( alignof( Matrix3f64 ) == alignof( f64 ) );
+static_assert( alignof( Matrix3i64 ) == alignof( i64 ) );
 
-static_assert( alignof( Matrix4f ) == alignof( f32 ) * 16 );
-static_assert( alignof( Matrix4d ) == alignof( f64 ) * 16 );
-static_assert( alignof( Matrix4i ) == alignof( i64 ) * 16 );
+static_assert( alignof( Matrix4f32 ) == alignof( f32 ) * 16 );
+static_assert( alignof( Matrix4f64 ) == alignof( f64 ) * 16 );
+static_assert( alignof( Matrix4i64 ) == alignof( i64 ) * 16 );
 
 
 

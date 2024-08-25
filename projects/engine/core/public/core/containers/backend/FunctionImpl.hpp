@@ -105,39 +105,47 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	union alignas( 8 ) LocalStorage
 	{
-		MyFunction													*	function_pointer;
-		void														*	heap_functor;
-		u8																raw[16];
+		MyFunction*		function_pointer;
+		void*			heap_functor;
+		u8				raw[16];
 	};
 	static_assert( sizeof( LocalStorage ) == 16 );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	class FunctorManagerBase
 	{
+		// TODO: Currently we're using this manager as a virtual base class. This is not ideal for performance because of vtable
+		//       indirection. We can substitude this with a single pointer to function instead. This function would be a template
+		//       function that gets instantiated by Store() function, and pointer to it would be reinterpret_casted to a function
+		//       signature of common type. Just need to make sure that the function signature matches. We only need one function for
+		//       every operation as we can just pass an op-code to it. A switch statement inside the function would probably be
+		//       faster than a vtable indirection. On the other hand, reinterpret_cast may prevent some optimizations so when we do
+		//       this, performance needs to be measured. Also, make sure that we can do this safely.
+
 	public:
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		virtual ~FunctorManagerBase() noexcept = default;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual ReturnType							Invoke(
-			bool									is_stored_locally,
-			LocalStorage						&	storage,
-			ParameterTypes...						args
-		) BC_CONTAINER_NOEXCEPT = 0;
+		virtual auto Invoke(
+			bool				is_stored_locally,
+			LocalStorage&		storage,
+			ParameterTypes...	args
+		) BC_CONTAINER_NOEXCEPT -> ReturnType = 0;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual void								Clone(
-			bool									is_stored_locally,
-			FunctorManagerBase					&	destination_manager,
-			LocalStorage						&	destination,
-			const LocalStorage					&	source
+		virtual void Clone(
+			bool				is_stored_locally,
+			FunctorManagerBase&	destination_manager,
+			LocalStorage&		destination,
+			const LocalStorage&	source
 		) const BC_CONTAINER_NOEXCEPT = 0;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual void								ClearFunctor(
-			bool									is_stored_locally,
-			LocalStorage						&	storage
+		virtual void ClearFunctor(
+			bool				is_stored_locally,
+			LocalStorage&		storage
 		) noexcept = 0;
 	};
 
@@ -151,22 +159,22 @@ private:
 		FunctorManager() = default;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual ReturnType							Invoke(
-			bool									is_stored_locally,
-			LocalStorage						&	storage,
-			ParameterTypes...						args
-		) BC_CONTAINER_NOEXCEPT override
+		virtual auto Invoke(
+			bool				is_stored_locally,
+			LocalStorage&		storage,
+			ParameterTypes...	args
+		) BC_CONTAINER_NOEXCEPT -> ReturnType override
 		{
 			auto functor_pointer = GetFunctorPointer<FunctorType>( is_stored_locally, storage );
 			return ( *functor_pointer )( std::forward<ParameterTypes>( args )... );
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual void								Clone(
-			bool									is_stored_locally,
-			FunctorManagerBase					&	destination_manager,
-			LocalStorage						&	destination,
-			const LocalStorage					&	source
+		virtual void Clone(
+			bool				is_stored_locally,
+			FunctorManagerBase&	destination_manager,
+			LocalStorage&		destination,
+			const LocalStorage&	source
 		) const BC_CONTAINER_NOEXCEPT override
 		{
 			// Allocate space for the functor in destination storage.
@@ -182,9 +190,9 @@ private:
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual void								ClearFunctor(
-			bool									is_stored_locally,
-			LocalStorage						&	storage
+		virtual void ClearFunctor(
+			bool			is_stored_locally,
+			LocalStorage&	storage
 		) noexcept override
 		{
 			auto functor_pointer = GetFunctorPointer<FunctorType>( is_stored_locally, storage );
@@ -212,9 +220,7 @@ public:
 	///
 	/// @param other
 	/// Function to copy.
-	BC_CONTAINER_NAME( Function )(
-		const BC_CONTAINER_NAME( Function )							&	other
-	)
+	BC_CONTAINER_NAME( Function )( const BC_CONTAINER_NAME( Function )& other )
 	{
 		DebugClearStorage();
 
@@ -227,9 +233,7 @@ public:
 	///
 	/// @param other
 	/// Function to move.
-	BC_CONTAINER_NAME( Function )(
-		BC_CONTAINER_NAME( Function )								&&	other
-	) noexcept
+	BC_CONTAINER_NAME( Function )( BC_CONTAINER_NAME( Function )&& other ) noexcept
 	{
 		DebugClearStorage();
 
@@ -246,9 +250,7 @@ public:
 	/// @param functor
 	/// Functor to store.
 	template<typename FunctorType>
-	BC_CONTAINER_NAME( Function )(
-		FunctorType													&&	functor
-	) BC_CONTAINER_NOEXCEPT
+	BC_CONTAINER_NAME( Function )( FunctorType&& functor ) BC_CONTAINER_NOEXCEPT
 	requires(
 		!std::is_same_v<std::remove_reference_t<std::remove_pointer_t<std::decay_t<FunctorType>>>, BC_CONTAINER_NAME( Function )> &&
 		BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FunctorType> &&
@@ -296,9 +298,10 @@ public:
 	///
 	/// @param other
 	/// Function to copy.
-	BC_CONTAINER_NAME( Function )									&	operator=(
-		const BC_CONTAINER_NAME( Function )							&	other
-	) BC_CONTAINER_NOEXCEPT
+	///
+	/// @returns
+	/// Reference to this.
+	auto operator=( const BC_CONTAINER_NAME( Function )& other ) BC_CONTAINER_NOEXCEPT -> BC_CONTAINER_NAME( Function )&
 	{
 		if( std::addressof( other ) != this )
 		{
@@ -313,9 +316,10 @@ public:
 	///
 	/// @param other
 	/// Function to move.
-	BC_CONTAINER_NAME( Function )									&	operator=(
-		BC_CONTAINER_NAME( Function )								&&	other
-	) noexcept
+	///
+	/// @returns
+	/// Reference to this.
+	auto operator=( BC_CONTAINER_NAME( Function )&& other ) noexcept -> BC_CONTAINER_NAME( Function )&
 	{
 		if( std::addressof( other ) != this )
 		{
@@ -342,9 +346,7 @@ public:
 	/// @return
 	/// A reference to this object.
 	template<typename FunctorType>
-	BC_CONTAINER_NAME( Function )									&	operator=(
-		FunctorType													&&	functor
-	) BC_CONTAINER_NOEXCEPT
+	auto operator=( FunctorType&& functor ) BC_CONTAINER_NOEXCEPT -> BC_CONTAINER_NAME( Function )&
 	requires(
 	!std::is_same_v<std::remove_reference_t<std::remove_pointer_t<std::decay_t<FunctorType>>>, BC_CONTAINER_NAME( Function )> &&
 		BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<FunctorType> &&
@@ -368,9 +370,7 @@ public:
 	///
 	/// @return
 	/// The return value of the functor.
-	ReturnType															operator()(
-		ParameterTypes...												args
-	)
+	auto operator()( ParameterTypes... args ) BC_CONTAINER_NOEXCEPT -> ReturnType
 	{
 		BC_ContainerAssert( !IsEmpty(), U"Cannot invoke empty function." );
 
@@ -389,7 +389,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Clears the Function, making it empty.
-	void																Clear() noexcept
+	void Clear() noexcept
 	{
 		if ( this->type == Type::INVOKEABLE_OBJECT )
 		{
@@ -410,7 +410,7 @@ public:
 	///
 	/// @return
 	/// true if the function is stored in the stack, false when the function is stored in the heap.
-	bool																IsStoredLocally() const noexcept
+	auto IsStoredLocally() const noexcept -> bool
 	{
 		BC_ContainerAssert( !IsEmpty(), U"Cannot check empty function stack locality, results would be meaningless." );
 		return this->is_stored_locally;
@@ -422,7 +422,7 @@ public:
 	///
 	/// @return
 	/// true if the function is empty and cannot be invoked, false otherwise.
-	bool																IsEmpty() const noexcept
+	auto IsEmpty() const noexcept -> bool
 	{
 		return this->type == Type::NONE;
 	}
@@ -441,9 +441,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																Copy(
-		const BC_CONTAINER_NAME( Function )							&	other
-	) BC_CONTAINER_NOEXCEPT
+	void Copy( const BC_CONTAINER_NAME( Function )& other ) BC_CONTAINER_NOEXCEPT
 	{
 		assert( this->type == Type::NONE && "Function already initialized." );
 
@@ -465,9 +463,7 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																Swap(
-		BC_CONTAINER_NAME( Function )								&	other
-	) noexcept
+	void Swap( BC_CONTAINER_NAME( Function )& other ) noexcept
 	{
 		std::swap( this->is_stored_locally, other.is_stored_locally );
 		std::swap( this->type, other.type );
@@ -477,9 +473,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
-	void																Store(
-		FunctorType													&&	functor
-	) BC_CONTAINER_NOEXCEPT
+	void Store( FunctorType&& functor ) BC_CONTAINER_NOEXCEPT
 	{
 		assert( this->type == Type::NONE && "Function already initialized." );
 
@@ -514,10 +508,10 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
-	static FunctorType												*	AllocateFunctor(
-		bool															is_stored_locally,
-		LocalStorage												&	storage
-	) noexcept
+	static auto AllocateFunctor(
+		bool			is_stored_locally,
+		LocalStorage&	storage
+	) noexcept -> FunctorType*
 	{
 		if( is_stored_locally )
 		{
@@ -534,9 +528,9 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
-	static void															FreeFunctor(
-		bool															is_stored_locally,
-		LocalStorage												&	storage
+	static void FreeFunctor(
+		bool			is_stored_locally,
+		LocalStorage&	storage
 	) noexcept
 	{
 		if( is_stored_locally ) return;
@@ -550,10 +544,10 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
-	static const FunctorType										*	GetFunctorPointer(
-		bool															is_stored_locally,
-		const LocalStorage											&	storage
-	) noexcept
+	static auto GetFunctorPointer(
+		bool				is_stored_locally,
+		const LocalStorage&	storage
+	) noexcept -> const FunctorType*
 	{
 		if( is_stored_locally ) return reinterpret_cast<const FunctorType*>( storage.raw );
 		return static_cast<const FunctorType*>( storage.heap_functor );
@@ -561,10 +555,10 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
-	static FunctorType												*	GetFunctorPointer(
-		bool															is_stored_locally,
-		LocalStorage												&	storage
-	) noexcept
+	static auto GetFunctorPointer(
+		bool			is_stored_locally,
+		LocalStorage&	storage
+	) noexcept -> FunctorType*
 	{
 		if( is_stored_locally ) return reinterpret_cast<FunctorType*>( storage.raw );
 		return static_cast<FunctorType*>( storage.heap_functor );
@@ -572,7 +566,7 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename FunctorType>
-	static consteval bool												TestFunctorCanBeStoredLocally() noexcept
+	static consteval auto TestFunctorCanBeStoredLocally() noexcept -> bool
 	{
 		constexpr auto StorageSize = sizeof( LocalStorage );
 		constexpr auto StorageAlignment = alignof( LocalStorage );
@@ -584,7 +578,7 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void																DebugClearStorage() noexcept
+	void DebugClearStorage() noexcept
 	{
 		#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
 		std::memset( &storage, 0, sizeof( decltype( storage ) ) );
@@ -592,10 +586,10 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	bool																is_stored_locally		= false;
-	Type																type					= Type::NONE;
-	FunctorManagerStorage												functor_manager;
-	LocalStorage														storage;
+	bool					is_stored_locally		= false;
+	Type					type					= Type::NONE;
+	FunctorManagerStorage	functor_manager;
+	LocalStorage			storage;
 };
 
 

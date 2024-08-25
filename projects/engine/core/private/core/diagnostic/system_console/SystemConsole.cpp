@@ -16,16 +16,29 @@
 
 
 
+namespace bc {
+namespace diagnostic {
+namespace internal_ {
+auto SetupSystemConsole_SetCharactersPerLine( i32 characters_per_line_num ) -> i32
+{
+	if( characters_per_line_num <= characters_per_line_num ) characters_per_line_num = 80;
+	if( characters_per_line_num > 1024 ) characters_per_line_num = 1024;
+	return characters_per_line_num;
+}
+} // internal_
+} // diagnostic
+} // bc
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Mutex needed to make sense of messages if multiple threads are printing messages at the same time.
-std::mutex print_mutex;
+static std::mutex print_mutex;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const char * PrintRecordColorToCharANSIForegroundColorCode(
-	bc::diagnostic::PrintRecordColor color
-)
+auto PrintRecordColorToCharANSIForegroundColorCode( bc::diagnostic::PrintRecordColor color ) -> const char*
 {
 	switch( color )
 	{
@@ -54,9 +67,7 @@ const char * PrintRecordColorToCharANSIForegroundColorCode(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const char * PrintRecordColorToCharANSIBackgroundColorCode(
-	bc::diagnostic::PrintRecordColor color
-)
+auto PrintRecordColorToCharANSIBackgroundColorCode( bc::diagnostic::PrintRecordColor color ) -> const char*
 {
 	switch( color )
 	{
@@ -85,9 +96,7 @@ const char * PrintRecordColorToCharANSIBackgroundColorCode(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const wchar_t * PrintRecordColorToWCharANSIForegroundColorCode(
-	bc::diagnostic::PrintRecordColor color
-)
+auto PrintRecordColorToWCharANSIForegroundColorCode( bc::diagnostic::PrintRecordColor color ) -> const wchar_t*
 {
 	switch( color )
 	{
@@ -116,9 +125,7 @@ const wchar_t * PrintRecordColorToWCharANSIForegroundColorCode(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const wchar_t * PrintRecordColorToWCharANSIBackgroundColorCode(
-	bc::diagnostic::PrintRecordColor color
-)
+auto PrintRecordColorToWCharANSIBackgroundColorCode( bc::diagnostic::PrintRecordColor color ) -> const wchar_t*
 {
 	switch( color )
 	{
@@ -147,10 +154,10 @@ const wchar_t * PrintRecordColorToWCharANSIBackgroundColorCode(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::basic_ostream<char8_t> & operator<<(
-	std::basic_ostream<char8_t>					&	out,
-	const bc::internal_::SimpleTextView8			&	in
-)
+auto operator<<(
+	std::basic_ostream<char8_t>&			out,
+	const bc::internal_::SimpleTextView8&	in
+) -> std::basic_ostream<char8_t>&
 {
 	std::basic_ostringstream<char8_t> ss;
 	for( auto c : in )
@@ -168,12 +175,14 @@ std::basic_ostream<char8_t> & operator<<(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
-	const char8_t						*	raw_text,
-	u64										raw_text_length,
-	bc::diagnostic::PrintRecordColor		foreground_color,
-	bc::diagnostic::PrintRecordColor		background_color
+	const char8_t*						raw_text,
+	i64									raw_text_length,
+	bc::diagnostic::PrintRecordColor	foreground_color,
+	bc::diagnostic::PrintRecordColor	background_color
 )
 {
+	if( raw_text_length <= 0 ) return;
+
 	auto text = bc::internal_::SimpleTextView8( raw_text, raw_text_length );
 	auto text_as_utf16 = conversion::ToUTF16( text );
 
@@ -229,10 +238,10 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal_::SetupSystemConsole(
-	u64 characters_per_line_num
-)
+void bc::diagnostic::internal_::SetupSystemConsole( i32 characters_per_line_num )
 {
+	characters_per_line_num = SetupSystemConsole_SetCharactersPerLine( characters_per_line_num );
+
 	HANDLE std_out_handle = GetStdHandle( STD_OUTPUT_HANDLE );
 	if( std_out_handle == INVALID_HANDLE_VALUE )
 	{
@@ -304,10 +313,10 @@ void bc::diagnostic::internal_::SetupSystemConsole(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal_::SetupSystemConsole(
-	bc::u64 characters_per_line_num
-)
+void bc::diagnostic::internal_::SetupSystemConsole( i32 characters_per_line_num )
 {
+	characters_per_line_num = SetupSystemConsole_SetCharactersPerLine( characters_per_line_num );
+
 	auto set_characters_per_line_syscall_string = bc::text::TextFormat( "stty cols {}", characters_per_line_num );
 	std::system( set_characters_per_line_syscall_string.ToCStr() );
 }
@@ -316,14 +325,15 @@ void bc::diagnostic::internal_::SetupSystemConsole(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
-	const char8_t						*	raw_text,
-	bc::u64									raw_text_length,
-	bc::diagnostic::PrintRecordColor		foreground_color,
-	bc::diagnostic::PrintRecordColor		background_color
+	const char8_t*						raw_text,
+	bc::i64								raw_text_length,
+	bc::diagnostic::PrintRecordColor	foreground_color,
+	bc::diagnostic::PrintRecordColor	background_color
 )
 {
 	// TODO: Test ConsolePrint on Linux machine.
-	using namespace bc;
+
+	if( raw_text_length <= 0 ) return;
 
 	auto text = bc::internal_::SimpleText8( bc::internal_::SimpleTextView8( raw_text, raw_text_length ) );
 
@@ -357,9 +367,7 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::SystemConsolePrint(
-	const PrintRecord	&	print_record
-)
+void bc::diagnostic::SystemConsolePrint( const PrintRecord& print_record )
 {
 	auto finalized_print_record = print_record.GetFinalized();
 	for( const auto & s : finalized_print_record.GetSections() )

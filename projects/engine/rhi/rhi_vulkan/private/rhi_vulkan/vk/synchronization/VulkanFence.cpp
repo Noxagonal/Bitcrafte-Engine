@@ -9,9 +9,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanFence::VulkanFence(
-	RHIVulkanImpl		&	rhi_vulkan_impl,
-	bool					initially_signaled
-) :
+	RHIVulkanImpl&	rhi_vulkan_impl,
+	bool			initially_signaled
+)
+:
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 	auto create_info = VkFenceCreateInfo {};
@@ -33,11 +34,9 @@ bc::rhi::VulkanFence::~VulkanFence()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::VulkanFence & bc::rhi::VulkanFence::operator=(
-	VulkanFence && other
-) noexcept
+auto bc::rhi::VulkanFence::operator=( VulkanFence&& other ) noexcept -> VulkanFence&
 {
-	MoveOther( std::move( other ) );
+	Move( other );
 	return *this;
 }
 
@@ -54,9 +53,7 @@ void bc::rhi::VulkanFence::Clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::VulkanFence::MoveOther(
-	VulkanFence && other
-)
+void bc::rhi::VulkanFence::Move( VulkanFence& other )
 {
 	std::swap( vk_fence, other.vk_fence );
 }

@@ -34,73 +34,71 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct ApplicationInfo
 	{
-		Text32													application_name					= {};
-		utility::Version										application_version					= {};
+		Text32				application_name	= {};
+		utility::Version	application_version	= {};
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct DebugSettings
 	{
-		bool													debug_enabled						= false;
-		RHIDebugLevel											minimum_debug_level					= RHIDebugLevel::VERBOSE;
+		bool			debug_enabled		= false;
+		RHIDebugLevel	minimum_debug_level	= RHIDebugLevel::VERBOSE;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	RHIVulkanImpl(
-		window_manager::WindowManagerComponent				&	window_manager_component,
-		const RHIComponentCreateInfo						&	create_info
+		window_manager::WindowManagerComponent&	window_manager_component,
+		const RHIComponentCreateInfo&			create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~RHIVulkanImpl();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void														Start(
-		const RHIComponentStartInfo							&	rhi_start_info
-	);
+	void Start( const RHIComponentStartInfo& rhi_start_info );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline window_manager::WindowManagerComponent			&	GetWindowManagerComponent() { return window_manager_component; }
+	inline auto GetWindowManagerComponent() -> window_manager::WindowManagerComponent& { return window_manager_component; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline RHIMemoryPool									&	GetRHIMemoryPool() { return *memory_pool; };
+	inline auto GetRHIMemoryPool() -> RHIMemoryPool& { return *memory_pool; };
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	i64															GetBestPhysicalDevice();
+	auto GetBestPhysicalDevice() -> i64;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const VkAllocationCallbacks						*	GetMainThreadAllocationCallbacks() { return &main_thread_allocation_callbacks; }
+	inline auto GetMainThreadAllocationCallbacks() -> VkAllocationCallbacks* { return &main_thread_allocation_callbacks; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const ApplicationInfo							&	GetApplicationInfo() { return application_info; }
+	inline auto GetApplicationInfo() -> const ApplicationInfo& { return application_info; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const DebugSettings								&	GetDebugSettings() { return debug_settings; }
+	inline auto GetDebugSettings() -> const DebugSettings& { return debug_settings; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline VulkanInstance									&	GetVulkanInstance() { return *vulkan_instance; }
+	inline auto GetVulkanInstance() -> VulkanInstance& { return *vulkan_instance; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline VulkanDevice										&	GetVulkanDevice() { return *vulkan_device; }
+	inline auto GetVulkanDevice() -> VulkanDevice& { return *vulkan_device; }
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkAllocationCallbacks										main_thread_allocation_callbacks;
-	ApplicationInfo												application_info;
-	DebugSettings												debug_settings;
+	VkAllocationCallbacks						main_thread_allocation_callbacks;
+	ApplicationInfo								application_info;
+	DebugSettings								debug_settings;
 
-	UniquePtr<RHIMemoryPool>									memory_pool;
+	UniquePtr<RHIMemoryPool>					memory_pool;
 
-	window_manager::WindowManagerComponent					&	window_manager_component;
+	window_manager::WindowManagerComponent&		window_manager_component;
 
-	UniquePtr<VulkanInstance>									vulkan_instance;
-	UniquePtr<VulkanDevice>										vulkan_device;
+	UniquePtr<VulkanInstance>					vulkan_instance;
+	UniquePtr<VulkanDevice>						vulkan_device;
 
-	List<UniquePtr<WindowContext>>								window_context_list;
+	List<UniquePtr<WindowContext>>				window_context_list;
 
-	Event<window_manager::Window*>								OnWindowCreated;
-	Event<window_manager::Window*>								OnWindowBeingDestroyed;
+	Event<window_manager::Window*>				OnWindowCreated;
+	Event<window_manager::Window*>				OnWindowBeingDestroyed;
 };
 
 

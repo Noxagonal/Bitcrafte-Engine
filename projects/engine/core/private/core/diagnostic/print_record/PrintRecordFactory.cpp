@@ -6,10 +6,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord(
+auto bc::diagnostic::MakePrintRecord(
 	bc::internal_::SimpleTextView32		text,
 	bc::diagnostic::PrintRecordTheme	theme
-)
+) -> PrintRecord
 {
 	using namespace bc::diagnostic;
 
@@ -23,9 +23,7 @@ bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord(
-	bc::internal_::SimpleTextView32 text
-)
+auto bc::diagnostic::MakePrintRecord( bc::internal_::SimpleTextView32 text ) -> PrintRecord
 {
 	return MakePrintRecord( text, PrintRecordTheme::DEFAULT );
 }
@@ -33,9 +31,7 @@ bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-bc::diagnostic::PrintRecord bc::diagnostic::MakePrintRecord_SourceLocation(
-	const SourceLocation 	&	source_location
-)
+auto bc::diagnostic::MakePrintRecord_SourceLocation( const SourceLocation & source_location ) -> PrintRecord
 {
 	auto record = MakePrintRecord_Argument( U"File", source_location.GetFile() );
 	record += MakePrintRecord( U"\n" );

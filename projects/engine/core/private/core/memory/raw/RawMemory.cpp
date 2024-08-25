@@ -6,9 +6,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::memory::internal_::FreeRawMemory_Runtime(
-	void			*	location
-) noexcept
+void bc::memory::internal_::FreeRawMemory_Runtime( void* location ) noexcept
 {
 	if( location == nullptr ) return;
 
@@ -22,10 +20,10 @@ void bc::memory::internal_::FreeRawMemory_Runtime(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void * bc::memory::internal_::AllocateRawMemory_Runtime(
-	u64				size,
-	u64				alignment_requirement
-) noexcept
+auto bc::memory::internal_::AllocateRawMemory_Runtime(
+	u64	size,
+	u64	alignment_requirement
+) noexcept -> void*
 {
 	auto minimum_required_allocation_size = CalculateMinimumRequiredSystemMemoryAllocationSize(
 		size,
@@ -51,10 +49,10 @@ void * bc::memory::internal_::AllocateRawMemory_Runtime(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void * bc::memory::internal_::ReallocateRawMemory_Runtime(
+auto bc::memory::internal_::ReallocateRawMemory_Runtime(
 	void			*	old_location,
 	u64					new_size
-) noexcept
+) noexcept -> void*
 {
 	auto old_allocation_info = GetMemoryAllocationHeaderFromUserPointer( old_location );
 	BHardAssert( old_allocation_info, "Couldn't reallocate runtime memory, old memory pointer was not allocated from bc::memory utilities" );

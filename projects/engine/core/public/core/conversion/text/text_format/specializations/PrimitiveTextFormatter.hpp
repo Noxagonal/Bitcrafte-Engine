@@ -23,8 +23,8 @@ namespace text {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView				OutTextContainerType,
-	utility::TextContainerView				ValueTextContainerType
+	utility::TextContainerView	OutTextContainerType,
+	utility::TextContainerView	ValueTextContainerType
 >
 class TextFormatter<OutTextContainerType, ValueTextContainerType>
 {
@@ -105,8 +105,8 @@ std::is_same_v<T, char32_t>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView				OutTextContainerType,
-	FormatterCStringType					ValueTextType
+	utility::TextContainerView	OutTextContainerType,
+	FormatterCStringType		ValueTextType
 >
 class TextFormatter<OutTextContainerType, const ValueTextType*>
 {
@@ -142,9 +142,9 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView				OutTextContainerType,
-	FormatterCStringType					ValueTextType,
-	u64										StringArraySize
+	utility::TextContainerView	OutTextContainerType,
+	FormatterCStringType		ValueTextType,
+	u64							StringArraySize
 >
 class TextFormatter<OutTextContainerType, ValueTextType[ StringArraySize ]>
 {
@@ -227,8 +227,8 @@ std::is_same_v<T, u64>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView				OutTextContainerType,
-	FormatterIntegerType					IntegerType
+	utility::TextContainerView	OutTextContainerType,
+	FormatterIntegerType		IntegerType
 >
 class TextFormatter<OutTextContainerType, IntegerType>
 {
@@ -269,7 +269,7 @@ public:
 			{
 				++it;
 				BAssert(
-					it.IsValid(),
+					it.IsInBounds(),
 					OutTextContainerFullType<c32>( U"Unsupported text format options while formatting integer primitive type, "
 						"invalid number format while parsing integer zero fill parse text, unrecognized parse text: \"" ) +
 					conversion::ToUTF32( parse_text ) + U"\n"
@@ -331,8 +331,8 @@ std::is_same_v<T, f64>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView				OutTextContainerType,
-	FormatterFloatingType					FloatType
+	utility::TextContainerView	OutTextContainerType,
+	FormatterFloatingType		FloatType
 >
 class TextFormatter<OutTextContainerType, FloatType>
 {

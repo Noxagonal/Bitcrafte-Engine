@@ -29,14 +29,14 @@ public:
 	///
 	/// @eventparam List<Text>
 	/// List of files that were dropped on the window.
-	Event<List<Text>&>															FileDrop;
+	Event<List<Text>&> FileDrop;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Window close requested.
 	///
 	/// This event is signaled to indicate that the window should be closed.
-	Event<>																		CloseRequested;
+	Event<> CloseRequested;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -44,7 +44,7 @@ public:
 	///
 	/// @eventparam @ref math::Vec2i32
 	/// New position of the window in OS virtual screen coordinates.
-	Event<math::Vec2i32>														PositionChanged;
+	Event<math::Vec2i32> PositionChanged;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -52,7 +52,7 @@ public:
 	///
 	/// @eventparam @ref math::Vec2i32
 	/// New size of the window.
-	Event<math::Vec2i32>														SizeChanged;
+	Event<math::Vec2i32> SizeChanged;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -60,7 +60,7 @@ public:
 	///
 	/// @eventparam bool
 	/// True if window gained focus, false if window lost focus.
-	Event<bool>																	FocusChanged;
+	Event<bool> FocusChanged;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -68,7 +68,7 @@ public:
 	///
 	/// @eventparam @ref WindowState
 	/// New current state of the window.
-	Event<WindowState>															StateChanged;
+	Event<WindowState> StateChanged;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -82,7 +82,7 @@ public:
 	/// \~
 	/// @eventparam @ref ModifierKeyFlags
 	/// Modifier keys that were pressed down during the event.
-	Event<MouseButton, MouseButtonAction, ModifierKeyFlags>						MouseButton;
+	Event<MouseButton, MouseButtonAction, ModifierKeyFlags> MouseButton;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -90,7 +90,7 @@ public:
 	///
 	/// @eventparam @ref math::Vec2f64
 	/// Current mouse position on the window framebuffer area.
-	Event<math::Vec2f64>														MousePosition;
+	Event<math::Vec2f64> MousePosition;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -99,7 +99,7 @@ public:
 	/// @eventparam @ref math::Vec2f64
 	/// Mouse scroll delta. Eg. <tt>{ 0.0f, 0.0f }</tt> if no scroll happened, <tt>{ 0.0f, 1.0f }</tt> if scrolled down,
 	/// <tt>{ 1.0f, 0.0f }</tt> if scrolled right. Typically only the y axis is used.
-	Event<math::Vec2f64>														MouseScroll;
+	Event<math::Vec2f64> MouseScroll;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -107,7 +107,7 @@ public:
 	///
 	/// @eventparam @ref bool
 	/// True if mouse entered, false if mouse exited.
-	Event<bool>																	MouseEnter;
+	Event<bool> MouseEnter;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -126,7 +126,7 @@ public:
 	/// \~
 	/// @eventparam @ref ModifierKeyFlags
 	/// Modifier keys that were pressed down during the event.
-	Event<KeyboardButton, i32, KeyboardButtonAction, ModifierKeyFlags>			KeyboardKey;
+	Event<KeyboardButton, i32, KeyboardButtonAction, ModifierKeyFlags> KeyboardKey;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -136,7 +136,7 @@ public:
 	/// 
 	/// @eventparam @ref c32
 	/// Unicode character.
-	Event<c32>																	KeyboardCharacter;
+	Event<c32> KeyboardCharacter;
 };
 
 

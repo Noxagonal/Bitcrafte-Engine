@@ -17,12 +17,12 @@ namespace math {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Small value for f32. Used in rounding error corrections.
-static constexpr f32							SMALL_F32_VALUE				= 0.0001f;
+static constexpr f32	SMALL_F32_VALUE		= 0.0001f;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Small value for f64. Used in rounding error corrections.
-static constexpr f64							SMALL_F64_VALUE				= 0.00001;
+static constexpr f64	SMALL_F64_VALUE		= 0.00001;
 
 
 

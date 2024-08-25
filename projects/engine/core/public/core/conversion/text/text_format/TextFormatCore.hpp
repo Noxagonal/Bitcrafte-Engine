@@ -15,27 +15,27 @@ namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainerView TextContainerType>
-constexpr void															TextFormat_Collector(
-	u64																	current_argument,
-	u64																	requested_argument,
-	typename TextContainerType::ThisFullType						&	out,
-	TextContainerType													parse_text
+constexpr void TextFormat_Collector(
+	i64											current_argument,
+	i64											requested_argument,
+	typename TextContainerType::ThisFullType&	out,
+	TextContainerType							parse_text
 )
 {};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView											TextContainerType,
-	typename															FirstType,
-	typename															...RestTypePack
+	utility::TextContainerView	TextContainerType,
+	typename					FirstType,
+	typename					...RestTypePack
 >
-constexpr void															TextFormat_Collector(
-	u64																	current_argument,
-	u64																	requested_argument,
-	typename TextContainerType::ThisFullType						&	out,
-	TextContainerType													parse_text,
-	const FirstType													&	first,
-	RestTypePack													&&	...rest
+constexpr void TextFormat_Collector(
+	i64											current_argument,
+	i64											requested_argument,
+	typename TextContainerType::ThisFullType&	out,
+	TextContainerType							parse_text,
+	const FirstType&							first,
+	RestTypePack&&								...rest
 )
 {
 	if( current_argument == requested_argument ) {
@@ -119,24 +119,24 @@ constexpr void															TextFormat_Collector(
 /// @return
 /// New formatted text object.
 template<
-	utility::TextContainerView											TextContainerType,
-	typename															...ArgumentsTypePack
+	utility::TextContainerView	TextContainerType,
+	typename					...ArgumentsTypePack
 >
-constexpr typename TextContainerType::ThisFullType						TextFormat(
-	const TextContainerType											&	format_text,
-	ArgumentsTypePack												&&	...args
-)
+constexpr auto TextFormat(
+	const TextContainerType&	format_text,
+	ArgumentsTypePack&&			...args
+) -> typename TextContainerType::ThisFullType
 {
-	using TextFullType = typename TextContainerType::ThisFullType;
-	using TextFullType32 = typename TextContainerType::template ThisContainerFullType<c32>;
-	using TextViewType = typename TextContainerType::template ThisViewType<true>;
-	using TextCharacterType = typename TextContainerType::ContainedCharacterType;
+	using TextFullType		= typename TextContainerType::ThisFullType;
+	using TextFullType32	= typename TextContainerType::template ThisContainerFullType<c32>;
+	using TextViewType		= typename TextContainerType::template ThisViewType<true>;
+	using TextCharacterType	= typename TextContainerType::ContainedCharacterType;
 
-	constexpr u64 args_count = sizeof...( ArgumentsTypePack );
+	constexpr i64 args_count = sizeof...( ArgumentsTypePack );
 	TextFullType out_buffer;
 	out_buffer.Reserve( 256 );
 
-	u64 current_argument = 0;
+	i64 current_argument = 0;
 	TextViewType argument_parse_text;
 
 	// TODO: Get rid of std::from_chars and std::isdigit inside TextFormat function
@@ -145,7 +145,6 @@ constexpr typename TextContainerType::ThisFullType						TextFormat(
 	auto it = format_text.begin();
 	while( it != format_text.end() )
 	{
-
 		if( *it == TextCharacterType( '{' ) )
 		{
 			// Enter formatted area

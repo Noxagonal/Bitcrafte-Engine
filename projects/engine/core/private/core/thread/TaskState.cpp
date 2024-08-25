@@ -4,9 +4,7 @@
 
 
 
-bc::TextView bc::thread::TaskStateToText(
-	const TaskState & task_state
-)
+auto bc::thread::TaskStateToText( const TaskState & task_state ) noexcept -> TextView
 {
 	switch( task_state )
 	{

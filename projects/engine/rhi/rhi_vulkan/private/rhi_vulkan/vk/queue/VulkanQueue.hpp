@@ -22,9 +22,9 @@ class DeviceQueueResolver;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct SubmitInfo
 {
-	List<VkCommandBuffer>										command_buffers;
-	List<Pair<VkSemaphore, VkPipelineStageFlags>>				wait_semaphores;
-	List<VkSemaphore>											signal_semaphores;
+	List<VkCommandBuffer>							command_buffers;
+	List<Pair<VkSemaphore, VkPipelineStageFlags>>	wait_semaphores;
+	List<VkSemaphore>								signal_semaphores;
 };
 
 
@@ -32,8 +32,8 @@ struct SubmitInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct SwapchainPresentInfo
 {
-	VkSwapchainKHR												swapchain;
-	u32													image_index;
+	VkSwapchainKHR	swapchain;
+	u32				image_index;
 };
 
 
@@ -46,49 +46,49 @@ class VulkanQueue
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void														Submit(
-		const List<VkCommandBuffer>							&	command_buffers,
-		const List<Pair<VkSemaphore, VkPipelineStageFlags>>	&	wait_semaphores					= {},
-		const List<VkSemaphore>								&	signal_semaphores				= {},
-		VkFence													fence							= VK_NULL_HANDLE
+	void Submit(
+		const List<VkCommandBuffer>&							command_buffers,
+		const List<Pair<VkSemaphore, VkPipelineStageFlags>>&	wait_semaphores		= {},
+		const List<VkSemaphore>&								signal_semaphores	= {},
+		VkFence													fence				= VK_NULL_HANDLE
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void														Submit(
-		const List<SubmitInfo>								&	submit_infos,
-		VkFence													fence							= VK_NULL_HANDLE
+	void Submit(
+		const List<SubmitInfo>&		submit_infos,
+		VkFence						fence			= VK_NULL_HANDLE
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void														Present(
-		const List<VkSemaphore>								&	wait_semaphores,
-		const List<SwapchainPresentInfo>					&	swapchains
+	void Present(
+		const List<VkSemaphore>&			wait_semaphores,
+		const List<SwapchainPresentInfo>&	swapchains
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkQueue														GetQueue() const;
+	auto GetQueue() const -> VkQueue;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u32													GetQueueFamilyIndex() const;
+	auto GetQueueFamilyIndex() const -> u32;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VkBool32													SupportsPresentation() const;
+	auto SupportsPresentation() const -> VkBool32;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const VkQueueFamilyProperties							&	GetQueueFamilyProperties() const;
+	auto GetQueueFamilyProperties() const -> const VkQueueFamilyProperties&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u32													GetBasedOn() const;
+	auto GetBasedOn() const -> u32;
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::shared_ptr<std::mutex>									queue_mutex;						///< Mutex for queue submissions, only one thread must submit work at a time for single queue.
-	VkQueue														queue						= {};	///< VkQueue handle.
-	u32													queue_family_index			= {};	///< Index of the queue family.
-	VkBool32													supports_presentation		= {};	///< VK_TRUE if you can present using this queue, VK_FALSE if you can not.
-	VkQueueFamilyProperties										queue_family_properties		= {};	///< Typical VkQueueFamilyProperties.
-	u32													based_on					= {};	///< Which other queue this one is based off.
+	std::shared_ptr<std::mutex>	queue_mutex;						///< Mutex for queue submissions, only one thread must submit work at a time for single queue.
+	VkQueue						queue						= {};	///< VkQueue handle.
+	u32							queue_family_index			= {};	///< Index of the queue family.
+	VkBool32					supports_presentation		= {};	///< VK_TRUE if you can present using this queue, VK_FALSE if you cannot.
+	VkQueueFamilyProperties		queue_family_properties		= {};	///< Typical VkQueueFamilyProperties.
+	u32							based_on					= {};	///< Which other queue this one is based off.
 };
 
 

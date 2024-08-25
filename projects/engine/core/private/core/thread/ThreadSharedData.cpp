@@ -6,9 +6,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::thread::Task * bc::thread::ThreadSharedData::FindWork(
-	bc::thread::ThreadDescription	&	thread_description
-)
+auto bc::thread::ThreadSharedData::FindWork( bc::thread::ThreadDescription& thread_description ) -> Task*
 {
 	std::lock_guard<std::mutex> lock_guard( task_list_mutex );
 
@@ -68,9 +66,7 @@ bc::thread::Task * bc::thread::ThreadSharedData::FindWork(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::thread::ThreadSharedData::TaskCompleted(
-	bc::thread::Task	*	task
-)
+void bc::thread::ThreadSharedData::TaskCompleted( Task* task )
 {
 	std::lock_guard<std::mutex> lock_guard( task_list_mutex );
 	auto it = task_list.begin();
@@ -86,15 +82,14 @@ void bc::thread::ThreadSharedData::TaskCompleted(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::thread::ThreadSharedData::IsTaskListEmpty()
+auto bc::thread::ThreadSharedData::IsTaskListEmpty() -> bool
 {
 	std::lock_guard<std::mutex> lock_guard( task_list_mutex );
 	return task_list.IsEmpty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::thread::ThreadSharedData::AddTask(
-	UniquePtr<Task>	&&	new_task )
+void bc::thread::ThreadSharedData::AddTask( UniquePtr<Task>&& new_task )
 {
 	assert( !thread_exception_raised );
 	if( thread_exception_raised ) return;
@@ -104,9 +99,7 @@ void bc::thread::ThreadSharedData::AddTask(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::thread::ThreadSharedData::RescheduleTask(
-	Task * task
-)
+void bc::thread::ThreadSharedData::RescheduleTask( Task* task )
 {
 	assert( !thread_exception_raised );
 	if( thread_exception_raised ) return;

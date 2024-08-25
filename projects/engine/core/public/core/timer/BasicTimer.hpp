@@ -20,7 +20,7 @@ class BasicTimer
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline									BasicTimer()
+	inline BasicTimer()
 	{
 		last_time_point	= std::chrono::steady_clock::now();
 	}
@@ -33,7 +33,7 @@ public:
 	/// 
 	/// @return
 	/// Amount of time passed in seconds.
-	inline f64								Tick()
+	inline auto Tick() -> f64
 	{
 		auto now		= std::chrono::steady_clock::now();
 		auto delta_time	= std::chrono::duration<f64>( now - last_time_point ).count();

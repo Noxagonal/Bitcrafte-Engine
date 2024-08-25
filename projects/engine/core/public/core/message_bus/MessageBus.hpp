@@ -141,7 +141,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename MessageBusPacketType>
 	[[nodiscard]]
-	UniquePtr<MessageBusPacketType> ClaimPacket( u64 packet_id )
+	auto ClaimPacket( u64 packet_id ) -> UniquePtr<MessageBusPacketType>
 	{
 		static_assert(
 			std::is_base_of_v<MessageBusPacketBase, MessageBusPacketType>,
@@ -169,7 +169,7 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	u64 GetMessagePacketIndex( u64 packet_id )
+	auto GetMessagePacketIndex( u64 packet_id ) -> u64
 	{
 		auto it = std::find( message_packet_id_list.begin(), message_packet_id_list.end(), packet_id );
 		if( it == message_packet_id_list.end() ) return std::numeric_limits<u64>::max();

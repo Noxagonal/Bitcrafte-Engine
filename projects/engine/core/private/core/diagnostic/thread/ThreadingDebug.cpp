@@ -18,9 +18,7 @@ void bc::diagnostic::internal_::SetMainThreadForDebug()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::AssertMainThread(
-	diagnostic::SourceLocation source_location
-)
+void bc::diagnostic::AssertMainThread( diagnostic::SourceLocation source_location )
 {
 	if( main_thread != std::this_thread::get_id() )
 	{
@@ -40,9 +38,7 @@ std::mutex										access_tracker_map_mutex;
 bc::Map<bc::internal_::SimpleText, bc::u32>		access_tracker_map;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::SingleThreadAccessScopeTracker::SingleThreadAccessScopeTracker(
-	bc::diagnostic::SourceLocation source_location
-)
+bc::diagnostic::SingleThreadAccessScopeTracker::SingleThreadAccessScopeTracker( bc::diagnostic::SourceLocation source_location )
 {
 	position_key.Reserve( 64 );
 	position_key.Append( bc::internal_::SimpleTextView( source_location.GetFile() ) );

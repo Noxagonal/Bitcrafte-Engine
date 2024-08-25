@@ -32,9 +32,7 @@ enum class TaskExecutionResult
 	FINISHED,
 	ERROR,
 };
-inline TaskState				TaskExecutionResultToTaskState(
-	TaskExecutionResult			e
-)
+inline auto TaskExecutionResultToTaskState( TaskExecutionResult e ) noexcept -> TaskState
 {
 	switch( e )
 	{
@@ -61,23 +59,19 @@ class Task
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline 											Task()
+	inline Task() noexcept
 	{
 		state = TaskState::NOT_STARTED;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Task(
-		const Task								&	other
-	) = delete;
+	Task( const Task& other ) noexcept = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Task(
-		Task									&&	other
-	) = delete;
+	Task( Task&& other ) noexcept = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual inline									~Task()
+	virtual inline ~Task() noexcept
 	{}
 
 public:
@@ -88,7 +82,7 @@ public:
 	/// 
 	/// @return
 	/// Reference to an array of indices which represent threads that this task is allowed to run on.
-	inline const List<ThreadIdentifier>			&	GetThreadLocks() const
+	inline auto GetThreadLocks() const noexcept -> const List<ThreadIdentifier>&
 	{
 		return locked_to_threads;
 	}
@@ -99,7 +93,7 @@ public:
 	/// 
 	/// @return
 	/// true if this task must run on specific threads or false if this task can run on any thread.
-	inline bool										IsThreadLocked() const
+	inline auto IsThreadLocked() const noexcept -> bool
 	{
 		return !!locked_to_threads.Size();
 	}
@@ -112,7 +106,7 @@ public:
 	/// 
 	/// @return
 	/// Task unique identifier.
-	inline TaskIdentifier							GetTaskId() const
+	inline auto GetTaskId() const noexcept -> TaskIdentifier
 	{
 		return task_id;
 	}
@@ -123,7 +117,7 @@ public:
 	/// 
 	/// @return
 	/// An array of unique identifiers to tasks that must complete before this task.
-	inline const List<u64>						&	GetDependencies() const
+	inline auto GetDependencies() const noexcept -> const List<TaskIdentifier>&
 	{
 		return dependencies;
 	}
@@ -142,24 +136,11 @@ public:
 	///
 	/// @param task_id
 	///	Id of the task we want this task to depend on.
-	inline void										AddDependencyAtRuntime(
-		TaskIdentifier								task_id
-	)
+	inline void AddDependencyAtRuntime( TaskIdentifier task_id )
 	{
 		BAssert( state == TaskState::RUNNING, "Cannot call AddDependencyAtRuntime on a task that is not currently running, this function must be called from within the running task" );
 		BAssert( running_thread_system_id == std::this_thread::get_id(), "Cannot call AddDependencyAtRuntime from a different thread from which the task is running, this function must be called from within the running task" );
 		dependencies.PushBack( task_id );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Gets the current state of the task.
-	/// 
-	/// @return
-	/// State of the task.
-	inline TaskState								GetState() const
-	{
-		return state.load();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +151,7 @@ public:
 	///
 	/// @return
 	/// Task state.
-	inline TaskState								GetTaskState() const
+	inline auto GetState() const noexcept -> TaskState
 	{
 		return state.load();
 	}
@@ -184,9 +165,7 @@ public:
 	///
 	/// @return
 	/// Result of the execution.
-	virtual TaskExecutionResult						operator()(
-		Thread									&	thread
-	) = 0;
+	virtual auto operator()( Thread& thread ) -> TaskExecutionResult = 0;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -200,9 +179,7 @@ public:
 	///
 	/// @return
 	/// Result of the execution.
-	inline TaskExecutionResult						ThreadRun(
-		Thread									&	thread
-	)
+	inline auto ThreadRun( Thread& thread ) -> TaskExecutionResult
 	{
 		assert( state == TaskState::RUNNING );
 		return operator()( thread );

@@ -43,44 +43,42 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	DeviceQueueResolver(
-		RHIVulkanImpl									&	rhi_vulkan_impl,
-		const VulkanPhysicalDevice						&	vk_physical_device,
-		List<Pair<VkQueueFlags, f32>>						queue_types
+		RHIVulkanImpl&					rhi_vulkan_impl,
+		const VulkanPhysicalDevice&		vk_physical_device,
+		List<Pair<VkQueueFlags, f32>>	queue_types
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~DeviceQueueResolver();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	const List<VkDeviceQueueCreateInfo>					&	GetDeviceQueueCreateInfos();
+	auto GetDeviceQueueCreateInfos() -> const List<VkDeviceQueueCreateInfo>&;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<VulkanQueue>										GetVulkanQueues(
-		VkDevice											device
-	);
+	auto GetVulkanQueues( VkDevice device ) -> List<VulkanQueue>;
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	struct QueueGetInfo
 	{
-		u32													queue_index;
-		u32													queue_family_index;
-		u32													based_on;
+		u32	queue_index;
+		u32	queue_family_index;
+		u32	based_on;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIVulkanImpl										&	rhi_vulkan_impl;
-	const VulkanPhysicalDevice							&	physical_device;
-	VkInstance												vk_instance					= VK_NULL_HANDLE;
+	RHIVulkanImpl&									rhi_vulkan_impl;
+	const VulkanPhysicalDevice&						physical_device;
+	VkInstance										vk_instance					= VK_NULL_HANDLE;
 
-	List<Pair<VkQueueFlags, f32>>							queue_types;
+	List<Pair<VkQueueFlags, f32>>					queue_types;
 
-	List<VkDeviceQueueCreateInfo>							queue_create_infos;
-	List<QueueGetInfo>										queue_get_info;
-	List<List<f32>>											queue_priorities;
+	List<VkDeviceQueueCreateInfo>					queue_create_infos;
+	List<QueueGetInfo>								queue_get_info;
+	List<List<f32>>									queue_priorities;
 
-	const VulkanPhysicalDevice::QueueFamilyInfo			&	queue_family_properties;
+	const VulkanPhysicalDevice::QueueFamilyInfo&	queue_family_properties;
 };
 
 

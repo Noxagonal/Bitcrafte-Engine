@@ -28,10 +28,11 @@ namespace internal_ {
 ///
 /// @return
 /// A new unique pointer with its contained value constructed.
-template<typename ValueType, typename ...ConstructorArgumentTypePack>
-SimpleUniquePtr<ValueType>								MakeSimpleUniquePtr(
-	ConstructorArgumentTypePack						&&	...constructor_arguments
-)
+template<
+	typename ValueType,
+	typename ...ConstructorArgumentTypePack
+>
+auto MakeSimpleUniquePtr( ConstructorArgumentTypePack&& ...constructor_arguments ) -> SimpleUniquePtr<ValueType>
 {
 	auto result = SimpleUniquePtr<ValueType> {};
 	result.Emplace( std::forward<ConstructorArgumentTypePack>( constructor_arguments )... );

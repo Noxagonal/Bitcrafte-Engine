@@ -11,8 +11,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanBuffer::VulkanBuffer(
-	RHIVulkanImpl					&	rhi_vulkan_impl,
-	const VulkanBufferCreateInfo	&	create_info
+	RHIVulkanImpl&					rhi_vulkan_impl,
+	const VulkanBufferCreateInfo&	create_info
 ) :
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {

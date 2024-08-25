@@ -9,9 +9,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanFramebuffer::VulkanFramebuffer(
-	RHIVulkanImpl		&	rhi_vulkan_impl,
-	VulkanRenderPass	&	vulkan_render_pass
-) :
+	RHIVulkanImpl&		rhi_vulkan_impl,
+	VulkanRenderPass&	vulkan_render_pass
+)
+:
 	rhi_vulkan_impl( rhi_vulkan_impl ),
 	vulkan_render_pass( vulkan_render_pass )
 {

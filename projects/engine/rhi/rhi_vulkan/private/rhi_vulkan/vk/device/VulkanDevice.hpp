@@ -25,42 +25,34 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	VulkanDevice(
-		RHIVulkanImpl									&	rhi_vulkan_impl,
-		VulkanPhysicalDevice							&	physical_device,
-		const RHIComponentStartInfo						&	rhi_start_info
+		RHIVulkanImpl&					rhi_vulkan_impl,
+		VulkanPhysicalDevice&			physical_device,
+		const RHIComponentStartInfo&	rhi_start_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanDevice(
-		const VulkanDevice								&	other
-	) = delete;
+	VulkanDevice( const VulkanDevice& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanDevice(
-		VulkanDevice									&&	other
-	) = delete;
+	VulkanDevice( VulkanDevice&& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~VulkanDevice();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanDevice										&	operator=(
-		const VulkanDevice								&	other
-	) = delete;
+	auto operator=( const VulkanDevice& other ) -> VulkanDevice& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanDevice										&	operator=(
-		VulkanDevice									&&	other
-	) = delete;
+	auto operator=( VulkanDevice&& other ) -> VulkanDevice& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanPhysicalDevice								&	GetVulkanPhysicalDevice() { return physical_device; }
+	auto GetVulkanPhysicalDevice() -> VulkanPhysicalDevice& { return physical_device; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanQueue											&	GetPrimaryRenderQueue() { return primary_render_queue; }
-	VulkanQueue											&	GetSecondaryRenderQueue() { return secondary_render_queue; }
-	VulkanQueue											&	GetPrimaryComputeQueue() { return primary_compute_queue; }
-	VulkanQueue											&	GetPrimaryTransferQueue() { return primary_transfer_queue; }
+	auto GetPrimaryRenderQueue() -> VulkanQueue& { return primary_render_queue; }
+	auto GetSecondaryRenderQueue() -> VulkanQueue& { return secondary_render_queue; }
+	auto GetPrimaryComputeQueue() -> VulkanQueue& { return primary_compute_queue; }
+	auto GetPrimaryTransferQueue() -> VulkanQueue& { return primary_transfer_queue; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline operator VkDevice() { return vk_device; }
@@ -68,16 +60,16 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIVulkanImpl										&	rhi_vulkan_impl;
-	VulkanPhysicalDevice								&	physical_device;
-	VkDevice												vk_device							= VK_NULL_HANDLE;
+	RHIVulkanImpl&			rhi_vulkan_impl;
+	VulkanPhysicalDevice&	physical_device;
+	VkDevice				vk_device					= VK_NULL_HANDLE;
 
-	List<Text>												enabled_extension_names;
+	List<Text>				enabled_extension_names;
 
-	VulkanQueue												primary_render_queue;
-	VulkanQueue												secondary_render_queue;
-	VulkanQueue												primary_compute_queue;
-	VulkanQueue												primary_transfer_queue;
+	VulkanQueue				primary_render_queue;
+	VulkanQueue				secondary_render_queue;
+	VulkanQueue				primary_compute_queue;
+	VulkanQueue				primary_transfer_queue;
 };
 
 

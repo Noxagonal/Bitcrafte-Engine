@@ -5,12 +5,12 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::scene::Vertex bc::scene::MakeVertex(
+auto bc::scene::MakeVertex(
 	math::Vec4f32			position,
 	math::Vec4f32			normal,
 	math::Vec4f32			color,
 	math::Vec2f32			uv
-) noexcept
+) noexcept -> Vertex
 {
 	auto result = Vertex();
 	result.position		= position;

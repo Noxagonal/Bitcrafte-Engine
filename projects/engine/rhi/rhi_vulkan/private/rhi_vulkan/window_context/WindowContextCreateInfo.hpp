@@ -14,7 +14,7 @@ namespace rhi {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct WindowContextCreateInfo
 {
-	VulkanSwapchainCreateInfo							swapchain_create_info					= {};
+	VulkanSwapchainCreateInfo	swapchain_create_info	= {};
 };
 
 

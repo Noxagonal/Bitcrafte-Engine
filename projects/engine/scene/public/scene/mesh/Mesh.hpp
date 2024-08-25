@@ -50,8 +50,8 @@ public:
 	/// @param meshlet_list
 	/// List of meshlets that are copied over to internal_ meshlet list.
 	Mesh(
-		const List<Vertex>									&	vertex_list,
-		const List<Meshlet>									&	meshlet_list
+		const List<Vertex>&		vertex_list,
+		const List<Meshlet>&	meshlet_list
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,8 +67,8 @@ public:
 	/// @param index_list
 	/// List of vertex indices that are copied over to internal_ index list.
 	Mesh(
-		const List<Vertex>									&	vertex_list,
-		const List<u32>										&	index_list
+		const List<Vertex>&		vertex_list,
+		const List<u32>&		index_list
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,12 +77,12 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<Vertex>												vertex_list;
-	List<Meshlet>												meshlet_list;
-	List<u32>													index_list;
-	Type														type					= Type::NONE;
+	List<Vertex>	vertex_list;
+	List<Meshlet>	meshlet_list;
+	List<u32>		index_list;
+	Type			type			= Type::NONE;
 
-	math::AABB3f64												aabb					= {};
+	math::AABB3f64	aabb			= {};
 };
 
 

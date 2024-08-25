@@ -26,35 +26,25 @@ class VulkanInstance
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanInstance(
-		RHIVulkanImpl								&	rhi_vulkan_impl
-	);
+	VulkanInstance( RHIVulkanImpl& rhi_vulkan_impl );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanInstance(
-		const VulkanInstance						&	other
-	) = delete;
+	VulkanInstance( const VulkanInstance& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanInstance(
-		VulkanInstance								&&	other
-	) = delete;
+	VulkanInstance( VulkanInstance&& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~VulkanInstance();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanInstance									&	operator=(
-		const VulkanInstance						&	other
-	) = delete;
+	auto operator=( const VulkanInstance& other ) -> VulkanInstance& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	VulkanInstance									&	operator=(
-		VulkanInstance								&&	other
-	) = delete;
+	auto operator=( VulkanInstance&& other ) -> VulkanInstance& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<VulkanPhysicalDevice>						&	GetPhysicalDeviceList() { return physical_devices; }
+	auto GetPhysicalDeviceList() -> List<VulkanPhysicalDevice>& { return physical_devices; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	inline operator VkInstance() { return vk_instance; }
@@ -62,20 +52,20 @@ public:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	List<VulkanPhysicalDevice>							FetchPhysicalDevices() const;
+	auto FetchPhysicalDevices() const -> List<VulkanPhysicalDevice>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	RHIVulkanImpl									&	rhi_vulkan_impl;
-	VkInstance											vk_instance									= nullptr;
+	RHIVulkanImpl&						rhi_vulkan_impl;
+	VkInstance							vk_instance								= nullptr;
 
-	List<Text>											enabled_layer_names;
-	List<Text>											enabled_extension_names;
+	List<Text>							enabled_layer_names;
+	List<Text>							enabled_extension_names;
 
-	List<VulkanPhysicalDevice>							physical_devices;
+	List<VulkanPhysicalDevice>			physical_devices;
 
-	PFN_vkCreateDebugUtilsMessengerEXT					vkCreateDebugUtilsMessengerEXT_func			= nullptr;
-	PFN_vkDestroyDebugUtilsMessengerEXT					vkDestroyDebugUtilsMessengerEXT_func		= nullptr;
-	VkDebugUtilsMessengerEXT							debug_utils_messenger						= VK_NULL_HANDLE;
+	PFN_vkCreateDebugUtilsMessengerEXT	vkCreateDebugUtilsMessengerEXT_func		= nullptr;
+	PFN_vkDestroyDebugUtilsMessengerEXT	vkDestroyDebugUtilsMessengerEXT_func	= nullptr;
+	VkDebugUtilsMessengerEXT			debug_utils_messenger					= VK_NULL_HANDLE;
 };
 
 

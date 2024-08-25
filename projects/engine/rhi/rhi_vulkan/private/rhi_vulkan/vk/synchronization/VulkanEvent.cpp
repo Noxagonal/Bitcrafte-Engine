@@ -8,9 +8,8 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::VulkanEvent::VulkanEvent(
-	RHIVulkanImpl		&	rhi_vulkan_impl
-) :
+bc::rhi::VulkanEvent::VulkanEvent( RHIVulkanImpl& rhi_vulkan_impl )
+:
 	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 	auto create_info = VkEventCreateInfo {};
@@ -32,11 +31,9 @@ bc::rhi::VulkanEvent::~VulkanEvent()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::VulkanEvent & bc::rhi::VulkanEvent::operator=(
-	VulkanEvent && other
-) noexcept
+auto bc::rhi::VulkanEvent::operator=( VulkanEvent&& other ) noexcept -> VulkanEvent&
 {
-	MoveOther( std::move( other ) );
+	Move( other );
 	return *this;
 }
 
@@ -53,9 +50,7 @@ void bc::rhi::VulkanEvent::Clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::rhi::VulkanEvent::MoveOther(
-	VulkanEvent && other
-)
+void bc::rhi::VulkanEvent::Move( VulkanEvent& other )
 {
 	std::swap( vk_event, other.vk_event );
 }

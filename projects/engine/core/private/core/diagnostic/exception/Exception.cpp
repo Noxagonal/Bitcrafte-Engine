@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 [[noreturn]]
 void ExceptionThrowPanic(
-	const bc::diagnostic::Exception 	&	exception,
-	bc::diagnostic::SourceLocation			source_location					= bc::diagnostic::SourceLocation::Current()
+	const bc::diagnostic::Exception&	exception,
+	bc::diagnostic::SourceLocation		source_location		= bc::diagnostic::SourceLocation::Current()
 )
 {
 	using namespace bc::diagnostic;
@@ -37,8 +37,8 @@ void ExceptionThrowPanic(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::Throw [[noreturn]] (
-	const bc::diagnostic::Exception					&	exception,
-	bc::diagnostic::SourceLocation						source_location
+	const bc::diagnostic::Exception&	exception,
+	bc::diagnostic::SourceLocation		source_location
 )
 {
 	throw exception;
@@ -48,8 +48,8 @@ void bc::diagnostic::Throw [[noreturn]] (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::Throw [[noreturn]] (
-	const bc::diagnostic::Exception					&	exception,
-	bc::diagnostic::SourceLocation						source_location
+	const bc::diagnostic::Exception&	exception,
+	bc::diagnostic::SourceLocation		source_location
 )
 {
 	ExceptionThrowPanic( exception, source_location );
@@ -59,8 +59,8 @@ void bc::diagnostic::Throw [[noreturn]] (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::Throw [[noreturn]] (
-	const bc::diagnostic::PrintRecord				&	print_record,
-	const bc::diagnostic::SourceLocation			&	source_location
+	const bc::diagnostic::PrintRecord&		print_record,
+	const bc::diagnostic::SourceLocation&	source_location
 )
 {
 	Throw(
@@ -74,8 +74,8 @@ void bc::diagnostic::Throw [[noreturn]] (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::diagnostic::Throw [[noreturn]] (
-	const bc::internal_::SimpleTextView32				message,
-	const bc::diagnostic::SourceLocation			&	source_location
+	const bc::internal_::SimpleTextView32	message,
+	const bc::diagnostic::SourceLocation&	source_location
 )
 {
 	Throw(

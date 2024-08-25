@@ -16,9 +16,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanWindowSurface::VulkanWindowSurface(
-	RHIVulkanImpl &rhi_vulkan_impl,
-	window_manager::Window *window
-) : rhi_vulkan_impl( rhi_vulkan_impl )
+	RHIVulkanImpl&			rhi_vulkan_impl,
+	window_manager::Window*	window
+)
+:
+	rhi_vulkan_impl( rhi_vulkan_impl )
 {
 	auto CreatePlatformSpecificSurface = [ &rhi_vulkan_impl, window ]() -> VkSurfaceKHR
 	{

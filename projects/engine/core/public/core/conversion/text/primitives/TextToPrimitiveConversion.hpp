@@ -65,13 +65,13 @@ concept TextToFloatingConvertible = std::is_floating_point_v<ValueType>;
 /// @return
 /// Number of characters read from the text.
 template<
-	utility::TextContainerView					TextContainerType,
-	internal_::TextToBoolConvertible			ValueType
+	utility::TextContainerView			TextContainerType,
+	internal_::TextToBoolConvertible	ValueType
 >
-constexpr i64									TextToPrimitive(
-	ValueType								&	out_value,
-	const TextContainerType					&	in_text
-)
+constexpr auto TextToPrimitive(
+	ValueType&					out_value,
+	const TextContainerType&	in_text
+) -> i64
 {
 	using CharT = typename TextContainerType::ContainedCharacterType;
 
@@ -169,11 +169,11 @@ template<
 	utility::TextContainerView					TextContainerType,
 	internal_::TextToIntegerConvertible			ValueType
 >
-constexpr i64									TextToPrimitive(
-	ValueType								&	out_value,
-	const TextContainerType					&	in_text,
-	TextToIntegerConversionFormat				text_format		= TextToIntegerConversionFormat::AUTOMATIC
-)
+constexpr auto TextToPrimitive(
+	ValueType&						out_value,
+	const TextContainerType&		in_text,
+	TextToIntegerConversionFormat	text_format		= TextToIntegerConversionFormat::AUTOMATIC
+) -> i64
 {
 	using CharacterType			= typename TextContainerType::ContainedCharacterType;
 	using ASCIIType				= typename TextContainerType::template ThisContainerFullType<char>;
@@ -318,14 +318,14 @@ enum class TextToFloatConversionFormat : u32
 /// @return
 /// Number of characters processed.
 template<
-	utility::TextContainerView					TextContainerType,
-	internal_::TextToFloatingConvertible		ValueType
+	utility::TextContainerView				TextContainerType,
+	internal_::TextToFloatingConvertible	ValueType
 >
-constexpr i64									TextToPrimitive(
-	ValueType								&	out_value,
-	const TextContainerType					&	in_text,
-	TextToFloatConversionFormat					text_format				= TextToFloatConversionFormat::AUTOMATIC
-)
+constexpr auto TextToPrimitive(
+	ValueType&						out_value,
+	const TextContainerType&		in_text,
+	TextToFloatConversionFormat		text_format		= TextToFloatConversionFormat::AUTOMATIC
+) -> i64
 {
 	using CharacterType			= typename TextContainerType::CharacterType;
 	using ASCIIType				= typename TextContainerType::template NonViewBaseType<char>;

@@ -27,11 +27,11 @@ namespace internal_ {
 /// 
 /// @param background_color
 ///	Color of the background of the letters you wish to print. ( not entire console window )
-void								SystemConsolePrintRawUTF8(
-	const char8_t				*	raw_text,
-	u64								raw_text_length,
-	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
-	PrintRecordColor				background_color		= PrintRecordColor::DEFAULT
+void SystemConsolePrintRawUTF8(
+	const char8_t*		raw_text,
+	i64					raw_text_length,
+	PrintRecordColor	foreground_color		= PrintRecordColor::DEFAULT,
+	PrintRecordColor	background_color		= PrintRecordColor::DEFAULT
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,9 +42,7 @@ void								SystemConsolePrintRawUTF8(
 /// Maximum number of characters per line before wrapping around to the next line, this can be used to make the console window
 /// more readable, however, the console window does not expand to a new size, rather a scroll bar appears on the bottom of the
 /// console window.
-void								SetupSystemConsole(
-	u64								characters_per_line_num
-);
+void SetupSystemConsole( i32 characters_per_line_num );
 
 
 
@@ -63,9 +61,7 @@ void								SetupSystemConsole(
 ///
 /// @param print_record
 /// Print record which to print to the console window.
-void								SystemConsolePrint(
-	const PrintRecord			&	print_record
-);
+void SystemConsolePrint( const PrintRecord& print_record );
 
 
 
@@ -90,10 +86,10 @@ void								SystemConsolePrint(
 /// @param background_color
 ///	Color of the background of the letters you wish to print. ( not entire console window )
 template<utility::TextContainerView ContainerType>
-void								SystemConsolePrint(
-	const ContainerType			&	text,
-	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
-	PrintRecordColor				background_color		= PrintRecordColor::DEFAULT
+void SystemConsolePrint(
+	const ContainerType&	text,
+	PrintRecordColor		foreground_color	= PrintRecordColor::DEFAULT,
+	PrintRecordColor		background_color	= PrintRecordColor::DEFAULT
 )
 {
 	if constexpr( std::is_same_v<char8_t, typename ContainerType::ContainedCharacterType> || std::is_same_v<char, typename ContainerType::ContainedCharacterType> ) {
@@ -137,9 +133,9 @@ void								SystemConsolePrint(
 /// @param theme
 ///	Text and background color of the message according to a theme.
 template<utility::TextContainerView ContainerType>
-void								SystemConsolePrint(
-	const ContainerType			&	text,
-	PrintRecordTheme				theme
+void SystemConsolePrint(
+	const ContainerType&	text,
+	PrintRecordTheme		theme
 )
 {
 	auto [foreground_color, background_color] = GetPrintRecordThemeColors( theme );
@@ -172,10 +168,10 @@ void								SystemConsolePrint(
 /// @param background_color
 ///	Color of the background of the letters you wish to print. ( not entire console window )
 template<utility::TextContainerCharacterType CharacterType, u64 CharacterArraySize>
-void								SystemConsolePrint(
-	const CharacterType				( &text )[ CharacterArraySize ],
-	PrintRecordColor				foreground_color		= PrintRecordColor::DEFAULT,
-	PrintRecordColor				background_color		= PrintRecordColor::DEFAULT
+void SystemConsolePrint(
+	const CharacterType		( &text )[ CharacterArraySize ],
+	PrintRecordColor		foreground_color					= PrintRecordColor::DEFAULT,
+	PrintRecordColor		background_color					= PrintRecordColor::DEFAULT
 )
 {
 	static_assert( CharacterArraySize > 0 );
@@ -205,9 +201,9 @@ void								SystemConsolePrint(
 /// @param theme
 ///	Text and background color of the message according to a theme.
 template<utility::TextContainerCharacterType CharacterType, u64 CharacterArraySize>
-void								SystemConsolePrint(
-	const CharacterType				( &text )[ CharacterArraySize ],
-	PrintRecordTheme				theme
+void SystemConsolePrint(
+	const CharacterType		( &text )[ CharacterArraySize ],
+	PrintRecordTheme		theme
 )
 {
 	static_assert( CharacterArraySize > 0 );

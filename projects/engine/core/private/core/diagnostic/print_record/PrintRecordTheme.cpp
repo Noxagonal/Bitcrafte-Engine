@@ -5,9 +5,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::diagnostic::PrintRecordThemeColors bc::diagnostic::GetPrintRecordThemeColors(
-	bc::diagnostic::PrintRecordTheme		theme
-)
+auto bc::diagnostic::GetPrintRecordThemeColors( bc::diagnostic::PrintRecordTheme theme ) -> PrintRecordThemeColors
 {
 	auto result = PrintRecordThemeColors {};
 

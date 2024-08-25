@@ -19,18 +19,18 @@ namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static void registry_handler(
-	void					*	data,
-	wl_registry				*	registry,
-	uint32_t					id,
-	const char				*	interface,
-	uint32_t					version
+	void*			data,
+	wl_registry*	registry,
+	uint32_t		id,
+	const char*		interface,
+	uint32_t		version
 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static void registry_remover(
-	void					*	data,
-	wl_registry				*	registry,
-	uint32_t					id
+	void*			data,
+	wl_registry*	registry,
+	uint32_t		id
 );
 
 } // internal_
@@ -52,60 +52,56 @@ class WaylandManager
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	friend void ::bc::window_manager::internal_::registry_handler(
-		void					*	data,
-		wl_registry				*	registry,
-		uint32_t					id,
-		const char				*	interface,
-		uint32_t					version
+		void*			data,
+		wl_registry*	registry,
+		uint32_t		id,
+		const char*		interface,
+		uint32_t		version
 	);
 
 	friend void ::bc::window_manager::internal_::registry_remover(
-		void					*	data,
-		wl_registry				*	registry,
-		uint32_t					id
+		void*			data,
+		wl_registry*	registry,
+		uint32_t		id
 	);
 
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	WaylandManager(
-		WindowManagerWaylandComponent							&	window_manager_wayland_component,
-		const WindowManagerComponentCreateInfo					&	window_manager_component_create_info
+		WindowManagerWaylandComponent&				window_manager_wayland_component,
+		const WindowManagerComponentCreateInfo&		window_manager_component_create_info
 	);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	~WaylandManager();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void															Run();
+	void Run();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	UniquePtr<Window>												CreateWindow(
-		const WindowCreateInfo									&	window_create_info
-	);
+	auto CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void															NotifyWindowBeingDestroyed(
-		WaylandWindow											*	window_ptr
-	);
+	void NotifyWindowBeingDestroyed( WaylandWindow* window_ptr );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline const WindowManagerWaylandPlatformHandles			*	GetPlatformSpecificHandles() const { return &platform_handles; }
+	inline auto GetPlatformSpecificHandles() const -> const WindowManagerWaylandPlatformHandles* { return &platform_handles; }
 
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void															ProcessMessages();
+	void ProcessMessages();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	bool															FlushDisplay();
+	auto FlushDisplay() -> bool;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	WindowManagerWaylandComponent								&	window_manager_wayland_component;
+	WindowManagerWaylandComponent&			window_manager_wayland_component;
 
-	List<WaylandWindow*>											active_window_list;
+	List<WaylandWindow*>					active_window_list;
 
-	WindowManagerWaylandPlatformHandles								platform_handles;
+	WindowManagerWaylandPlatformHandles		platform_handles;
 };
 
 

@@ -20,8 +20,8 @@ class ShaderInterface;
 struct RenderPipelineCreateInfo
 {
 	// TODO: Replace this with Handle type when Handle has been implemented.
-	ShaderInterface									*	shader_interface						= {};
-	List<RenderPipelineStageCreateInfo>					stage_create_info_list;
+	ShaderInterface*						shader_interface			= {};
+	List<RenderPipelineStageCreateInfo>		stage_create_info_list;
 };
 
 

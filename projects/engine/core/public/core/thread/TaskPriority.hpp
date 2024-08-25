@@ -28,9 +28,7 @@ enum class TaskPriority : u32
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TextView							TaskPriorityToText(
-	const TaskPriority			&	task_priority
-);
+auto TaskPriorityToText( const TaskPriority& task_priority ) noexcept -> TextView;
 
 
 

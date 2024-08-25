@@ -11,9 +11,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::List<bc::Text> bc::rhi::GetPlatformSpecificInstanceExtensionNames(
-	bc::rhi::RHIVulkanImpl		&	rhi_vulkan_impl
-)
+auto bc::rhi::GetPlatformSpecificInstanceExtensionNames( bc::rhi::RHIVulkanImpl& rhi_vulkan_impl ) -> List<Text>
 {
 	switch( rhi_vulkan_impl.GetWindowManagerComponent().GetPlatformSpecificHandles()->structure_type )
 	{

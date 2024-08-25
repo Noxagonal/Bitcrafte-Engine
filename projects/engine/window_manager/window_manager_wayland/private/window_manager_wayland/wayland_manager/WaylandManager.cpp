@@ -24,11 +24,11 @@ namespace internal_ {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Registry listener callbacks to bind global objects
 static void registry_handler(
-	void					*	data,
-	wl_registry				*	registry,
-	uint32_t					id,
-	const char				*	interface,
-	uint32_t					version
+	void*			data,
+	wl_registry*	registry,
+	uint32_t		id,
+	const char*		interface,
+	uint32_t		version
 )
 {
 	WaylandManager* wayland_manager = static_cast<WaylandManager*>( data );
@@ -46,9 +46,9 @@ static void registry_handler(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static void registry_remover(
-	void					*	data,
-	wl_registry				*	registry,
-	uint32_t					id
+	void*			data,
+	wl_registry*	registry,
+	uint32_t		id
 )
 {
 	WaylandManager* wayland_manager = static_cast<WaylandManager*>( data );
@@ -71,8 +71,8 @@ static const struct wl_registry_listener registry_listener = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::window_manager::WaylandManager::WaylandManager(
-	WindowManagerWaylandComponent			&	window_manager_wayland_component,
-	const WindowManagerComponentCreateInfo	&	window_manager_component_create_info
+	WindowManagerWaylandComponent&				window_manager_wayland_component,
+	const WindowManagerComponentCreateInfo&		window_manager_component_create_info
 ) :
 	window_manager_wayland_component( window_manager_wayland_component )
 {
@@ -116,9 +116,7 @@ void bc::window_manager::WaylandManager::Run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WaylandManager::CreateWindow(
-	const WindowCreateInfo  & window_create_info
-)
+auto bc::window_manager::WaylandManager::CreateWindow( const WindowCreateInfo& window_create_info ) -> UniquePtr<Window>
 {
 	auto new_window = MakeUniquePtr<WaylandWindow>( *this, window_create_info );
 	active_window_list.PushBack( new_window.Get() );
@@ -128,9 +126,7 @@ bc::UniquePtr<bc::window_manager::Window> bc::window_manager::WaylandManager::Cr
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::window_manager::WaylandManager::NotifyWindowBeingDestroyed(
-	bc::window_manager::WaylandWindow * window_ptr
-)
+void bc::window_manager::WaylandManager::NotifyWindowBeingDestroyed( bc::window_manager::WaylandWindow* window_ptr )
 {
 	window_manager_wayland_component.events.OnWindowBeingDestroyed.Signal( window_ptr );
 	active_window_list.Erase( window_ptr );
@@ -175,7 +171,7 @@ void bc::window_manager::WaylandManager::ProcessMessages()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool bc::window_manager::WaylandManager::FlushDisplay()
+auto bc::window_manager::WaylandManager::FlushDisplay() -> bool
 {
 	while( wl_display_flush( platform_handles.display ) == -1 )
 	{

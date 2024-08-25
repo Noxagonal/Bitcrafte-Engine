@@ -14,9 +14,7 @@ class RHIVulkanImpl;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-List<Text>					GetPlatformSpecificInstanceExtensionNames(
-	RHIVulkanImpl		&	rhi_vulkan_impl
-);
+auto GetPlatformSpecificInstanceExtensionNames( RHIVulkanImpl& rhi_vulkan_impl ) -> List<Text>;
 
 
 

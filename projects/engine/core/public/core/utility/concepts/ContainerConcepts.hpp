@@ -14,9 +14,9 @@ namespace utility {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename Type>
 concept ContainerIterator = requires(
-	Type											type,
-	const typename Type::IteratorContainerType	*	container,
-	const typename Type::ContainedValueType		*	data
+	Type										type,
+	const typename Type::IteratorContainerType*	container,
+	const typename Type::ContainedValueType*	data
 )
 {
 	typename Type::ContainedValueType;
@@ -71,10 +71,10 @@ concept SimpleContainerAllowedValueType =
 ///	Generic container type
 template<typename ContainerType>
 concept STLContainer = requires(
-	ContainerType										container,
-	typename ContainerType::const_iterator				const_iterator,
-	bool												boolean
-	)
+	ContainerType							container,
+	typename ContainerType::const_iterator	const_iterator,
+	bool									boolean
+)
 {
 	const_iterator	= container.begin();
 	const_iterator	= container.end();
@@ -94,10 +94,10 @@ concept STLContainer = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept ContainerView = requires(
-	ContainerType											container,
-	u64														size,
-	typename ContainerType::ConstIterator					const_iterator
-	)
+	ContainerType							container,
+	u64										size,
+	typename ContainerType::ConstIterator	const_iterator
+)
 {
 	typename ContainerType::Base;
 
@@ -141,8 +141,8 @@ concept ContainerView = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept ContainerEditableView = requires(
-	ContainerType											container
-	)
+	ContainerType container
+)
 {
 	requires( ContainerView<ContainerType> );
 	requires( ContainerType::IsDataConst == false );
@@ -160,8 +160,8 @@ concept ContainerEditableView = requires(
 /// Generic container type
 template<typename ContainerType>
 concept Container = requires(
-	ContainerType											container
-	)
+	ContainerType container
+)
 {
 	requires( ContainerEditableView<ContainerType> );
 	requires( std::is_same_v<ContainerType, typename ContainerType::ThisFullType> );
@@ -184,9 +184,9 @@ concept Container = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept LinearContainerView = requires(
-	ContainerType											container,
-	const typename ContainerType::ContainedValueType	*	const_data
-	)
+	ContainerType										container,
+	const typename ContainerType::ContainedValueType*	const_data
+)
 {
 	requires( ContainerView<ContainerType> );
 
@@ -205,9 +205,9 @@ concept LinearContainerView = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept LinearContainerEditableView = requires(
-	ContainerType											container,
-	typename ContainerType::ContainedValueType			*	data
-	)
+	ContainerType									container,
+	typename ContainerType::ContainedValueType*		data
+)
 {
 	requires( LinearContainerView<ContainerType> );
 	requires( ContainerEditableView<ContainerType> );
@@ -227,8 +227,8 @@ concept LinearContainerEditableView = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept LinearContainer = requires(
-	ContainerType											container,
-	u64														size
+	ContainerType	container,
+	u64				size
 )
 {
 	requires( LinearContainerEditableView<ContainerType> );
@@ -251,7 +251,7 @@ concept LinearContainer = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept TextContainerView = requires(
-	ContainerType											container
+	ContainerType container
 )
 {
 	requires( LinearContainerView<ContainerType> );
@@ -271,8 +271,8 @@ concept TextContainerView = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept TextContainerEditableView = requires(
-	ContainerType											container
-	)
+	ContainerType container
+)
 {
 	requires( LinearContainerEditableView<ContainerType> );
 	requires( TextContainerView<ContainerType> );
@@ -290,9 +290,9 @@ concept TextContainerEditableView = requires(
 ///	Generic container type
 template<typename ContainerType>
 concept TextContainer = requires(
-	ContainerType											container,
-	u64														size
-	)
+	ContainerType	container,
+	u64				size
+)
 {
 	requires( LinearContainer<ContainerType> );
 	requires( TextContainerEditableView<ContainerType> );

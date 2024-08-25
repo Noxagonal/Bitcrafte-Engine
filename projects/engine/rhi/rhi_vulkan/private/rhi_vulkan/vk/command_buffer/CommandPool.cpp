@@ -11,10 +11,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::rhi::VulkanCommandPool::VulkanCommandPool(
-	RHIVulkanImpl		&	rhi_vulkan_impl,
-	VulkanQueue			&	queue,
-	bool					is_transient,
-	bool					is_resettable
+	RHIVulkanImpl&	rhi_vulkan_impl,
+	VulkanQueue&	queue,
+	bool			is_transient,
+	bool			is_resettable
 ) :
 	rhi_vulkan_impl( &rhi_vulkan_impl )
 {
@@ -49,9 +49,7 @@ bc::rhi::VulkanCommandPool::~VulkanCommandPool()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::rhi::VulkanCommandBuffer> bc::rhi::VulkanCommandPool::AllocateCommandBuffer(
-	bool is_secondary
-)
+auto bc::rhi::VulkanCommandPool::AllocateCommandBuffer( bool is_secondary ) -> UniquePtr<VulkanCommandBuffer>
 {
 	return MakeUniquePtr<VulkanCommandBuffer>( *rhi_vulkan_impl, *this, is_secondary );
 }

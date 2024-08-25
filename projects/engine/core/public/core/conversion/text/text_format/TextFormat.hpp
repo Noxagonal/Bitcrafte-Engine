@@ -10,15 +10,16 @@ namespace text {
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerCharacterType									CharacterType,
-	u64																	CharacterArraySize,
-	typename															...ArgumentsTypePack
+	utility::TextContainerCharacterType	CharacterType,
+	i64									CharacterArraySize,
+	typename							...ArgumentsTypePack
 >
-constexpr bc::internal_::SimpleTextBase<CharacterType>					TextFormat(
-	const CharacterType ( &format_text )[ CharacterArraySize ],
-	ArgumentsTypePack												&&	...arguments
-)
+constexpr auto TextFormat(
+	const CharacterType		( &format_text )[ CharacterArraySize ],
+	ArgumentsTypePack&&		...arguments
+) -> bc::internal_::SimpleTextBase<CharacterType>
 {
 	return TextFormat( bc::internal_::SimpleTextViewBase<CharacterType, true>( format_text, CharacterArraySize ), std::forward<ArgumentsTypePack>( arguments )... );
 }

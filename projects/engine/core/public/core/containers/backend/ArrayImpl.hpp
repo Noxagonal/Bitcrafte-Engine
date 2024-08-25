@@ -84,20 +84,14 @@ public:
 	constexpr BC_CONTAINER_NAME( Array )() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) = default;
+	constexpr BC_CONTAINER_NAME( Array )( const BC_CONTAINER_NAME( Array )&	other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )(
-		BC_CONTAINER_NAME( Array )																	&&	other
-	) = default;
+	constexpr BC_CONTAINER_NAME( Array )( BC_CONTAINER_NAME( Array )&& other ) = default;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<utility::ConstructibleFrom<ValueType> ...ValueArgumentTypePack>
-	constexpr BC_CONTAINER_NAME( Array )(
-		ValueArgumentTypePack																		&&	...values
-	)
+	constexpr BC_CONTAINER_NAME( Array )( ValueArgumentTypePack&& ...values )
 	{
 		static_assert( sizeof...( ValueArgumentTypePack ) <= ValueCount, "Too many values given to constructor" );
 		FillFromTemplateParameterPack<0>( std::forward<ValueArgumentTypePack>( values )... );
@@ -110,9 +104,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<utility::InvocableFunction ...ValueArgumentTypePack>
-	constexpr BC_CONTAINER_NAME( Array )(
-		ValueArgumentTypePack																		&&	...values
-	)
+	constexpr BC_CONTAINER_NAME( Array )( ValueArgumentTypePack&& ...values )
 	{
 		static_assert( sizeof...( ValueArgumentTypePack ) <= ValueCount, "Too many values given to constructor" );
 		FillFromTemplateParameterPack<0>( std::forward<ValueArgumentTypePack>( values )... );
@@ -127,51 +119,43 @@ public:
 	constexpr ~BC_CONTAINER_NAME( Array )() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )															&	operator=(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) = default;
+	constexpr auto operator=( const BC_CONTAINER_NAME( Array )& other ) -> BC_CONTAINER_NAME( Array )& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )															&	operator=(
-		BC_CONTAINER_NAME( Array )																	&&	other
-	) = default;
+	constexpr auto operator=( BC_CONTAINER_NAME( Array )&& other ) -> BC_CONTAINER_NAME( Array )& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	Front()
+	constexpr auto Front() const -> const ValueType&
 	{
 		return At( 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	Front() const
+	constexpr auto Front() -> ValueType&
 	{
 		return At( 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	Back()
+	constexpr auto Back() const -> const ValueType&
 	{
 		return At( ValueCount - 1 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	Back() const
+	constexpr auto Back() -> ValueType&
 	{
 		return At( ValueCount - 1 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	operator[](
-		i64																								index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const ValueType&
 	{
 		return At( index );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	operator[](
-		i64																								index
-	)
+	constexpr auto operator[]( i64 index ) -> ValueType&
 	{
 		return At( index );
 	}
@@ -185,47 +169,7 @@ public:
 	/// 
 	/// @return
 	/// true if every value of this array matches the other, false otherwise.
-	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( Array )																		other
-	) const BC_CONTAINER_NOEXCEPT
-	{
-		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
-
-		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if Array contents differ.
-	/// 
-	/// @param other
-	///	Other array to compare with.
-	/// 
-	/// @return
-	/// true if any value differs from the other array, false if contents match.
-	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( Array )																		other
-	) const BC_CONTAINER_NOEXCEPT
-	{
-		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
-
-		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if Array contents match exactly.
-	///
-	/// @param other
-	///	Other array to compare with.
-	/// 
-	/// @return
-	/// true if every value of this array matches the other, false otherwise.
-	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator==( const BC_CONTAINER_NAME( Array )& other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( std::addressof( other ) == this ) return true;
 
@@ -241,9 +185,7 @@ public:
 	/// 
 	/// @return
 	/// true if any value differs from the other array, false if contents match.
-	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator!=( const BC_CONTAINER_NAME( Array )& other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( std::addressof( other ) == this ) return false;
 
@@ -260,9 +202,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr ConstIterator																				Find(
-		const ValueType																				&	value
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		return ConstIterator { this, container_bases::internal_::DoLinearSearch<ValueType, true>( this->data, ValueCount, value ) };
 	}
@@ -277,9 +217,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr Iterator																					Find(
-		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		return Iterator { this, container_bases::internal_::DoLinearSearch<ValueType, false>( this->data, ValueCount, value ) };
 	}
@@ -298,9 +236,7 @@ public:
 	/// Iterator to value position where value was found.
 	template<typename LambdaType>
 	[[nodiscard]]
-	constexpr ConstIterator																				FindIf(
-		LambdaType																					&&	lambda
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( LambdaType&&	lambda ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		return ConstIterator { this, container_bases::internal_::DoLinearSearchIf<ValueType, true>( this->data, ValueCount, lambda ) };
 	}
@@ -319,51 +255,45 @@ public:
 	/// Iterator to value position where value was found.
 	template<typename LambdaType>
 	[[nodiscard]]
-	constexpr Iterator																					FindIf(
-		LambdaType																					&&	lambda
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( LambdaType&& lambda ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		return Iterator { this, container_bases::internal_::DoLinearSearchIf<ValueType, false>( this->data, ValueCount, lambda ) };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	At(
-		i64																								index
-	) const
+	constexpr auto At( i64 index ) const -> const ValueType&
 	{
 		BC_ContainerAssert( index < ValueCount, U"Index out of range" );
 		return data[ index ];
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	At(
-		i64																								index
-	)
+	constexpr auto At( i64 index ) -> ValueType&
 	{
 		BC_ContainerAssert( index < ValueCount, U"Index out of range" );
 		return data[ index ];
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	Data() const noexcept
-	{
-		return data;
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	Data() noexcept
+	constexpr auto Data() const noexcept -> const ValueType*
 	{
 		return data;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr i64																						Size() const noexcept
+	constexpr auto Data() noexcept -> ValueType*
+	{
+		return data;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr auto Size() const noexcept -> i64
 	{
 		return ValueCount;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool																						IsEmpty() const noexcept
+	constexpr auto IsEmpty() const noexcept -> bool
 	{
 		return !Size();
 	}
@@ -375,7 +305,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	constexpr auto begin() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, &this->data[ 0 ] };
 	}
@@ -387,7 +317,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				begin() const noexcept
+	constexpr auto begin() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data[ 0 ] };
 	}
@@ -399,7 +329,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cbegin() const noexcept
+	constexpr auto cbegin() const noexcept -> ConstIterator
 	{
 		return this->begin();
 	}
@@ -411,7 +341,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	constexpr auto end() noexcept 
 	{
 		return IteratorBase<IsDataConst> { this, &this->data[ ValueCount ] };
 	}
@@ -423,7 +353,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				end() const noexcept
+	constexpr auto end() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, &this->data[ ValueCount ] };
 	}
@@ -435,7 +365,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cend() const noexcept
+	constexpr auto cend() const noexcept -> ConstIterator
 	{
 		return this->end();
 	}
@@ -461,13 +391,13 @@ private:
 	/// @param ...rest
 	/// Remaining elements in the parameter pack.
 	template<
-		i64																								Index,
-		std::constructible_from<ValueType>																FirstType,
-		std::constructible_from<ValueType>																...RestTypePack
+		i64									Index,
+		std::constructible_from<ValueType>	FirstType,
+		std::constructible_from<ValueType>	...RestTypePack
 	>
-	constexpr void																						FillFromTemplateParameterPack(
-		FirstType																					&&	first,
-		RestTypePack																				&&	...rest
+	constexpr void FillFromTemplateParameterPack(
+		FirstType&&		first,
+		RestTypePack&&	...rest
 	)
 	{
 		static_assert( Index < ValueCount, "Index out of range" );
@@ -478,7 +408,7 @@ private:
 private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ValueType																							data[ ValueCount ];
+	ValueType data[ ValueCount ];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -492,8 +422,7 @@ private:
 /// @tparam ValueType
 /// Type of the contained element.
 template<BC_CONTAINER_VALUE_TYPENAME ValueType>
-class BC_CONTAINER_NAME( Array )<ValueType, 0> :
-	public container_bases::ContainerResource
+class BC_CONTAINER_NAME( Array )<ValueType, 0> : public container_bases::ContainerResource
 {
 public:
 
@@ -544,64 +473,52 @@ public:
 	constexpr BC_CONTAINER_NAME( Array )() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) = default;
+	constexpr BC_CONTAINER_NAME( Array )( const BC_CONTAINER_NAME( Array )& other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )(
-		BC_CONTAINER_NAME( Array )																	&&	other
-	) = default;
+	constexpr BC_CONTAINER_NAME( Array )( BC_CONTAINER_NAME( Array )&& other ) = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr ~BC_CONTAINER_NAME( Array )() = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )															&	operator=(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) = default;
+	constexpr auto operator=( const BC_CONTAINER_NAME( Array )& other ) -> BC_CONTAINER_NAME( Array )& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( Array )															&	operator=(
-		BC_CONTAINER_NAME( Array )																	&&	other
-	) = default;
+	constexpr auto operator=( BC_CONTAINER_NAME( Array )&& other ) -> BC_CONTAINER_NAME( Array )& = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	Front()
+	constexpr auto Front() const -> const ValueType&
 	{
 		return At( 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	Front() const
+	constexpr auto Front() -> ValueType&
 	{
 		return At( 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	Back()
+	constexpr auto Back() const -> const ValueType&
 	{
 		return At( 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	Back() const
+	constexpr auto Back() -> ValueType&
 	{
 		return At( 0 );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		&	operator[](
-		i64																								index
-	) const
+	constexpr auto operator[]( i64 index ) const -> const ValueType&
 	{
 		return At( index );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				&	operator[](
-		i64																								index
-	)
+	constexpr auto operator[]( i64 index ) -> ValueType&
 	{
 		return At( index );
 	}
@@ -616,9 +533,7 @@ public:
 	/// @return
 	/// true if every value of this array matches the other, false otherwise.
 	template<bool IsOtherConst>
-	constexpr bool																						operator==(
-		BC_CONTAINER_NAME( Array )																		other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator==( const BC_CONTAINER_NAME( Array )& other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return true;
 
@@ -635,9 +550,7 @@ public:
 	/// @return
 	/// true if any value differs from the other array, false if contents match.
 	template<bool IsOtherConst>
-	constexpr bool																						operator!=(
-		BC_CONTAINER_NAME( Array )																		other
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto operator!=( const BC_CONTAINER_NAME( Array )& other ) const BC_CONTAINER_NOEXCEPT -> bool
 	{
 		if( other.Data() == this->Data() && other.Size() == this->Size() ) return false;
 
@@ -646,42 +559,6 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Check if Array contents match exactly.
-	///
-	/// @param other
-	///	Other array to compare with.
-	/// 
-	/// @return
-	/// true if every value of this array matches the other, false otherwise.
-	constexpr bool																						operator==(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) const BC_CONTAINER_NOEXCEPT
-	{
-		if( std::addressof( other ) == this ) return true;
-
-		return container_bases::internal_::CheckContainerContentsMatch( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
-	/// Check if Array contents differ.
-	/// 
-	/// @param other
-	///	Other array to compare with.
-	/// 
-	/// @return
-	/// true if any value differs from the other array, false if contents match.
-	constexpr bool																						operator!=(
-		const BC_CONTAINER_NAME( Array )															&	other
-	) const BC_CONTAINER_NOEXCEPT
-	{
-		if( std::addressof( other ) == this ) return false;
-
-		return container_bases::internal_::CheckContainerContentsDiffer( *this, other );
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// @brief
 	/// Find the first occurance of a specific value in this container.
 	///
 	/// @param value
@@ -690,9 +567,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr ConstIterator																				Find(
-		const ValueType																				&	value
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		return ConstIterator { this, nullptr };
 	}
@@ -707,9 +582,7 @@ public:
 	/// @return
 	/// Iterator to value position where value was found.
 	[[nodiscard]]
-	constexpr Iterator																					Find(
-		const ValueType																				&	value
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto Find( const ValueType& value ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		return Iterator { this, nullptr };
 	}
@@ -728,9 +601,7 @@ public:
 	/// Iterator to value position where value was found.
 	template<typename LambdaType>
 	[[nodiscard]]
-	constexpr ConstIterator																				FindIf(
-		LambdaType																					&&	lambda
-	) const BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( LambdaType&& lambda ) const BC_CONTAINER_NOEXCEPT -> ConstIterator
 	{
 		return ConstIterator { this, nullptr };
 	}
@@ -749,51 +620,45 @@ public:
 	/// Iterator to value position where value was found.
 	template<typename LambdaType>
 	[[nodiscard]]
-	constexpr Iterator																					FindIf(
-		LambdaType																					&&	lambda
-	) BC_CONTAINER_NOEXCEPT
+	constexpr auto FindIf( LambdaType&& lambda ) BC_CONTAINER_NOEXCEPT -> Iterator
 	{
 		return Iterator { this, nullptr };
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[noreturn]]
-	constexpr const ValueType																		&	At(
-		i64
-	) const
+	constexpr auto At( i64 ) const -> const ValueType&
 	{
 		BC_ContainerThrowOrCrash( U"Index out of range, Array is empty" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[noreturn]]
-	constexpr ValueType																				&	At(
-		i64
-	)
+	constexpr auto At( i64 ) -> ValueType&
 	{
 		BC_ContainerThrowOrCrash( U"Index out of range, Array is empty" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr const ValueType																		*	Data() const noexcept
-	{
-		return nullptr;
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ValueType																				*	Data() noexcept
+	constexpr auto Data() const noexcept -> const ValueType*
 	{
 		return nullptr;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr i64																						Size() const noexcept
+	constexpr auto Data() noexcept -> ValueType*
+	{
+		return nullptr;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr auto Size() const noexcept -> i64
 	{
 		return 0;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr bool																						IsEmpty() const noexcept
+	constexpr auto IsEmpty() const noexcept -> bool
 	{
 		return !Size();
 	}
@@ -805,7 +670,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	begin() noexcept
+	constexpr auto begin() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, nullptr };
 	}
@@ -817,7 +682,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				begin() const noexcept
+	constexpr auto begin() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, nullptr };
 	}
@@ -829,7 +694,7 @@ public:
 	/// @return
 	/// Iterator that points to the first value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cbegin() const noexcept
+	constexpr auto cbegin() const noexcept -> ConstIterator
 	{
 		return this->begin();
 	}
@@ -841,7 +706,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr IteratorBase<IsDataConst>																	end() noexcept
+	constexpr auto end() noexcept -> IteratorBase<IsDataConst>
 	{
 		return IteratorBase<IsDataConst> { this, nullptr };
 	}
@@ -853,7 +718,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				end() const noexcept
+	constexpr auto end() const noexcept -> ConstIterator
 	{
 		return ConstIterator { this, nullptr };
 	}
@@ -865,7 +730,7 @@ public:
 	/// @return
 	/// Iterator that points to one over the last value.
 	[[nodiscard]]
-	constexpr ConstIterator																				cend() const noexcept
+	constexpr auto cend() const noexcept -> ConstIterator
 	{
 		return this->end();
 	}

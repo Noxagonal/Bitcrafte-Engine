@@ -45,21 +45,17 @@ public:
 	/// 
 	/// @param thread_resources
 	/// This initializes thread private resources and tells how many threads should be created.
-	ThreadPool(
-		const ThreadPoolCreateInfo						&	create_info
-	);
+	ThreadPool( const ThreadPoolCreateInfo& create_info );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	virtual													~ThreadPool();
+	virtual ~ThreadPool();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<
-		typename											ThreadType,
-		typename											...ThreadConstructorArgumentsTypePack
+		typename ThreadType,
+		typename ...ThreadConstructorArgumentsTypePack
 	>
-	ThreadIdentifier										AddThread(
-		ThreadConstructorArgumentsTypePack				&&	...constructor_arguments
-	)
+	auto AddThread( ThreadConstructorArgumentsTypePack&& ...constructor_arguments ) -> ThreadIdentifier
 	{
 		static_assert( std::is_base_of_v<Thread, ThreadType>, "Thread type must be derived from bc::thread::Thread" );
 		auto thread_description = MakeUniquePtr<ThreadDescription>();
@@ -68,9 +64,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void													RemoveThread(
-		ThreadIdentifier									thread_id
-	);
+	void RemoveThread( ThreadIdentifier thread_id );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -94,14 +88,15 @@ public:
 	/// @return
 	/// Unique id to the task process which can be waited upon by other submits.
 	template<
-		typename											ThreadType,
-		typename											TaskType,
-		typename											...TaskConstructorArgumentTypePack
+		typename ThreadType,
+		typename TaskType,
+		typename ...TaskConstructorArgumentTypePack
 	>
-	TaskIdentifier											ScheduleTaskToThreadTypeWithDependencies(
-		const List<TaskIdentifier>						&	dependencies,
-		TaskConstructorArgumentTypePack					&&	...task_constructor_arguments
-	) requires( std::is_base_of_v<Task, TaskType> )
+	auto ScheduleTaskToThreadTypeWithDependencies(
+		const List<TaskIdentifier>&				dependencies,
+		TaskConstructorArgumentTypePack&&		...task_constructor_arguments
+	) -> TaskIdentifier
+		requires( std::is_base_of_v<Task, TaskType> )
 	{
 		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
 		unique_task->locked_to_threads	= GetTaskThreadLockIDs<ThreadType>();
@@ -128,13 +123,14 @@ public:
 	/// @return
 	/// Unique id to the task process which can be waited upon by other submits.
 	template<
-		typename											TaskType,
-		typename											...TaskConstructorArgumentTypePack
+		typename TaskType,
+		typename ...TaskConstructorArgumentTypePack
 	>
-	TaskIdentifier											ScheduleTaskWithDependencies(
-		const List<TaskIdentifier>						&	dependencies,
-		TaskConstructorArgumentTypePack					&&	...task_constructor_arguments
-	) requires( std::is_base_of_v<Task, TaskType> )
+	auto ScheduleTaskWithDependencies(
+		const List<TaskIdentifier>&			dependencies,
+		TaskConstructorArgumentTypePack&&	...task_constructor_arguments
+	) -> TaskIdentifier
+		requires( std::is_base_of_v<Task, TaskType> )
 	{
 		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
 		unique_task->dependencies		= dependencies;
@@ -160,13 +156,12 @@ public:
 	/// @return
 	/// Unique id to the task process which can be waited upon by other submits.
 	template<
-		typename											ThreadType,
-		typename											TaskType,
-		typename											...TaskConstructorArgumentTypePack
+		typename ThreadType,
+		typename TaskType,
+		typename ...TaskConstructorArgumentTypePack
 	>
-	TaskIdentifier											ScheduleTaskToThreadType(
-		TaskConstructorArgumentTypePack					&&	...task_constructor_arguments
-	) requires( std::is_base_of_v<Task, TaskType> )
+	auto ScheduleTaskToThreadType( TaskConstructorArgumentTypePack&& ...task_constructor_arguments ) -> TaskIdentifier
+		requires( std::is_base_of_v<Task, TaskType> )
 	{
 		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
 		unique_task->locked_to_threads	= GetTaskThreadLockIDs<ThreadType>();
@@ -189,12 +184,11 @@ public:
 	/// @return
 	/// Unique id to the task process which can be waited upon by other submits.
 	template<
-		typename											TaskType,
-		typename											...TaskConstructorArgumentTypePack
+		typename TaskType,
+		typename ...TaskConstructorArgumentTypePack
 	>
-	TaskIdentifier											ScheduleTask(
-		TaskConstructorArgumentTypePack					&&	...task_constructor_arguments
-	) requires( std::is_base_of_v<Task, TaskType> )
+	auto ScheduleTask( TaskConstructorArgumentTypePack&& ...task_constructor_arguments ) -> TaskIdentifier
+		requires( std::is_base_of_v<Task, TaskType> )
 	{
 		auto unique_task = MakeUniquePtr<TaskType>( std::forward<TaskConstructorArgumentTypePack>( task_constructor_arguments )... );
 		return DoAddTask( std::move( unique_task ) );
@@ -222,10 +216,10 @@ public:
 		typename ThreadType,
 		typename LambdaType
 	>
-	TaskIdentifier											ScheduleLambdaTaskToThreadTypeWithDependencies(
-		const List<TaskIdentifier>						&	dependencies,
-		LambdaType										&&	lambda_function
-	)
+	auto ScheduleLambdaTaskToThreadTypeWithDependencies(
+		const List<TaskIdentifier>&		dependencies,
+		LambdaType&&					lambda_function
+	) -> TaskIdentifier
 	{
 		static_assert(
 			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
@@ -261,13 +255,11 @@ public:
 	///
 	/// @return
 	/// Unique id to the task process which can be waited upon by other submits.
-	template<
-		typename											LambdaType
-	>
-	TaskIdentifier											ScheduleLambdaTaskWithDependencies(
-		const List<TaskIdentifier>						&	dependencies,
-		LambdaType										&&	lambda_function
-	)
+	template<typename LambdaType>
+	auto ScheduleLambdaTaskWithDependencies(
+		const List<TaskIdentifier>&		dependencies,
+		LambdaType&&					lambda_function
+	) -> TaskIdentifier
 	{
 		static_assert(
 			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
@@ -303,12 +295,10 @@ public:
 	/// @return
 	/// Unique id to the task process which can be waited upon by other submits.
 	template<
-		typename											ThreadType,
-		typename											LambdaType
+		typename ThreadType,
+		typename LambdaType
 	>
-	TaskIdentifier											ScheduleLambdaTaskToThreadType(
-		LambdaType										&&	lambda_function
-	)
+	auto ScheduleLambdaTaskToThreadType( LambdaType&& lambda_function ) -> TaskIdentifier
 	{
 		static_assert(
 			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
@@ -340,12 +330,8 @@ public:
 	///
 	/// @return
 	/// Unique id to the task process which can be waited upon by other submits.
-	template<
-		typename											LambdaType
-	>
-	TaskIdentifier											ScheduleLambdaTask(
-		LambdaType										&&	lambda_function
-	)
+	template<typename LambdaType>
+	auto ScheduleLambdaTask( LambdaType&& lambda_function ) -> TaskIdentifier
 	{
 		static_assert(
 			utility::Invocable<LambdaType, Task&> || utility::Invocable<LambdaType>,
@@ -370,7 +356,7 @@ public:
 	///
 	/// @return
 	/// Number of tasks queued.
-	u64														GetTaskQueueCount() const;
+	auto GetTaskQueueCount() const -> u64;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -378,7 +364,7 @@ public:
 	///
 	/// @return
 	/// Number of tasks being executed.
-	u64														GetTaskRunningCount() const;
+	auto GetTaskRunningCount() const -> u64;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -389,12 +375,10 @@ public:
 	/// 
 	/// @return
 	/// STL thread id. Returned id will be empty if thread was not found.
-	std::thread::id											GetThreadSystemID(
-		ThreadIdentifier									thread_id
-	) const;
+	auto GetThreadSystemID( ThreadIdentifier thread_id ) const -> std::thread::id;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void													Run();
+	void Run();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -402,7 +386,7 @@ public:
 	///
 	/// @warning
 	/// This can add up to a millisecond of wasted time per call and is primarily meant to be used only when shutting down.
-	void													WaitIdle();
+	void WaitIdle();
 
 private:
 
@@ -410,15 +394,12 @@ private:
 	class LambdaTask : public Task
 	{
 	public:
-		LambdaTask(
-			LambdaType										lambda_function
-		) :
+		LambdaTask( LambdaType lambda_function )
+		:
 			lambda_function( lambda_function )
 		{}
 
-		virtual TaskExecutionResult							operator() (
-			Thread										&	thread
-		) override
+		virtual auto operator() ( Thread& thread ) -> TaskExecutionResult override
 		{
 			constexpr bool non_void1 = utility::Invocable<LambdaType, void>;
 			constexpr bool non_void2 = utility::Invocable<LambdaType, void, Task&>;
@@ -450,33 +431,27 @@ private:
 		}
 
 	private:
-		LambdaType											lambda_function;
+		LambdaType	lambda_function;
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	TaskIdentifier											DoAddTask(
-		UniquePtr<Task>									&&	new_task
-	);
+	auto DoAddTask( UniquePtr<Task>&& new_task ) -> TaskIdentifier;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ThreadIdentifier										DoAddThread(
-		UniquePtr<ThreadDescription>					&&	thread_description
-	);
+	auto DoAddThread( UniquePtr<ThreadDescription>&& thread_description ) -> ThreadIdentifier;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void													DoRemoveThread(
-		ThreadIdentifier									thread_id
-	);
+	void DoRemoveThread( ThreadIdentifier thread_id );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void													CheckAndHandleThreadThrow();
+	void CheckAndHandleThreadThrow();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void													EvacuateThreads();
+	void EvacuateThreads();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename ThreadType>
-	List<ThreadIdentifier>									GetTaskThreadLockIDs()
+	auto GetTaskThreadLockIDs() -> List<ThreadIdentifier>
 	{
 		List<ThreadIdentifier> ret;
 		for( u64 i = 0; i < thread_description_list.Size(); i++ )
@@ -490,17 +465,17 @@ private:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	ThreadPoolCreateInfo									create_info					= {};
+	ThreadPoolCreateInfo				create_info					= {};
 
-	std::thread::id											main_thread_id;
+	std::thread::id						main_thread_id;
 
-	UniquePtr<ThreadSharedData>								thread_shared_data;
-	List<UniquePtr<ThreadDescription>>						thread_description_list;
+	UniquePtr<ThreadSharedData>			thread_shared_data;
+	List<UniquePtr<ThreadDescription>>	thread_description_list;
 
-	std::atomic<TaskIdentifier>								task_id_counter				= 0;
-	std::atomic<ThreadIdentifier>							thread_id_counter			= 0;
+	std::atomic<TaskIdentifier>			task_id_counter				= 0;
+	std::atomic<ThreadIdentifier>		thread_id_counter			= 0;
 
-	std::atomic_bool										shutting_down				= {};
+	std::atomic_bool					shutting_down				= {};
 };
 
 

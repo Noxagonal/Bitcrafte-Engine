@@ -13,8 +13,8 @@ namespace text {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerView				OutTextContainerType,
-	typename								ElementType
+	utility::TextContainerView	OutTextContainerType,
+	typename					ElementType
 >
 class TextFormatter<OutTextContainerType, List<ElementType>>
 {

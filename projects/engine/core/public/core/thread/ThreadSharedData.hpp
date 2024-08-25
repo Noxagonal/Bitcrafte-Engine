@@ -41,9 +41,7 @@ public:
 	///
 	/// @return
 	/// Task that needs to be run by worker thread.
-	Task 							*	FindWork(
-		ThreadDescription			&	thread_description
-	);
+	auto FindWork( ThreadDescription& thread_description ) -> Task*;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -51,17 +49,13 @@ public:
 	/// 
 	/// @param task
 	///	Pointer to task that was completed.
-	void								TaskCompleted(
-		Task						*	task
-	);
+	void TaskCompleted( Task* task );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	bool								IsTaskListEmpty();
+	auto IsTaskListEmpty() -> bool;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	void								AddTask(
-		UniquePtr<Task>				&&	new_task
-	);
+	void AddTask( UniquePtr<Task>&& new_task );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -71,24 +65,22 @@ public:
 	///
 	/// @param task
 	///	Pointer to task that is being resecheduled.
-	void								RescheduleTask(
-		Task						*	task
-	);
+	void RescheduleTask( Task* task );
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::mutex							thread_wakeup_mutex;
-	std::condition_variable				thread_wakeup;
+	std::mutex						thread_wakeup_mutex;
+	std::condition_variable			thread_wakeup;
 
-	std::atomic_bool					threads_should_exit;
+	std::atomic_bool				threads_should_exit;
 
-	std::mutex							thread_exception_mutex;
-	std::atomic_bool					thread_exception_raised				= false;
-	std::atomic_bool					thread_exception_handled			= false;
-	std::atomic<ThreadIdentifier>		thread_exception_id					= 0;
-	diagnostic::Exception				thread_exception;
+	std::mutex						thread_exception_mutex;
+	std::atomic_bool				thread_exception_raised		= false;
+	std::atomic_bool				thread_exception_handled	= false;
+	std::atomic<ThreadIdentifier>	thread_exception_id			= 0;
+	diagnostic::Exception			thread_exception;
 
-	mutable std::mutex					task_list_mutex;
-	List<UniquePtr<Task>>				task_list;
+	mutable std::mutex				task_list_mutex;
+	List<UniquePtr<Task>>			task_list;
 };
 
 

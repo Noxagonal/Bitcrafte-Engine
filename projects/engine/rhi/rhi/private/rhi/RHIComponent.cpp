@@ -16,9 +16,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::rhi::RHIComponent::RHIComponent(
-	const RHIComponentCreateInfo & create_info
-)
+bc::rhi::RHIComponent::RHIComponent( const RHIComponentCreateInfo& create_info )
 {
 
 }
@@ -32,10 +30,10 @@ bc::rhi::RHIComponent::~RHIComponent()
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bc::UniquePtr<bc::rhi::RHIComponent> bc::rhi::CreateRHIComponent(
-	window_manager::WindowManagerComponent			&	window_manager_component,
-	const RHIComponentCreateInfo					&	create_info
-)
+auto bc::rhi::CreateRHIComponent(
+	window_manager::WindowManagerComponent&		window_manager_component,
+	const RHIComponentCreateInfo&				create_info
+) -> UniquePtr<RHIComponent>
 {
 	#if BITCRAFTE_RHI_VULKAN
 	if( create_info.rhi_selection == RHISelection::VULKAN )

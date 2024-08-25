@@ -13,8 +13,8 @@ namespace diagnostic {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct LogEntry
 {
-	LogReportSeverity			severity				= LogReportSeverity::NONE;
-	PrintRecord					message;
+	LogReportSeverity	severity		= LogReportSeverity::NONE;
+	PrintRecord			message;
 };
 
 
