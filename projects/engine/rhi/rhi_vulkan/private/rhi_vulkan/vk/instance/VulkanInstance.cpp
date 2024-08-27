@@ -63,9 +63,9 @@ VkBool32 VKAPI_PTR VulkanDebugUtilsMessengerCallback(
 		break;
 	}
 
-	auto print_report = bc::diagnostic::MakePrintRecord_Argument( U"Vulkan debug message", message_type );
+	auto print_report = bc::diagnostic::MakePrintRecord_Argument( U"Vulkan debug", message_type );
 	print_report += bc::diagnostic::MakePrintRecord( U"\n" );
-	print_report += bc::diagnostic::MakePrintRecord( bc::conversion::ToUTF32( bc::TextView( pCallbackData->pMessage ) ) ).AddIndent();
+	print_report += bc::diagnostic::MakePrintRecord_Argument( U"Message", bc::TextView( pCallbackData->pMessage ) ).AddIndent();
 	bc::GetCore()->GetLogger()->Log(
 		report_severity,
 		print_report
@@ -150,12 +150,31 @@ bc::rhi::VulkanInstance::VulkanInstance( RHIVulkanImpl& rhi_vulkan_impl )
 
 
 	// Set up Vulkan instance
-	Text engine_name = application::EngineName;
-	Text8 application_name = bc::conversion::ToUTF8( rhi_vulkan_impl.GetApplicationInfo().application_name);
+	auto engine_name = Text( application::EngineName );
+	auto application_name_c8 = [ &rhi_vulkan_impl ]() -> Text8
+		{
+			auto& app_name = rhi_vulkan_impl.GetApplicationInfo().application_name;
+			auto result = Text8();
+			result.Resize( app_name.Size() * 4 );
+			auto conversion_result = conversion::UTFConvert<c8>(
+				result.Data(),
+				result.Data() + result.Size(),
+				app_name.Data(),
+				app_name.Data() + app_name.Size()
+			);
+			// TODO: Replace line below with this line once conversion::UTFConvert is fixed
+			// if( conversion_result.outcome == conversion::UTFConvertResult::Outcome::SUCCESS )
+			if( conversion_result.outcome == conversion::UTFConvertResult::Outcome::SUCCESS )
+			{
+				diagnostic::Throw( diagnostic::Exception( U"Failed to convert application name to UTF8" ) );
+			}
+			return result;
+		}();
+
 	auto application_info = VkApplicationInfo {};
 	application_info.sType					= VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	application_info.pNext					= nullptr;
-	application_info.pApplicationName		= reinterpret_cast<const char*>( application_name.ToCStr() );
+	application_info.pApplicationName		= reinterpret_cast<const char*>( application_name_c8.ToCStr() );
 	application_info.applicationVersion		= rhi_vulkan_impl.GetApplicationInfo().application_version.ToVulkanPacked();
 	application_info.pEngineName			= engine_name.ToCStr();
 	application_info.engineVersion			= application::EngineVersion.ToVulkanPacked();

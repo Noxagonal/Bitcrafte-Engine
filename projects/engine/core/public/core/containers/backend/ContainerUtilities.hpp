@@ -6,17 +6,6 @@
 
 #include <cstdint>
 #include <type_traits>
-#include <assert.h>
-
-
-
-#if BC_CONTAINER_IMPLEMENTATION_NORMAL
-#elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
-#else
-#error "Container implementation type not given"
-#endif
-
-#include <core/containers/backend/ContainerImplAddDefinitions.hpp>
 
 
 
@@ -176,7 +165,7 @@ constexpr auto DoLinearSearch(
 	std::conditional_t<IsConst, const ValueType, ValueType>*	data,
 	i64															range,
 	const ValueType&											value
-) BC_CONTAINER_NOEXCEPT -> std::conditional_t<IsConst, const ValueType, ValueType>*
+) -> std::conditional_t<IsConst, const ValueType, ValueType>*
 {
 	auto it = data;
 	auto it_end = data + range;
@@ -221,7 +210,7 @@ constexpr auto DoLinearSearchIf(
 	std::conditional_t<IsConst, const ValueType, ValueType>*	data,
 	i64															range,
 	LambdaType&&												lambda
-) BC_CONTAINER_NOEXCEPT -> std::conditional_t<IsConst, const ValueType, ValueType>*
+) -> std::conditional_t<IsConst, const ValueType, ValueType>*
 {
 	auto it = data;
 	auto it_end = data + range;
@@ -241,5 +230,3 @@ constexpr auto DoLinearSearchIf(
 } // internal_
 } // container_bases
 } // bc
-
-#include <core/containers/backend/ContainerImplRemoveDefinitions.hpp>

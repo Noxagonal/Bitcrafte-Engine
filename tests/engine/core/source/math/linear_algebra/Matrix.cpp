@@ -13,15 +13,15 @@ namespace math {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Matrix, BasicInitialize )
 {
-	using A2 = bc::math::Matrix2d;
-	using A3 = bc::math::Matrix3d;
-	using A4 = bc::math::Matrix4d;
+	using M2 = bc::math::Matrix2f64;
+	using M3 = bc::math::Matrix3f64;
+	using M4 = bc::math::Matrix4f64;
 
 	{
-		A2 a;
-		A2 b;
-		A2 c { 1.0 };
-		A2 d = A2::Identity();
+		M2 a;
+		M2 b;
+		M2 c { 1.0 };
+		M2 d = M2::Identity();
 
 		EXPECT_EQ( a, a );
 		EXPECT_EQ( a, b );
@@ -43,9 +43,9 @@ TEST( Matrix, BasicInitialize )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TEST( Matrix, Multiplication )
 {
-	using M2 = bc::math::Matrix2d;
-	using M3 = bc::math::Matrix3d;
-	using M4 = bc::math::Matrix4d;
+	using M2 = bc::math::Matrix2f64;
+	using M3 = bc::math::Matrix3f64;
+	using M4 = bc::math::Matrix4f64;
 
 	using V2 = bc::math::Vec2f64;
 	using V3 = bc::math::Vec3f64;

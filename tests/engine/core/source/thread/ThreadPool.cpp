@@ -79,7 +79,7 @@ TEST( ThreadPool, ThrowAtThreadConstruction )
 		public:
 			ThrowingThread() = default;
 			void ThreadBegin() override {
-				bc::diagnostic::Throw( "Test" );
+				bc::diagnostic::Throw( bc::diagnostic::Exception( U"Test" ) );
 			}
 			void ThreadEnd() noexcept override {}
 		};

@@ -65,6 +65,14 @@ TEST( ArrayContainer, IndexOperator )
 	EXPECT_EQ( a[ 1 ], 10 );
 	EXPECT_EQ( a[ 2 ], 20 );
 
+	try
+	{
+		a[ 3 ];
+	}
+	catch( const bc::diagnostic::Exception& e )
+	{
+		e.GetMessage();
+	}
 	EXPECT_THROW( a[ 3 ], bc::diagnostic::Exception );
 	EXPECT_THROW( a[ 4 ], bc::diagnostic::Exception );
 	EXPECT_THROW( a[ 5 ], bc::diagnostic::Exception );

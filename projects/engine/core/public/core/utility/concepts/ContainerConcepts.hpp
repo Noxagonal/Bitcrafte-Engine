@@ -2,6 +2,8 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
+#include <core/data_types/FundamentalTypes.hpp>
+
 #include <type_traits>
 
 
@@ -37,11 +39,11 @@ concept ContainerIterator = requires(
 /// @tparam CharacterType
 ///	Type to test if it is allowed to be used as a text container character type.
 template<typename CharacterType>
-concept TextContainerCharacterType =
-std::is_same_v<CharacterType, char> ||
-std::is_same_v<CharacterType, c8> ||
-std::is_same_v<CharacterType, c16> ||
-std::is_same_v<CharacterType, c32>;
+concept TextCharacter =
+	std::is_same_v<CharacterType, char> ||
+	std::is_same_v<CharacterType, c8> ||
+	std::is_same_v<CharacterType, c16> ||
+	std::is_same_v<CharacterType, c32>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -51,13 +53,16 @@ std::is_same_v<CharacterType, c32>;
 ///
 /// @tparam ValueType
 /// Type to test if it is allowed to be used in simple containers.
+///
+/// @deprecated
+/// To be removed once we get rid of simple containers.
 template<typename ValueType>
 concept SimpleContainerAllowedValueType =
-( !std::is_default_constructible_v<ValueType>		|| std::is_nothrow_default_constructible_v<ValueType> ) &&
-( !std::is_destructible_v<ValueType>				|| std::is_nothrow_destructible_v<ValueType> ) &&
-( !std::is_copy_constructible_v<ValueType>			|| std::is_nothrow_copy_constructible_v<ValueType> ) &&
-( !std::is_move_constructible_v<ValueType>			|| std::is_nothrow_move_constructible_v<ValueType> ) &&
-( !std::is_swappable_v<ValueType>					|| std::is_nothrow_swappable_v<ValueType> );
+	( !std::is_default_constructible_v<ValueType>		|| std::is_nothrow_default_constructible_v<ValueType> ) &&
+	( !std::is_destructible_v<ValueType>				|| std::is_nothrow_destructible_v<ValueType> ) &&
+	( !std::is_copy_constructible_v<ValueType>			|| std::is_nothrow_copy_constructible_v<ValueType> ) &&
+	( !std::is_move_constructible_v<ValueType>			|| std::is_nothrow_move_constructible_v<ValueType> ) &&
+	( !std::is_swappable_v<ValueType>					|| std::is_nothrow_swappable_v<ValueType> );
 
 
 
@@ -95,7 +100,7 @@ concept STLContainer = requires(
 template<typename ContainerType>
 concept ContainerView = requires(
 	ContainerType							container,
-	u64										size,
+	i64										size,
 	typename ContainerType::ConstIterator	const_iterator
 )
 {
@@ -228,7 +233,7 @@ concept LinearContainerEditableView = requires(
 template<typename ContainerType>
 concept LinearContainer = requires(
 	ContainerType	container,
-	u64				size
+	i64				size
 )
 {
 	requires( LinearContainerEditableView<ContainerType> );
@@ -291,7 +296,7 @@ concept TextContainerEditableView = requires(
 template<typename ContainerType>
 concept TextContainer = requires(
 	ContainerType	container,
-	u64				size
+	i64				size
 )
 {
 	requires( LinearContainer<ContainerType> );
@@ -321,8 +326,8 @@ template<
 	bool IsSourceConst
 >
 concept IsConstConvertible =
-IsDestinationConst == true ||
-IsDestinationConst == IsSourceConst;
+	IsDestinationConst == true ||
+	IsDestinationConst == IsSourceConst;
 
 static_assert( IsConstConvertible<true, true> );
 static_assert( !IsConstConvertible<false, true> );

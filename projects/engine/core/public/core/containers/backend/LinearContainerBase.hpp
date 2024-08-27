@@ -1,17 +1,9 @@
+#pragma once
 
 #include <core/containers/backend/ContainerBase.hpp>
 
-#if BC_CONTAINER_IMPLEMENTATION_NORMAL
 #include <core/diagnostic/assertion/Assert.hpp>
-
-#elif BC_CONTAINER_IMPLEMENTATION_SIMPLE
-#include <core/diagnostic/assertion/HardAssert.hpp>
-
-#else
-#error "Container implementation type not given"
-#endif
-
-#include <core/containers/backend/ContainerImplAddDefinitions.hpp>
+#include <core/containers/backend/ContainerUtilities.hpp>
 
 
 
@@ -20,24 +12,24 @@ namespace container_bases {
 
 
 
-template<BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst>
-class BC_CONTAINER_NAME( LinearContainerViewBase );
+template<typename ValueType, bool IsConst>
+class LinearContainerViewBase;
 
-template<BC_CONTAINER_VALUE_TYPENAME ValueType>
-class BC_CONTAINER_NAME( LinearContainerBase );
+template<typename ValueType>
+class LinearContainerBase;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename ContainerType, bool IsConst>
-class BC_CONTAINER_NAME( LinearContainerIteratorBase )
+class LinearContainerIteratorBase
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	using ThisType				= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsConst>;
+	using ThisType				= LinearContainerIteratorBase<ContainerType, IsConst>;
 	template<bool IsOtherConst>
-	using ThisTypeOtherConst	= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, IsOtherConst>;
+	using ThisTypeOtherConst	= LinearContainerIteratorBase<ContainerType, IsOtherConst>;
 
 	using ContainedValueType	= typename ContainerType::ContainedValueType;
 	using IteratorContainerType	= ContainerType;
@@ -56,10 +48,10 @@ private:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<typename OtherContainerType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase );
+	friend class LinearContainerIteratorBase;
 
-	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, true>;
-	friend class BC_CONTAINER_NAME( LinearContainerIteratorBase )<ContainerType, false>;
+	friend class LinearContainerIteratorBase<ContainerType, true>;
+	friend class LinearContainerIteratorBase<ContainerType, false>;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	const ContainerType*	container		= nullptr;
@@ -68,7 +60,7 @@ private:
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )() noexcept = default;
+	constexpr LinearContainerIteratorBase() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
@@ -78,7 +70,7 @@ public:
 	/// Other iterator.
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )( ThisTypeOtherConst<IsOtherConst> other ) noexcept
+	constexpr LinearContainerIteratorBase( ThisTypeOtherConst<IsOtherConst> other ) noexcept
 		requires( utility::IsConstConvertible<IsConst, IsOtherConst> )
 		:
 		container( other.container ),
@@ -86,7 +78,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerIteratorBase )(
+	constexpr LinearContainerIteratorBase(
 		const ContainerType*	container,
 		Pointer					data
 	) noexcept :
@@ -110,26 +102,26 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator*() const BC_CONTAINER_NOEXCEPT -> const Reference
+	constexpr auto operator*() const -> const Reference
 	{
 		return *this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator*() BC_CONTAINER_NOEXCEPT -> Reference
+	constexpr auto operator*() -> Reference
 		requires( IsConst == false )
 	{
 		return *this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator->() const BC_CONTAINER_NOEXCEPT -> const Pointer
+	constexpr auto operator->() const -> const Pointer
 	{
 		return this->Get();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator->() BC_CONTAINER_NOEXCEPT -> Pointer
+	constexpr auto operator->() -> Pointer
 		requires( IsConst == false )
 	{
 		return this->Get();
@@ -150,7 +142,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator++() BC_CONTAINER_NOEXCEPT -> ThisType&
+	constexpr auto operator++() -> ThisType&
 	{
 		CheckContainer();
 		CheckBounds( 1, true );
@@ -159,7 +151,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator++(int) BC_CONTAINER_NOEXCEPT -> ThisType
+	constexpr auto operator++(int) -> ThisType
 	{
 		ThisType tmp = *this;
 		++( *this );
@@ -167,7 +159,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator--() BC_CONTAINER_NOEXCEPT -> ThisType&
+	constexpr auto operator--() -> ThisType&
 	{
 		CheckContainer();
 		CheckBounds( -1, true );
@@ -176,7 +168,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator--(int) BC_CONTAINER_NOEXCEPT -> ThisType
+	constexpr auto operator--(int) -> ThisType
 	{
 		ThisType tmp = *this;
 		--( *this );
@@ -184,7 +176,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator+( DifferenceType value ) const BC_CONTAINER_NOEXCEPT -> ThisType
+	constexpr auto operator+( DifferenceType value ) const -> ThisType
 	{
 		ThisType ret = *this;
 		ret += value;
@@ -192,7 +184,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator-( DifferenceType value ) const BC_CONTAINER_NOEXCEPT -> ThisType
+	constexpr auto operator-( DifferenceType value ) const -> ThisType
 	{
 		ThisType ret = *this;
 		ret -= value;
@@ -207,7 +199,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator+=( DifferenceType value ) BC_CONTAINER_NOEXCEPT -> ThisType&
+	constexpr auto operator+=( DifferenceType value ) -> ThisType&
 	{
 		CheckContainer();
 		CheckBounds( value, true );
@@ -216,7 +208,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator-=( DifferenceType value ) BC_CONTAINER_NOEXCEPT -> ThisType&
+	constexpr auto operator-=( DifferenceType value ) -> ThisType&
 	{
 		CheckContainer();
 		CheckBounds( -value, true );
@@ -225,7 +217,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator[]( DifferenceType value ) const BC_CONTAINER_NOEXCEPT -> const Reference
+	constexpr auto operator[]( DifferenceType value ) const -> const Reference
 	{
 		CheckContainer();
 		CheckBounds( value );
@@ -233,7 +225,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto operator[]( DifferenceType value ) BC_CONTAINER_NOEXCEPT -> Reference
+	constexpr auto operator[]( DifferenceType value ) -> Reference
 		requires( IsConst == false )
 	{
 		CheckContainer();
@@ -270,7 +262,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto Get() const BC_CONTAINER_NOEXCEPT -> const Pointer
+	constexpr auto Get() const -> const Pointer
 	{
 		CheckContainer();
 		CheckBounds( 0, false );
@@ -278,7 +270,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto Get() BC_CONTAINER_NOEXCEPT -> Pointer
+	constexpr auto Get() -> Pointer
 		requires( IsConst == false )
 	{
 		CheckContainer();
@@ -313,7 +305,7 @@ public:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto GetIndex() const BC_CONTAINER_NOEXCEPT -> DifferenceType
+	constexpr auto GetIndex() const -> DifferenceType
 	{
 		CheckContainer();
 		CheckBounds( 0, true );
@@ -346,7 +338,7 @@ private:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr void CheckContainer() const
 	{
-		BC_ContainerAssert( this->container, U"Invalid use of iterator, container is nullptr" );
+		BAssert( this->container, U"Invalid use of iterator, container is nullptr" );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -355,20 +347,17 @@ private:
 		bool	 		allow_one_past_last
 	) const
 	{
-		BC_ContainerAssert( !this->container->IsEmpty(),
-			U"Iterator is out of range, container is empty",
-			U"Container size", this->container->Size(),
-			U"Accessed container index", this->GetIndex_NoCheck() + offset
+		BAssert(
+			!this->container->IsEmpty(),
+			U"Iterator is out of range, container is empty"
 		);
-		BC_ContainerAssert( this->data + offset >= this->container->Data(),
-			U"Iterator out of range, lower than first value",
-			U"Container size", this->container->Size(),
-			U"Accessed container index", this->GetIndex_NoCheck() + offset
+		BAssert(
+			this->data + offset >= this->container->Data(),
+			U"Iterator out of range, lower than first value"
 		);
-		BC_ContainerAssert( this->data + offset < this->container->Data() + this->container->Size() + ( !!allow_one_past_last ),
-			U"Iterator out of range, greater than last value",
-			U"Container size", this->container->Size(),
-			U"Accessed container index", this->GetIndex_NoCheck() + offset
+		BAssert(
+			this->data + offset < this->container->Data() + this->container->Size() + ( !!allow_one_past_last ),
+			U"Iterator out of range, greater than last value"
 		);
 	}
 };
@@ -387,8 +376,8 @@ private:
 ///
 /// @tparam IsConst
 ///	Tells if the data should be kept read only. true if data should be read only or false if data is allowed to be modified.
-template<BC_CONTAINER_VALUE_TYPENAME ValueType, bool IsConst>
-class BC_CONTAINER_NAME( LinearContainerViewBase )
+template<typename ValueType, bool IsConst>
+class LinearContainerViewBase
 {
 public:
 
@@ -397,25 +386,25 @@ public:
 	using ContainedValueType				= ValueType;
 	static constexpr bool IsDataConst		= IsConst;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	using ThisContainerType					= BC_CONTAINER_NAME( LinearContainerViewBase )<OtherValueType, IsOtherConst>;
+	template<typename OtherValueType, bool IsOtherConst>
+	using ThisContainerType					= LinearContainerViewBase<OtherValueType, IsOtherConst>;
 	using ThisType							= ThisContainerType<ValueType, IsConst>;
 
 	template<bool IsOtherConst>
 	using ThisTypeOtherConst				= ThisContainerType<ValueType, IsOtherConst>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	using ThisContainerViewType				= BC_CONTAINER_NAME( LinearContainerViewBase )<OtherValueType, IsOtherConst>;
+	template<typename OtherValueType, bool IsOtherConst>
+	using ThisContainerViewType				= LinearContainerViewBase<OtherValueType, IsOtherConst>;
 
 	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<ValueType, IsOtherConst>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	using ThisContainerFullType				= BC_CONTAINER_NAME( LinearContainerBase )<OtherValueType>;
+	template<typename OtherValueType>
+	using ThisContainerFullType				= LinearContainerBase<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
 	//template<bool IsOtherConst>
-	//using IteratorBase						= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsOtherConst>;
+	//using IteratorBase						= LinearContainerIteratorBase<ThisType, IsOtherConst>;
 	//using ConstIterator						= IteratorBase<true>;
 	//using Iterator							= IteratorBase<false>;
 
@@ -430,20 +419,20 @@ private:
 	//friend ConstIterator;
 	//friend Iterator;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( LinearContainerViewBase );
+	template<typename OtherValueType, bool IsOtherConst>
+	friend class LinearContainerViewBase;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	friend class BC_CONTAINER_NAME( LinearContainerBase );
+	template<typename OtherValueType>
+	friend class LinearContainerBase;
 
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )() noexcept = default;
+	constexpr LinearContainerViewBase() noexcept = default;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	template<bool IsOtherConst>
-	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )( const ThisTypeOtherConst<IsOtherConst>& other ) noexcept
+	constexpr LinearContainerViewBase( const ThisTypeOtherConst<IsOtherConst>& other ) noexcept
 		requires( utility::IsConstConvertible<IsDataConst, IsOtherConst> )
 		:
 		data_ptr( const_cast<ValueType*>( other.Data() ) ),
@@ -451,7 +440,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )(
+	constexpr LinearContainerViewBase(
 		const ValueType*	ptr,
 		i64					size
 	) noexcept requires( IsDataConst == true )
@@ -461,7 +450,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr BC_CONTAINER_NAME( LinearContainerViewBase )(
+	constexpr LinearContainerViewBase(
 		ValueType*	ptr,
 		i64			size
 	) noexcept requires( IsDataConst == false )
@@ -472,14 +461,14 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
-	constexpr auto operator[]( i64 index ) const BC_CONTAINER_NOEXCEPT -> const ValueType&
+	constexpr auto operator[]( i64 index ) const -> const ValueType&
 	{
 		return this->At( index );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
-	constexpr auto operator[]( i64 index ) BC_CONTAINER_NOEXCEPT -> ValueType&
+	constexpr auto operator[]( i64 index ) -> ValueType&
 		requires( IsDataConst == false )
 	{
 		return this->At( index );
@@ -487,26 +476,18 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
-	constexpr auto At( i64 index ) const BC_CONTAINER_NOEXCEPT -> const ValueType&
+	constexpr auto At( i64 index ) const -> const ValueType&
 	{
-		BC_ContainerAssert( index < this->data_size,
-			U"Index out of range",
-			U"Container size", this->data_size,
-			U"Index", index
-		);
+		BAssert( index < this->data_size, U"Index out of range" );
 		return data_ptr[ index ];
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[[nodiscard]]
-	constexpr auto At( i64 index ) BC_CONTAINER_NOEXCEPT -> ValueType&
+	constexpr auto At( i64 index ) -> ValueType&
 		requires( IsDataConst == false )
 	{
-		BC_ContainerAssert( index < this->data_size,
-			U"Index out of range",
-			U"Container size", this->data_size,
-			U"Index", index
-		);
+		BAssert( index < this->data_size, U"Index out of range" );
 		return data_ptr[ index ];
 	}
 
@@ -522,7 +503,7 @@ public:
 	/// 
 	/// @return
 	/// True if this container has member which equals what we're searching for, false if not found.
-	constexpr auto HasMember( const ValueType& member ) const BC_CONTAINER_NOEXCEPT -> bool
+	constexpr auto HasMember( const ValueType& member ) const -> bool
 	{
 		return this->DoFind( member ) < this->data_ptr + this->data_size;
 	}
@@ -534,7 +515,7 @@ public:
 	/// @return
 	/// True if this container contains nothing, false otherwise.
 	[[nodiscard]]
-	constexpr auto IsEmpty() const BC_CONTAINER_NOEXCEPT -> bool
+	constexpr auto IsEmpty() const -> bool
 	{
 		return !this->data_size;
 	}
@@ -546,9 +527,9 @@ public:
 	/// @return
 	/// Reference to the first value.
 	[[nodiscard]]
-	constexpr auto Front() const BC_CONTAINER_NOEXCEPT -> const ValueType&
+	constexpr auto Front() const -> const ValueType&
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container front value, container is empty.");
+		BAssert( !this->IsEmpty(), U"Cannot get container front value, container is empty.");
 		return this->data_ptr[ 0 ];
 	}
 
@@ -559,10 +540,10 @@ public:
 	/// @return
 	/// Reference to the first value.
 	[[nodiscard]]
-	constexpr auto Front() BC_CONTAINER_NOEXCEPT -> ValueType&
+	constexpr auto Front() -> ValueType&
 		requires( IsDataConst == false )
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container front value, container is empty." );
+		BAssert( !this->IsEmpty(), U"Cannot get container front value, container is empty." );
 		return this->data_ptr[ 0 ];
 	}
 
@@ -573,9 +554,9 @@ public:
 	/// @return
 	/// Reference to the last value.
 	[[nodiscard]]
-	constexpr auto Back() const BC_CONTAINER_NOEXCEPT -> const ValueType&
+	constexpr auto Back() const -> const ValueType&
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container back value, container is empty." );
+		BAssert( !this->IsEmpty(), U"Cannot get container back value, container is empty." );
 		return this->data_ptr[ this->data_size - 1 ];
 	}
 
@@ -586,10 +567,10 @@ public:
 	/// @return
 	/// Reference to the last value.
 	[[nodiscard]]
-	constexpr auto Back() BC_CONTAINER_NOEXCEPT ->  ValueType&
+	constexpr auto Back() ->  ValueType&
 		requires( IsDataConst == false )
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot get container back value, container is empty." );
+		BAssert( !this->IsEmpty(), U"Cannot get container back value, container is empty." );
 		return this->data_ptr[ this->data_size - 1 ];
 	}
 
@@ -655,34 +636,34 @@ protected:
 /// 
 /// @tparam ValueType
 ///	Type of linear container values.
-template<BC_CONTAINER_VALUE_TYPENAME ValueType>
-class BC_CONTAINER_NAME( LinearContainerBase ) :
-	public BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, false>,
+template<typename ValueType>
+class LinearContainerBase :
+	public LinearContainerViewBase<ValueType, false>,
 	protected ContainerResource
 {
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	using Base								= BC_CONTAINER_NAME( LinearContainerViewBase )<ValueType, false>;
+	using Base								= LinearContainerViewBase<ValueType, false>;
 	using ContainedValueType				= ValueType;
 	static constexpr bool IsDataConst		= false;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	using ThisContainerType					= BC_CONTAINER_NAME( LinearContainerBase )<OtherValueType>;
+	template<typename OtherValueType>
+	using ThisContainerType					= LinearContainerBase<OtherValueType>;
 	using ThisType							= ThisContainerType<ValueType>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	using ThisContainerViewType				= BC_CONTAINER_NAME( LinearContainerViewBase )<OtherValueType, IsOtherConst>;
+	template<typename OtherValueType, bool IsOtherConst>
+	using ThisContainerViewType				= LinearContainerViewBase<OtherValueType, IsOtherConst>;
 
 	template<bool IsOtherConst>
 	using ThisViewType						= ThisContainerViewType<ValueType, IsOtherConst>;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	using ThisContainerFullType				= BC_CONTAINER_NAME( LinearContainerBase )<OtherValueType>;
+	template<typename OtherValueType>
+	using ThisContainerFullType				= LinearContainerBase<OtherValueType>;
 	using ThisFullType						= ThisContainerFullType<ValueType>;
 
 	//template<bool IsOtherConst>
-	//using IteratorBase						= BC_CONTAINER_NAME( LinearContainerIteratorBase )<ThisType, IsOtherConst>;
+	//using IteratorBase						= LinearContainerIteratorBase<ThisType, IsOtherConst>;
 	//using ConstIterator						= IteratorBase<true>;
 	//using Iterator							= IteratorBase<false>;
 
@@ -697,21 +678,21 @@ private:
 	//friend ConstIterator;
 	//friend Iterator;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType, bool IsOtherConst>
-	friend class BC_CONTAINER_NAME( LinearContainerViewBase );
+	template<typename OtherValueType, bool IsOtherConst>
+	friend class LinearContainerViewBase;
 
-	template<BC_CONTAINER_VALUE_TYPENAME OtherValueType>
-	friend class BC_CONTAINER_NAME( LinearContainerBase );
-
-public:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//BC_CONTAINER_NAME( LinearContainerBase )() = default;
+	template<typename OtherValueType>
+	friend class LinearContainerBase;
 
 public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr ~BC_CONTAINER_NAME( LinearContainerBase )() BC_CONTAINER_NOEXCEPT
+	//LinearContainerBase() = default;
+
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr ~LinearContainerBase() 
 	{
 		this->Clear();
 		this->FreeMemory( this->data_ptr, this->data_capacity );
@@ -729,7 +710,7 @@ public:
 	constexpr void Reserve(
 		i64	new_capacity,
 		i64	headroom		= 0
-	) BC_CONTAINER_NOEXCEPT
+	) 
 	{
 		if( this->data_capacity < new_capacity )
 		{
@@ -759,8 +740,10 @@ public:
 	constexpr void Resize(
 		i64	new_size,
 		i64	headroom			= 0
-	) BC_CONTAINER_NOEXCEPT
+	) 
 	{
+		if( new_size == this->data_size ) return;
+
 		auto old_size = this->data_size;
 		this->ResizeNoConstruct( new_size, headroom );
 		if( new_size > old_size )
@@ -790,10 +773,12 @@ public:
 		const OtherContainerType&	other,
 		i64							count		= 1,
 		i64							headroom	= 0
-	) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	) 
+		requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
-		if( count < 0 ) count = 0;
+		if( other.Size() <= 0 ) return;
+		if( count <= 0 ) return;
+		if( headroom < 0 ) headroom = 0;
 
 		i64 old_size			= this->Size();
 		i64 other_size			= other.Size();
@@ -830,10 +815,12 @@ public:
 		const std::initializer_list<ValueType>&		init_list,
 		i64											count			= 1,
 		i64											headroom		= 0
-	) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	) 
+		requires( std::is_copy_constructible_v<ValueType> )
 	{
-		if( count < 0 ) count = 0;
+		if( init_list.size() <= 0 ) return;
+		if( count <= 0 ) return;
+		if( headroom < 0 ) headroom = 0;
 
 		i64 old_size			= this->Size();
 		i64 other_size			= init_list.size();
@@ -859,7 +846,7 @@ public:
 	///
 	/// @note
 	/// Does not change capacity.
-	constexpr void Clear() BC_CONTAINER_NOEXCEPT
+	constexpr void Clear() 
 	{
 		this->DestructRange( this->data_ptr, this->data_size );
 		this->data_size = 0;
@@ -874,8 +861,8 @@ public:
 	/// 
 	/// @param value
 	/// Value to add to the front.
-	constexpr void PushFront( const ValueType& value ) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr void PushFront( const ValueType& value ) 
+		requires( std::is_copy_constructible_v<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ShiftRight( 0, 1, reserve_space );
@@ -891,13 +878,13 @@ public:
 	///
 	/// @param value
 	/// Value to add to the front via move. Falls back to copying if more is not possible.
-	constexpr void PushFront( ValueType&& value ) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+	constexpr void PushFront( ValueType&& value ) 
+		requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ShiftRight( 0, 1, reserve_space );
 		// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-		if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+		if constexpr( std::is_move_constructible_v<ValueType> )
 		{
 			new( &this->data_ptr[ 0 ] ) ValueType( std::move( value ) );
 		}
@@ -913,8 +900,8 @@ public:
 	/// 
 	/// @param value
 	/// Value to add to the back.
-	constexpr void PushBack( const ValueType& value ) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	constexpr void PushBack( const ValueType& value ) 
+		requires( std::is_copy_constructible_v<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ResizeNoConstruct( reserve_space, reserve_space );
@@ -927,13 +914,13 @@ public:
 	/// 
 	/// @param value
 	/// Value to add to the back via move. Falls back to copying if more is not possible.
-	constexpr void PushBack( ValueType&& value ) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+	constexpr void PushBack( ValueType&& value ) 
+		requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ResizeNoConstruct( reserve_space, reserve_space );
 		// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-		if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+		if constexpr( std::is_move_constructible_v<ValueType> )
 		{
 			new( &this->data_ptr[ this->data_size - 1 ] ) ValueType( std::move( value ) );
 		}
@@ -961,8 +948,8 @@ public:
 		const ValueType&	value,
 		i64					count,
 		i64					headroom		= 0
-	) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	) 
+		requires( std::is_copy_constructible_v<ValueType> )
 	{
 		if( count < 0 ) count = 0;
 
@@ -989,8 +976,8 @@ public:
 		const ValueType&	value,
 		i64					count,
 		i64					headroom		= 0
-	) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	) 
+		requires( std::is_copy_constructible_v<ValueType> )
 	{
 		if( count < 0 ) count = 0;
 
@@ -1016,8 +1003,8 @@ public:
 	/// @param constructor_args
 	///	Constructor arguments sent to the constructor of the value.
 	template<typename ...ConstructorArgumentsTypePack>
-	constexpr void EmplaceFront( ConstructorArgumentsTypePack&& ...constructor_args ) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+	constexpr void EmplaceFront( ConstructorArgumentsTypePack&& ...constructor_args ) 
+		requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ShiftRight( 0, 1, reserve_space );
@@ -1034,8 +1021,8 @@ public:
 	/// @param constructor_args
 	/// Constructor arguments sent to the constructor of the value.
 	template<typename ...ConstructorArgumentsTypePack>
-	constexpr void EmplaceBack( ConstructorArgumentsTypePack&& ...constructor_args ) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+	constexpr void EmplaceBack( ConstructorArgumentsTypePack&& ...constructor_args ) 
+		requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		auto reserve_space = this->data_size + 1;
 		this->ResizeNoConstruct( reserve_space, reserve_space );
@@ -1047,37 +1034,48 @@ public:
 	/// Removes the first value and shifts everything towards the front to fill the gap.
 	///
 	///	Decreases the index of all other values by 1.
-	constexpr void PopFront() BC_CONTAINER_NOEXCEPT
+	constexpr void PopFront() 
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot pop front, container is empty");
+		BAssert( !this->IsEmpty(), U"Cannot pop front, container is empty");
 		this->ShiftLeft();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
 	/// Removes the last value.
-	constexpr void PopBack() BC_CONTAINER_NOEXCEPT
+	constexpr void PopBack() 
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot pop back, container is empty");
+		BAssert( !this->IsEmpty(), U"Cannot pop back, container is empty");
 		this->ResizeNoConstruct( this->data_size - 1, 0 );
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief
+	/// Get the current capacity of this container.
+	///
+	/// @return
+	/// The current capacity of this container.
+	constexpr auto Capacity() const noexcept -> i64
+	{
+		return this->data_capacity;
 	}
 
 protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto DoErase( const ValueType& value ) BC_CONTAINER_NOEXCEPT -> ValueType*
+	constexpr auto DoErase( const ValueType& value ) -> ValueType*
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
+		BAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
 		auto iterator = container_bases::internal_::DoLinearSearch<ValueType, false>( this->data_ptr, this->data_size, value );
 		if( iterator >= this->data_ptr + this->data_size ) return iterator;
 		return this->DoErase( iterator );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr auto DoErase( const ValueType* at ) BC_CONTAINER_NOEXCEPT -> ValueType*
+	constexpr auto DoErase( const ValueType* at ) -> ValueType*
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
-		BC_ContainerAssert(
+		BAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
+		BAssert(
 			at >= this->data_ptr && at < this->data_ptr + this->data_size,
 			U"Iterator out of range or it points to the end"
 		);
@@ -1089,19 +1087,21 @@ protected:
 	constexpr auto DoErase(
 		const ValueType*	from,
 		const ValueType*	to
-	) BC_CONTAINER_NOEXCEPT -> ValueType*
+	) -> ValueType*
 	{
-		BC_ContainerAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
-		BC_ContainerAssert(
+		BAssert( !this->IsEmpty(), U"Cannot erase from container, container is already empty" );
+		BAssert(
 			from >= this->data_ptr && from < this->data_ptr + this->data_size,
 			U"'from' iterator out of range or it points to the end"
 		);
-		BC_ContainerAssert(
+		BAssert(
 			to >= this->data_ptr && to < this->data_ptr + this->data_size + 1,
 			U"'to' iterator out of range"
 		);
 
 		i64 from_to_range		= to - from;
+		BEngineAssert( from_to_range > 0, U"'to' must be greater than 'from'" );
+
 		i64 tail_range			= this->data_ptr + this->data_size - to;
 		auto from_it			= &this->data_ptr[ from - this->data_ptr ];
 		auto to_it				= &this->data_ptr[ to - this->data_ptr ];
@@ -1109,7 +1109,7 @@ protected:
 		auto it_last			= this->data_ptr + this->data_size - 1;
 		while( to_it != it_end )
 		{
-			if constexpr( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
+			if constexpr( std::is_move_assignable_v<ValueType> )
 			{
 				*from_it = std::move( *( to_it ) );
 			}
@@ -1131,10 +1131,11 @@ protected:
 		const ValueType&	value,
 		i64					count			= 1,
 		i64					headroom		= 0
-	) BC_CONTAINER_NOEXCEPT -> ValueType*
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> )
+	) -> ValueType*
+		requires( std::is_copy_constructible_v<ValueType> )
 	{
-		BC_ContainerAssert(
+		BEngineAssert( count > 0, U"Cannot insert 0 or less count of values" );
+		BAssert(
 			( this->data_ptr == nullptr && at == nullptr ) ||
 			( at >= this->data_ptr && at <= this->data_ptr + this->data_size ),
 			U"Iterator out of range"
@@ -1158,10 +1159,11 @@ protected:
 		const OtherContainerType&	other,
 		i64							count			= 1,
 		i64							headroom		= 0
-	) BC_CONTAINER_NOEXCEPT -> ValueType*
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
+	) -> ValueType*
+		requires( std::is_copy_constructible_v<ValueType> && std::is_same_v<ValueType, typename OtherContainerType::ContainedValueType> )
 	{
-		BC_ContainerAssert(
+		BEngineAssert( count > 0, U"Cannot insert 0 or less count of values" );
+		BAssert(
 			( this->data_ptr == nullptr && at == nullptr ) ||
 			( at >= this->data_ptr && at <= this->data_ptr + this->data_size ),
 			U"Iterator out of range"
@@ -1234,6 +1236,9 @@ protected:
 		i64	headroom
 	)
 	{
+		BEngineAssert( new_size >= 0, U"Invalid size" );
+		BEngineAssert( headroom >= 0, U"Invalid headroom" );
+
 		auto old_size = this->data_size;
 		this->Reserve( new_size, headroom );
 		if( old_size > new_size )
@@ -1245,7 +1250,7 @@ protected:
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Swap( ThisType& other ) BC_CONTAINER_NOEXCEPT
+	constexpr void Swap( ThisType& other ) 
 	{
 		std::swap( this->data_ptr, other.data_ptr );
 		std::swap( this->data_size, other.data_size );
@@ -1254,7 +1259,7 @@ protected:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief
-	/// Shifts everything right (towards end index), expands the container.
+	/// Shifts elements right (towards end index), expands the container.
 	///
 	///	This function can also split the container in the middle allowing inserting values in the middle. values are
 	/// copy-constructed, moved, copied and destructed as needed, move is preferred wherever possible.
@@ -1275,8 +1280,8 @@ protected:
 		i64	start_position,
 		i64	amount,
 		i64	headroom
-	) BC_CONTAINER_NOEXCEPT
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+	) 
+		requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		// TODO: Should combine shift and resize to the same copy-loop
 		// if new memory is being allocated at the same time.
@@ -1289,6 +1294,10 @@ protected:
 		// if it should allocate or not, crash if it gets wrong info and let the caller
 		// determine if new memory is needed or not. Or just let ResizeNoConstruct determine
 		// the need for allocation the second time.
+
+		BEngineAssert( start_position >= 0, U"Invalid start position" );
+		BEngineAssert( amount > 0, U"Invalid amount" );
+		BEngineAssert( headroom >= 0, U"Invalid headroom" );
 
 		i64 old_size					= this->data_size;
 		i64 new_size					= this->data_size + amount;
@@ -1310,7 +1319,7 @@ protected:
 			for( i64 i = copy_range_end - 1; i >= copy_range_begin; --i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-				if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+				if constexpr( std::is_move_constructible_v<ValueType> )
 				{
 					new( &this->data_ptr[ i ] ) ValueType( std::move( this->data_ptr[ i - amount ] ) );
 				}
@@ -1324,7 +1333,7 @@ protected:
 			for( i64 i = overlap_range_end - 1; i >= overlap_range_begin; --i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-				if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+				if constexpr( std::is_move_constructible_v<ValueType> )
 				{
 					this->data_ptr[ i ] = std::move( this->data_ptr[ i - amount ] );
 				}
@@ -1349,7 +1358,7 @@ protected:
 		// i64																								start_position,
 		// i64																								amount
 	)
-		requires( BC_CONTAINER_IS_COPY_CONSTRUCTIBLE<ValueType> || BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+		requires( std::is_copy_constructible_v<ValueType> || std::is_move_constructible_v<ValueType> )
 	{
 		// TODO: Implement start_position and amount parameters.
 
@@ -1360,7 +1369,7 @@ protected:
 
 			// Construct the first value from the next value.
 			// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-			if constexpr( BC_CONTAINER_IS_MOVE_CONSTRUCTIBLE<ValueType> )
+			if constexpr( std::is_move_constructible_v<ValueType> )
 			{
 				new( &this->data_ptr[ 0 ] ) ValueType( std::move( this->data_ptr[ 1 ] ) );
 			}
@@ -1372,7 +1381,7 @@ protected:
 			for( i64 i = 1; i < this->data_size; ++i )
 			{
 				// This test is needed in cases where either the copy constructor or the move constructor has been explicitly deleted.
-				if constexpr( BC_CONTAINER_IS_MOVE_ASSIGNABLE<ValueType> )
+				if constexpr( std::is_move_assignable_v<ValueType> )
 				{
 					this->data_ptr[ i ] = std::move( this->data_ptr[ i + 1 ] );
 				}
@@ -1398,26 +1407,26 @@ namespace tests {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if linear container base fulfills size requirements.
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, true> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, true> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, false> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, false> ) == 16 );
+static_assert( sizeof( LinearContainerIteratorBase<LinearContainerViewBase<u32, true>, true> ) == 16 );
+static_assert( sizeof( LinearContainerIteratorBase<LinearContainerViewBase<u32, false>, true> ) == 16 );
+static_assert( sizeof( LinearContainerIteratorBase<LinearContainerViewBase<u32, true>, false> ) == 16 );
+static_assert( sizeof( LinearContainerIteratorBase<LinearContainerViewBase<u32, false>, false> ) == 16 );
 
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true> ) == 16 );
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false> ) == 16 );
+static_assert( sizeof( LinearContainerViewBase<u32, true> ) == 16 );
+static_assert( sizeof( LinearContainerViewBase<u32, false> ) == 16 );
 
-static_assert( sizeof( BC_CONTAINER_NAME( LinearContainerBase )<u32> ) == 24 );
+static_assert( sizeof( LinearContainerBase<u32> ) == 24 );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if linear container iterator base passes container iterator concept.
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, true>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, true>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, true>, false>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerViewBase )<u32, false>, false>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<u32>, true>> );
-static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIteratorBase )<BC_CONTAINER_NAME( LinearContainerBase )<u32>, false>> );
+static_assert( utility::ContainerIterator<LinearContainerIteratorBase<LinearContainerViewBase<u32, true>, true>> );
+static_assert( utility::ContainerIterator<LinearContainerIteratorBase<LinearContainerViewBase<u32, false>, true>> );
+static_assert( utility::ContainerIterator<LinearContainerIteratorBase<LinearContainerViewBase<u32, true>, false>> );
+static_assert( utility::ContainerIterator<LinearContainerIteratorBase<LinearContainerViewBase<u32, false>, false>> );
+static_assert( utility::ContainerIterator<LinearContainerIteratorBase<LinearContainerBase<u32>, true>> );
+static_assert( utility::ContainerIterator<LinearContainerIteratorBase<LinearContainerBase<u32>, false>> );
 
 } // tests
 #endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
@@ -1426,7 +1435,3 @@ static_assert( utility::ContainerIterator<BC_CONTAINER_NAME( LinearContainerIter
 
 } // container_bases
 } // bc
-
-
-
-#include <core/containers/backend/ContainerImplRemoveDefinitions.hpp>

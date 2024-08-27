@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 
 #include <cmath>
 
@@ -14,19 +14,19 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr auto Sin( utility::FloatingPointValue auto value )
+constexpr auto Sin( utility::FloatingPoint auto value )
 {
 	return std::sin( value );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr auto Cos( utility::FloatingPointValue auto value )
+constexpr auto Cos( utility::FloatingPoint auto value )
 {
 	return std::cos( value );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-constexpr auto Tan( utility::FloatingPointValue auto value )
+constexpr auto Tan( utility::FloatingPoint auto value )
 {
 	return std::tan( value );
 }

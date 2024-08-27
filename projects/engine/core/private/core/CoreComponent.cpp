@@ -41,7 +41,11 @@ bc::CoreComponent*	global_core			= nullptr;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::CoreComponent::CoreComponent( const bc::CoreComponentCreateInfo & create_info )
 {
-	BHardAssert( global_core == nullptr, "More than one core instance is not allowed" );
+	BHardAssert(
+		global_core == nullptr,
+		U"More than one core instance is not allowed"
+	);
+
 	global_core = this;
 
 	internal_::SetGlobalLocale();
@@ -51,13 +55,16 @@ bc::CoreComponent::CoreComponent( const bc::CoreComponentCreateInfo & create_inf
 	logger				= MakeUniquePtr<diagnostic::Logger>( create_info.logger_create_info );
 	thread_pool			= MakeUniquePtr<thread::ThreadPool>( create_info.thread_pool_create_info );
 
-	logger->LogVerbose( "Core component started" );
+	logger->LogVerbose( U"Core component started" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bc::CoreComponent::~CoreComponent()
 {
-	BHardAssert( global_core == this, "Global core singleton changed in running application" );
+	BHardAssert(
+		global_core == this,
+		U"Global core singleton changed in running application"
+	);
 
 	// Cleanup code here...
 

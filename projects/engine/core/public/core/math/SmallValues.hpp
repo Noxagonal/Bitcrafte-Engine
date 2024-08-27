@@ -1,7 +1,7 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/data_types/FundamentalTypes.hpp>
 
 #include <cstdint>
@@ -28,7 +28,7 @@ static constexpr f64	SMALL_F64_VALUE		= 0.00001;
 
 namespace internal_ {
 
-template<utility::FundamentalValue FundamentalValue>
+template<utility::Fundamental FundamentalValue>
 struct SmallValueGetter
 {
     static constexpr FundamentalValue value = {};
@@ -56,7 +56,7 @@ struct SmallValueGetter<f64>
 /// 
 /// @tparam FundamentalValue
 /// Type to get small value for.
-template<utility::FundamentalValue FundamentalValue>
+template<utility::Fundamental FundamentalValue>
 constexpr FundamentalValue SmallValue = internal_::SmallValueGetter<FundamentalValue>::value;
 
 

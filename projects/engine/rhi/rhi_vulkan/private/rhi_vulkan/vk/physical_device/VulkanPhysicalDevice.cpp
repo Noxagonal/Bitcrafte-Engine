@@ -132,7 +132,7 @@ auto bc::rhi::VulkanPhysicalDevice::GetPhysicalDeviceQueuePresentationSupport( L
 	#endif // BITCRAFTE_WINDOW_MANAGER_WAYLAND
 
 	default:
-		BEnsure( 0, "Please add window manager specific queue presentation support query here" );
+		BEnsure( 0, U"Please add window manager specific queue presentation support query here" );
 		break;
 	}
 

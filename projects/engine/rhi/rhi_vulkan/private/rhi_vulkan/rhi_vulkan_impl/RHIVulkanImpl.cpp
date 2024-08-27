@@ -98,7 +98,7 @@ void bc::rhi::RHIVulkanImpl::Start( const RHIComponentStartInfo& rhi_start_info 
 {
 	if( rhi_start_info.use_device >= vulkan_instance->GetPhysicalDeviceList().Size() )
 	{
-		bc::diagnostic::Throw( bc::diagnostic::Exception{ "GPU not selected." } );
+		bc::diagnostic::Throw( bc::diagnostic::Exception{ U"GPU not selected." } );
 	}
 
 	auto & selected_physical_device = vulkan_instance->GetPhysicalDeviceList()[ rhi_start_info.use_device ];

@@ -138,8 +138,14 @@ public:
 	///	Id of the task we want this task to depend on.
 	inline void AddDependencyAtRuntime( TaskIdentifier task_id )
 	{
-		BAssert( state == TaskState::RUNNING, "Cannot call AddDependencyAtRuntime on a task that is not currently running, this function must be called from within the running task" );
-		BAssert( running_thread_system_id == std::this_thread::get_id(), "Cannot call AddDependencyAtRuntime from a different thread from which the task is running, this function must be called from within the running task" );
+		BAssert(
+			state == TaskState::RUNNING,
+			U"Cannot call AddDependencyAtRuntime on a task that is not currently running, this function must be called from within the running task"
+		);
+		BAssert(
+			running_thread_system_id == std::this_thread::get_id(),
+			U"Cannot call AddDependencyAtRuntime from a different thread from which the task is running, this function must be called from within the running task"
+		);
 		dependencies.PushBack( task_id );
 	}
 

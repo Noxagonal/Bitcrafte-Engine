@@ -4,14 +4,9 @@
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
 // Diagnostic
-#include <core/diagnostic/assertion/HardAssert.hpp>
 #include <core/diagnostic/assertion/Assert.hpp>
 
 // Containers
-#include <core/containers/simple/SimpleUniquePtr.hpp>
-#include <core/containers/simple/SimpleList.hpp>
-#include <core/containers/simple/SimpleText.hpp>
-#include <core/containers/simple/SimplePair.hpp>
 #include <core/containers/UniquePtr.hpp>
 #include <core/containers/List.hpp>
 #include <core/containers/Text.hpp>

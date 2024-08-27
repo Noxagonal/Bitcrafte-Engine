@@ -11,14 +11,12 @@ namespace bc {
 
 #if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
 /// Make sure condition is true in both development and shipping builds.
 ///
-///	If condition is false, in development builds, an exception will be thrown. In shipping builds, this will cause the engine to
-/// shut down immediately.
+///	If condition is false, in game development builds, an exception will be thrown. In shipping builds, this will cause the
+/// engine to shut down immediately.
 ///
 /// @see
 /// bc::diagnostic::Throw(), bc::diagnostic::Panic()
@@ -34,27 +32,22 @@ namespace bc {
 /// @param m_failure_explanation
 ///	bc::diagnostic::MessageEntryText. General explanation of what went wrong. Eg, "Index out of scope" when iterating over
 /// array.
-#define BEnsure( m_condition, m_failure_explanation )								\
-do {																				\
-	if( !( m_condition ) ) [[unlikely]] {											\
-		::bc::diagnostic::Throw( m_failure_explanation );							\
-	}																				\
+#define BEnsure( m_condition, m_failure_explanation )										\
+do {																						\
+	if( !( m_condition ) ) [[unlikely]] {													\
+		::bc::diagnostic::Throw( ::bc::diagnostic::Exception( m_failure_explanation ) );	\
+	}																						\
 } while( false )
-
-
 
 #else // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 
-
-
-#define BEnsure( m_condition, m_failure_explanation )								\
-do {																				\
-	if( !( m_condition ) ) [[unlikely]] {											\
-		::bc::diagnostic::Panic( m_failure_explanation );							\
-	}																				\
+#define BEnsure( m_condition, m_failure_explanation )										\
+do {																						\
+	if( !( m_condition ) ) [[unlikely]] {													\
+		/* TODO: Add logging. */															\
+		::bc::diagnostic::Panic();															\
+	}																						\
 } while( false )
-
-
 
 #endif // BITCRAFTE_GAME_DEVELOPMENT_BUILD
 

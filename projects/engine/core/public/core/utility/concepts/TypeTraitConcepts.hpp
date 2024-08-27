@@ -104,6 +104,17 @@ concept CommonWith = std::common_with<Type, OtherType>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
+/// Concept to test if a type is a fundamental type.
+///
+/// Fundamental types are types the CPU can natively handle.
+///
+/// @tparam Type
+/// Type to test if it is a fundamental type.
+template<typename Type>
+concept Fundamental = std::is_fundamental_v<Type>;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
 /// Concept to test if a type is a character type.
 ///
 /// Character is an integral type that is commonly used as a character type.
@@ -121,6 +132,17 @@ concept Character =
 	std::is_same_v<Type, char8_t> ||
 	std::is_same_v<Type, char16_t> ||
 	std::is_same_v<Type, char32_t>;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Concept to test if a type is a boolean type.
+///
+/// Boolean type is bool.
+///
+/// @tparam Type
+/// Type to test if it is an integral type.
+template<typename Type>
+concept Boolean = std::is_same_v<Type, bool>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
@@ -165,6 +187,43 @@ concept UnsignedIntegral = std::unsigned_integral<Type>;
 /// Type to test if it is a floating-point type.
 template<typename Type>
 concept FloatingPoint = std::floating_point<Type>;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Concept to test if a type is a POD (Plain Old Data) type.
+///
+/// POD types are types that meet the following criteria:
+/// - They have trivial or no constructors, destructors, copy/move constructors, copy/move assignment operators.
+/// - They do not have any user-defined non-trivial constructors or destructors.
+/// - They cannot have virtual functions or virtual base classes.
+/// - All non-static data members must have the same access control (public, private, or protected).
+/// - They cannot have base classes with members that have the same name as members in the derived class.
+/// - They must have a simple memory layout that is compatible with C-style structs.
+///
+/// POD types are useful when raw memory operations like `memcpy` are needed and compatibility with C is required.
+///
+/// @tparam Type
+/// Type to test if it is a POD type.
+template<typename Type>
+concept POD = std::is_standard_layout_v<Type> && std::is_trivial_v<Type>;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief
+/// Concept to test if a type is a trivial type.
+///
+/// Trivial types are types that meet the following criteria:
+/// - They have trivial or no default constructors, destructors, copy/move constructors, copy/move assignment operators.
+/// - Trivial types do not perform any custom initialization or cleanup.
+/// - They cannot have virtual functions or virtual base classes.
+/// - A trivial type allows the compiler to generate simple, efficient code for copying, moving, and destroying the object.
+///
+/// Trivial types are useful when raw memory operations like `memcpy` are needed, but unlike POD types, they don't necessarily 
+/// guarantee a simple memory layout.
+///
+/// @tparam Type
+/// Type to test if it is a trivial type.
+template<typename Type>
+concept Trivial = std::is_trivial_v<Type>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief

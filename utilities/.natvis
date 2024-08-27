@@ -2,8 +2,75 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
+	<!-- Raw Memory Types -->
+
+	<Type Name="bc::memory::HeapMemoryBlock&lt;*&gt;">
+		<DisplayString>{{count={count}}}</DisplayString>
+		<Expand>
+			<Synthetic Name="[items]">
+				<DisplayString>{count}</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>count</Size>
+						<ValuePointer>data</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+
+	<Type Name="bc::PODAutoBuffer&lt;*&gt;">
+		<DisplayString>{{count={heap_block.count}}}</DisplayString>
+		<Expand>
+			<Synthetic Name="[items]">
+				<DisplayString>{heap_block.count}</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>heap_block.count</Size>
+						<ValuePointer>heap_block.data</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+
+
+	
+	<!-- Diagnostic Types -->
+
+	<Type Name="bc::diagnostic::PrintRecordSection">
+		<DisplayString>{message.heap_block.data,[message.heap_block.count] s32 }</DisplayString>
+		<Expand>
+			<Synthetic Name="[message]">
+				<DisplayString>{ message.heap_block.data,[message.heap_block.count] s32 }</DisplayString>
+			</Synthetic>
+			<Item Name="[message size]">message.heap_block.count</Item>
+			<Item Name="[theme]">theme</Item>
+			<Item Name="[indent]">indent</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bc::diagnostic::PrintRecord">
+		<DisplayString>{{size={section_count}}}</DisplayString>
+		<Expand>
+			<Synthetic Name="[sections]">
+				<DisplayString>{section_count}</DisplayString>
+				<Expand>
+					<ArrayItems>
+						<Size>section_count</Size>
+						<ValuePointer>section_list</ValuePointer>
+					</ArrayItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+
+
+	
+	<!-- Container Types -->
+
 	<Type Name="bc::Array&lt;*&gt;">
-		<DisplayString>{{ size={$T2} }}</DisplayString>
+		<DisplayString>{{size={$T2}}}</DisplayString>
 		<Expand>
 			<Item Name="[size]" ExcludeView="simple">$T2</Item>
 			<ArrayItems>
@@ -14,7 +81,7 @@
 	</Type>
 
 	<Type Name="bc::List&lt;*&gt;">
-		<DisplayString>{{ size={data_size} }}</DisplayString>
+		<DisplayString>{{size={data_size}}}</DisplayString>
 		<Expand>
 			<Item Name="[size]" ExcludeView="simple">data_size</Item>
 			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
@@ -26,7 +93,7 @@
 	</Type>
 
 	<Type Name="bc::ListViewBase&lt;*&gt;">
-		<DisplayString>{{ size={data_size} }}</DisplayString>
+		<DisplayString>{{size={data_size}}}</DisplayString>
 		<Expand>
 			<Item Name="[size]" ExcludeView="simple">data_size</Item>
 			<ArrayItems>
@@ -36,32 +103,7 @@
 		</Expand>
 	</Type>
 
-	
 
-	<Type Name="bc::SimpleList&lt;*&gt;">
-		<DisplayString>{{ size={data_size} }}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
-			<ArrayItems>
-				<Size>data_size</Size>
-				<ValuePointer>data_ptr</ValuePointer>
-			</ArrayItems>
-		</Expand>
-	</Type>
-
-	<Type Name="bc::SimpleListViewBase&lt;*&gt;">
-		<DisplayString>{{ size={data_size} }}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<ArrayItems>
-				<Size>data_size</Size>
-				<ValuePointer>data_ptr</ValuePointer>
-			</ArrayItems>
-		</Expand>
-	</Type>
-
-	
 
 	<Type Name="bc::TextBase&lt;*&gt;">
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
@@ -85,49 +127,6 @@
 	</Type>
 
 	<Type Name="bc::TextViewBase&lt;*&gt;">
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
-		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<Synthetic Name="[text]" ExcludeView="simple">
-				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
-				<Expand>
-					<ArrayItems>
-						<Size>data_size</Size>
-						<ValuePointer>data_ptr</ValuePointer>
-					</ArrayItems>
-				</Expand>
-			</Synthetic>
-		</Expand>
-	</Type>
-
-
-	
-	<Type Name="bc::SimpleTextBase&lt;*&gt;">
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>
-		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char32_t&quot;)==0">{ data_ptr,[data_size] s32 }</DisplayString>
-		<DisplayString>Unsupported type {&quot;$T1&quot;}</DisplayString>
-		<Expand>
-			<Item Name="[size]" ExcludeView="simple">data_size</Item>
-			<Item Name="[capacity]" ExcludeView="simple">data_capacity</Item>
-			<Synthetic Name="[text]" ExcludeView="simple">
-				<DisplayString>{ data_ptr,[data_size] }</DisplayString>
-				<Expand>
-					<ArrayItems>
-						<Size>data_size</Size>
-						<ValuePointer>data_ptr</ValuePointer>
-					</ArrayItems>
-				</Expand>
-			</Synthetic>
-		</Expand>
-	</Type>
-
-	<Type Name="bc::SimpleTextViewBase&lt;*&gt;">
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char8_t&quot;)==0">{ data_ptr,[data_size] s8 }</DisplayString>
 		<DisplayString Condition="strcmp(&quot;$T1&quot;,&quot;char16_t&quot;)==0">{ data_ptr,[data_size] su }</DisplayString>

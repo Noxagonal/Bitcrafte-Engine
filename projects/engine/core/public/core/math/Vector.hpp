@@ -1,7 +1,7 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/math/SmallValues.hpp>
 #include <core/math/FundamentalComparison.hpp>
 #include <core/diagnostic/exception/Exception.hpp>
@@ -26,13 +26,13 @@ namespace math {
 /// 
 /// @tparam ValueType
 /// Type of the contained value, eg. f32, i32, f64.
-template<u64 DimensionCount, utility::FundamentalValue ValueType>
+template<u64 DimensionCount, utility::Fundamental ValueType>
 class VectorBase;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
+template<utility::Fundamental ValueType>
 class alignas( sizeof( ValueType ) * 2 ) VectorBase<2, ValueType>
 {
 public:
@@ -178,7 +178,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr auto operator==( VectorBase other ) const noexcept -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y );
 		}
@@ -191,7 +191,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr auto operator!=( VectorBase other ) const noexcept -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y );
 		}
@@ -206,7 +206,7 @@ public:
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
-		diagnostic::Throw( U"Index out of range" );
+		diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ public:
 	{
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
-		diagnostic::Throw( U"Index out of range" );
+		diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -264,7 +264,7 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
+template<utility::Fundamental ValueType>
 class VectorBase<3, ValueType>
 {
 public:
@@ -420,7 +420,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr auto operator==( VectorBase other ) const noexcept -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y ) && IsFloatEqual( z, other.z );
 		}
@@ -433,7 +433,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr auto operator!=( VectorBase other ) const noexcept -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y ) || !IsFloatEqual( z, other.z );
 		}
@@ -449,7 +449,7 @@ public:
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
 		if( index == 2 ) return z;
-		diagnostic::Throw( U"Index out of range" );
+		diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -458,7 +458,7 @@ public:
 		if( index == 0 ) return x;
 		if( index == 1 ) return y;
 		if( index == 2 ) return z;
-		diagnostic::Throw( U"Index out of range" );
+		diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -516,7 +516,7 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
+template<utility::Fundamental ValueType>
 class alignas( sizeof( ValueType ) * 4 ) VectorBase<4, ValueType>
 {
 public:
@@ -682,7 +682,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr auto operator==( VectorBase other ) const noexcept -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return IsFloatEqual( x, other.x ) && IsFloatEqual( y, other.y ) && IsFloatEqual( z, other.z ) && IsFloatEqual( w, other.w );
 		}
@@ -695,7 +695,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	constexpr auto operator!=( VectorBase other ) const noexcept -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return !IsFloatEqual( x, other.x ) || !IsFloatEqual( y, other.y ) || !IsFloatEqual( z, other.z ) || !IsFloatEqual( w, other.w );
 		}
@@ -712,7 +712,7 @@ public:
 		if( index == 1 ) return y;
 		if( index == 2 ) return z;
 		if( index == 3 ) return w;
-		diagnostic::Throw( U"Index out of range" );
+		diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -722,7 +722,7 @@ public:
 		if( index == 1 ) return y;
 		if( index == 2 ) return z;
 		if( index == 3 ) return w;
-		diagnostic::Throw( U"Index out of range" );
+		diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 #if defined( _WIN32 ) && !defined( _WIN64 )
 #error "32 bit systems are not supported"
 

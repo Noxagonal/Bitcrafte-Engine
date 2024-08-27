@@ -7,12 +7,16 @@
 
 #if defined( BITCRAFTE_PLATFORM_WINDOWS )
 #include <core/platform/windows/Windows.hpp>
+#undef GetMessage
 #elif defined( BITCRAFTE_PLATFORM_LINUX )
 #include <core/platform/linux/Linux.hpp>
 #else
 #error "Please add platform support here."
 #endif
-#include <core/conversion/text/text_format/TextFormat.hpp>
+
+#include <core/memory/pod_auto_buffer/PODAutoBuffer.hpp>
+
+#include <string>
 
 
 
@@ -153,22 +157,6 @@ auto PrintRecordColorToWCharANSIBackgroundColorCode( bc::diagnostic::PrintRecord
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-auto operator<<(
-	std::basic_ostream<char8_t>&			out,
-	const bc::internal_::SimpleTextView8&	in
-) -> std::basic_ostream<char8_t>&
-{
-	std::basic_ostringstream<char8_t> ss;
-	for( auto c : in )
-	{
-		ss << c;
-	}
-	return out << ss.str();
-}
-
-
-
 #if defined( BITCRAFTE_PLATFORM_WINDOWS )
 
 
@@ -179,12 +167,29 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 	i64									raw_text_length,
 	bc::diagnostic::PrintRecordColor	foreground_color,
 	bc::diagnostic::PrintRecordColor	background_color
-)
+) noexcept
 {
+	constexpr c16 conversion_error_message[] = u"UTF-16 conversion error while printing to console.";
+	constexpr i64 conversion_error_message_length = i64( std::char_traits<c16>::length( conversion_error_message ) );
+
 	if( raw_text_length <= 0 ) return;
 
-	auto text = bc::internal_::SimpleTextView8( raw_text, raw_text_length );
-	auto text_as_utf16 = conversion::ToUTF16( text );
+	memory::PODAutoBuffer<c16> text_as_utf16( std::max( raw_text_length + 1, conversion_error_message_length ) );
+	auto conversion_result = conversion::UTFConvert<c16>(
+		text_as_utf16.Data(),
+		text_as_utf16.Data() + text_as_utf16.Size(),
+		raw_text,
+		raw_text + raw_text_length
+	);
+	if( conversion_result.outcome == conversion::UTFConvertResult::Outcome::SUCCESS )
+	{
+		text_as_utf16[ conversion_result.code_unit_count ] = '\0';
+	}
+	else
+	{
+		std::copy( conversion_error_message, conversion_error_message + conversion_error_message_length, text_as_utf16.Data() );
+		text_as_utf16[ conversion_error_message_length ] = '\0';
+	}
 
 	auto lock_guard = std::lock_guard( print_mutex );
 
@@ -228,7 +233,7 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 
 	static_assert( sizeof( wchar_t ) == 2, "Wrong wchar_t size, this is Windows only." );
 
-	std::wcout << reinterpret_cast<const wchar_t*>( text_as_utf16.ToCStr() );
+	std::wcout << reinterpret_cast<const wchar_t*>( text_as_utf16.Data() );
 
 	SetConsoleTextAttribute( std_out_handle, old_attributes );
 
@@ -238,14 +243,14 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::internal_::SetupSystemConsole( i32 characters_per_line_num )
+void bc::diagnostic::internal_::SetupSystemConsole( i32 characters_per_line_num ) noexcept
 {
 	characters_per_line_num = SetupSystemConsole_SetCharactersPerLine( characters_per_line_num );
 
 	HANDLE std_out_handle = GetStdHandle( STD_OUTPUT_HANDLE );
 	if( std_out_handle == INVALID_HANDLE_VALUE )
 	{
-		// TODO: Figure out what to do if we cannot aquire a handle to system console.
+		// TODO: Figure out what to do if we cannot acquire a handle to system console.
 		return;
 	}
 
@@ -367,13 +372,47 @@ void bc::diagnostic::internal_::SystemConsolePrintRawUTF8(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void bc::diagnostic::SystemConsolePrint( const PrintRecord& print_record )
+void bc::diagnostic::SystemConsolePrint( const PrintRecord& print_record ) noexcept
 {
+	auto buffer = memory::PODAutoBuffer<c8>( 256 );
+	auto ConvertToUTF8InBuffer = [ &buffer ]( const char32_t* raw_text, i64 raw_text_length ) -> i64
+		{
+			constexpr c8 conversion_error_message[] = u8"UTF-8 conversion error while printing to console.";
+			constexpr i64 conversion_error_message_length = i64( std::char_traits<c8>::length( conversion_error_message ) );
+
+			if( raw_text == nullptr ) return 0;
+			if( raw_text_length <= 0 ) return 0;
+			if( raw_text_length * 4 > buffer.Size() )
+			{
+				buffer.Resize( raw_text_length * 4 * 2 );
+			}
+
+			auto conversion_result = conversion::UTFConvert<c8>(
+				buffer.Data(),
+				buffer.Data() + buffer.Size(),
+				raw_text,
+				raw_text + raw_text_length
+			);
+			if( conversion_result.outcome != conversion::UTFConvertResult::Outcome::SUCCESS )
+			{
+				std::copy( conversion_error_message, conversion_error_message + conversion_error_message_length, buffer.Data() );
+				buffer[ conversion_error_message_length ] = '\0';
+				return conversion_error_message_length;
+			}
+
+			buffer[ conversion_result.code_unit_count ] = '\0';
+			return conversion_result.code_unit_count;
+		};
+
 	auto finalized_print_record = print_record.GetFinalized();
-	for( const auto & s : finalized_print_record.GetSections() )
+	auto section_count = finalized_print_record.GetSectionCount();
+	for( i64 i = 0; i < section_count; ++i )
 	{
-		auto print_record_colors = diagnostic::GetPrintRecordThemeColors( s.theme );
-		SystemConsolePrint( s.text, print_record_colors.foreground_color, print_record_colors.background_color );
+		auto section = finalized_print_record.GetSection( i );
+		auto print_record_colors = diagnostic::GetPrintRecordThemeColors( section->GetTheme() );
+		auto message = section->GetMessage();
+		auto converted_length = ConvertToUTF8InBuffer( message.Data(), message.Size() );
+		internal_::SystemConsolePrintRawUTF8( buffer.Data(), converted_length, print_record_colors.foreground_color, print_record_colors.background_color);
 	}
 }
 

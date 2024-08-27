@@ -1,232 +1,235 @@
 #pragma once
 
-#include <core/containers/backend/ContainerBase.hpp>
-#include <core/diagnostic/assertion/HardAssert.hpp>
-
-#include <cuchar>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
+#include <core/data_types/FundamentalTypes.hpp>
+#include <core/utility/concepts/ContainerConcepts.hpp>
 
 
 
 namespace bc {
 namespace conversion {
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief
-/// Convert any text container type into a UTF-8 representation.
-///
-/// @tparam TextContainerType
-///	Generic text container type. May be a text container view, output will always be an memory backed text object.
-///
-/// @param text
-///	Container containing the text we want to convert to UTF-8.
-///
-/// @return
-/// Memory backed text container type similar to input type. Eg. If input type is bc::Text32, then return type is also
-/// bc::Text32, if input type is bc::TextView32 or bc::EditableTextView32, then return type is still also bc::Text32.
-/// Other text container types work in similar manner.
-template<utility::TextContainerView TextContainerType>
-auto ToUTF8(const TextContainerType& text )
+/// Result of UTF conversion.
+struct UTFConvertResult
 {
-	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<char8_t>;
-	using OutTextCharacterType = typename TextContainerType::ContainedCharacterType;
+	enum class Outcome : u8
+	{
+		SUCCESS,			///< The entire string was converted.
+		INCOMPLETE,			///< Partial success, not the entire text was converted because lack of space in output buffer.
+		ERROR,				///< Conversion may have completed to some extent but the utf string had error that prevent further conversion.
+	};
 
-	OutTextContainerType out;
-	out.Reserve( text.Size() * sizeof( OutTextCharacterType ) );
+	i64		code_unit_count;    ///< Output buffer size used (e.g, number of bytes for UTF-8, shorts for UTF-16, or words for UTF-32).
+	i64		code_point_count;   ///< Number of Unicode code points (characters) written to the output buffer. May be -1 if not calculated.
+	Outcome	outcome;			///< Conversion outcome, indicates if the conversion was successful.
+};
 
-	if constexpr( std::is_same_v<char, OutTextCharacterType> ) {
-		// From ASCII to UTF-8.
-		out.Append( text );
-
-	} else if constexpr( std::is_same_v<char8_t, OutTextCharacterType> ) {
-		// From UTF-8 to UTF-8.
-		out.Append( text );
-
-	} else if constexpr( std::is_same_v<char16_t, OutTextCharacterType> ) {
-		// From UTF-16 to UTF-8.
-		std::mbstate_t state {};
-		char c8_buffer[ MB_LEN_MAX ];
-
-		for( u64 i = 0; i < text.Size(); ++i ) {
-			char16_t c16 = text[ i ];
-			u64 c8_length = std::c16rtomb( c8_buffer, c16, &state );
-			if( c8_length != u64( -1 ) ) {
-				for( u64 c = 0; c < c8_length; ++c ) {
-					out.PushBack( c8_buffer[ c ] );
-				}
-			}
-		}
-
-
-	} else if constexpr( std::is_same_v<char32_t, OutTextCharacterType> ) {
-		// From UTF-32 to UTF-8.
-		std::mbstate_t state {};
-		char c8_buffer[ MB_LEN_MAX ];
-
-		for( u64 i = 0; i < text.Size(); ++i ) {
-			char32_t c32 = text[ i ];
-			u64 c8_length = std::c32rtomb( c8_buffer, c32, &state );
-			if( c8_length != u64( -1 ) ) {
-				for( u64 c = 0; c < c8_length; ++c ) {
-					out.PushBack( c8_buffer[ c ] );
-				}
-			}
-		}
-
-	} else {
-		assert( 0 && "Failed to convert to UTF32, not a valid character type" );
-	}
-
-	return out;
-}
+namespace internal_ {
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Convert any text container type into a UTF-16 representation.
-///
-/// @tparam TextContainerType
-///	Generic text container type. May be a text container view, output will always be an memory backed text object.
-///
-/// @param text
-///	Container containing the text we want to convert to UTF-16.
-///
-/// @return
-/// Memory backed text container type similar to input type. Eg. If input type is bc::Text32, then return type is also
-/// bc::Text32, if input type is bc::TextView32 or bc::EditableTextView32, then return type is still also bc::Text32.
-/// Other text container types work in similar manner.
-template<utility::TextContainerView TextContainerType>
-auto ToUTF16( const TextContainerType& text )
+static auto MakeUTFConvertResult(
+	i64							code_unit_count,
+	i64							code_point_count,
+	UTFConvertResult::Outcome	outcome
+) -> UTFConvertResult
 {
-	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<char16_t>;
-	using OutTextCharacterType = typename TextContainerType::ContainedCharacterType;
-
-	OutTextContainerType out;
-	out.Reserve( text.Size() * sizeof( OutTextCharacterType ) );
-
-	if constexpr( std::is_same_v<char, OutTextCharacterType> ) {
-		// From ASCII to UTF-16.
-		out.Append( text );
-
-	} else if constexpr( std::is_same_v<char8_t, OutTextCharacterType> ) {
-		// From UTF-8 to UTF-16.
-		std::mbstate_t state {};
-		char16_t c16 {};
-		auto data_in		= reinterpret_cast<const char*>( text.Data() );
-		auto data_in_end	= reinterpret_cast<const char*>( text.Data() + text.Size() );
-		while( data_in < data_in_end ) {
-			u64 read_length = std::mbrtoc16( &c16, data_in, text.Size(), &state );
-			if( read_length == 0 ) break;
-			if( read_length == u64( -1 ) ) break;
-			if( read_length == u64( -2 ) ) break;
-			out.PushBack( c16 );
-			data_in += read_length;
-		}
-
-	} else if constexpr( std::is_same_v<char16_t, OutTextCharacterType> ) {
-		// From UTF-16 to UTF-16.
-		out.Append( text );
-
-	} else if constexpr( std::is_same_v<char32_t, OutTextCharacterType> ) {
-		// From UTF-32 to UTF-16.
-		out = ToUTF16( ToUTF8( text ) );
-
-	} else {
-		assert( 0 && "Failed to convert to UTF32, not a valid character type" );
-	}
-
-	return out;
+	// Update this if UTFConvertResult changes.
+	return UTFConvertResult {
+		code_unit_count,
+		code_point_count,
+		outcome
+	};
 }
 
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @brief
-/// Convert any text container type into a UTF-32 representation.
-///
-/// @tparam TextContainerType
-///	Generic text container type. May be a text container view, output will always be an memory backed text object.
-///
-/// @param text
-///	Container containing the text we want to convert to UTF-32.
-///
-/// @return
-/// Memory backed text container type similar to input type. Eg. If input type is bc::Text32, then return type is also
-/// bc::Text32, if input type is bc::TextView32 or bc::EditableTextView32, then return type is still also bc::Text32.
-/// Other text container types work in similar manner.
-template<utility::TextContainerView TextContainerType>
-auto ToUTF32( const TextContainerType& text )
-{
-	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<char32_t>;
-	using OutTextCharacterType = typename TextContainerType::ContainedCharacterType;
-
-	OutTextContainerType out;
-	out.Reserve( text.Size() * sizeof( OutTextCharacterType ) );
-
-	if constexpr( std::is_same_v<char, OutTextCharacterType> ) {
-		// From ASCII to UTF-32.
-		out.Append( text );
-
-	} else if constexpr( std::is_same_v<char8_t, OutTextCharacterType> ) {
-		// From UTF-8 to UTF-32.
-		std::mbstate_t state {};
-		char32_t c32 {};
-		auto data_in		= reinterpret_cast<const char*>( text.Data() );
-		auto data_in_end	= reinterpret_cast<const char*>( text.Data() + text.Size() );
-		while( data_in < data_in_end ) {
-			u64 read_length = std::mbrtoc32( &c32, data_in, text.Size(), &state );
-			BHardAssert( read_length != u64( -3 ), U"Failed to convert to UTF32, corrupt UTF text, UTF-32 does not have surrogates" );
-			if( read_length == 0 ) break;
-			if( read_length == u64( -1 ) ) break;
-			if( read_length == u64( -2 ) ) break;
-			out.PushBack( c32 );
-			data_in += read_length;
-		}
-
-	} else if constexpr( std::is_same_v<char16_t, OutTextCharacterType> ) {
-		// From UTF-16 to UTF-32.
-		out = ToUTF32( ToUTF8( text ) );
-
-	} else if constexpr( std::is_same_v<char32_t, OutTextCharacterType> ) {
-		// From UTF-32 to UTF-32.
-		out.Append( text );
-
-	} else {
-		assert( 0 && "Failed to convert to UTF32, not a valid character type" );
-	}
-
-	return out;
-}
-
-
-
-// TODO: Convert all char8_t, char16_t, char32_t to c8, c16, c32.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
-	utility::TextContainerCharacterType			OutTextCharacterType,
-	utility::TextContainerView					TextContainerType
+	utility::TextCharacter	ToCharacterType,
+	utility::TextCharacter	FromCharacterType
 >
-auto											ToUTF(
-	const TextContainerType					&	text
-)
+auto UTFCopy(
+	ToCharacterType*			output_string_begin,
+	ToCharacterType*			output_string_end,
+	const FromCharacterType*	source_string_begin,
+	const FromCharacterType*	source_string_end
+) -> UTFConvertResult
 {
-	using OutTextContainerType = typename TextContainerType::template ThisContainerFullType<OutTextCharacterType>;
-
-	if constexpr( std::is_same_v<OutTextCharacterType, c8> ) {
-		return ToUTF8( text );
-	} else if constexpr( std::is_same_v<OutTextCharacterType, c16> ) {
-		return ToUTF16( text );
-	} else if constexpr( std::is_same_v<OutTextCharacterType, c32> ) {
-		return ToUTF32( text );
-	} else {
-		[]<bool Check = false>() {
-			static_assert(Check, "Failed to convert to UTF, not a valid character type");
-		}();
-		return OutTextContainerType {};
+	auto output_size = output_string_end - output_string_begin;
+	auto source_size = source_string_end - source_string_begin;
+	auto copy_size = std::min( output_size, source_size );
+	for( i64 i = 0; i < copy_size; ++i )
+	{
+		output_string_begin[ i ] = static_cast<ToCharacterType>( source_string_begin[ i ] );
 	}
+	return internal_::MakeUTFConvertResult(
+		copy_size,
+		-1, // Code point count may differ from code unit count, but I don't think it's worth calculating it, might remove this field. Leaving as -1 as an unknown. 
+		( output_size < source_size ) ? UTFConvertResult::Outcome::INCOMPLETE : UTFConvertResult::Outcome::SUCCESS
+	);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+auto UTFC16ToC8(
+	c8*			output_string_begin,
+	c8*			output_string_end,
+	const c16*	source_string_begin,
+	const c16*	source_string_end
+) -> UTFConvertResult;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+auto UTFC32ToC8(
+	c8*			output_string_begin,
+	c8*			output_string_end,
+	const c32*	source_string_begin,
+	const c32*	source_string_end
+) -> UTFConvertResult;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+auto UTFC8ToC16(
+	c16*		output_string_begin,
+	c16*		output_string_end,
+	const c8*	source_string_begin,
+	const c8*	source_string_end
+) -> UTFConvertResult;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+auto UTFC32ToC16(
+	c16*		output_string_begin,
+	c16*		output_string_end,
+	const c32*	source_string_begin,
+	const c32*	source_string_end
+) -> UTFConvertResult;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+auto UTFC8ToC32(
+	c32*		output_string_begin,
+	c32*		output_string_end,
+	const c8*	source_string_begin,
+	const c8*	source_string_end
+) -> UTFConvertResult;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+auto UTFC16ToC32(
+	c32*		output_string_begin,
+	c32*		output_string_end,
+	const c16*	source_string_begin,
+	const c16*	source_string_end
+) -> UTFConvertResult;
+
+
+
+} // namespace internal_
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	utility::TextCharacter	ToCharacterType,
+	utility::TextCharacter	FromCharacterType
+>
+auto UTFConvert(
+	ToCharacterType*			output_string_begin,
+	ToCharacterType*			output_string_end,
+	const FromCharacterType*	source_string_begin,
+	const FromCharacterType*	source_string_end
+) -> UTFConvertResult
+{
+	auto output_size = output_string_end - output_string_begin;
+	auto source_size = source_string_end - source_string_begin;
+
+	if( output_size <= 0 )
+	{
+		return internal_::MakeUTFConvertResult(
+			0,
+			0,
+			( source_size > 0 ) ? UTFConvertResult::Outcome::SUCCESS : UTFConvertResult::Outcome::ERROR
+		);
+	}
+
+	if constexpr( utility::SameAs<ToCharacterType, FromCharacterType> || utility::SameAs<FromCharacterType, char> )
+	{
+		// same type	-> same type
+		// char			-> any type
+		return internal_::UTFCopy(
+			output_string_begin,
+			output_string_end,
+			source_string_begin,
+			source_string_end
+		);
+	}
+	else if constexpr( utility::SameAs<ToCharacterType, c8> && utility::SameAs<FromCharacterType, c16> )
+	{
+		// c16 -> c8
+		return internal_::UTFC16ToC8(
+			output_string_begin,
+			output_string_end,
+			source_string_begin,
+			source_string_end
+		);
+	}
+	else if constexpr( utility::SameAs<ToCharacterType, c8> && utility::SameAs<FromCharacterType, c32> )
+	{
+		// c32 -> c8
+		return internal_::UTFC32ToC8(
+			output_string_begin,
+			output_string_end,
+			source_string_begin,
+			source_string_end
+		);
+	}
+	else if constexpr( utility::SameAs<ToCharacterType, c16> && utility::SameAs<FromCharacterType, c8> )
+	{
+		// c8 -> c16
+		return internal_::UTFC8ToC16(
+			output_string_begin,
+			output_string_end,
+			source_string_begin,
+			source_string_end
+		);
+	}
+	else if constexpr( utility::SameAs<ToCharacterType, c16> && utility::SameAs<FromCharacterType, c32> )
+	{
+		// c32 -> c16
+		return internal_::UTFC32ToC16(
+			output_string_begin,
+			output_string_end,
+			source_string_begin,
+			source_string_end
+		);
+	}
+	else if constexpr( utility::SameAs<ToCharacterType, c32> && utility::SameAs<FromCharacterType, c8> )
+	{
+		// c8 -> c32
+		return internal_::UTFC8ToC32(
+			output_string_begin,
+			output_string_end,
+			source_string_begin,
+			source_string_end
+		);
+	}
+	else if constexpr( utility::SameAs<ToCharacterType, c32> && utility::SameAs<FromCharacterType, c16> )
+	{
+		// c16 -> c32
+		return internal_::UTFC16ToC32(
+			output_string_begin,
+			output_string_end,
+			source_string_begin,
+			source_string_end
+		);
+	}
+
+	return internal_::MakeUTFConvertResult(
+		0,
+		0,
+		UTFConvertResult::Outcome::ERROR
+	);
 }
 
 

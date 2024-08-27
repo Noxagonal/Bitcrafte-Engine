@@ -11,7 +11,7 @@ void bc::memory::internal_::FreeRawMemory_Runtime( void* location ) noexcept
 	if( location == nullptr ) return;
 
 	auto allocation_header = GetMemoryAllocationHeaderFromUserPointer( location );
-	BHardAssert( allocation_header, "Couldn't free runtime memory, memory pointer was not allocated from bc::memory utilities" );
+	BHardAssert( allocation_header, U"Couldn't free runtime memory, memory pointer was not allocated from bc::memory utilities" );
 
 	// TODO: Free from memory pool once it's implemented.
 	delete[] reinterpret_cast<u8*>( allocation_header->system_allocated_location );
@@ -33,7 +33,10 @@ auto bc::memory::internal_::AllocateRawMemory_Runtime(
 	// TODO: Allocate from memory pool once it's implemented.
 	auto system_ptr = new u8[ minimum_required_allocation_size ];
 	if( system_ptr == nullptr ) std::abort();
-	BHardAssert( ( reinterpret_cast<uintptr_t>( system_ptr ) & 0xFFFF000000000000ULL ) == 0ULL, "Allocated memory from system needs to have high 16 bits unused" );
+	BHardAssert(
+		( reinterpret_cast<uintptr_t>( system_ptr ) & 0xFFFF000000000000ULL ) == 0ULL,
+		U"Allocated memory from system needs to have high 16 bits unused"
+	);
 
 	auto allocation_header = CreateMemoryAllocationHeader(
 		system_ptr,
@@ -57,7 +60,7 @@ auto bc::memory::internal_::ReallocateRawMemory_Runtime(
 	auto old_allocation_info = GetMemoryAllocationHeaderFromUserPointer( old_location );
 	BHardAssert( old_allocation_info, "Couldn't reallocate runtime memory, old memory pointer was not allocated from bc::memory utilities" );
 
-	auto old_size								= old_allocation_info->payload_size;
+	auto old_size = old_allocation_info->payload_size;
 
 	// This checks if the allocation has enough payload space remaining at the end to accommodate new payload size, in this case
 	// we can just recalculate the allocation info struct and return the old pointer.

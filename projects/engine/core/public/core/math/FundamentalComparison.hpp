@@ -1,7 +1,7 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/math/SmallValues.hpp>
 
 #include <concepts>
@@ -26,9 +26,9 @@ namespace math {
 /// @param range
 /// Maximum distance between values for them to still be considered within range.
 constexpr auto AreValuesWithinRange(
-	utility::FundamentalValue auto		v1,
-	utility::FundamentalValue auto		v2,
-	utility::FundamentalValue auto		range
+	utility::Fundamental auto		v1,
+	utility::Fundamental auto		v2,
+	utility::Fundamental auto		range
 ) noexcept -> bool
 {
 	static_assert( std::same_as<decltype( v1 ), decltype( v2 )> && std::same_as<decltype( v1 ), decltype( range )>, "Value types must be same" );
@@ -47,8 +47,8 @@ constexpr auto AreValuesWithinRange(
 /// @param v2
 /// Value to test against v1 if it is close enough to it.
 constexpr auto IsFloatEqual(
-	utility::FloatingPointValue auto	v1,
-	utility::FloatingPointValue auto	v2
+	utility::FloatingPoint auto		v1,
+	utility::FloatingPoint auto		v2
 ) noexcept -> bool
 {
 	static_assert( std::same_as<decltype( v1 ), decltype( v2 )>, "Value types must be same" );

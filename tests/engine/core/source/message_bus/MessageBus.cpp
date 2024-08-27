@@ -274,7 +274,7 @@ TEST( MessageBus, ThrowingHandlerConstructor )
 	struct ThrowingMessageHandler : public NonThrowingMessageHandler_A
 	{
 		ThrowingMessageHandler() {
-			throw diagnostic::Exception( "ThrowingHandlerConstructor" );
+			throw diagnostic::Exception( U"ThrowingHandlerConstructor" );
 		}
 	};
 

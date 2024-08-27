@@ -1,7 +1,6 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <core/utility/concepts/ValueConcepts.hpp>
 #include <core/math/SmallValues.hpp>
 #include <core/math/Vector.hpp>
 
@@ -17,13 +16,13 @@ namespace math {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<u64 MatrixDimensions, utility::FundamentalValue ValueType>
+template<u64 MatrixDimensions, utility::Fundamental ValueType>
 class MatrixBase;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
+template<utility::Fundamental ValueType>
 class alignas( sizeof( ValueType ) * 2 * 2 ) MatrixBase<2, ValueType>
 {
 public:
@@ -179,7 +178,7 @@ public:
 		if( index == 1 ) return column_2;
 		if( !std::is_constant_evaluated() )
 		{
-			diagnostic::Throw( U"Index out of range" );
+			diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 		}
 		return column_1;
 	}
@@ -191,7 +190,7 @@ public:
 		if( index == 1 ) return column_2;
 		if( !std::is_constant_evaluated() )
 		{
-			diagnostic::Throw( U"Index out of range" );
+			diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 		}
 		return column_1;
 	}
@@ -224,7 +223,7 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
+template<utility::Fundamental ValueType>
 class MatrixBase<3, ValueType>
 {
 public:
@@ -303,7 +302,7 @@ public:
 	{}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr operator=( const MatrixBase& other ) noexcept -> MatrixBase&
+	constexpr auto operator=( const MatrixBase& other ) noexcept -> MatrixBase&
 	{
 		Copy( other );
 		return *this;
@@ -394,7 +393,7 @@ public:
 		if( index == 2 ) return column_3;
 		if( !std::is_constant_evaluated() )
 		{
-			diagnostic::Throw( U"Index out of range" );
+			diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 		}
 		return column_1;
 	}
@@ -407,7 +406,7 @@ public:
 		if( index == 2 ) return column_3;
 		if( !std::is_constant_evaluated() )
 		{
-			diagnostic::Throw( U"Index out of range" );
+			diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 		}
 		return column_1;
 	}
@@ -442,7 +441,7 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<utility::FundamentalValue ValueType>
+template<utility::Fundamental ValueType>
 class alignas( sizeof( ValueType ) * 4 * 4 ) MatrixBase<4, ValueType>
 {
 public:
@@ -625,7 +624,7 @@ public:
 		if( index == 3 ) return column_4;
 		if( !std::is_constant_evaluated() )
 		{
-			diagnostic::Throw( U"Index out of range" );
+			diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 		}
 		return column_1;
 	}
@@ -639,7 +638,7 @@ public:
 		if( index == 3 ) return column_4;
 		if( !std::is_constant_evaluated() )
 		{
-			diagnostic::Throw( U"Index out of range" );
+			diagnostic::Throw( diagnostic::Exception( U"Index out of range" ) );
 		}
 		return column_1;
 	}

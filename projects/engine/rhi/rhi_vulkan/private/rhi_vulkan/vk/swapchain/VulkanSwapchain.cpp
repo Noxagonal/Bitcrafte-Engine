@@ -53,7 +53,7 @@ bc::rhi::VulkanSwapchain::VulkanSwapchain(
 			image_count = std::max( image_count, surface_capabilities.minImageCount );
 			if( image_count == 0 )
 			{
-				diagnostic::Throw( U"Failed to acquire Vulkan swapchain image count" );
+				diagnostic::Throw( diagnostic::Exception( U"Failed to acquire Vulkan swapchain image count" ) );
 			}
 			return image_count;
 		};

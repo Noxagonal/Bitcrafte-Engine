@@ -2,6 +2,8 @@
 
 #include <vulkan/vulkan.h>
 #include <vulkan/vk_enum_string_helper.h>
+#include <core/diagnostic/assertion/Assert.hpp>
+#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 
 
 

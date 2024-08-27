@@ -65,6 +65,8 @@ struct LoggerCreateInfo
 	///
 	/// Useful mostly when running tests as it keeps the console clean and takes a whole equation out of the test path.
 	bool						disabled								= false;
+
+	i64							log_history_size						= 1024 * 2;
 };
 
 

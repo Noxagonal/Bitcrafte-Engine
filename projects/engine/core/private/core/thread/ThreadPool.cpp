@@ -84,7 +84,7 @@ static void ThreadPoolWorker(
 			}
 			catch( ... )
 			{
-				ReportException( bc::diagnostic::Exception{ "Unknown exception thrown in thread" } );
+				ReportException( bc::diagnostic::Exception{ U"Unknown exception thrown in thread" } );
 				return false;
 			}
 			return true;
@@ -131,7 +131,7 @@ static void ThreadPoolWorker(
 			}
 			catch( ... )
 			{
-				ReportException( bc::diagnostic::Exception{ "Unknown exception thrown in thread" } );
+				ReportException( bc::diagnostic::Exception{ U"Unknown exception thrown in thread" } );
 				break;
 			}
 
@@ -312,7 +312,7 @@ void bc::thread::ThreadPool::WaitIdle()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 auto bc::thread::ThreadPool::DoAddTask( UniquePtr<Task>&& new_task ) -> u64
 {
-	BHardAssert( !shutting_down, "Failed to schedule task, trying to add tasks while shutting down the thread pool" );
+	BHardAssert( !shutting_down, U"Failed to schedule task, trying to add tasks while shutting down the thread pool" );
 	if( thread_shared_data->thread_exception_raised )
 	{
 		return 0;
@@ -329,9 +329,9 @@ auto bc::thread::ThreadPool::DoAddTask( UniquePtr<Task>&& new_task ) -> u64
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 auto bc::thread::ThreadPool::DoAddThread( UniquePtr<ThreadDescription>&& thread_description ) -> ThreadIdentifier
 {
-	BHardAssert( !shutting_down, "Cannot add thread, trying to add threads while shutting down the thread pool" );
-	BHardAssert( GetTaskQueueCount() == 0, "Cannot remove thread, threads cannot be removed when there are any tasks queued" );
-	BHardAssert( std::this_thread::get_id() == main_thread_id, "Cannot add thread, threads can only be added by the main thread" );
+	BHardAssert( !shutting_down, U"Cannot add thread, trying to add threads while shutting down the thread pool" );
+	BHardAssert( GetTaskQueueCount() == 0, U"Cannot remove thread, threads cannot be removed when there are any tasks queued" );
+	BHardAssert( std::this_thread::get_id() == main_thread_id, U"Cannot add thread, threads can only be added by the main thread" );
 
 	thread_description->state			= WorkerThreadState::UNINITIALIZED;
 	thread_description->ready_to_join	= false;
@@ -352,7 +352,7 @@ auto bc::thread::ThreadPool::DoAddThread( UniquePtr<ThreadDescription>&& thread_
 	}
 	if( thread_description_ptr->state == WorkerThreadState::INITIALIZATION_ERROR )
 	{
-		auto exception = diagnostic::Exception{ "Failed to start thread pool thread" };
+		auto exception = diagnostic::Exception{ U"Failed to start thread pool thread" };
 		exception.SetNextException( thread_shared_data->thread_exception );
 
 		EvacuateThreads();
@@ -365,9 +365,9 @@ auto bc::thread::ThreadPool::DoAddThread( UniquePtr<ThreadDescription>&& thread_
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::thread::ThreadPool::DoRemoveThread( ThreadIdentifier thread_id )
 {
-	BHardAssert( !shutting_down, "Cannot remove thread, trying to remove threads while shutting down the thread pool" );
-	BHardAssert( GetTaskQueueCount() == 0, "Cannot remove thread, threads cannot be removed when there are any tasks queued" );
-	BHardAssert( std::this_thread::get_id() == main_thread_id, "Cannot remove thread, threads can only be removed by the main thread" );
+	BHardAssert( !shutting_down, U"Cannot remove thread, trying to remove threads while shutting down the thread pool" );
+	BHardAssert( GetTaskQueueCount() == 0, U"Cannot remove thread, threads cannot be removed when there are any tasks queued" );
+	BHardAssert( std::this_thread::get_id() == main_thread_id, U"Cannot remove thread, threads can only be removed by the main thread" );
 
 	// Find the thread from thread description list.
 	auto thread = std::find_if( thread_description_list.begin(), thread_description_list.end(),
@@ -415,7 +415,7 @@ void bc::thread::ThreadPool::CheckAndHandleThreadThrow()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void bc::thread::ThreadPool::EvacuateThreads()
 {
-	BHardAssert( std::this_thread::get_id() == main_thread_id, "Cannot evacuate threads, threads can only be evacuated by the main thread" );
+	BHardAssert( std::this_thread::get_id() == main_thread_id, U"Cannot evacuate threads, threads can only be evacuated by the main thread" );
 
 	thread_shared_data->threads_should_exit = true;
 	while( std::any_of( thread_description_list.begin(), thread_description_list.end(), [](const auto & thread_description) { return !thread_description->ready_to_join.load(); }) )

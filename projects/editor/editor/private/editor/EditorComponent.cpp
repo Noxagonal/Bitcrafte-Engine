@@ -42,7 +42,7 @@ bc::editor::EditorComponent::EditorComponent()
 	auto core_create_info = CoreComponentCreateInfo {};
 	core_create_info.logger_create_info.minimum_report_severity			= bc::diagnostic::LogReportSeverity::VERBOSE;
 	core_create_info.logger_create_info.minimum_display_severity		= bc::diagnostic::LogReportSeverity::VERBOSE;
-	core_create_info.logger_create_info.print_to_system_console	= true;
+	core_create_info.logger_create_info.print_to_system_console			= true;
 	core = std::make_unique<CoreComponent>( core_create_info );
 
 	try
@@ -64,7 +64,6 @@ bc::editor::EditorComponent::EditorComponent()
 		engine_create_info.rhi_create_info.enable_debug = true;
 		engine_create_info.rhi_create_info.minimum_debug_level = rhi::RHIDebugLevel::WARNING;
 		engine = MakeUniquePtr<engine::EngineComponent>( engine_create_info );
-
 
 		{
 			auto gpus = engine->GetRHIComponent()->GetGraphicsCardList();
@@ -94,8 +93,9 @@ bc::editor::EditorComponent::EditorComponent()
 	}
 	catch( const diagnostic::Exception & exception )
 	{
+		core->GetLogger()->LogCriticalError( U"Exception caught while constructing editor" );
 		core->GetLogger()->LogCriticalError( exception.GetMessage() );
-		bc::diagnostic::Panic( "Exception caught while constructing editor" );
+		bc::diagnostic::Panic();
 	}
 }
 

@@ -158,8 +158,8 @@ public:
 		if( packet_index == std::numeric_limits<u64>::max() ) return nullptr; // Packet not found.
 		BAssert(
 			message_packet_type_index_list[ packet_index ] == MessagePacketTypeList::template TypeToIndex<MessageBusPacketType>(),
-			"Message bus packet found, but its type does not match, packet cannot be claimed until the correct type is given to "
-			"MessageBus::ClaimPacket<Type>(), packet will remain in the bus."
+			U"Message bus packet found, but its type does not match, packet cannot be claimed until the correct type is given to "
+			U"MessageBus::ClaimPacket<Type>(), packet will remain in the bus."
 		);
 		auto packet = std::move( message_packet_list[ packet_index ] );
 		ErasePacketSlot( packet_index );

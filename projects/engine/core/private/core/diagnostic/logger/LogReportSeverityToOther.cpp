@@ -5,7 +5,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-auto bc::diagnostic::LogReportSeverityToText( bc::diagnostic::LogReportSeverity e ) -> bc::internal_::SimpleTextView32
+auto bc::diagnostic::LogReportSeverityToCString( bc::diagnostic::LogReportSeverity e ) noexcept -> const c32*
 {
 	switch( e )
 	{
@@ -33,7 +33,7 @@ auto bc::diagnostic::LogReportSeverityToText( bc::diagnostic::LogReportSeverity 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-auto bc::diagnostic::LogReportSeverityToPrintRecordTheme( LogReportSeverity e ) -> PrintRecordTheme
+auto bc::diagnostic::LogReportSeverityToPrintRecordTheme( LogReportSeverity e ) noexcept -> PrintRecordTheme
 {
 	switch( e )
 	{

@@ -18,7 +18,7 @@ namespace math {
 ///
 /// @param value
 /// Value to round.
-constexpr auto RoundToCeiling( utility::FloatingPointValue auto value )
+constexpr auto RoundToCeiling( utility::FloatingPoint auto value )
 {
 	return std::ceil( value );
 }
@@ -29,7 +29,7 @@ constexpr auto RoundToCeiling( utility::FloatingPointValue auto value )
 ///
 /// @param value
 /// Value to round.
-constexpr auto RoundToFloor( utility::FloatingPointValue auto value )
+constexpr auto RoundToFloor( utility::FloatingPoint auto value )
 {
 	return std::floor( value );
 }
@@ -40,7 +40,7 @@ constexpr auto RoundToFloor( utility::FloatingPointValue auto value )
 ///
 /// @param value
 /// Value to round.
-constexpr auto RoundToClosest( utility::FloatingPointValue auto value )
+constexpr auto RoundToClosest( utility::FloatingPoint auto value )
 {
 	return std::round( value );
 }
@@ -51,7 +51,7 @@ constexpr auto RoundToClosest( utility::FloatingPointValue auto value )
 ///
 /// @param value
 /// Value to round.
-constexpr auto Truncate( utility::FloatingPointValue auto value )
+constexpr auto Truncate( utility::FloatingPoint auto value )
 {
 	return std::trunc( value );
 }

@@ -1,8 +1,125 @@
 #pragma once
 
-#include <core/diagnostic/assertion/Assert.hpp>
-#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
+#include <core/containers/backend/ContainerBase.hpp>
 
-#define BC_CONTAINER_IMPLEMENTATION_NORMAL 1
-#include <core/containers/backend/PairImplNormal.hpp>
-#undef BC_CONTAINER_IMPLEMENTATION_NORMAL
+
+
+namespace bc {
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename FirstType, typename SecondType>
+class Pair
+{
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	using Base								= void;
+	using FirstContainedType				= FirstType;
+	using SecondContainedType				= SecondType;
+	using ContainedKeyType					= FirstType;
+	using ContainedValueType				= SecondType;
+
+	template<typename OtherFirstType, typename OtherSecondType>
+	using ThisContainerType					= Pair<OtherFirstType, OtherSecondType>;
+	using ThisType							= ThisContainerType<FirstType, SecondType>;
+
+	using ThisContainerViewType				= void;
+	using ThisViewType						= void;
+
+	template<typename OtherFirstType, typename OtherSecondType>
+	using ThisContainerFullType				= Pair<OtherFirstType, OtherSecondType>;
+	using ThisFullType						= ThisContainerFullType<FirstType, SecondType>;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	FirstType																							first;
+	SecondType																							second;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Pair() = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Pair( const ThisType& other ) = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Pair( ThisType&&	other ) noexcept = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Pair(
+		const FirstType&	first,
+		const SecondType&	second
+	)
+		requires( std::is_copy_constructible_v<FirstType> && std::is_copy_constructible_v<SecondType> )
+	:
+		first( first ),
+		second( second )
+	{}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Pair(
+		const FirstType&	first,
+		SecondType&&		second
+	)
+		requires( std::is_copy_constructible_v<FirstType> && std::is_move_constructible_v<SecondType> )
+	:
+		first( first ),
+		second( std::move( second ) )
+	{}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Pair(
+		FirstType&&			first,
+		const SecondType&	second
+	)
+		requires( std::is_move_constructible_v<FirstType> && std::is_copy_constructible_v<SecondType> )
+	:
+		first( std::move( first ) ),
+		second( second )
+	{}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr Pair(
+		FirstType&&			first,
+		SecondType&&		second
+	) noexcept
+		requires( std::is_move_constructible_v<FirstType> && std::is_move_constructible_v<SecondType> )
+	:
+		first( std::move( first ) ),
+		second( std::move( second ) )
+	{}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr auto operator=( const ThisType& other )->ThisType & = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr auto operator=( ThisType&& other ) noexcept -> ThisType & = default;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr auto operator==( const ThisType& other ) const noexcept -> bool
+	{
+		return this->first == other.first && this->second == other.second;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr auto operator!=( const ThisType& other ) const noexcept -> bool
+	{
+		return this->first != other.first || this->second != other.second;
+	}
+};
+
+
+
+#if BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+namespace tests {
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Check if pair container fulfills size requirements.
+static_assert( sizeof( Pair<u32, u32> ) == ( sizeof( u32 ) + sizeof( u32 ) ) );
+
+} // tests
+#endif // BITCRAFTE_ENGINE_DEVELOPMENT_BUILD
+
+
+
+} // bc

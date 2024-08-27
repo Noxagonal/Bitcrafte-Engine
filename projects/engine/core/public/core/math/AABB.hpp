@@ -2,7 +2,7 @@
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
 
-#include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/math/Vector.hpp>
 #include <core/math/VectorComparison.hpp>
 #include <core/diagnostic/exception/Exception.hpp>
@@ -32,7 +32,7 @@ namespace math {
 /// Value type of this bounding box.
 template<
 	u64							AABBDimensionCount,
-	utility::FundamentalValue	ValueType
+	utility::Fundamental	ValueType
 >
 class AABBBase
 {
@@ -108,7 +108,7 @@ public:
 	/// True if AABBs match or in case of floating point value types, matches closely. False otherwise.
 	constexpr auto operator==( const AABBBase& other ) const -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return IsFloatEqual( begin, other.begin ) && IsFloatEqual( end, other.end );
 		}
@@ -133,7 +133,7 @@ public:
 	/// AABBs match, or match closely enough to be within rounding errors.
 	constexpr auto operator!=( const AABBBase& other ) const -> bool
 	{
-		if constexpr( utility::FloatingPointValue<ValueType> )
+		if constexpr( utility::FloatingPoint<ValueType> )
 		{
 			return !IsFloatEqual( begin, other.begin ) || !IsFloatEqual( end, other.end );
 		}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <build_configuration/BuildConfigurationComponent.hpp>
-#include <core/utility/concepts/ValueConcepts.hpp>
+#include <core/utility/concepts/TypeTraitConcepts.hpp>
 #include <core/math/SmallValues.hpp>
 #include <core/math/FundamentalComparison.hpp>
 #include <core/math/Vector.hpp>
@@ -27,8 +27,8 @@ namespace math {
 /// Maximum distance between values for them to still be considered within range.
 template<
 	u64							VectorLength,
-	utility::FundamentalValue	VectorValueType,
-	utility::FundamentalValue	RangeValueType
+	utility::Fundamental	VectorValueType,
+	utility::Fundamental	RangeValueType
 >
 constexpr auto AreValuesWithinRange(
 	const math::VectorBase<VectorLength, VectorValueType>&	v1,
@@ -84,7 +84,7 @@ constexpr auto AreValuesWithinRange(
 /// Value to test against v1 if it is close enough to it.
 template<
 	u64							VectorLength,
-	utility::FundamentalValue	VectorValueType
+	utility::Fundamental	VectorValueType
 >
 constexpr auto IsFloatEqual(
 	const math::VectorBase<VectorLength, VectorValueType>&	v1,

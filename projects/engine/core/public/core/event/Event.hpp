@@ -90,7 +90,7 @@ public:
 	///	Event to signal when this event is signalled.
 	void RegisterObserver( Event* event )
 	{
-		BAssert( listeners.Find( event ) == listeners.end(), "tried registering same observer twice to the same event" );
+		BAssert( listeners.Find( event ) == listeners.end(), U"tried registering same observer twice to the same event" );
 		#if BITCRAFTE_GAME_DEVELOPMENT_BUILD
 		// Returns true if this is found in any of the other events.
 		auto FindCircularDependencies = []( Event<EventSignalTypePack...> * self, Event<EventSignalTypePack...> * event ) -> bool
@@ -117,8 +117,8 @@ public:
 			};
 			return recursive( recursive, event );
 		};
-		BAssert( !FindCircularDependencies( this, event ), "Failed to register an observer to an event, circular registration of listeners" );
-		BAssert( !FindDoubleDependencies( this, event ), "Failed to register an observer to an event, double registration of observer" );
+		BAssert( !FindCircularDependencies( this, event ), U"Failed to register an observer to an event, circular registration of listeners" );
+		BAssert( !FindDoubleDependencies( this, event ), U"Failed to register an observer to an event, double registration of observer" );
 		#endif
 
 		listeners.PushBack( event );

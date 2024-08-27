@@ -47,7 +47,7 @@ public:
 	ThreadDescription( const ThreadDescription& other ) = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	inline ThreadDescription( ThreadDescription&& other )
+	inline ThreadDescription( ThreadDescription&& other ) noexcept
 	{
 		auto lock_guard = std::lock_guard( other.modify_mutex );
 		Swap( other );
@@ -57,7 +57,7 @@ public:
 	auto operator=( const ThreadDescription& other ) -> ThreadDescription& = delete;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	auto operator=( ThreadDescription&& other ) -> ThreadDescription&
+	auto operator=( ThreadDescription&& other ) noexcept -> ThreadDescription&
 	{
 		std::lock( modify_mutex, other.modify_mutex );
 		auto my_lock_guard = std::lock_guard( modify_mutex, std::adopt_lock );
@@ -95,7 +95,7 @@ private:
 	/// Swaps two atomic values.
 	///
 	/// @warning
-	/// Internal use only. Assumes that the mutexes are locked and does not verify that atomic exhanges are actually atomic.
+	/// Internal use only. Assumes that the mutexes are locked and does not verify that atomic exchanges are actually atomic.
 	template<typename Type>
 	void AtomicSwap(
 		std::atomic<Type>&	left,

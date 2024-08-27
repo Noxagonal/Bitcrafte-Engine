@@ -50,10 +50,10 @@ TEST( CoreResourceSerializationJSON, SerializePrimitives )
 	bc::serialization::JSONSerialization<uint64_t>::Serialize( root, "data_u64", data_u64, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
 	bc::serialization::JSONSerialization<int64_t>::Serialize( root, "data_s64", data_s64, bc::conversion::IntegerToTextConversionFormat::DECIMAL );
 
-	bc::serialization::JSONSerialization<float>::Serialize( root, "data_f32p", data_f32p, bc::conversion::FloatToTextConversionFormat::GENERAL );
-	bc::serialization::JSONSerialization<float>::Serialize( root, "data_f32n", data_f32n, bc::conversion::FloatToTextConversionFormat::GENERAL );
-	bc::serialization::JSONSerialization<double>::Serialize( root, "data_f64p", data_f64p, bc::conversion::FloatToTextConversionFormat::GENERAL );
-	bc::serialization::JSONSerialization<double>::Serialize( root, "data_f64n", data_f64n, bc::conversion::FloatToTextConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<float>::Serialize( root, "data_f32p", data_f32p, bc::conversion::FloatToStringConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<float>::Serialize( root, "data_f32n", data_f32n, bc::conversion::FloatToStringConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<double>::Serialize( root, "data_f64p", data_f64p, bc::conversion::FloatToStringConversionFormat::GENERAL );
+	bc::serialization::JSONSerialization<double>::Serialize( root, "data_f64n", data_f64n, bc::conversion::FloatToStringConversionFormat::GENERAL );
 
 	auto & child_entries = root->GetChildEntries();
 

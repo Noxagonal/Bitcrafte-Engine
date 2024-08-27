@@ -5,33 +5,24 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BITCRAFTE_ENGINE_API
 auto bc::diagnostic::MakePrintRecord(
-	bc::internal_::SimpleTextView32		text,
-	bc::diagnostic::PrintRecordTheme	theme
-) -> PrintRecord
+	const c32*			c_string,
+	i64					length,
+	PrintRecordTheme	theme
+) noexcept -> PrintRecord
 {
 	using namespace bc::diagnostic;
 
 	auto record = PrintRecord {};
 	auto new_section = PrintRecordSection {};
-	new_section.text = text;
-	new_section.theme = theme;
+	new_section.SetMessage( c_string, length );
+	new_section.SetTheme( theme );
 	record += new_section;
 	return record;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BITCRAFTE_ENGINE_API
-auto bc::diagnostic::MakePrintRecord( bc::internal_::SimpleTextView32 text ) -> PrintRecord
-{
-	return MakePrintRecord( text, PrintRecordTheme::DEFAULT );
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BITCRAFTE_ENGINE_API
-auto bc::diagnostic::MakePrintRecord_SourceLocation( const SourceLocation & source_location ) -> PrintRecord
+auto bc::diagnostic::MakePrintRecord_SourceLocation( const SourceLocation & source_location ) noexcept -> PrintRecord
 {
 	auto record = MakePrintRecord_Argument( U"File", source_location.GetFile() );
 	record += MakePrintRecord( U"\n" );

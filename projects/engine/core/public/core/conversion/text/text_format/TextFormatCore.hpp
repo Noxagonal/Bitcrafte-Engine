@@ -3,7 +3,8 @@
 #include "TextFormatter.hpp"
 #include <core/diagnostic/exception/Exception.hpp>
 #include "specializations/PrimitiveTextFormatter.hpp"
-#include <core/conversion/text/primitives/TextToPrimitiveConversion.hpp>
+#include <core/conversion/text/primitives/StringToPrimitiveConversion.hpp>
+#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 
 
 
@@ -15,7 +16,7 @@ namespace internal_ {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<utility::TextContainerView TextContainerType>
-constexpr void TextFormat_Collector(
+constexpr void TextFormat_ArgumentParser(
 	i64											current_argument,
 	i64											requested_argument,
 	typename TextContainerType::ThisFullType&	out,
@@ -29,7 +30,7 @@ template<
 	typename					FirstType,
 	typename					...RestTypePack
 >
-constexpr void TextFormat_Collector(
+constexpr void TextFormat_ArgumentParser(
 	i64											current_argument,
 	i64											requested_argument,
 	typename TextContainerType::ThisFullType&	out,
@@ -43,7 +44,7 @@ constexpr void TextFormat_Collector(
 		formatter.Parse( parse_text );
 		formatter.Format( out, first );
 	} else {
-		TextFormat_Collector(
+		TextFormat_ArgumentParser(
 			current_argument + 1,
 			requested_argument,
 			out,
@@ -52,6 +53,31 @@ constexpr void TextFormat_Collector(
 		);
 	}
 };
+
+
+
+template<utility::TextContainerView TextContainerType>
+constexpr auto TextFormat_ConvertTextToUTF32( const TextContainerType &in ) -> typename TextContainerType::template ThisContainerFullType<c32>
+{
+	using TextFullType32 = typename TextContainerType::template ThisContainerFullType<c32>;
+
+	auto out = TextFullType32 {};
+	out.Resize( in.Size() );
+	auto conversion_result = conversion::UTFConvert<c32>(
+		out.Data(),
+		out.Data() + out.Size(),
+		in.Data(),
+		in.Data() + in.Size()
+	);
+	out.Resize( conversion_result.code_unit_count );
+	if( conversion_result.outcome != conversion::UTFConvertResult::Outcome::SUCCESS )
+	{
+		// We should practically never get here.
+		out = U"[Internal error, text format failed to convert text to UTF-32]";
+	}
+
+	return out;
+}
 
 
 
@@ -139,9 +165,6 @@ constexpr auto TextFormat(
 	i64 current_argument = 0;
 	TextViewType argument_parse_text;
 
-	// TODO: Get rid of std::from_chars and std::isdigit inside TextFormat function
-	// to lower dependencies to libraries, use our own primitive conversion instead.
-
 	auto it = format_text.begin();
 	while( it != format_text.end() )
 	{
@@ -154,29 +177,25 @@ constexpr auto TextFormat(
 			{
 				if( *it >= TextCharacterType( '0' ) && *it <= TextCharacterType( '9' ) )
 				{
-					auto arg_number_end_it = it;
-					bool found_end = false;
-
-					while( arg_number_end_it != format_text.end() )
-					{
-						if( *arg_number_end_it == TextCharacterType( ':' ) )
-						{
-							found_end = true;
-							break;
-
-						}
-						else if( *arg_number_end_it == TextCharacterType( '}' ) )
-						{
-							found_end = true;
-							break;
-						}
-						++arg_number_end_it;
-					}
-					BAssert( found_end,
-						TextFullType32( U"Error while formatting text, missing \"}\", format text: \"" ) +
-						conversion::ToUTF32( format_text ) + U"\""
+					auto arg_number_text = format_text.SubText( it );
+					auto conversion_result = conversion::StringToInteger(
+						current_argument,
+						arg_number_text.Data(),
+						arg_number_text.Data() + arg_number_text.Size()
 					);
-					it += conversion::TextToPrimitive( current_argument, format_text.SubText( it, arg_number_end_it ) );
+					it += conversion_result.length;
+					if( conversion_result.outcome != conversion::StringToPrimitiveResult::Outcome::SUCCESS )
+					{
+						auto message_print_record = diagnostic::MakePrintRecord(
+							U"Error while formatting text, missing \"}\""
+						);
+						message_print_record += diagnostic::MakePrintRecord_Argument(
+							U"format text",
+							internal_::TextFormat_ConvertTextToUTF32( format_text )
+						);
+						diagnostic::Throw( diagnostic::Exception( message_print_record ) );
+					}
+					continue;
 				}
 				else if( *it == ':' )
 				{
@@ -195,40 +214,58 @@ constexpr auto TextFormat(
 						++it;
 					}
 
-					BAssert( found_end,
-						TextFullType32( U"Error while formatting text, missing \"}\", format text: \"" ) +
-						conversion::ToUTF32( format_text ) + U"\""
-					);
+					if( !found_end )
+					{
+						auto message_print_record = diagnostic::MakePrintRecord(
+							U"Error while formatting text, missing \"}\""
+						);
+						message_print_record += diagnostic::MakePrintRecord_Argument(
+							U"format text",
+							internal_::TextFormat_ConvertTextToUTF32( format_text )
+						);
+						diagnostic::Throw( diagnostic::Exception( message_print_record ) );
+					}
 
 					auto end = it;
 					argument_parse_text = TextViewType { begin, end };
+					continue;
 				}
 				else if( *it == ' ' )
 				{
 					// Allow spaces in formatting
 					++it;
+					continue;
 				}
 				else
 				{
-					diagnostic::Throw(
-						TextFullType32( U"Error while formatting text, \"{\" must be followed by a number, \":\" or \"}\", format text: \"" ) +
-						conversion::ToUTF32( format_text ) + U"\""
+					auto message_print_record = diagnostic::MakePrintRecord(
+						U"Error while formatting text, \"{\" must be followed by a number, \":\" or \"}\""
 					);
+					message_print_record += diagnostic::MakePrintRecord_Argument(
+						U"format text",
+						internal_::TextFormat_ConvertTextToUTF32( format_text )
+					);
+					diagnostic::Throw( diagnostic::Exception( message_print_record ) );
 				}
 			}
-			// Do formatting.
 			if( current_argument >= args_count )
 			{
-				auto current_argument_as_text = TextFullType32 {};
-				auto argument_count_as_text = TextFullType32 {};
-				conversion::PrimitiveToText<TextFullType32>( current_argument_as_text, current_argument );
-				conversion::PrimitiveToText<TextFullType32>( argument_count_as_text, args_count );
-				diagnostic::Throw( TextFullType32( U"Error while formatting text, text argument number out of range, format text: \"" ) +
-					U"\".\nTried accessing argument :\"" + current_argument_as_text +
-					U"\".\nNumber of arguments: \"" + argument_count_as_text + U"\""
+				auto message_print_record = diagnostic::MakePrintRecord( U"Error while formatting text, text argument number out of range" );
+				message_print_record += diagnostic::MakePrintRecord_ArgumentList(
+					U"Tried accessing argument", current_argument,
+					U"Number of arguments", args_count
 				);
+				diagnostic::Throw( diagnostic::Exception( message_print_record ) );
 			}
-			internal_::TextFormat_Collector( 0, current_argument, out_buffer, argument_parse_text, std::forward<ArgumentsTypePack>( args )... );
+
+			// Do formatting.
+			internal_::TextFormat_ArgumentParser(
+				0,
+				current_argument,
+				out_buffer,
+				argument_parse_text,
+				std::forward<ArgumentsTypePack>( args )...
+			);
 			argument_parse_text = {};
 
 			++current_argument;

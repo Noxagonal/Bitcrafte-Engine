@@ -4,7 +4,6 @@
 
 #include <core/diagnostic/logger/LogReportSeverity.hpp>
 #include <core/diagnostic/print_record/PrintRecordTheme.hpp>
-#include <core/containers/simple/SimpleText.hpp>
 
 
 
@@ -15,11 +14,11 @@ namespace diagnostic {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-auto LogReportSeverityToText( LogReportSeverity e ) -> bc::internal_::SimpleTextView32;
+auto LogReportSeverityToCString( LogReportSeverity e ) noexcept -> const c32*;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BITCRAFTE_ENGINE_API
-auto LogReportSeverityToPrintRecordTheme( LogReportSeverity e ) -> PrintRecordTheme;
+auto LogReportSeverityToPrintRecordTheme( LogReportSeverity e ) noexcept -> PrintRecordTheme;
 
 
 

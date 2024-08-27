@@ -1,25 +1,85 @@
 #pragma once
 
-#include <core/containers/simple/SimpleText.hpp>
 #include <core/diagnostic/exception/Exception.hpp>
+#include <core/diagnostic/print_record/PrintRecordFactory.hpp>
 #include "../TextFormatter.hpp"
-#include <core/conversion/text/primitives/PrimitiveToTextConversion.hpp>
-#include <core/conversion/text/primitives/TextToPrimitiveConversion.hpp>
+#include <core/conversion/text/primitives/PrimitiveToStringConversion.hpp>
+#include <core/conversion/text/primitives/StringToPrimitiveConversion.hpp>
 #include <core/conversion/text/utf/UTFConversion.hpp>
 #include <core/diagnostic/assertion/Assert.hpp>
+#include <core/containers/Text.hpp>
+
+#include <cctype>
 
 
 
 namespace bc {
 namespace text {
+namespace internal_ {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	utility::TextContainerView	ParseTextType,
+	i64							MessageBeginCharacterArraySize
+>
+auto MakeTextFormatStingErrorMessage(
+	const c32( &message_begin )[ MessageBeginCharacterArraySize ],
+	const ParseTextType & format_text
+) -> diagnostic::PrintRecord
+{
+	auto message_print_record = diagnostic::MakePrintRecord( message_begin );
+	message_print_record += diagnostic::MakePrintRecord_Argument(
+		U"format_text",
+		format_text
+	);
+	return message_print_record;
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	utility::TextContainerView	ParseTextType,
+	i64							MessageBeginCharacterArraySize
+>
+void ThrowFormatStringError(
+	const c32( &message_begin )[ MessageBeginCharacterArraySize ],
+	const ParseTextType&				parse_text,
+	const diagnostic::SourceLocation&	source_location		= diagnostic::SourceLocation::Current(),
+	const diagnostic::StackTrace&		stack_trace			= diagnostic::StackTrace::Current()
+)
+{
+	auto message = MakeTextFormatStingErrorMessage(
+		message_begin,
+		parse_text
+	);
+	diagnostic::Throw( diagnostic::Exception( message, source_location, stack_trace ) );
+}
 
-////////////////////////////////////////////////////////////////
-// Bitcrafte Text types
-////////////////////////////////////////////////////////////////
+template<
+	typename				OutTextCharacterType,
+	utility::TextContainer	InputTextContainerType
+>
+auto MakeUTFConvertedText(
+	const InputTextContainerType& in
+) -> TextBase<OutTextCharacterType>
+{
+	using InTextCharacterType = typename InputTextContainerType::ContainedCharacterType;
 
+	auto out = TextBase<OutTextCharacterType>();
+	out.Resize( in.Size() * std::min( 1, sizeof( InTextCharacterType ) / sizeof( OutTextCharacterType ) ) );
 
+	auto conversion_result = conversion::UTFConvert<OutTextCharacterType, InTextCharacterType>(
+		out.Data(),
+		out.Data() + out.Size(),
+		in.Data(),
+		in.Data() + in.Size()
+	);
+	BAssert( conversion_result.outcome == conversion::UTFConvertResult::Outcome::SUCCESS, "error converting UTF text in text formatter" );
+
+	out.Resize( conversion_result.code_unit_count );
+	return out;
+}
+
+} // namespace internal_
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
@@ -42,71 +102,48 @@ public:
 	{
 		if( !parse_text.IsEmpty() )
 		{
-			diagnostic::Throw(
-				OutTextContainerFullType<c32>( U"Unsupported text format options while formatting text, unrecognized parse text: \"" ) +
-				conversion::ToUTF32( parse_text ) + U"\""
+			internal_::ThrowFormatStringError(
+				U"Unsupported text format options while formatting text: \"",
+				parse_text
 			);
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Format( OutTextFullType & out, const ValueTextContainerType & in )
+	constexpr void Format( OutTextFullType& out, const ValueTextContainerType& in )
 	{
-		if constexpr( std::is_same_v<OutTextCharacterType, ValueTextCharacterType> )
+		static_assert(
+			!utility::SameAs<OutTextCharacterType, char> || utility::SameAs<ValueTextCharacterType, char>,
+			"Cannot convert from unicode to char, output text type can only be char if input text type is also char"
+		);
+
+		if constexpr( utility::SameAs<OutTextCharacterType, ValueTextCharacterType> )
 		{
 			out.Append( in );
-
 		}
 		else
 		{
-			if constexpr( std::is_same_v<OutTextCharacterType, char8_t> )
-			{
-				out.Append( conversion::ToUTF8( in ) );
-
-			}
-			else if constexpr( std::is_same_v<OutTextCharacterType, char16_t> )
-			{
-				out.Append( conversion::ToUTF16( in ) );
-
-			}
-			else if constexpr( std::is_same_v<OutTextCharacterType, char32_t> )
-			{
-				out.Append( conversion::ToUTF32( in ) );
-
-			}
-			else
-			{
-				diagnostic::Throw(
-					U"Cannot format text, tried converting from an UTF text to char, Bitcrafte considers char to be ASCII and thus cannot handle UTF text"
-				);
-			}
+			out.Append( internal_::MakeUTFConvertedText<OutTextCharacterType>( in ) );
 		}
 	}
 };
 
 
 
-////////////////////////////////////////////////////////////////
-// C-string types
-////////////////////////////////////////////////////////////////
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-concept FormatterCStringType =
-std::is_same_v<T, char> ||
-std::is_same_v<T, wchar_t> ||
-std::is_same_v<T, char8_t> ||
-std::is_same_v<T, char16_t> ||
-std::is_same_v<T, char32_t>;
+concept FormatterCString =
+	utility::SameAs<T, char> ||
+	utility::SameAs<T, c8> ||
+	utility::SameAs<T, c16> ||
+	utility::SameAs<T, c32>;
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
 	utility::TextContainerView	OutTextContainerType,
-	FormatterCStringType		ValueTextType
+	FormatterCString			ValueTextType
 >
 class TextFormatter<OutTextContainerType, const ValueTextType*>
 {
@@ -123,14 +160,15 @@ public:
 	{
 		if( !parse_text.IsEmpty() )
 		{
-			diagnostic::Throw(
-				OutTextContainerFullType<c32>( U"Unsupported text format options while formatting c-style string, unrecognized parse text: \"" ) + conversion::ToUTF32( parse_text ) + "\""
+			internal_::ThrowFormatStringError(
+				U"Unsupported text format options while formatting c-style string: \"",
+				parse_text
 			);
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Format( OutTextFullType & out, const ValueTextType * in )
+	constexpr void Format( OutTextFullType& out, const ValueTextType* in )
 	{
 		while( *in != '\0' )
 		{
@@ -143,10 +181,10 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<
 	utility::TextContainerView	OutTextContainerType,
-	FormatterCStringType		ValueTextType,
-	u64							StringArraySize
+	FormatterCString			ValueTextType,
+	u64							CharacterArraySize
 >
-class TextFormatter<OutTextContainerType, ValueTextType[ StringArraySize ]>
+class TextFormatter<OutTextContainerType, ValueTextType[ CharacterArraySize ]>
 {
 	using OutTextFullType = typename OutTextContainerType::ThisFullType;
 	template<typename CharacterType>
@@ -163,336 +201,29 @@ public:
 	{
 		if( !parse_text.IsEmpty() )
 		{
-			diagnostic::Throw(
-				OutTextContainerFullType<c32>( U"Unsupported text format options while formatting c-style string, unrecognized parse text: \"" ) +
-				conversion::ToUTF32( parse_text ) + U"\""
+			internal_::ThrowFormatStringError(
+				U"Unsupported text format options while formatting c-style string: \"",
+				parse_text
 			);
 		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Format( OutTextFullType & out, const ValueTextType( &in )[ StringArraySize ] )
+	constexpr void Format( OutTextFullType & out, const ValueTextType( &in )[ CharacterArraySize ] )
 	{
-		if constexpr( std::is_same_v<OutTextCharacterType, ValueTextCharacterType> )
-		{
-			out.Append( InTextAsOutViewType { in, StringArraySize } );
+		static_assert(
+			!utility::SameAs<OutTextCharacterType, char> || utility::SameAs<ValueTextCharacterType, char>,
+			"Cannot convert from unicode to char, output text type can only be char if input text type is also char"
+		);
 
+		if constexpr( utility::SameAs<OutTextCharacterType, ValueTextCharacterType> )
+		{
+			out.Append( in );
 		}
 		else
 		{
-			if constexpr( std::is_same_v<OutTextCharacterType, char8_t> )
-			{
-				out.Append( conversion::ToUTF8( InTextAsOutViewType { in, StringArraySize } ) );
-			}
-			else if constexpr( std::is_same_v<OutTextCharacterType, char16_t> )
-			{
-				out.Append( conversion::ToUTF16( InTextAsOutViewType { in, StringArraySize } ) );
-			}
-			else if constexpr( std::is_same_v<OutTextCharacterType, char32_t> )
-			{
-				out.Append( conversion::ToUTF32( InTextAsOutViewType { in, StringArraySize } ) );
-			}
-			else
-			{
-				diagnostic::Throw(
-					OutTextContainerFullType<c32>( U"Cannot format text, tried converting from an UTF text to char, Bitcrafte considers char to be ASCII and thus cannot handle UTF text, input text: \"" ) +
-					conversion::ToUTF32( InTextAsOutViewType { in, StringArraySize } ) + "\""
-				);
-			}
+			out.Append( internal_::MakeUTFConvertedText<OutTextCharacterType>( TextViewBase<ValueTextCharacterType>( in ) ) );
 		}
-	}
-};
-
-
-
-////////////////////////////////////////////////////////////////
-// Number types
-////////////////////////////////////////////////////////////////
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename T>
-concept FormatterIntegerType =
-std::is_same_v<T, i8> ||
-std::is_same_v<T, u8> ||
-std::is_same_v<T, i16> ||
-std::is_same_v<T, u16> ||
-std::is_same_v<T, i32> ||
-std::is_same_v<T, u32> ||
-std::is_same_v<T, i64> ||
-std::is_same_v<T, u64>;
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<
-	utility::TextContainerView	OutTextContainerType,
-	FormatterIntegerType		IntegerType
->
-class TextFormatter<OutTextContainerType, IntegerType>
-{
-	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
-	template<typename CharacterType>
-	using OutTextContainerFullType = typename OutTextContainerType::template ThisContainerFullType<CharacterType>;
-	using OutTextFullType = typename OutTextContainerType::ThisFullType;
-	using OutTextViewType = typename OutTextContainerType::template ThisViewType<true>;
-
-	conversion::IntegerToTextConversionFormat base = conversion::IntegerToTextConversionFormat::DECIMAL;
-	i64 zero_fill = 0;
-
-public:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Parse( const OutTextViewType parse_text )
-	{
-		auto it = parse_text.begin();
-		auto end = parse_text.end();
-		while( it != end )
-		{
-			if( *it == 'b' )
-			{
-				base = conversion::IntegerToTextConversionFormat::BINARY;
-				++it;
-			}
-			else if( *it == 'o' )
-			{
-				base = conversion::IntegerToTextConversionFormat::OCTAL;
-				++it;
-			}
-			else if( *it == 'x' )
-			{
-				base = conversion::IntegerToTextConversionFormat::HEX;
-				++it;
-			}
-			else if( *it == 'z' )
-			{
-				++it;
-				BAssert(
-					it.IsInBounds(),
-					OutTextContainerFullType<c32>( U"Unsupported text format options while formatting integer primitive type, "
-						"invalid number format while parsing integer zero fill parse text, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + U"\n"
-				);
-				BAssert( zero_fill <= 1024,
-					OutTextContainerFullType<c32>( U"Unsupported text format options while formatting integer primitive type, "
-						"too many zeroes requested from zero fill, current limit is 1024, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + U"\n"
-				);
-				it += conversion::TextToPrimitive(
-					zero_fill,
-					parse_text.SubText( it, parse_text.end() ),
-					conversion::TextToIntegerConversionFormat::DECIMAL
-				);
-			}
-			else
-			{
-				diagnostic::Throw(
-					OutTextContainerFullType<c32>( U"Unsupported text format options while formatting integer primitive type, unrecognized parse text: " ) +
-					conversion::ToUTF32( parse_text ) + U"\n"
-				);
-			}
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Format( OutTextFullType & out, const IntegerType & in )
-	{
-		if( zero_fill )
-		{
-			OutTextFullType buffer;
-			conversion::PrimitiveToText( buffer, in, base );
-			if( buffer.Size() < zero_fill )
-			{
-				u64 add_count = zero_fill - buffer.Size();
-				for( u64 i = 0; i < add_count; ++i )
-				{
-					out.PushBack( '0' );
-				}
-			}
-			out.Append( buffer );
-		}
-		else
-		{
-			conversion::PrimitiveToText( out, in, base );
-		}
-	}
-};
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<typename T>
-concept FormatterFloatingType =
-std::is_same_v<T, f32> ||
-std::is_same_v<T, f64>;
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template<
-	utility::TextContainerView	OutTextContainerType,
-	FormatterFloatingType		FloatType
->
-class TextFormatter<OutTextContainerType, FloatType>
-{
-	using OutTextFullType = typename OutTextContainerType::ThisFullType;
-	template<typename CharacterType>
-	using OutTextContainerFullType = typename OutTextContainerType::template ThisContainerFullType<CharacterType>;
-	using OutTextViewType = typename OutTextContainerType::template ThisViewType<true>;
-	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
-
-	conversion::FloatToTextConversionFormat float_to_text_conversion_format = conversion::FloatToTextConversionFormat::GENERAL;
-	i64 requested_decimal_count = INT64_MAX;
-	bool decimals_set = false;
-
-public:
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Parse( const OutTextViewType parse_text )
-	{
-		bool first_format_setting = true;
-		auto it = parse_text.begin();
-		auto end = parse_text.end();
-		while( it != end )
-		{
-			if( *it == 'f' )
-			{
-				if( first_format_setting )
-				{
-					first_format_setting = false;
-					float_to_text_conversion_format = {};
-				}
-				float_to_text_conversion_format = float_to_text_conversion_format | conversion::FloatToTextConversionFormat::FIXED;
-
-			}
-			else if( *it == 's' )
-			{
-				if( first_format_setting )
-				{
-					first_format_setting = false;
-					float_to_text_conversion_format = {};
-				}
-				float_to_text_conversion_format = float_to_text_conversion_format | conversion::FloatToTextConversionFormat::SCIENTIFIC;
-
-			}
-			else if( *it == 'x' )
-			{
-				if( first_format_setting )
-				{
-					first_format_setting = false;
-					float_to_text_conversion_format = {};
-				}
-				float_to_text_conversion_format = float_to_text_conversion_format | conversion::FloatToTextConversionFormat::HEX;
-
-			}
-			else if( *it == '.' )
-			{
-				++it;
-				it += conversion::TextToPrimitive(
-					requested_decimal_count,
-					parse_text.SubText( it, parse_text.end() ),
-					conversion::TextToIntegerConversionFormat::DECIMAL
-				);
-				decimals_set = true;
-				BAssert(
-					it.IsValid(),
-					OutTextContainerFullType<c32>( U"Unsupported text format options while formatting floating primitive type, "
-						"invalid number format while parsing floating point decimal count, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + U"\n"
-				);
-				BAssert( requested_decimal_count <= 1024,
-					OutTextContainerFullType<c32>( U"Unsupported text format options while formatting integer primitive type, "
-						"too many decimal numbers requested from floating point text parser, current limit is 1024, unrecognized parse text: \"" ) +
-					conversion::ToUTF32( parse_text ) + U"\n"
-				);
-			}
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	constexpr void Format( OutTextFullType & out, const FloatType & in )
-	{
-		OutTextFullType buffer;
-		conversion::PrimitiveToText( buffer, in, float_to_text_conversion_format );
-
-		auto remaining_decimals = requested_decimal_count;
-
-		enum class ParseState
-		{
-			WHOLE,
-			DECIMAL,
-			DECIMAL_NOT_INCLUDED,
-			REMAINDER,
-		};
-		ParseState parse_state = ParseState::WHOLE;
-		for( u64 i = 0; i < buffer.Size(); ++i )
-		{
-			auto c = buffer[ i ];
-
-			switch( parse_state )
-			{
-			case ParseState::WHOLE:
-			{
-				out.PushBack( c );
-				if( c == '.' )
-				{
-					parse_state = ParseState::DECIMAL;
-				}
-				break;
-			}
-
-			case ParseState::DECIMAL:
-			{
-				if( c < '0' || c > '9' )
-				{
-					parse_state = ParseState::REMAINDER;
-					if( decimals_set )
-					{
-						for( u64 d = 0; d < remaining_decimals; ++d )
-						{
-							out.PushBack( '0' );
-						}
-					}
-					remaining_decimals = 0;
-					out.PushBack( c );
-					break;
-				}
-
-				if( remaining_decimals )
-				{
-					--remaining_decimals;
-				}
-				else
-				{
-					parse_state = ParseState::DECIMAL_NOT_INCLUDED;
-				}
-				out.PushBack( c );
-				break;
-			}
-
-			case ParseState::DECIMAL_NOT_INCLUDED:
-			{
-				if( c <= '0' || c >= '9' )
-				{
-					out.PushBack( c );
-					parse_state = ParseState::REMAINDER;
-					break;
-				}
-				break;
-			}
-
-			case ParseState::REMAINDER:
-			{
-				out.PushBack( c );
-				break;
-			}
-
-			default:
-				assert( 0 && "Invalid parse state" );
-			}
-		}
-		remaining_decimals = 0;
 	}
 };
 
@@ -521,10 +252,9 @@ public:
 		}
 		else
 		{
-			diagnostic::Throw(
-				OutTextContainerFullType<c32>( U"Unsupported text format options while formatting boolean primitive type, "
-					"unrecognized parse text: \"" ) +
-				conversion::ToUTF32( parse_text ) + U"\n"
+			internal_::ThrowFormatStringError(
+				U"Unsupported text format options while formatting boolean primitive type: \"",
+				parse_text
 			);
 		}
 	}
@@ -549,6 +279,408 @@ public:
 			return;
 		}
 		out.Append( "false" );
+	}
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename T>
+concept FormatterIntegerType =
+	utility::SameAs<T, i8> ||
+	utility::SameAs<T, u8> ||
+	utility::SameAs<T, i16> ||
+	utility::SameAs<T, u16> ||
+	utility::SameAs<T, i32> ||
+	utility::SameAs<T, u32> ||
+	utility::SameAs<T, i64> ||
+	utility::SameAs<T, u64>;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	utility::TextContainerView	OutTextContainerType,
+	FormatterIntegerType		IntegerType
+>
+class TextFormatter<OutTextContainerType, IntegerType>
+{
+	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
+	template<typename CharacterType>
+	using OutTextContainerFullType = typename OutTextContainerType::template ThisContainerFullType<CharacterType>;
+	using OutTextFullType = typename OutTextContainerType::ThisFullType;
+	using OutTextViewType = typename OutTextContainerType::template ThisViewType<true>;
+
+	i64 zero_fill = 0;
+	conversion::IntegerToStringConversionFormat base = conversion::IntegerToStringConversionFormat::DECIMAL;
+	bool add_prefix = false;
+	bool uppercase = false;
+
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr void Parse( const OutTextViewType parse_text )
+	{
+		auto it = parse_text.begin();
+		auto end = parse_text.end();
+		while( it != end )
+		{
+			if( *it == 'b' )
+			{
+				base = conversion::IntegerToStringConversionFormat::BINARY;
+				++it;
+			}
+			else if( *it == 'o' )
+			{
+				base = conversion::IntegerToStringConversionFormat::OCTAL;
+				++it;
+			}
+			else if( *it == 'x' )
+			{
+				base = conversion::IntegerToStringConversionFormat::HEX;
+				++it;
+			}
+			else if( *it == 'p' )
+			{
+				add_prefix = true;
+				++it;
+			}
+			else if( *it == 'u' )
+			{
+				uppercase = true;
+				++it;
+			}
+			else if( *it == 'z' )
+			{
+				++it;
+				BAssert(
+					it.IsInBounds(),
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting integer primitive type, "
+						"while parsing integer zero fill parse text, expected a digit after \"z\"",
+						parse_text
+					)
+				);
+				BAssert(
+					std::isdigit( *it ),
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting integer primitive type "
+						"while parsing integer zero fill parse text, expected a digit after \"z\"",
+						parse_text
+					)
+				);
+				auto conversion_result = conversion::StringToInteger<OutTextCharacterType>(
+					zero_fill,
+					it.GetAddress(),
+					end.GetAddress()
+				);
+				it += conversion_result.length;
+				BAssert(
+					conversion_result.outcome == conversion::StringToPrimitiveResult::Outcome::SUCCESS,
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting integer primitive type, "
+						"invalid number while parsing zero-fill from parse text",
+						parse_text
+					)
+				);
+				BAssert(
+					zero_fill <= 1024,
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting integer primitive type, "
+						"too many zeroes requested from zero fill, current limit is 1024",
+						parse_text
+					)
+				);
+			}
+			else
+			{
+				++it;
+				internal_::ThrowFormatStringError(
+					U"Unsupported text format options while formatting integer primitive type",
+					parse_text
+				);
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr void Format( OutTextFullType & out, const IntegerType & in )
+	{
+		auto ResizeInitialOrToCapacity = [ this, &out ]()
+			{
+				if( out.Size() <= 0 )
+				{
+					out.Resize( zero_fill + 128 );
+				}
+				else
+				{
+					out.Resize( out.Capacity() );
+				}
+			};
+
+		auto TryConvert = [ this, in ](
+			OutTextCharacterType* text_buffer_begin,
+			OutTextCharacterType* text_buffer_end
+			) -> conversion::PrimitiveToStringResult
+			{
+				if constexpr( std::is_signed_v<IntegerType> )
+				{
+					return conversion::IntegerToString(
+						text_buffer_begin,
+						text_buffer_end,
+						in,
+						this->base,
+						this->add_prefix,
+						this->uppercase
+					);
+				}
+				else
+				{
+					return conversion::UnsignedIntegerToString(
+						text_buffer_begin,
+						text_buffer_end,
+						in,
+						this->base,
+						this->add_prefix,
+						this->uppercase
+					);
+				}
+			};
+
+		auto DoZeroFill = [ this ](
+			OutTextCharacterType* text_buffer_begin,
+			OutTextCharacterType* text_buffer_end,
+			i64 number_of_written_characters
+			)
+			{
+				// zero_fill is is the total required length.
+				// Range [text_buffer_begin, text_buffer_end] is the total length of the text buffer we have to work within and should always be large enough.
+				if( number_of_written_characters >= zero_fill ) return;
+
+				i64 text_range = text_buffer_end - text_buffer_begin;
+				BEngineAssert( text_range <= zero_fill, U"Range was larger than zero_fill, this should never happen" );
+
+				// number_of_written_characters is the number of characters written to the text buffer starting from the beginning.
+				// zero_add_count is the number of zeros that must be added to the text buffer to make it the same length as zero_fill,
+				//   if this is negative, do nothing. Should never be below zero because we checked for that above.
+
+				i64 zero_add_count = zero_fill - number_of_written_characters;
+				for( i64 i = number_of_written_characters - 1; i >= 0; --i )
+				{
+					text_buffer_begin[ i + zero_add_count ] = text_buffer_begin[ i ];
+				}
+				for( i64 i = 0; i < zero_add_count; ++i )
+				{
+					text_buffer_begin[ i ] = '\0';
+				}
+			};
+
+		// Resize output buffer to hold converted text.
+		auto original_out_size = out.Size();
+		ResizeInitialOrToCapacity();
+
+		// Try to convert to text without allocating more space first.
+		auto conversion_result = TryConvert(
+			out.Data() + original_out_size,
+			out.Data() + out.Size()
+		);
+		if( conversion_result.outcome == conversion::PrimitiveToStringResult::Outcome::INCOMPLETE )
+		{
+			// If incomplete, reallocate output text container with enough space to contain any integer value.
+			out.Resize( original_out_size + zero_fill + 128 );
+
+			conversion_result = TryConvert(
+				out.Data() + original_out_size,
+				out.Data() + out.Size()
+			);
+		}
+		BAssert(
+			conversion_result.outcome == conversion::PrimitiveToStringResult::Outcome::SUCCESS,
+			U"Unable to convert integer primitive type to text"
+		);
+
+		DoZeroFill(
+			out.Data() + original_out_size,
+			out.Data() + out.Size(),
+			conversion_result.length
+		);
+
+		i64 size_increase = std::max( conversion_result.length, zero_fill );
+		out.Resize( original_out_size + size_increase );
+	}
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<typename T>
+concept FormatterFloatingType =
+	utility::SameAs<T, f32> ||
+	utility::SameAs<T, f64>;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template<
+	utility::TextContainerView	OutTextContainerType,
+	FormatterFloatingType		FloatType
+>
+class TextFormatter<OutTextContainerType, FloatType>
+{
+	using OutTextFullType = typename OutTextContainerType::ThisFullType;
+	template<typename CharacterType>
+	using OutTextContainerFullType = typename OutTextContainerType::template ThisContainerFullType<CharacterType>;
+	using OutTextViewType = typename OutTextContainerType::template ThisViewType<true>;
+	using OutTextCharacterType = typename OutTextContainerType::ContainedCharacterType;
+
+	conversion::FloatToStringConversionFormat float_to_text_conversion_format = conversion::FloatToStringConversionFormat::GENERAL;
+	i64 precision = -1;
+	bool uppercase = false;
+
+public:
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr void Parse( const OutTextViewType parse_text )
+	{
+		bool first_format_setting = true;
+		auto it = parse_text.begin();
+		auto end = parse_text.end();
+		while( it != end )
+		{
+			if( *it == 'f' )
+			{
+				if( first_format_setting )
+				{
+					first_format_setting = false;
+					float_to_text_conversion_format = {};
+				}
+				float_to_text_conversion_format = float_to_text_conversion_format | conversion::FloatToStringConversionFormat::FIXED;
+				++it;
+			}
+			else if( *it == 's' )
+			{
+				if( first_format_setting )
+				{
+					first_format_setting = false;
+					float_to_text_conversion_format = {};
+				}
+				float_to_text_conversion_format = float_to_text_conversion_format | conversion::FloatToStringConversionFormat::SCIENTIFIC;
+				++it;
+			}
+			else if( *it == 'x' )
+			{
+				if( first_format_setting )
+				{
+					first_format_setting = false;
+					float_to_text_conversion_format = {};
+				}
+				float_to_text_conversion_format = float_to_text_conversion_format | conversion::FloatToStringConversionFormat::HEX;
+				++it;
+			}
+			else if( *it == 'u' )
+			{
+				uppercase = true;
+				++it;
+			}
+			else if( *it == '.' )
+			{
+				++it;
+				BAssert(
+					it.IsInBounds(),
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting float primitive type, "
+						"while parsing float precision parse text, expected a digit after \".\"",
+						parse_text
+					)
+				);
+				BAssert(
+					std::isdigit( *it ),
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting float primitive type, "
+						"while parsing float precision parse text, expected a digit after \".\"",
+						parse_text
+					)
+				);
+				auto conversion_result = conversion::StringToInteger<OutTextCharacterType>(
+					precision,
+					it.GetAddress(),
+					end.GetAddress()
+				);
+				it += conversion_result.length;
+				BAssert(
+					conversion_result.outcome == conversion::StringToPrimitiveResult::Outcome::SUCCESS,
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting float primitive type, "
+						"while parsing float precision, invalid number after \".\"",
+						parse_text
+					)
+				);
+				BAssert(
+					precision <= 1024,
+					internal_::MakeTextFormatStingErrorMessage(
+						U"Unsupported text format options while formatting float primitive type, "
+						"too large float precision requested, current limit is 1024",
+						parse_text
+					)
+				);
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	constexpr void Format( OutTextFullType & out, const FloatType & in )
+	{
+		auto ResizeInitialOrToCapacity = [ this, &out ]()
+			{
+				if( out.Size() <= 0 )
+				{
+					auto zero_fill = i64( 0 );
+					if( ( float_to_text_conversion_format & conversion::FloatToStringConversionFormat::FIXED ) == conversion::FloatToStringConversionFormat::FIXED )
+					{
+						zero_fill = ( precision < 0 ) ? 0 : precision;
+					}
+					out.Resize( zero_fill + 128 );
+				}
+				else
+				{
+					out.Resize( out.Capacity() );
+				}
+			};
+
+		auto TryConvert = [ this, in ](
+			OutTextCharacterType* text_buffer_begin,
+			OutTextCharacterType* text_buffer_end
+			) -> conversion::PrimitiveToStringResult
+			{
+				return conversion::FloatToString(
+					text_buffer_begin,
+					text_buffer_end,
+					in,
+					float_to_text_conversion_format,
+					precision
+				);
+			};
+
+		auto original_out_size = out.Size();
+		ResizeInitialOrToCapacity();
+
+		auto conversion_result = TryConvert(
+			out.Data(),
+			out.Data() + out.Size()
+		);
+		if( conversion_result.outcome == conversion::PrimitiveToStringResult::Outcome::INCOMPLETE )
+		{
+			out.Resize( out.Size() + ( ( precision < 0 ) ? 0 : precision ) + 2048 ); // Retry with a much larger buffer
+			conversion_result = TryConvert(
+				out.Data(),
+				out.Data() + out.Size()
+			);
+		}
+		BAssert(
+			conversion_result.outcome == conversion::PrimitiveToStringResult::Outcome::SUCCESS,
+			U"Unable to convert float primitive type to text"
+		);
+		out.Resize( original_out_size + conversion_result.length );
 	}
 };
 
